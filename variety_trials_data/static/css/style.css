@@ -29,7 +29,18 @@
 
 .variety_trials__LSD_row 
 {
+	text-align: right;
+	padding-left: 0.2em;
+	padding-right: 0.2em;
+	border-right: 1px dotted #666;
+	width: 70px;
+	
 	background-color: #CCC;
+}
+
+.variety_trials__LSD_row th
+{
+	text-align: left;
 }
 
 .variety_trials__Column 
@@ -53,4 +64,28 @@
 	float: left; 
 	text-align:left;
 	display:inline;
+}
+
+#variety_trials__footer
+{
+	font-size: 0.8em;
+	text-align: center;
+}
+
+#variety_trials__footer p
+{
+	margin-bottom: 0.5em;
+}
+
+#variety_trials__footer ul
+{
+	margin-top: 0.5em;
+}
+
+#variety_trials__footer ul li
+{
+	list-style-type: none;
+	display: inline;
+	padding-left: 1em;
+
 }

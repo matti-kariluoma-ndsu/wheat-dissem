@@ -10,13 +10,14 @@ from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
 from variety_trials_data.Page import Page
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Scope
+from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Scope, LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
 import datetime
 try:
 	import simplejson as json # Python 2.5
 except ImportError:
 	import json # Python 2.6
 
+ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
 
 def index(request, abtest=None):
 	zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
@@ -224,39 +225,34 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			print cache_key
 			page = cache.get(cache_key)
 			if page is not None:
-				for table in page.tables:
+				for table in page.data_tables:
 					table.set_defaults(curyear, fieldname)
-				page.mask_locations(not_location_objects)
+					table.mask_locations(not_location_objects)
 			else:
-				page = Page(
-							locations,
-							number_locations,
-							not_location_objects,
-							curyear, 
-							year_range, 
-							fieldname, 
-							lsd_probability, 
-							break_into_subtables=break_into_subtables, 
-							varieties=varieties
-						)
-				"""
+
 				try:
 					page = Page(
-							locations,
-							curyear, 
-							year_range, 
-							fieldname, 
-							lsd_probability, 
-							break_into_subtables=break_into_subtables, 
-							varieties=varieties
-						)
+								locations,
+								number_locations,
+								not_location_objects,
+								curyear, 
+								year_range, 
+								fieldname, 
+								lsd_probability, 
+								break_into_subtables=break_into_subtables, 
+								varieties=varieties
+							)
+					cache.set(cache_key, page, 300) # expires after 300 seconds (5 minutes)
+				except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear) as error:
+					page = None
+					message = " ".join([ERROR_MESSAGE, error.message])
+					raise
 				except:
-					# TODO: Print message to the user telling them why we are exiting
-					return HttpResponseRedirect('/')
-				"""
-				cache.set(cache_key, page, 300) # expires after 300 seconds (5 minutes)
+					page = None
+					message = ERROR_MESSAGE
+					raise
 					
-			
+				
 			"""
 			import sys
 			for table in page.tables:
@@ -266,30 +262,73 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 						sys.stdout.write('\t'+unicode(cell))
 					sys.stdout.write(']\n')
 				print table.columns
-			"""
+			#"""
+			response = None
+			if page is not None:
+				try:
+					response = render_to_response(
+						'tabbed_object_table_view.html',
+						{
+							'hidden_zipcode_form': hidden_zipcode_form,
+							'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
+							'zipcode': zipcode,
+							'scope_get_string': '&%s' % (urlencode( [('scope', scope)] )),
+							'scope': scope,
+							'not_location_get_string': '&%s' % (urlencode([('not_location', l) for l in not_locations])),
+							'not_locations': not_locations,
+							'variety_get_string': '&%s' % (urlencode([('variety', v) for v in varieties])),
+							'varieties': varieties,
+							'year_get_string': '&%s' % (urlencode( [('year', curyear)] )),
+							'year_url_bit': year_url_bit,
+							'curyear': curyear,
+							'maxyear': maxyear,
+							'page': page,
+							'message': None,
+							'years': years,
+							'blurbs' : unit_blurbs,
+							'curfield' : fieldname,
+						},
+						context_instance=RequestContext(request)
+					)
+				except: # We have no expected exceptions for this code block
+					page = None
+					message = ERROR_MESSAGE
+					raise
 			
-			return render_to_response(
-				'tabbed_object_table_view.html',
-				{
-					'hidden_zipcode_form': hidden_zipcode_form,
-					'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
-					'zipcode': zipcode,
-					'scope_get_string': '&%s' % (urlencode( [('scope', scope)] )),
-					'scope': scope,
-					'not_location_get_string': '&%s' % (urlencode([('not_location', l) for l in not_locations])),
-					'not_locations': not_locations,
-					'variety_get_string': '&%s' % (urlencode([('variety', v) for v in varieties])),
-					'varieties': varieties,
-					'year_get_string': '&%s' % (urlencode( [('year', curyear)] )),
-					'year_url_bit': year_url_bit,
-					'curyear': curyear,
-					'page': page,
-					'years': years,
-					'blurbs' : unit_blurbs,
-					'curfield' : fieldname,
-				},
-				context_instance=RequestContext(request)
-			)
+			if response is None:
+				response = render_to_response(
+						'tabbed_object_table_view.html',
+						{
+							'hidden_zipcode_form': hidden_zipcode_form,
+							'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
+							'zipcode': zipcode,
+							'scope_get_string': '&%s' % (urlencode( [('scope', scope)] )),
+							'scope': scope,
+							'not_location_get_string': '&%s' % (urlencode([('not_location', l) for l in not_locations])),
+							'not_locations': not_locations,
+							'variety_get_string': '&%s' % (urlencode([('variety', v) for v in varieties])),
+							'varieties': varieties,
+							'year_get_string': '&%s' % (urlencode( [('year', curyear)] )),
+							'year_url_bit': year_url_bit,
+							'curyear': curyear,
+							'maxyear': maxyear,
+							'page': page,
+							'message': message,
+							'years': years,
+							'blurbs' : unit_blurbs,
+							'curfield' : fieldname,
+						},
+						context_instance=RequestContext(request)
+					)
+			
+			# TODO: is python's refcount/garbage collection enough?
+			"""
+			if page is not None:
+				page.clear() # clear references
+				page = None
+			#"""
+				
+			return response
 
 def zipcode_view(request, year_range, fieldname, abtest=None):
 	if request.method != 'GET':
