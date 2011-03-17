@@ -1,1 +1,9 @@
-TODO: Everything
+Prereqs:
+ Python:
+  Download and Install Python, version 2.4 or greater.
+ Django:
+  Download Django (http://www.djangoproject.com/download/)
+  Install Django (http://docs.djangoproject.com/en/dev/intro/install/)
+  Verify Django is installed correctly:
+   $ python -c  "import django; print django.get_version()"
+   # should print the version number and exit w/o errors
