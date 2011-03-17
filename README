@@ -7,3 +7,4 @@ Prereqs:
   Verify Django is installed correctly:
    $ python -c  "import django; print django.get_version()"
    # should print the version number and exit w/o errors
+
