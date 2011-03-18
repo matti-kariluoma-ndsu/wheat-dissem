@@ -8,3 +8,14 @@ Prereqs:
    $ python -c  "import django; print django.get_version()"
    # should print the version number and exit w/o errors
 
+Database/Models development:
+ Should you change one of the models, you must delete the old table
+ for that model before your change will take effect.
+  $ python manage.py dbshell
+  > .schema
+  # shows the database schema, look for your old table
+  # i.e. if the model you changed was called "Location" in the directory
+  # "wheat_data", then the table is probably called 
+  # "wheat_data_location".
+  > drop table wheat_data_location
+  # Hit Ctrl+D to exit.
