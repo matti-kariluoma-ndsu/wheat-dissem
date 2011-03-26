@@ -15,7 +15,10 @@ class Variety(models.Model):
   
   def __unicode__(self):
     return self.name
-    
+  
+  class Meta:
+    ordering = ["-name"]
+
 class Location(models.Model):
   name = models.CharField(max_length=200)
   zipcode = models.CharField(max_length=10)
@@ -48,7 +51,7 @@ class Entry(models.Model):
   plant_height = models.DecimalField(decimal_places=5, max_digits=10)
   year    = models.ForeignKey(Date)
   location= models.ForeignKey(Location)
-  name    = models.ForeignKey(Variety)
+  variety_name    = models.ForeignKey(Variety)
 
   def __unicode__(self):
-    return str(self.name)+" at "+str(self.location)+", "+str(self.year)
+    return str(self.variety_name)+" at "+str(self.location)+", "+str(self.year)
