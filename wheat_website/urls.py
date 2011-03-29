@@ -1,13 +1,13 @@
 from django.conf.urls.defaults import *
 from django.views.generic import list_detail
 from wheat_data.models import *
-from wheat_data.views import add_variety
+from wheat_data import views
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
-variety_info = {
+variety_dictionary = {
       # queries for all Variety Rows in the DB
     "queryset" : Variety.objects.all(),
       # sets which template we'd like to use
@@ -28,7 +28,9 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-    (r'^variety/', list_detail.object_list, variety_info),
-    (r'^add/', add_variety)
+    (r'^$', views.index),
+    (r'^variety/', list_detail.object_list, variety_dictionary),
+    (r'^add_variety/', views.add_variety),
+    (r'^add_trial/', views.add_trial_entry)
 
 )

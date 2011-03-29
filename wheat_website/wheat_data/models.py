@@ -62,28 +62,28 @@ class Date(models.Model):
     return str(self.date)
   
 class Trial_Entry(models.Model):
-  bushels_acre    = models.DecimalField(decimal_places=5, max_digits=10)
-  lodging_factor  = models.SmallIntegerField(blank=True, null=True)
-  test_weight     = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-  protein_percent = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-  plant_height    = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-  moisture_basis  = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-  previous_crop   = models.CharField(max_length=200, blank=True, null=True)
-  seeding_rate    = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-  days_to_head    = models.SmallIntegerField(blank=True, null=True)
-  jday_of_head    = models.SmallIntegerField(blank=True, null=True)
-  winter_survival_rate    = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-  kernel_weight   = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-  shatter         = models.SmallIntegerField(blank=True, null=True)
-  seeds_per_round = models.SmallIntegerField(blank=True, null=True)
-  canopy_density  = models.SmallIntegerField(blank=True, null=True)
-  canopy_height   = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-  days_to_flower  = models.SmallIntegerField(blank=True, null=True)
-  seed_oil_percent= models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-  plant_date      = models.ForeignKey(Date, related_name='plant_date', blank=True, null=True)
-  harvest_date    = models.ForeignKey(Date, related_name='harvest_date')
-  location        = models.ForeignKey(Location)
-  variety         = models.ForeignKey(Variety)
+  bushels_acre         = models.DecimalField(decimal_places=5, max_digits=10)
+  lodging_factor       = models.SmallIntegerField(blank=True, null=True)
+  test_weight          = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+  protein_percent      = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+  plant_height         = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+  moisture_basis       = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+  previous_crop        = models.CharField(max_length=200, blank=True, null=True)
+  seeding_rate         = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+  days_to_head         = models.SmallIntegerField(blank=True, null=True)
+  jday_of_head         = models.SmallIntegerField(blank=True, null=True)
+  winter_survival_rate = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+  kernel_weight        = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+  shatter              = models.SmallIntegerField(blank=True, null=True)
+  seeds_per_round      = models.SmallIntegerField(blank=True, null=True)
+  canopy_density       = models.SmallIntegerField(blank=True, null=True)
+  canopy_height        = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+  days_to_flower       = models.SmallIntegerField(blank=True, null=True)
+  seed_oil_percent     = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+  plant_date           = models.ForeignKey(Date, related_name='plant_date', blank=True, null=True)
+  harvest_date         = models.ForeignKey(Date, related_name='harvest_date')
+  location             = models.ForeignKey(Location)
+  variety              = models.ForeignKey(Variety)
 
   def __unicode__(self):
     return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.year)
@@ -92,3 +92,9 @@ class Trial_Entry(models.Model):
 class VarietyForm(ModelForm):
   class Meta:
     model = Variety
+    # exclude any ForeignKey or ManyToMany fields
+    exclude = ('diseases',)
+    
+class Trial_EntryForm(ModelForm):
+  class Meta:
+    model = Trial_Entry
