@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
 from django.views.generic import list_detail
 from wheat_data.models import *
+from wheat_data.views import add_variety
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -14,7 +15,7 @@ variety_info = {
       # changes the variable passed to the template from 'object_list' to 'variety_list'
     "template_object_name" : "variety",
       # sends along additional information, notice the lack of '()'
-    "extra_context" : {"entry_list" : Entry.objects.all}
+    "extra_context" : {"entry_list" : Trial_Entry.objects.all}
 }
 
 
@@ -27,6 +28,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-    (r'^variety/', list_detail.object_list, variety_info)
+    (r'^variety/', list_detail.object_list, variety_info),
+    (r'^add/', add_variety)
 
 )

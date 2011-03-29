@@ -8,7 +8,7 @@
               {{ variety.name }}
               <ul>
                 {% for entry in entry_list %}
-                  {% if entry.variety_name == variety %}
+                  {% if entry.variety == variety %}
                   <li>{{ entry.bushels_acre }} bushels</li>
                   {% endif %}
                 {% endfor %}
