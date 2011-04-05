@@ -37,9 +37,21 @@ class Disease_Entry(models.Model):
     return str(self.variety) + " has a " + str(self.susceptibility) 
     + "% susceptibility to " + str(self.disease)
 
+class Zipcode(models.Model):
+  zipcode          = models.PositiveIntegerField()
+  city             = models.CharField(max_length=200)
+  state            = models.CharField(max_length=2)
+  latitude         = models.DecimalField(decimal_places=10, max_digits=13)
+  longitude        = models.DecimalField(decimal_places=10, max_digits=13)
+  timezone         = models.SmallIntegerField()
+  daylight_savings = models.SmallIntegerField()
+  
+  def __unicode__(self):
+    return str(self.zipcode).zfill(5) + ": " + self.city + ", " + self.state
+
 class Location(models.Model):
   name                  = models.CharField(max_length=200)
-  zipcode               = models.CharField(max_length=10)
+  zipcode               = models.ForeignKey(Zipcode)
   latitude_degree       = models.SmallIntegerField(blank=True)
   latitude_minute       = models.SmallIntegerField(blank=True)
   latitude_second       = models.SmallIntegerField(blank=True)
