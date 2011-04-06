@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% for location in location_list %}
+  <h2>Your area, {{ location.zipcode }}</h2>
+    <ul>
+      <li>
+        {{ location.name }}
+        <ul>
+          {% for entry in trialentry_list %}
+            <li>{{ entry.bushels_acre }} bushels</li>
+          {% endfor %}
+        </ul>
+      </li>
+    </ul>
+  {% endfor %}
+  {% for lat in lat_list %}
+  <p>{{ lat }}</p>
+  {% endfor %}
+  {% for lon in lon_list %}
+  <p>{{ lon }}</p>
+  {% endfor %}
+{% endblock %}
