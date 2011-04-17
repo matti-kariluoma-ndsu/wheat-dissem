@@ -99,3 +99,5 @@ INSTALLED_APPS = (
     #'django.contrib.admindocs',
     'wheat_data'
 )
+
+STATIC_URL = 'wheat_data/static'

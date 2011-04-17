@@ -1,5 +1,7 @@
 from django.conf.urls.defaults import *
+#from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import list_detail
+from django.conf import settings
 from wheat_data.models import *
 from wheat_data import views
 
@@ -32,6 +34,10 @@ urlpatterns = patterns('',
     (r'^variety/', list_detail.object_list, variety_dictionary),
     #(r'^location/'),
     (r'^add_variety/', views.add_variety),
-    (r'^add_trial/', views.add_trial_entry)
-
+    (r'^add_trial/', views.add_trial_entry),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': settings.STATIC_URL})
 )
+
+
+#urlpatterns += staticfiles_urlpatterns()

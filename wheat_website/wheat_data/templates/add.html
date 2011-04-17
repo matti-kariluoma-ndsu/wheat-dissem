@@ -3,10 +3,20 @@
 {% block content %}
 <form action="#" method="post">
   {% csrf_token %}
-  {{ form.as_p }}
+  {% for field in form %}
+    <div class="input_row">
+      {{ field.errors }}
+      {{ field.label_tag }}: {{ field }}
+    </div>
+  {% endfor %}
   {{ formset.management_form }}
     {% for form in formset.forms %}
-        {{ form.as_p }}
+        {% for field in form %}
+          <div class="input_row">
+            {{ field.errors }}
+            {{ field.label_tag }}: {{ field }}
+          </div>
+        {% endfor %}
     {% endfor %}
   <input type="submit" value="Submit" />
 </form>
