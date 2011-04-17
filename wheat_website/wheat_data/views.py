@@ -4,7 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from wheat_data import models
 from wheat_data import wheat_forms
-from math import pi, sin, cos, asin, atan2
+from math import pi, sin, cos, asin, atan2, degrees, radians
 
 # Create your views here.
 def select_location(request):
@@ -18,16 +18,31 @@ def select_location(request):
       try:
         lat1 = float(zipcode.get().latitude) # should only be one result
         lon1 = float(zipcode.get().longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
-        lat2_list.append(lat1)
-        lon2_list.append(lon1)
+        lat1 = radians(lat1)
+        lon1 = radians(lon1)
         R = 6378137.0 # Earths median radius, in meters
-        d = 80467.0   # 50 miles, in meters
+        d = 402336.0   # 250 miles, in meters # TODO: Search the max distance, then have the user decided what threshold to filter at after _all_ results returned.
         bearing_list = [ 0.0, pi/2.0, pi, 3.0*pi/2.0 ] # cardinal directions
         for theta in bearing_list:
           lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(theta))
-          lat2_list.append( lat2 )
-          lon2_list.append( lon1 + atan2(sin(theta)*sin(d/R)*cos(lat1), cos(d/R)-sin(lat1)*sin(lat2)) )
-        locations = models.Location.objects.filter(zipcode=zipcode)
+          lat2_list.append( degrees(lat2) )
+          lon2 = lon1 + atan2(sin(theta)*sin(d/R)*cos(lat1), cos(d/R)-sin(lat1)*sin(lat2))
+          lon2_list.append( degrees(lon2) )
+          lon2 = (lon2+3.0*pi)%(2.0*pi) - pi  # normalise to -180...+180
+        lat2_list = lat2_list[0::2] # discard non-moved points
+        lon2_list = lon2_list[1::2] # both should contain two values, {min, max} lat/long
+        # locations = models.Location.objects.filter( # TODO: have the Location objects grab default lat/long
+        locations = models.Location.objects.filter(
+            zipcode__latitude__gte=str(lat2_list[1])
+          ).exclude(
+            zipcode__latitude__gt=str(lat2_list[0])
+          ).filter(
+            zipcode__longitude__gte=str(lon2_list[1])
+          ).exclude(
+            zipcode__longitude__gte=str(lon2_list[0])
+          ) # doesn't work 100% due to +/- of lat,long numbers...
+        #We just searched a square, now discard searches that are > 50 miles away.
+        #locations = models.Location.objects.filter(zipcode=zipcode)
       except models.Zipcode.DoesNotExist:
         return render_to_response(
           'select_location.html', 

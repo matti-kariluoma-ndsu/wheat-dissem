@@ -2,7 +2,7 @@
 
 {% block content %}
   {% for location in location_list %}
-  <h2>Your area, {{ location.zipcode }}</h2>
+  <h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
     <ul>
       <li>
         {{ location.name }}
@@ -14,9 +14,11 @@
       </li>
     </ul>
   {% endfor %}
+  <p>This information is for locations between latitudes:</p>
   {% for lat in lat_list %}
   <p>{{ lat }}</p>
   {% endfor %}
+  <p>This information is for locations between longitudes:</p>
   {% for lon in lon_list %}
   <p>{{ lon }}</p>
   {% endfor %}
