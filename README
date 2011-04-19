@@ -9,6 +9,19 @@ Prereqs:
    # should print the version number and exit w/o errors
    # Apr 2011: Verified the project is compatible with Django 1.3
    
+Install to a fresh machine w/apache (Ubuntu syntax):
+ $ sudo apt-get install git-{arch,svn,cvs,daemon-run} sqlite3 \
+     python-{sqlite,flup,psycopg2} subversion apache2 libapache2-mod-wsgi 
+ $ git clone http://github.com/matti-kariluoma-ndsu/wheat-dissem.git
+ $ cd wheat-dissem
+ $ cat README # this file you are currently reading
+ $ wget -O django-1.3.tar.gz http://djangoproject.com/download/1.3/tarball/
+ $ tar xzf django-1.3.tar.gz
+ $ cd Django-1.3
+ $ sudo python setup.py install # should install to /usr/local/lib/python-*
+ $ cat apache/httpd.conf >> /etc/apache2/httpd.conf # then fix any conflicts
+ $ sudo /etc/init.d/apache2 reload # or restart
+
 Database/Models development:
  Should you change one of the models, you must delete the old table
  for that model before your change will take effect.
@@ -35,3 +48,5 @@ To populate a table in the testing (sqlite) db:
   $ sqlite> .import import.csv your_table
   $ sqlite> .exit
 
+NOTE: Did a chmod a+w {wheat_website/,wheat_website/sqlite.db} , will need
+to be undone when we move on from sqlite.
