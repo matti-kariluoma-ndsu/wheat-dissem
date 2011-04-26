@@ -2,18 +2,25 @@
 
 {% block content %}
   {% for location in location_list %}
-  <h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
-    <ul>
-      <li>
-        {{ location.name }}
-        <ul>
-          {% for entry in trialentry_list %}
-            <li>{{ entry.bushels_acre }} bushels</li>
-          {% endfor %}
-        </ul>
-      </li>
-    </ul>
+  
+  <div id="{{ location.zipcode }}">
+    <h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
+    <div class="datarow">  
+      <div class="location_name">{{ location.name }}</div>
+      <div class="row headings">
+        <div class="bushels_acre"><h3>Bushels per acre</h3></div>
+        <div class="protein_percent"><h3>Protein percent</h3></div>
+      </div>
+      {% for entry in trialentry_list %}
+      <div class="row">       
+        <div class="bushels_acre data">{{ entry.bushels_acre }} bushels</div>
+        <div class="protein_percent data">{{ entry.protein_percent }} protein %</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
   {% endfor %}
+  <!--
   <p>This information is for locations between latitudes:</p>
   {% for lat in lat_list %}
   <p>{{ lat }}</p>
@@ -22,4 +29,5 @@
   {% for lon in lon_list %}
   <p>{{ lon }}</p>
   {% endfor %}
+  -->
 {% endblock %}
