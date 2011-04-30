@@ -50,16 +50,11 @@ class Zipcode(models.Model):
     return str(self.zipcode).zfill(5) + ": " + self.city + ", " + self.state
 
 class Location(models.Model):
-  name                  = models.CharField(max_length=200)
-  zipcode               = models.ForeignKey(Zipcode)
-  latitude_degree       = models.SmallIntegerField(blank=True, null=True)
-  latitude_minute       = models.SmallIntegerField(blank=True, null=True)
-  latitude_second       = models.SmallIntegerField(blank=True, null=True)
-  latitude_millisecond  = models.SmallIntegerField(blank=True, null=True)
-  longitude_degree      = models.SmallIntegerField(blank=True, null=True)
-  longitude_minute      = models.SmallIntegerField(blank=True, null=True)
-  longitude_second      = models.SmallIntegerField(blank=True, null=True)
-  longitude_millisecond = models.SmallIntegerField(blank=True, null=True)
+  name      = models.CharField(max_length=200)
+  zipcode   = models.ForeignKey(Zipcode)
+  latitude  = models.DecimalField(decimal_places=10, max_digits=13, blank=True, null=True)
+  longitude = models.DecimalField(decimal_places=10, max_digits=13, blank=True, null=True)
+
   
   def __unicode__(self):
     return self.name
