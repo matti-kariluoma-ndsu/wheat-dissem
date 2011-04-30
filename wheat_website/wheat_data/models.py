@@ -87,6 +87,7 @@ class Trial_Entry(models.Model):
   canopy_height        = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
   days_to_flower       = models.SmallIntegerField(blank=True, null=True)
   seed_oil_percent     = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+  planting_method_tags = models.CharField(max_length=200, blank=True, null=True)
   plant_date           = models.ForeignKey(Date, related_name='plant_date', blank=True, null=True)
   harvest_date         = models.ForeignKey(Date, related_name='harvest_date')
   location             = models.ForeignKey(Location)
