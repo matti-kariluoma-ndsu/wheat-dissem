@@ -60,9 +60,6 @@ class Location(models.Model):
     return self.name
 
 class Date(models.Model):
-  year  = models.SmallIntegerField()
-  month = models.SmallIntegerField()
-  day   = models.SmallIntegerField()
   date  = models.DateField()
   
   def __unicode__(self):
