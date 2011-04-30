@@ -3,7 +3,7 @@
 {% block content %}
   {% for location in location_list %}
   
-  <div id="{{ location.zipcode.zipcode }}">
+  <div id="{{ location.zipcode.zipcode }}" class="grid_9">
     <h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
     <div class="datarows">  
       <div class="location_name">{{ location.name }}</div>
