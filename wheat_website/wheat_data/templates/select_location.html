@@ -7,7 +7,12 @@
 
 <form action="#" method="post">
   {% csrf_token %}
-  {{ form.as_p }}
+  {% for field in form %}
+  <div class="input row">
+    {{ field.errors }}
+    {{ field.label_tag }}: {{ field }}
+  </div>
+  {% endfor %}
   <input type="submit" value="Submit" />
 </form>
 

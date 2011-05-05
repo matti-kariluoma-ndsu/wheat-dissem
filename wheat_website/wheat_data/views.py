@@ -12,6 +12,7 @@ def select_location(request):
     form = wheat_forms.SelectLocationForm(request.POST)
     if form.is_valid():
       zipcode = models.Zipcode.objects.filter(zipcode=form.cleaned_data['zipcode'])
+      radius = float(form.cleaned_data['search_radius'])
       lat2_list = []
       lon2_list = []
       locations = []
@@ -21,7 +22,7 @@ def select_location(request):
         lat1 = radians(lat1)
         lon1 = radians(lon1)
         R = 6378137.0 # Earths median radius, in meters
-        d = 402336.0   # 250 miles, in meters # TODO: Search the max distance, then have the user decided what threshold to filter at after _all_ results returned.
+        d = radius * 1609.344   # in meters # TODO: Search the max distance, then have the user decided what threshold to filter at after _all_ results returned.
         bearing_list = [ 0.0, pi/2.0, pi, 3.0*pi/2.0 ] # cardinal directions
         for theta in bearing_list:
           lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(theta))
