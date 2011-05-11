@@ -1,30 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {% for location in location_list %}
-  
-  <div id="{{ location.zipcode.zipcode }}" class="grid_9">
-    <h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
-    <div class="datarows">  
-      <div class="location_name">{{ location.name }}</div>
-      <div class="row headings">
-        <div class="bushels_acre"><h3>Bushels per Acre</h3></div>
-        <div class="test_weight"><h3>Test Weight</h3></div>
-        <div class="protein_percent"><h3>Protein Percent</h3></div>
-        <div class="plant_height"><h3>Plant Height</h3></div>
-      </div>
-      {% for entry in trialentry_list %}
-      <div class="row">       
-        <div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
-        <div class="test_weight data">{{ entry.test_weight }} lbs</div>
-        <div class="protein_percent data">{{ entry.protein_percent }} %</div>
-        <div class="plant_height data">{{ entry.plant_height }} in</div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  
-  {% endfor %}
+	{% for location in location_list %}
+	<div id="{{ location.zipcode.zipcode }}" class="grid_9">
+		<h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
+		<div class="datarows">
+			<div class="location_name">{{ location.name }}
+			<div class="row headings">
+				<div class="bushels_acre"><h3>Bushels per Acre</h3></div>
+				<div class="test_weight"><h3>Test Weight</h3></div>
+				<div class="protein_percent"><h3>Protein Percent</h3></div>
+				<div class="plant_height"><h3>Plant Height</h3></div>
+			</div>
+			{% for entry in trialentry_list %}
+			<div class="row">
+				<div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
+				<div class="test_weight data">{{ entry.test_weight }} lbs</div>
+				<div class="protein_percent data">{{ entry.protein_percent }} %</div>
+				<div class="plant_height data">{{ entry.plant_height }} in</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	
+	<div id="dynamic_content"></div>
+	
+	{% endfor %}
   <!--
   <p>This information is for locations between latitudes:</p>
   {% for lat in lat_list %}
@@ -35,4 +36,25 @@
   <p>{{ lon }}</p>
   {% endfor %}
   -->
+{% endblock %}
+
+{% load jsonify %}
+{% block jquery %}
+
+	var locations = jQuery.parseJSON('{{location_list|jsonify}}');
+	var trials = jQuery.parseJSON('{{trialentry_list|jsonify}}');
+
+	$('#dynamic_content').append('<div id="hello">');
+	var newdiv = $('#hello');
+	jQuery.each(locations, function(){
+		newdiv.append('<p>'+this.fields.name+'</p>');
+		jQuery.each(trials, function(){
+			newdiv.append('<p>'+this.fields.bushels_acre+'</p>');
+			newdiv.append('<p>'+this.fields.test_weight+'</p>');
+			newdiv.append('<p>'+this.fields.protein_percent+'</p>');
+			newdiv.append('<p>'+this.fields.plant_height+'</p>');
+		});
+	});
+	newdiv.css('color', 'red');
+
 {% endblock %}

@@ -42,8 +42,7 @@ def select_location(request):
           ).exclude(
             zipcode__longitude__gte=str(lon2_list[0])
           ) # doesn't work 100% due to +/- of lat,long numbers...
-        #We just searched a square, now discard searches that are > 50 miles away.
-        #locations = models.Location.objects.filter(zipcode=zipcode)
+        #We just searched a square, now discard searches that are > x miles away.
       except models.Zipcode.DoesNotExist:
         return render_to_response(
           'select_location.html', 
