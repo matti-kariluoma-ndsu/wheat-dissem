@@ -5,7 +5,7 @@
 	<div id="{{ location.zipcode.zipcode }}" class="grid_9">
 		<h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
 		<div class="datarows">
-			<div class="location_name">{{ location.name }}
+			<div class="location_name">{{ location.name }}</div>
 			<div class="row headings">
 				<div class="bushels_acre"><h3>Bushels per Acre</h3></div>
 				<div class="test_weight"><h3>Test Weight</h3></div>
@@ -23,7 +23,7 @@
 		</div>
 	</div>
 	
-	<div id="dynamic_content"></div>
+	<div id="dynamic_content" class="grid_9"></div>
 	
 	{% endfor %}
   <!--
@@ -44,17 +44,28 @@
 	var locations = jQuery.parseJSON('{{location_list|jsonify}}');
 	var trials = jQuery.parseJSON('{{trialentry_list|jsonify}}');
 
-	$('#dynamic_content').append('<div id="hello">');
-	var newdiv = $('#hello');
+	$('#dynamic_content').append('<div id="1" class="datarows">');
+	var root = $('#1');
 	jQuery.each(locations, function(){
-		newdiv.append('<p>'+this.fields.name+'</p>');
+		root.append('<div class="location_name">'+this.fields.name+'</div>');
+		root.append('<div id="row0" class="row headings">');
+		var headings = $('#row0');
+			headings.append('<div class="bushels_acre"><h3>Bushels per Acre</h3></div>');
+			headings.append('<div class="test_weight"><h3>Test Weight</h3></div>');
+			headings.append('<div class="protein_percent"><h3>Protein Percent</h3></div>');
+			headings.append('<div class="plant_height"><h3>Plant Height</h3></div>');
+		var nextnum = 1;
 		jQuery.each(trials, function(){
-			newdiv.append('<p>'+this.fields.bushels_acre+'</p>');
-			newdiv.append('<p>'+this.fields.test_weight+'</p>');
-			newdiv.append('<p>'+this.fields.protein_percent+'</p>');
-			newdiv.append('<p>'+this.fields.plant_height+'</p>');
+			root.append('<div id="row'+nextnum+'" class="row">');
+			var datarows = $('#row'+nextnum);
+			datarows.append('<div class="bushels_acre data">'+this.fields.bushels_acre+' bushels per acre'+'</div>');
+			datarows.append('<div class="test_weight data">'+this.fields.test_weight+' lbs'+'</div>');
+			datarows.append('<div class="protein_percent data">'+this.fields.protein_percent+' %'+'</div>');
+			datarows.append('<div class="plant_height data">'+this.fields.plant_height+' in'+'</div>');
+			nextnum += 1;
 		});
 	});
-	newdiv.css('color', 'red');
+	
+	root.css('color', 'red');
 
 {% endblock %}
