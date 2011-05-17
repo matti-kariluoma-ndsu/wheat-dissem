@@ -91,7 +91,7 @@ class Trial_Entry(models.Model):
   variety              = models.ForeignKey(Variety)
 
   def __unicode__(self):
-    return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.year)
+    return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.date.year)
 
 # Now add custom forms to populate these data:
 class VarietyForm(ModelForm):

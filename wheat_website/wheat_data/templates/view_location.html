@@ -7,18 +7,24 @@
 		<div class="datarows">
 			<div class="location_name">{{ location.name }}</div>
 			<div class="row headings">
+				<div class="variety"><h3>Variety</h3></div>
 				<div class="bushels_acre"><h3>Bushels per Acre</h3></div>
 				<div class="test_weight"><h3>Test Weight</h3></div>
 				<div class="protein_percent"><h3>Protein Percent</h3></div>
 				<div class="plant_height"><h3>Plant Height</h3></div>
 			</div>
-			{% for entry in trialentry_list %}
-			<div class="row">
-				<div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
-				<div class="test_weight data">{{ entry.test_weight }} lbs</div>
-				<div class="protein_percent data">{{ entry.protein_percent }} %</div>
-				<div class="plant_height data">{{ entry.plant_height }} in</div>
-			</div>
+			{% for entries_by_year in trialentry_list %}
+				{% for entry in entries_by_year %}
+				{% if entry.location == location %}
+				<div class="row">
+					<div class="variety data"><a href="{{ entry.harvest_date.date.year }}">{{ entry.variety.name }}</a></div>
+					<div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
+					<div class="test_weight data">{{ entry.test_weight }} lbs</div>
+					<div class="protein_percent data">{{ entry.protein_percent }} %</div>
+					<div class="plant_height data">{{ entry.plant_height }} in</div>
+				</div>
+				{% endif %}
+				{% endfor %}
 			{% endfor %}
 		</div>
 	</div>
@@ -42,22 +48,28 @@
 {% block jquery %}
 
 	var locations = jQuery.parseJSON('{{location_list|jsonify}}');
-	var trials = jQuery.parseJSON('{{trialentry_list|jsonify}}');
+	{% for entries_by_year in trialentry_list %}
+	var trials = jQuery.parseJSON('{{location_list|jsonify}}');
+	{% endfor %}
 
 	$('#dynamic_content').append('<div id="1" class="datarows">');
 	var root = $('#1');
 	jQuery.each(locations, function(){
 		root.append('<div class="location_name">'+this.fields.name+'</div>');
 		root.append('<div id="row0" class="row headings">');
+		
 		var headings = $('#row0');
-			headings.append('<div class="bushels_acre"><h3>Bushels per Acre</h3></div>');
-			headings.append('<div class="test_weight"><h3>Test Weight</h3></div>');
-			headings.append('<div class="protein_percent"><h3>Protein Percent</h3></div>');
-			headings.append('<div class="plant_height"><h3>Plant Height</h3></div>');
+		headings.append('<div class="variety"><h3>Variety</h3></div>');
+		headings.append('<div class="bushels_acre"><h3>Bushels per Acre</h3></div>');
+		headings.append('<div class="test_weight"><h3>Test Weight</h3></div>');
+		headings.append('<div class="protein_percent"><h3>Protein Percent</h3></div>');
+		headings.append('<div class="plant_height"><h3>Plant Height</h3></div>');
+			
 		var nextnum = 1;
 		jQuery.each(trials, function(){
 			root.append('<div id="row'+nextnum+'" class="row">');
 			var datarows = $('#row'+nextnum);
+			datarows.append('<div class="variety data">'+this.fields.variety+'</div>');
 			datarows.append('<div class="bushels_acre data">'+this.fields.bushels_acre+' bushels per acre'+'</div>');
 			datarows.append('<div class="test_weight data">'+this.fields.test_weight+' lbs'+'</div>');
 			datarows.append('<div class="protein_percent data">'+this.fields.protein_percent+' %'+'</div>');
