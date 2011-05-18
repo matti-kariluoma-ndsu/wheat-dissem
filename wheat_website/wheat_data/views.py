@@ -79,12 +79,13 @@ def select_location(request):
 					else:
 						entries_dict[entry.variety.name] = [entry]
 			
+			
 			sorted_entries = [] # a list of tuples, (TrialEntry, sum of all data)
-			for name in entries_dict.keys():
-				sum = 0.0
-				for entry in entries_dict[name]:
-					sum += 1.0
-				sorted_entries.append((entries_dict[name],))
+			#for name in entries_dict.keys():
+				#sum = 0.0
+				#for entry in entries_dict[name]:
+					#sum += 1.0
+				#sorted_entries.append((entries_dict[name],))
 				
 			#TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
 			# hmm... the back-button works, but it's not obvious it will based on the address bar

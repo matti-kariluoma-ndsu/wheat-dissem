@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+	<!--
 	{% for location in location_list %}
 	<div id="{{ location.zipcode.zipcode }}" class="grid_9">
 		<h2>Your area, {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
@@ -28,10 +29,37 @@
 			{% endfor %}
 		</div>
 	</div>
-	
+
 	<div id="dynamic_content" class="grid_9"></div>
 	
 	{% endfor %}
+	-->
+	<h2>These areas are within x miles:</h2>
+	{% for location in location_list %}
+	<h2> {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
+	{% endfor %}
+	<div class="grid_9">
+		<div class="datarows">
+			<div class="row headings">
+				<div class="variety"><h3>Variety</h3></div>
+				<div class="bushels_acre"><h3>Bushels per Acre</h3></div>
+				<div class="test_weight"><h3>Test Weight</h3></div>
+				<div class="protein_percent"><h3>Protein Percent</h3></div>
+				<div class="plant_height"><h3>Plant Height</h3></div>
+			</div>
+			{% for entries_by_year in trialentry_list %}
+				{% for entry in entries_by_year %}
+				<div class="row">
+					<div class="variety data"><a href="{{ entry.harvest_date.date.year }}">{{ entry.variety.name }}</a></div>
+					<div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
+					<div class="test_weight data">{{ entry.test_weight }} lbs</div>
+					<div class="protein_percent data">{{ entry.protein_percent }} %</div>
+					<div class="plant_height data">{{ entry.plant_height }} in</div>
+				</div>
+				{% endfor %}
+			{% endfor %}
+		</div>
+	</div>
   <!--
   <p>This information is for locations between latitudes:</p>
   {% for lat in lat_list %}
