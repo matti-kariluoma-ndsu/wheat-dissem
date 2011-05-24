@@ -110,8 +110,9 @@ def select_location(request):
 			)
 			"""
 			
-			entries = models.Trial_Entry.objects.select_related(depth=2).filter(
-				location=locations
+			#TODO: reduce this to depth=1, we only need harvest_date.date.year for 3 and variety.name for 2
+			entries = models.Trial_Entry.objects.select_related(depth=3).filter(
+				location__in=locations
 			).filter(
 				harvest_date__in=models.Date.objects.filter(
 					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
@@ -145,7 +146,7 @@ def select_location(request):
 							#print(getattr(entry_value, field.name))						
 							if getattr(entry_value, field.name) != None:
 								entries_dict[key][1][field.name] += float(getattr(entry_value, field.name))
-						entries_dict[key][1][field.name] /= float(entries_dict[key][0])
+						entries_dict[key][1][field.name] = round(entries_dict[key][1][field.name] / float(entries_dict[key][0]),2)
 
 			#TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
 			# hmm... the back-button works, but it's not obvious it will based on the address bar
@@ -160,6 +161,7 @@ def select_location(request):
 					'trialentry_list': entries,
 					'trialentry_dict': entries_dict,
 					'year_list': year_list,
+					'radius' : radius,
 					'lat_list': lat2_list,
 					'lon_list': lon2_list
 				}

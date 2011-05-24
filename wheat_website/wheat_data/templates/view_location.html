@@ -2,7 +2,7 @@
 
 {% block content %}
 
-	<h2>These areas are within x miles:</h2>
+	<h2>These areas are within {{radius}} miles:</h2>
 	{% for location in location_list %}
 	<h2> {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
 	{% endfor %}
@@ -15,17 +15,29 @@
 				<div class="protein_percent"><h3>Protein Percent</h3></div>
 				<div class="plant_height"><h3>Plant Height</h3></div>
 			</div>
-			{% for entry in trialentry_list %}
+			{% for variety_name, data_tuple in trialentry_dict.items %}
 				<div class="row">
-					<div class="variety data"><a href="{{ entry.harvest_date.date.year }}">{{ entry.variety.name }}</a></div>
-					<div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
-					<div class="test_weight data">{{ entry.test_weight }} lbs</div>
-					<div class="protein_percent data">{{ entry.protein_percent }} %</div>
-					<div class="plant_height data">{{ entry.plant_height }} in</div>
+					<div class="variety average data">{{data_tuple.0}} <a href="">{{ variety_name }}</a></div>
+					<div class="bushels_acre average data">{{ data_tuple.1.bushels_acre }} bushels per acre</div>
+					<div class="test_weight average data">{{ data_tuple.1.test_weight }} lbs</div>
+					<div class="protein_percent average data">{{ data_tuple.1.protein_percent }} %</div>
+					<div class="plant_height average data">{{ data_tuple.1.plant_height }} in</div>
 				</div>
+				{% for entry in data_tuple.2 %}
+					<div class="row">
+						<div class="data" style="font-size: 8pt">{{ entry.harvest_date.date.year }} {{entry.location}}</div>
+						<div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
+						<div class="test_weight data">{{ entry.test_weight }} lbs</div>
+						<div class="protein_percent data">{{ entry.protein_percent }} %</div>
+						<div class="plant_height data">{{ entry.plant_height }} in</div>
+					</div>
+				{% endfor %}
 			{% endfor %}
 		</div>
 	</div>
+	
+	<div id='dynamic_content' class='grid_9' ></div>
+	
   <!--
   <p>This information is for locations between latitudes:</p>
   {% for lat in lat_list %}
@@ -41,37 +53,36 @@
 {% load jsonify %}
 {% block jquery %}
 
-	var locations = jQuery.parseJSON('{{location_list|jsonify}}');
-	{% for entries_by_year in trialentry_list %}
-	var trials = jQuery.parseJSON('{{location_list|jsonify}}');
-	{% endfor %}
+	var locations = jQuery.parseJSON('{{location_list|jsonify:""}}');
+  var trials = jQuery.parseJSON('{{ trialentry_list|jsonify:"(\"variety\",)" }}');
+
+	jQuery.each(locations, function(){
+			$('#dynamic_content').append('<h2>'+this.fields.name+'</h2>');
+	});
 
 	$('#dynamic_content').append('<div id="1" class="datarows">');
-	var root = $('#1');
-	jQuery.each(locations, function(){
-		root.append('<div class="location_name">'+this.fields.name+'</div>');
-		root.append('<div id="row0" class="row headings">');
-		
-		var headings = $('#row0');
-		headings.append('<div class="variety"><h3>Variety</h3></div>');
-		headings.append('<div class="bushels_acre"><h3>Bushels per Acre</h3></div>');
-		headings.append('<div class="test_weight"><h3>Test Weight</h3></div>');
-		headings.append('<div class="protein_percent"><h3>Protein Percent</h3></div>');
-		headings.append('<div class="plant_height"><h3>Plant Height</h3></div>');
-			
-		var nextnum = 1;
-		jQuery.each(trials, function(){
-			root.append('<div id="row'+nextnum+'" class="row">');
-			var datarows = $('#row'+nextnum);
-			datarows.append('<div class="variety data">'+this.fields.variety+'</div>');
-			datarows.append('<div class="bushels_acre data">'+this.fields.bushels_acre+' bushels per acre'+'</div>');
-			datarows.append('<div class="test_weight data">'+this.fields.test_weight+' lbs'+'</div>');
-			datarows.append('<div class="protein_percent data">'+this.fields.protein_percent+' %'+'</div>');
-			datarows.append('<div class="plant_height data">'+this.fields.plant_height+' in'+'</div>');
-			nextnum += 1;
-		});
-	});
+	var root = $('#1');			
+	var nextnum = 1;
+	root.append('<div id="row0" class="row headings">');
+	var headings = $('#row0');
+	headings.append('<div class="variety"><h3>Variety</h3></div>');
+	headings.append('<div class="bushels_acre"><h3>Bushels per Acre</h3></div>');
+	headings.append('<div class="test_weight"><h3>Test Weight</h3></div>');
+	headings.append('<div class="protein_percent"><h3>Protein Percent</h3></div>');
+	headings.append('<div class="plant_height"><h3>Plant Height</h3></div>');
 	
-	root.css('color', 'red');
+	jQuery.each(trials, function(){
+		root.append('<div id="row'+nextnum+'" class="row">');
+		var datarows = $('#row'+nextnum);
+		datarows.append('<div class="variety data">'+this.fields.variety.fields.name+'</div>');
+		datarows.append('<div class="bushels_acre data">'+this.fields.bushels_acre+' bushels per acre'+'</div>');
+		datarows.append('<div class="test_weight data">'+this.fields.test_weight+' lbs'+'</div>');
+		datarows.append('<div class="protein_percent data">'+this.fields.protein_percent+' %'+'</div>');
+		datarows.append('<div class="plant_height data">'+this.fields.plant_height+' in'+'</div>');
+		nextnum += 1;
+	});
+
+	
+	$('#dynamic_content').css('color', 'red');
 
 {% endblock %}

@@ -101,3 +101,7 @@ INSTALLED_APPS = (
 )
 
 STATIC_URL = 'wheat_data/static'
+
+SERIALIZATION_MODULES = {
+    'json': 'wadofstuff.django.serializers.json'
+}

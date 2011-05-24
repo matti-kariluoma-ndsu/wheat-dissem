@@ -8,6 +8,7 @@ class Disease(models.Model):
 	def __unicode__(self):
 		return self.name
 
+
 class Variety(models.Model):
 	name						= models.CharField(max_length=200)
 	description_url = models.CharField(max_length=200, blank=True, null=True)
@@ -25,8 +26,15 @@ class Variety(models.Model):
 	def __unicode__(self):
 		return self.name
 	
+	def natural_key(self):
+		return (self.name,);
+	
 	class Meta:
 		ordering = ["-name"]
+
+class VarietyManager(Variety):
+	def get_by_natural_key(self, lookup):
+		return self.get(name=lookup)
 
 class Disease_Entry(models.Model):
 	disease				= models.ForeignKey(Disease)
