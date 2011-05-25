@@ -215,3 +215,25 @@ def add_trial_entry(request):
 		{'form': form },
 		context_instance=RequestContext(request)
 	)
+
+def add_trial_entry_csv_file(request):
+	
+	errors = {} 
+	# a dictionary, keys are strings (sources of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+		form = wheat_forms.UploadCSVForm(request.POST, request.FILES)
+		if form.is_valid():
+			success, errors = wheat_forms.handle_csv_file(request.FILES['csv_file'])
+			if success:
+				return HttpResponseRedirect('/success/')
+			else:
+				form = wheat_forms.UploadCSVForm()
+	else:	
+		form = wheat_forms.UploadCSVForm()
+
+	return render_to_response(
+		'add_from_csv_template.html', 
+		{'form': form, 'format_errors': errors},
+		context_instance=RequestContext(request)
+	)

@@ -1,7 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="#" method="post">
+
+
+<div>
+	<h4>Instructions: download the template file below, add your data,
+	then submit the completed file.</h4>
+	<a href="static/csv/ndsu_hard_red_spring_wheat_template.csv">Template File</a> (300K)
+	<br />
+	<br />
+	<br />
+</div>
+
+{% for error_source, error_msg in format_errors.items%}
+<div class="error">
+	{{ error_source }}: {{ error_msg }}
+</div>
+{% endfor %}
+
+<form enctype="multipart/form-data" action="#" method="post">
   {% csrf_token %}
   {% for field in form %}
     <div class="input_row">

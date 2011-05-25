@@ -35,6 +35,7 @@ urlpatterns = patterns('',
     #(r'^location/'),
     (r'^add_variety/', views.add_variety),
     (r'^add_trial/', views.add_trial_entry),
+    (r'^add_trials/', views.add_trial_entry_csv_file),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.STATIC_URL})
 )
