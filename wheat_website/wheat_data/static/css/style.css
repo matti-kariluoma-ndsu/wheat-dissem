@@ -21,9 +21,9 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
   text-align:center;}
 .row .data{
   font-family:'Courier New','Courier','sans-serif';}
+.slave {
+  display:none;}
 
 #map {
   float:right;}
 
-  
-  

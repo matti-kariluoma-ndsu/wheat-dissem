@@ -6,7 +6,7 @@
 	{% for location in location_list %}
 	<h2> {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
 	{% endfor %}
-	<div class="grid_9">
+	<div id="static_content" class="grid_9">
 		<div class="datarows">
 			<div class="row headings">
 				<div class="variety"><h3>Variety</h3></div>
@@ -17,15 +17,15 @@
 			</div>
 			{% for variety_name, data_tuple in trialentry_dict.items %}
       <div class="{{variety_name}} group">
-				<div class="row master">
-					<div class="variety average data">{{data_tuple.0}} <a href="">{{ variety_name }}</a></div>
+				<div class="row master {% cycle 'odd' 'even' %}">
+					<div class="variety average data"><a href="somewhere">{{ variety_name }}</a></div>
 					<div class="bushels_acre average data">{{ data_tuple.1.bushels_acre }} bushels per acre</div>
 					<div class="test_weight average data">{{ data_tuple.1.test_weight }} lbs</div>
 					<div class="protein_percent average data">{{ data_tuple.1.protein_percent }} %</div>
 					<div class="plant_height average data">{{ data_tuple.1.plant_height }} in</div>
 	      </div>
 				{% for entry in data_tuple.2 %}
-					<div class="row slave">
+					<div class="row slave {% cycle 'odd' 'even' %}">
 						<div class="data" style="font-size: 8pt">{{ entry.harvest_date.date.year }} {{entry.location}}</div>
 						<div class="bushels_acre data">{{ entry.bushels_acre }} bushels per acre</div>
 						<div class="test_weight data">{{ entry.test_weight }} lbs</div>
@@ -84,7 +84,13 @@
 		nextnum += 1;
 	});
 
-	
-	$('#dynamic_content').css('color', 'red');
+  $('.group .master').toggle(
+    function(){
+      $(this).siblings('.slave').show();
+    },
+    function(){
+      $(this).siblings('.slave').hide();  
+    }
+  );
 
 {% endblock %}
