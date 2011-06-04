@@ -27,3 +27,18 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 #map {
   float:right;}
 
+.slave.even {
+  background-color: #CFC;
+}
+
+.slave.odd {
+  background-color: #EFE;
+}
+
+.master.even {
+  background-color: #CCF;
+}
+
+.master.odd {
+  background-color: #EEF;
+}
