@@ -31,7 +31,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
     (r'^$', views.select_location), # the default view
-    (r'^variety/', list_detail.object_list, variety_dictionary),
+    (r'^variety/', views.select_variety),
+    (r'^variety_all/', list_detail.object_list, variety_dictionary),
     #(r'^location/'),
     (r'^add_variety/', views.add_variety),
     (r'^add_trial/', views.add_trial_entry),

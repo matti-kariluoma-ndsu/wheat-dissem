@@ -4,13 +4,17 @@ from wheat_data import models
 
 class SelectLocationForm(forms.Form):
   zipcode = forms.CharField(max_length=5)
-  search_radius = forms.ChoiceField(
-                    widget=forms.RadioSelect(), 
-                    choices=(
-                      (50,'50 miles'), (100,'100 miles'), (200,'200 miles')
-                      ),
-                    initial='50'
-                  )
+  search_radius = forms.CharField(max_length=5)
+									#forms.ChoiceField(
+                   # widget=forms.RadioSelect(), 
+                   # choices=(
+                    #  (50,'50 miles'), (100,'100 miles'), (200,'200 miles')
+                    #  ),
+                    #initial='50'
+                  #)
+
+class SelectVarietyForm(forms.Form):
+	variety = forms.CharField(max_length=20)
 
 class UploadCSVForm(forms.Form):
     csv_file  = forms.FileField()

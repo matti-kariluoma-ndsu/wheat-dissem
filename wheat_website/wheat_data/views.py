@@ -177,6 +177,41 @@ def select_location(request):
 	)
 	return render_to_response('base.html')
 
+def select_variety(request):
+	if request.method == 'POST':
+		form = wheat_forms.SelectVarietyForm(request.POST)
+		if form.is_valid():
+			variety = models.Variety.objects.filter(name=form.cleaned_data['variety'])
+			try:
+				print variety.get().name
+			except models.Variety.DoesNotExist:
+				return render_to_response(
+					'select_variety.html', 
+					{ 
+						'form': form,
+						'error_list': ['Sorry, the variety name: ' + form.cleaned_data['variety'] + ' doesn\'t match any records']
+					},
+					context_instance=RequestContext(request)
+				)
+			
+			return render_to_response(
+				'view_variety.html',
+				{ 
+					'variety_list' : variety.values()
+				}
+			)
+			
+	else:
+		form = wheat_forms.SelectVarietyForm()
+
+	return render_to_response(
+		'select_variety.html', 
+		{ 'form': form },
+		context_instance=RequestContext(request)
+	)
+	return render_to_response('base.html')
+
+
 def add_variety(request):
 	DiseaseFormset = inlineformset_factory(models.Variety, models.Disease_Entry)
 	

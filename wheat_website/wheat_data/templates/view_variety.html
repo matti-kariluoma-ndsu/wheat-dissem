@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% for variety in variety_list %}
+		<h3>{{ variety.name }}</h3>
+		<table border=0>
+		{% for key, value in variety.items %}
+			<tr>
+				<td>{{key}}:</td>
+				<td>{{value}}</td>
+			</tr>
+		{% endfor %}
+		</table>
+	{% endfor %}
+{% endblock %}
