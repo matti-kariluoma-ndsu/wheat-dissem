@@ -125,13 +125,19 @@ def select_location(request):
 			
 			entries_dict = {} # a dictionary; keys are the variety names, 
 			# values are a 3-item list: 
-			# [count, {dict of fieldname: averages}, [list of Trial_Entry objects]]
+			"""# [count, {dict of fieldname: averages}, [list of Trial_Entry objects]]"""
+			# {dict of year: [count, {dict of fieldname: averages}, [list of Trial_Entry objects]]}
+			
 			for entry in entries:
-				if entry.variety.name in entries_dict:
-					entries_dict[entry.variety.name][0] += 1
-					entries_dict[entry.variety.name][2].append(entry)
-				else:
-					entries_dict[entry.variety.name] = [1,{},[entry]]
+				if entry.variety.name in entries_dict: #TODO: replace with try,except block
+					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)][0] += 1
+					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)][2].append(entry)
+				else:  # initialize a new dictionary and add the first value
+					entries_dict[entry.variety.name] = {}
+					for year in year_list: # guarantee all years have am empty dictionary
+						entries_dict[entry.variety.name][str(year)] = [0,{},[]]
+					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)] = [1,{},[entry]]
+
 			
 			for field in models.Trial_Entry._meta.fields:
 				if (field.get_internal_type() == 'DecimalField' 
@@ -139,14 +145,16 @@ def select_location(request):
 						or field.get_internal_type() == 'SmallIntegerField'
 						or field.get_internal_type() == 'IntegerField'):
 					for key in entries_dict.keys():
-						entries_dict[key][1][field.name] = 0.0 # will be a float even if the field is an integer
-						for entry_value in entries_dict[key][2]:
-							#print(entry_value._meta.get_field(field.name))
-							#print(field.get_internal_type())
-							#print(getattr(entry_value, field.name))						
-							if getattr(entry_value, field.name) != None:
-								entries_dict[key][1][field.name] += float(getattr(entry_value, field.name))
-						entries_dict[key][1][field.name] = round(entries_dict[key][1][field.name] / float(entries_dict[key][0]),2)
+						for year in entries_dict[key].keys():
+							entries_dict[key][year][1][field.name] = 0.0 # will be a float even if the field is an integer
+							for entry_value in entries_dict[key][year][2]:
+								if(entries_dict[key][year][0] > 0):
+									#print(entry_value._meta.get_field(field.name))
+									#print(field.get_internal_type())
+									#print(getattr(entry_value, field.name))						
+									if getattr(entry_value, field.name) != None:
+										entries_dict[key][year][1][field.name] += float(getattr(entry_value, field.name))
+								entries_dict[key][year][1][field.name] = round(entries_dict[key][year][1][field.name] / float(entries_dict[key][year][0]),2)
 
 			#TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
 			# hmm... the back-button works, but it's not obvious it will based on the address bar

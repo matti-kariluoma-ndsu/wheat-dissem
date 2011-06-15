@@ -42,3 +42,11 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 .master.odd {
   background-color: #EEF;
 }
+
+.subheadings {
+  font-size: .8em;
+}
+
+#larger_column {
+  width: 305px;
+}
