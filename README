@@ -61,5 +61,5 @@ To populate a table in the testing (sqlite) db:
   $ sqlite> .import import.csv your_table
   $ sqlite> .exit
 
-NOTE: Did a chmod a+w {wheat_website/,wheat_website/sqlite.db} , will need
+NOTE: Did a chmod a+w {wheat_website/, wheat_website/sqlite.db} , will need
 to be undone when we move on from sqlite.

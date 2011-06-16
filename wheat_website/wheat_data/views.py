@@ -18,7 +18,7 @@ def select_location(request):
 			lon2_list = []
 			locations = []
 			today = datetime.date.today()
-			year_list = [today.year,today.year-1,today.year-2,today.year-3]
+			year_list = [today.year,today.year-1,today.year-2,today.year-3] # Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			try:
 				lat1 = float(zipcode.get().latitude) # should only be one result
 				lon1 = float(zipcode.get().longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
@@ -119,26 +119,28 @@ def select_location(request):
 				)
 			)
 			
-			#TODO: At this point, we may want to consider forking the above 
-			# code into a script-enabled version, and have the client sort the
-			# data.
+			# TODO: At this point, we may want to consider forking the above 
+			# TODO: code into a script-enabled version, and have the client sort the
+			# TODO: data.
 			
 			entries_dict = {} # a dictionary; keys are the variety names, 
 			# values are a 3-item list: 
 			"""# [count, {dict of fieldname: averages}, [list of Trial_Entry objects]]"""
 			# {dict of year: [count, {dict of fieldname: averages}, [list of Trial_Entry objects]]}
 			
+			# First sort by year
 			for entry in entries:
 				if entry.variety.name in entries_dict: #TODO: replace with try,except block
 					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)][0] += 1
 					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)][2].append(entry)
 				else:  # initialize a new dictionary and add the first value
 					entries_dict[entry.variety.name] = {}
-					for year in year_list: # guarantee all years have am empty dictionary
+					for year in sorted(year_list): # guarantee all years have am empty dictionary
 						entries_dict[entry.variety.name][str(year)] = [0,{},[]]
 					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)] = [1,{},[entry]]
 
 			
+			# Now average the entries from each year
 			for field in models.Trial_Entry._meta.fields:
 				if (field.get_internal_type() == 'DecimalField' 
 						or field.get_internal_type() == 'PositiveIntegerField' 
@@ -154,13 +156,32 @@ def select_location(request):
 									#print(getattr(entry_value, field.name))						
 									if getattr(entry_value, field.name) != None:
 										entries_dict[key][year][1][field.name] += float(getattr(entry_value, field.name))
-								entries_dict[key][year][1][field.name] = round(entries_dict[key][year][1][field.name] / float(entries_dict[key][year][0]),2)
+								entries_dict[key][year][1][field.name] = entries_dict[key][year][1][field.name] / float(entries_dict[key][year][0])
 
-			#TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
-			# hmm... the back-button works, but it's not obvious it will based on the address bar
-			# I'd still like this all to use the address bar to pass the user input
+			# TODO: We are aggreating all of the fields below, but at this point only displaying the aggreate of bushels/acre
+			# TODO: We need to decide, per variety, whether we are using the current year or the previous.
+			# TODO: if the former, we drop the oldest year. If the latter, we drop the newest year.
+			# Finally aggreate the years such that we have a 1-yr, 2-yr, 3-yr average
+			years_to_average = []
+			for year in sorted(year_list): # ordering matters for this algorithm
+				for element in years_to_average: # append this year to each existing element
+					element.append(year)
+				years_to_average.append([year]) # make a list containing only this object
 			
-			#TODO: I count 5+n queries being made above. Reduce!
+			for key in entries_dict.keys():
+				for years in years_to_average:
+					for year in years:
+						if (year != min(years)):
+							for field in entries_dict[key][str(min(years))][1]:
+								entries_dict[key][str(min(years))][1][field] += entries_dict[key][str(year)][1][field]
+					for field in entries_dict[key][str(min(years))][1]:
+						entries_dict[key][str(min(years))][1][field] = round(entries_dict[key][str(min(years))][1][field] / len(years), 2)
+							
+			# TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
+			# TODO: hmm... the back-button works, but it's not obvious it will based on the address bar
+			# TODO: I'd still like this all to use the address bar to pass the user input
+			
+			# TODO: I count 5+n queries being made above. Reduce!
 			
 			return render_to_response(
 				'view_location.html',

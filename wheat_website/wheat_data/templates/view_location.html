@@ -41,7 +41,7 @@
 			</div>
 			{% for variety_name, year_dict in trialentry_dict.items %}
 			{% for year, data_tuple in year_dict.items %}
-      <div class="{{variety_name}} group">
+      <div class="{{variety_name}} group"> <!--TODO: filter replace space with underscores in this class property-->
 				<div class="row master {% cycle 'odd' 'even' %}">
 					<div class="variety average data"><a href="somewhere">{{ variety_name }}</a></div>
 					<div class="days_to_head average data">{{ data_tuple.1.days_to_head }}</div>
