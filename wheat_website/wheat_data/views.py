@@ -4,6 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from wheat_data import models
 from wheat_data import wheat_forms
+from wheat_data.wheat_util import Trial_x_Variety_x_Year
 from math import pi, sin, cos, asin, atan2, degrees, radians
 import datetime
 
@@ -38,18 +39,6 @@ def select_location(request):
 				lat2_list = lat2_list[0::2] # discard non-moved points
 				lon2_list = lon2_list[1::2] # both should contain two values, {min, max} lat/long
 				
-				"""
-				locations = models.Location.objects.filter(
-						zipcode__latitude__gte=str(lat2_list[1])
-					).exclude(
-						zipcode__latitude__gt=str(lat2_list[0])
-					).filter(
-						zipcode__longitude__gte=str(lon2_list[1])
-					).exclude(
-						zipcode__longitude__gte=str(lon2_list[0])
-					) # doesn't work 100% due to +/- of lat,long numbers...
-				"""
-				
 				locations = models.Location.objects.filter(
 						zipcode__latitude__range=(str(min(lat2_list)), str(max(lat2_list)))
 					).filter(
@@ -66,49 +55,6 @@ def select_location(request):
 					},
 					context_instance=RequestContext(request)
 				)
-			
-			"""	
-			entries = [] # this will end up being a 2-dimensional array
-			# TODO: Do not make n=4 queries...
-			for i in year_list: 
-				entries.append(models.Trial_Entry.objects.filter(
-					location=locations
-				 ).filter(
-					harvest_date__in=models.Date.objects.filter(date__year=i)
-				 ))
-			
-			#Sort the entries 
-			entries_dict = {} # a dictionary; keys are the variety names, 
-			# value is a 3-item list: [count, list of averages, list of Trial_Entry objects]
-			for entries_by_year in entries:
-				for entry in entries_by_year:
-					if entry.variety.name in entries_dict:
-						entries_dict[entry.variety.name][0] += 1
-						entries_dict[entry.variety.name][2].append(entry)
-					else:
-						entries_dict[entry.variety.name] = [0,[],[entry]]
-			"""
-			
-			""" We cannot use __gte, __lte, etc. queries on date__* fields, a bug since 2009: http://code.djangoproject.com/ticket/6439
-			entries = models.Trial_Entry.objects.select_related(depth=2).filter(
-				location=locations
-			).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__year__gte=min(year_list)
-				).exclude(
-					date__year__gte=max(year_list)
-				)
-			)
-			"""
-			
-			"""
-			entries = models.Trial_Entry.objects.select_related(depth=2).filter(
-				location=locations
-			).filter(
-				# WARNING: This changes per database implementation...
-				harvest_date__in=models.Date.objects.extra(where=['year IN '+str(tuple(year_list))])
-			)
-			"""
 			
 			#TODO: reduce this to depth=1, we only need harvest_date.date.year for 3 and variety.name for 2
 			entries = models.Trial_Entry.objects.select_related(depth=3).filter(
@@ -135,7 +81,7 @@ def select_location(request):
 					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)][2].append(entry)
 				else:  # initialize a new dictionary and add the first value
 					entries_dict[entry.variety.name] = {}
-					for year in sorted(year_list): # guarantee all years have am empty dictionary
+					for year in sorted(year_list): # guarantee all years have an empty dictionary
 						entries_dict[entry.variety.name][str(year)] = [0,{},[]]
 					entries_dict[entry.variety.name][str(entry.harvest_date.date.year)] = [1,{},[entry]]
 
