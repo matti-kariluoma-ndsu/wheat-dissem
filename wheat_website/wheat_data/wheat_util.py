@@ -37,7 +37,8 @@ class Trial_x_Variety_x_Year:
 						or field.get_internal_type() == 'PositiveIntegerField' 
 						or field.get_internal_type() == 'SmallIntegerField'
 						or field.get_internal_type() == 'IntegerField'):
-          field_list.append(field) # only consider averageable data
+						field_list.append(field) # only consider averageable data
+						
     self._include_fields = field_list
     
     # Initialize our inner data structures
@@ -49,7 +50,7 @@ class Trial_x_Variety_x_Year:
         self._varieties[name][year][1].append(entry)
       except KeyError:  # initialize and add the first value
         self._varieties[name] = {}
-        self._varieties[name][year] = [1,[entry]]
+        self._varieties[name][year] = [1, [entry]]
     
 
 
@@ -80,8 +81,11 @@ class Trial_x_Variety_x_Year:
     
     TODO: Raise a custom exception to be caught outside this function.
     """
-    if (variety_list is None and field_list is None):
-      return self._varieties
+    if variety_list is None:
+			variety_list = self._varieties.keys()
+			
+    if field_list is None:
+      field_list = self._include_fields
 
     inclusion_dict = {}
     for name in variety_list:
@@ -103,10 +107,11 @@ class Trial_x_Variety_x_Year:
     data = _get(self, variety_list, field_list)
     
     recent_dict = {}
-    for name in data:
-      year = _most_recent_years_with_sufficient_data(self, name, n_list)
-      recent_dict[name] = {}
-      recent_dict[name][year] = data[name][year]
+    for name in data.keys():
+      years = _most_recent_years_with_sufficient_data(self, name, n_list)
+      for year in years:
+				recent_dict[name] = {}
+				recent_dict[name][year] = data[name][year]
     
     return recent_dict
     
@@ -121,7 +126,9 @@ class Trial_x_Variety_x_Year:
     prepending `1-yr-avg-' `2-year-avg-' etc. based on the values in 
     n_list.
     """
-    pass
+    data = _get_recent(self, n_list, variety_list, field_list)
+    
+    return data
 
   def fetch(self, n_list = None, variety_list = None, field_list = None):
     """
@@ -132,4 +139,12 @@ class Trial_x_Variety_x_Year:
     field_list is supplied, results are calculated over all fields. An 
     optional list of variety names filters which varities are returned.
     """
-    pass
+    if field_list is None:
+			field_list = []
+			exclusion_fields = self._include_fields
+		else:
+			exclusion_fields = list(set(self._include_fields).difference(set(field_list)))
+		
+		return _get_averages(self, [1], variety_list, exclusion_fields).update(
+			_get_averages(self, n_list, variety_list, field_list)
+		)
