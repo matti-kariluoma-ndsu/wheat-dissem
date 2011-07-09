@@ -158,6 +158,11 @@ class Trial_x_Variety_x_Year:
 				for prefix in years.keys():
 					if year in years[prefix]:
 						for entry in data[name][year][1]:
+							try:
+								if entry not in averaged[name]['entries']:
+									averaged[name]['entries'].append(entry)
+							except KeyError:
+								averaged[name]['entries'] = [entry]
 							for field in field_list:
 								fieldname = field.name
 								key = "%s%s" % (prefix, fieldname)
@@ -172,7 +177,8 @@ class Trial_x_Variety_x_Year:
 										#averaged[name][key] = [1,float(value),0.0]
 			#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
 			for key in averaged[name].keys():
-				averaged[name][key] = round(averaged[name][key][1] / averaged[name][key][0], 2)
+				if key != 'entries':
+					averaged[name][key] = round(averaged[name][key][1] / averaged[name][key][0], 2)
 
 		return averaged
 

@@ -52,6 +52,17 @@
 					<div class="bushels_acre average data">{{ avg_dict.2_yr_avg_bushels_acre }}</div>
 					<div class="bushels_acre average data">{{ avg_dict.3_yr_avg_bushels_acre }}</div>
 	      </div>
+				{% for entry in avg_dict.entries %}
+				<div class="row slave {% cycle 'odd' 'even' %}">
+					<div class="data" style="font-size: 8pt">{{ entry.harvest_date.date.year }} {{entry.location}}</div>
+					<div class="days_to_head data">{{ entry.days_to_head }}</div>
+					<div class="plant_height data">{{ entry.plant_height }}</div>
+					<div class="kernel_weight data">{{ entry.kernel_weight }}</div>
+					<div class="test_weight data">{{ entry.test_weight }}</div>
+					<div class="protein_percent data">{{ entry.protein_percent }}</div>
+					<div class="bushels_acre data">{{ entry.bushels_acre }}</div>
+				</div>
+				{% endfor %}
       </div>
 			{% endfor %}
 		</div>
