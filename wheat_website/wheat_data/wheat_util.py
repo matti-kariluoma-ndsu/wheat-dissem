@@ -30,14 +30,22 @@ class Trial_x_Variety_x_Year:
     TODO: Verify the fields that are passed in are actual fields
     """
     # Bring field_list to a consistent state
+    field_list = []
     if field_list is None:
-      field_list = []
       for field in models.Trial_Entry._meta.fields:
 				if (field.get_internal_type() == 'DecimalField' 
 						or field.get_internal_type() == 'PositiveIntegerField' 
 						or field.get_internal_type() == 'SmallIntegerField'
 						or field.get_internal_type() == 'IntegerField'):
 						field_list.append(field) # only consider averageable data
+		else:
+			for field in field_list:
+				if (field.get_internal_type() == 'DecimalField' 
+						or field.get_internal_type() == 'PositiveIntegerField' 
+						or field.get_internal_type() == 'SmallIntegerField'
+						or field.get_internal_type() == 'IntegerField'):
+						if field in models.Trial_Entry._meta.fields:
+							field_list.append(field) # ensure the user passed in good data
 						
     self._include_fields = field_list
     
@@ -71,7 +79,7 @@ class Trial_x_Variety_x_Year:
     # Remember to `try/except KeyError' when calling this function.
     return sorted(self._varieties[name].keys(), reverse=True)[:max(n_list):]
   
-  def _get(self, variety_list = None, field_list = None):
+  def _get(self, variety_list = None):
     """ 
     Return all data held in this object matching variety_list. If
     variety_list is None all data is returned. If a name appears
@@ -83,9 +91,6 @@ class Trial_x_Variety_x_Year:
     """
     if variety_list is None:
 			variety_list = self._varieties.keys()
-			
-    if field_list is None:
-      field_list = self._include_fields
 
     inclusion_dict = {}
     for name in variety_list:
@@ -96,7 +101,7 @@ class Trial_x_Variety_x_Year:
     
     return inclusion_dict
   
-  def _get_recent(self, n_list = None, variety_list = None, field_list = None):
+  def _get_recent(self, n_list = None, variety_list = None):
     """
     Return the data matching a list of variety_names in this object that
     is most recent in year, and has sufficient data in that year. If
@@ -104,14 +109,17 @@ class Trial_x_Variety_x_Year:
     None, all recent data are returned. An optional list of field names
     filters by those field names.
     """
-    data = _get(self, variety_list, field_list)
+    data = _get(self, variety_list)
     
     recent_dict = {}
     for name in data.keys():
       years = _most_recent_years_with_sufficient_data(self, name, n_list)
       for year in years:
-				recent_dict[name] = {}
-				recent_dict[name][year] = data[name][year]
+				try:
+					recent_dict[name][year] = data[name][year]
+				except KeyError:
+					recent_dict[name] = {}
+					recent_dict[name][year] = data[name][year]
     
     return recent_dict
     
@@ -126,9 +134,46 @@ class Trial_x_Variety_x_Year:
     prepending `1-yr-avg-' `2-year-avg-' etc. based on the values in 
     n_list.
     """
-    data = _get_recent(self, n_list, variety_list, field_list)
+    if field_list is None: # paranoia
+			field_list = self._include_fields
     
-    return data
+		averaged = {}
+		years = {}
+		data = _get_recent(self, n_list, variety_list)
+    
+    
+		for name in data.keys():
+			i = 1
+			all_years = sorted(data[name].keys(), reverse=True)
+			# populate years, a dictionary of {'prefix': [2000, 1999, ...], ...}
+			for year in all_years: # *must* be done on a per variety basis
+				prefix = "%d-yr-avg" % i
+				for prev_data in years.keys():
+					years[prev_data].append(year) # append this year to each existing element
+				years[prefix] = [year] # make a list containing only this year
+				i += 1
+			# populate averaged, a dictionary {'name': {'prefix'+'field': float, ...}, ...}
+			for year in all_years:
+				for prefix in years.keys():
+					if year in years[prefix]:
+						for entry in data[name][year][1]:
+							for field in field_list:
+								fieldname = field.name
+								key = prefix.join(fieldname)
+								value = getattr(entry, fieldname)
+								if value != None:
+									try:
+										averaged[name][key][0] += 1 # count
+										averaged[name][key][1] += float(value) # running total
+										#averaged[name][key][2] = (averaged[name][key][2] + averaged[name][key][1]) / averaged[name][key][0] # running average
+									except KeyError:
+										averaged[name][key] = [1,float(value)]
+										#averaged[name][key] = [1,float(value),0.0]
+			#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
+			for key in averaged[name].keys():
+				averaged[name][key] = averaged[name][key][1] / averaged[name][key][0]
+
+	return averaged
 
   def fetch(self, n_list = None, variety_list = None, field_list = None):
     """
