@@ -122,7 +122,13 @@ def select_location(request):
 								entries_dict[key][str(min(years))][1][field] += entries_dict[key][str(year)][1][field]
 					for field in entries_dict[key][str(min(years))][1]:
 						entries_dict[key][str(min(years))][1][field] = round(entries_dict[key][str(min(years))][1][field] / len(years), 2)
-							
+			
+			for field in models.Trial_Entry._meta.fields:
+				if field.name == 'bushels_acre':
+					break;
+			entries_dict = Trial_x_Variety_x_Year(entries).fetch(n_list=[1,2,3], field_list=[field])
+			
+			print entries_dict
 			# TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
 			# TODO: hmm... the back-button works, but it's not obvious it will based on the address bar
 			# TODO: I'd still like this all to use the address bar to pass the user input

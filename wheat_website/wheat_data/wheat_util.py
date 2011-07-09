@@ -20,49 +20,49 @@ class Trial_x_Variety_x_Year:
     Initializes with all elements matching field_list in query_set, or
     all elements if field_list is None.
     """
-    return populate(self, query_set, field_list)
+    return self.populate(query_set, field_list)
     
   def populate(self, query_set, field_list = None):
-    """ 
-    Adds all elements matching field_list in query_set, or all elements 
-    if field_list is None.
-    
-    TODO: Verify the fields that are passed in are actual fields
-    """
+		""" 
+		Adds all elements matching field_list in query_set, or all elements 
+		if field_list is None.
+
+		TODO: Verify the fields that are passed in are actual fields
+		"""
     # Bring field_list to a consistent state
-    field_list = []
-    if field_list is None:
-      for field in models.Trial_Entry._meta.fields:
+		if field_list is None:
+			field_list = []
+			for field in Trial_Entry._meta.fields:
 				if (field.get_internal_type() == 'DecimalField' 
 						or field.get_internal_type() == 'PositiveIntegerField' 
 						or field.get_internal_type() == 'SmallIntegerField'
 						or field.get_internal_type() == 'IntegerField'):
-						field_list.append(field) # only consider averageable data
+					field_list.append(field) # only consider averageable data
+			self._include_fields = field_list
 		else:
 			for field in field_list:
 				if (field.get_internal_type() == 'DecimalField' 
 						or field.get_internal_type() == 'PositiveIntegerField' 
 						or field.get_internal_type() == 'SmallIntegerField'
 						or field.get_internal_type() == 'IntegerField'):
-						if field in models.Trial_Entry._meta.fields:
-							field_list.append(field) # ensure the user passed in good data
-						
-    self._include_fields = field_list
+					if field in models.Trial_Entry._meta.fields:
+						self._include_fields.append(field) # ensure the user passed in good data
     
     # Initialize our inner data structures
-    for entry in query_set:
-      name = str(entry.variety.name) # force evaluation
-      year = str(entry.harvest_date.date.year)
-      try:
-        self._varieties[name][year][0] += 1
-        self._varieties[name][year][1].append(entry)
-      except KeyError:  # initialize and add the first value
-        self._varieties[name] = {}
-        self._varieties[name][year] = [1, [entry]]
+		for entry in query_set:
+			name = str(entry.variety.name) # force evaluation
+			year = str(entry.harvest_date.date.year)
+			try:
+				self._varieties[name][year][0] += 1
+				self._varieties[name][year][1].append(entry)
+			except KeyError:  # initialize and add the first value
+				try:
+					self._varieties[name][year] = [1, [entry]]
+				except KeyError:
+					self._varieties[name] = {}
+
     
-
-
-  def _most_recent_year_with_sufficient_data(self, variety_name, n_list = None):
+  def _most_recent_years_with_sufficient_data(self, variety_name, n_list = None):
     """ 
     Query for the most recent year that has sufficient data to post a 
     result using the variety_name. 
@@ -77,7 +77,7 @@ class Trial_x_Variety_x_Year:
       
     # Returns a list with the first element(s) of a sort-descending list      
     # Remember to `try/except KeyError' when calling this function.
-    return sorted(self._varieties[name].keys(), reverse=True)[:max(n_list):]
+    return sorted(self._varieties[variety_name].keys(), reverse=True)[:max(n_list):]
   
   def _get(self, variety_list = None):
     """ 
@@ -90,7 +90,7 @@ class Trial_x_Variety_x_Year:
     TODO: Raise a custom exception to be caught outside this function.
     """
     if variety_list is None:
-			variety_list = self._varieties.keys()
+			return self._varieties
 
     inclusion_dict = {}
     for name in variety_list:
@@ -109,11 +109,11 @@ class Trial_x_Variety_x_Year:
     None, all recent data are returned. An optional list of field names
     filters by those field names.
     """
-    data = _get(self, variety_list)
+    data = self._get(variety_list)
     
     recent_dict = {}
     for name in data.keys():
-      years = _most_recent_years_with_sufficient_data(self, name, n_list)
+      years = self._most_recent_years_with_sufficient_data(name, n_list)
       for year in years:
 				try:
 					recent_dict[name][year] = data[name][year]
@@ -124,30 +124,31 @@ class Trial_x_Variety_x_Year:
     return recent_dict
     
   def _get_averages(self, n_list = None, variety_list = None, field_list = None):
-    """
-    Given a list of the number of dates to go back (e.g. [1,2,3] for the
-    1-yr, 2-yr, and 3-yr averages), return those averaged data. An 
-    optional list of varieties filers by those varieties, and an 
-    optional list of fieldnames filters by those fieldnames.
-    
-    The returned dictionary tags the keys of the averaged items, 
-    prepending `1-yr-avg-' `2-year-avg-' etc. based on the values in 
-    n_list.
-    """
-    if field_list is None: # paranoia
+		"""
+		Given a list of the number of dates to go back (e.g. [1,2,3] for the
+		1-yr, 2-yr, and 3-yr averages), return those averaged data. An 
+		optional list of varieties filers by those varieties, and an 
+		optional list of fieldnames filters by those fieldnames.
+
+		The returned dictionary tags the keys of the averaged items, 
+		prepending `1-yr-avg-' `2-year-avg-' etc. based on the values in 
+		n_list.
+		"""
+		if field_list is None: # paranoia
 			field_list = self._include_fields
-    
+
 		averaged = {}
 		years = {}
-		data = _get_recent(self, n_list, variety_list)
+		data = self._get_recent(n_list, variety_list)
     
     
 		for name in data.keys():
 			i = 1
+			averaged[name] = {}
 			all_years = sorted(data[name].keys(), reverse=True)
 			# populate years, a dictionary of {'prefix': [2000, 1999, ...], ...}
 			for year in all_years: # *must* be done on a per variety basis
-				prefix = "%d-yr-avg" % i
+				prefix = "%d_yr_avg_" % i
 				for prev_data in years.keys():
 					years[prev_data].append(year) # append this year to each existing element
 				years[prefix] = [year] # make a list containing only this year
@@ -159,7 +160,7 @@ class Trial_x_Variety_x_Year:
 						for entry in data[name][year][1]:
 							for field in field_list:
 								fieldname = field.name
-								key = prefix.join(fieldname)
+								key = "%s%s" % (prefix, fieldname)
 								value = getattr(entry, fieldname)
 								if value != None:
 									try:
@@ -171,25 +172,28 @@ class Trial_x_Variety_x_Year:
 										#averaged[name][key] = [1,float(value),0.0]
 			#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
 			for key in averaged[name].keys():
-				averaged[name][key] = averaged[name][key][1] / averaged[name][key][0]
+				averaged[name][key] = round(averaged[name][key][1] / averaged[name][key][0], 2)
 
-	return averaged
+		return averaged
 
   def fetch(self, n_list = None, variety_list = None, field_list = None):
-    """
-    Main accessor method for this data. The optional fields n_list and 
-    field_list are used to return a multi-year averaged field, while 
-    fields not in field_list are returned as 1 (last) year averages. 
-    When n_list is not supplied, a 1 year average is assumed. If no 
-    field_list is supplied, results are calculated over all fields. An 
-    optional list of variety names filters which varities are returned.
-    """
-    if field_list is None:
+		"""
+		Main accessor method for this data. The optional fields n_list and 
+		field_list are used to return a multi-year averaged field, while 
+		fields not in field_list are returned as 1 (last) year averages. 
+		When n_list is not supplied, a 1 year average is assumed. If no 
+		field_list is supplied, results are calculated over all fields. An 
+		optional list of variety names filters which varities are returned.
+		"""
+		if field_list is None:
 			field_list = []
 			exclusion_fields = self._include_fields
 		else:
 			exclusion_fields = list(set(self._include_fields).difference(set(field_list)))
-		
-		return _get_averages(self, [1], variety_list, exclusion_fields).update(
-			_get_averages(self, n_list, variety_list, field_list)
-		)
+			
+		a = self._get_averages([1], variety_list, exclusion_fields)
+		b = self._get_averages(n_list, variety_list, field_list)
+		for name in a.keys():
+			a[name].update(b[name])
+			
+		return a
