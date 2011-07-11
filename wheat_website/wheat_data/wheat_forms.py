@@ -191,4 +191,4 @@ def handle_csv_file(uploaded_file):
 				setattr(model_instance, name, insertion_dict[name])
 			#model_instance.save() # ARE YOU BRAVE ENOUGH?
 			
-	return False, errors
+	return (False, errors)
