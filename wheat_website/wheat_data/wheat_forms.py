@@ -82,7 +82,7 @@ class fuzzy_spellchecker():
 def handle_reference_field(reference_dict, field, data):
 	"""
 	Given a spellchecker, a dictionary of possible reference values, a 
-	requested field to populate, and thedata to populate with, find/create
+	requested field to populate, and the data to populate with, find/create
 	the field and returns it's id to populate the reference field with.
 	"""
 	try:
@@ -98,6 +98,7 @@ def handle_reference_field(reference_dict, field, data):
 		print "make new %s called %s" % (field, data)
 		try:
 			if isinstance(reference_dict[field][0], models.Date):
+				pass
 		except IndexError:
 			pass
 	else: # lookup the existing object 
@@ -108,6 +109,18 @@ def handle_reference_field(reference_dict, field, data):
 				break
 		
 	return return_id
+
+alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+def letter(number):
+	j = int(number/(len(alphabet)-1)) - 1
+	
+	if j >= len(alphabet):
+		column_letter = str(number) # just bail if we get in trouble
+	elif j >= 0:
+		column_letter = "%s%s" % (alphabet[j % len(alphabet)], alphabet[number % len(alphabet)])
+	else:
+		column_letter = "%s" % (alphabet[number % len(alphabet)])
+	return column_letter
 
 def handle_csv_file(uploaded_file):
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
@@ -143,7 +156,7 @@ def handle_csv_file(uploaded_file):
 	skip_lines = 2
 	line_number = 0
 	headers = []
-	errors = []
+	errors = {}
 	
 	
 	for line in uploaded_file:
@@ -164,16 +177,15 @@ def handle_csv_file(uploaded_file):
 							try:
 								insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
 							except ValidationError:
-								errors.append("Couldn't read a badly formatted date on Row: %d, Column: %d: \"%s\"" % (line_number, column_number, column.strip()))
+								errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
 						else:
-							errors.append("Heading name \"%s\" not found in database." % name)
+							errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
 				except IndexError:
-					errors.append("Found more data columns than there are headings. Row: %d, Column: %d" % (line_number, column_number))
+					errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
 				column_number += 1
 			model_instance = models.Trial_Entry()
 			for name in insertion_dict.keys():
 				setattr(model_instance, name, insertion_dict[name])
 			#model_instance.save() # ARE YOU BRAVE ENOUGH?
 			
-	print errors
-	return False, {'file': 'not in csv format', 'variety': 'not an id'}
+	return False, errors
