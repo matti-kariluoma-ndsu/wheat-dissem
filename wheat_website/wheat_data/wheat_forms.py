@@ -94,11 +94,13 @@ def handle_reference_field(reference_dict, field, data):
 	word = speller.check(field, data)
 	return_id = None
 	
+	## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
+	
 	if word is None: # create a new object and save it to the db
 		print "make new %s called %s" % (field, data)
 		try:
 			if isinstance(reference_dict[field][0], models.Date):
-				pass
+				print str(forms.DateField().clean(data)) # raises a ValidationError
 		except IndexError:
 			pass
 	else: # lookup the existing object 
