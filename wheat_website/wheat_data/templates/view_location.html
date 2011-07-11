@@ -17,7 +17,7 @@
 				<div class="protein_percent"><h3>Protein</h3></div>
 				<div id="larger_column" class="bushels_acre"><h3>Grain Yield</h3></div>
 			</div>
-			<div class="row subheadings">
+			<div class="row subheadings thin">
 				<div class="variety"></div>
 				<div class="days_to_head">Days after Planting</div>
 				<div class="plant_height">Inches</div>
@@ -26,7 +26,7 @@
 				<div class="protein_percent">Percentage</div>
 				<div id="larger_column" class="bushels_acre">Bushels per Acre</div>
 			</div>
-			<div class="row subheadings">
+			<div class="row subheadings thin">
 				<div class="variety"></div>
 				<div class="days_to_head"></div>
 				<div class="plant_height"></div>
@@ -39,31 +39,58 @@
 					<div class="bushels_acre">3 yr</div>
 				</div>
 			</div>
-			{% for variety_name, avg_dict in trialentry_dict.items %}
-      <div class="{{variety_name}} group"> <!--TODO: filter replace space with underscores in this class property-->
-				<div class="row master {% cycle 'odd' 'even' %}">
-					<div class="variety average data"><a href="somewhere">{{ variety_name }}</a></div>
-					<div class="days_to_head average data">{{ avg_dict.1_yr_avg_days_to_head }}</div>
-					<div class="plant_height average data">{{ avg_dict.1_yr_avg_plant_height }}</div>
-					<div class="kernel_weight average data">{{ avg_dict.1_yr_avg_kernel_weight }}</div>
-					<div class="test_weight average data">{{ avg_dict.1_yr_avg_test_weight }}</div>
-					<div class="protein_percent average data">{{ avg_dict.1_yr_avg_protein_percent }}</div>
-					<div class="bushels_acre average data">{{ avg_dict.1_yr_avg_bushels_acre }}</div>
-					<div class="bushels_acre average data">{{ avg_dict.2_yr_avg_bushels_acre }}</div>
-					<div class="bushels_acre average data">{{ avg_dict.3_yr_avg_bushels_acre }}</div>
-	      </div>
-				{% for entry in avg_dict.entries %}
-				<div class="row slave {% cycle 'odd' 'even' %}">
-					<div class="data" style="font-size: 8pt">{{ entry.harvest_date.date.year }} {{entry.location}}</div>
-					<div class="days_to_head data">{{ entry.days_to_head }}</div>
-					<div class="plant_height data">{{ entry.plant_height }}</div>
-					<div class="kernel_weight data">{{ entry.kernel_weight }}</div>
-					<div class="test_weight data">{{ entry.test_weight }}</div>
-					<div class="protein_percent data">{{ entry.protein_percent }}</div>
-					<div class="bushels_acre data">{{ entry.bushels_acre }}</div>
+			<div class="row subheadings thin">
+				<div class="row_label"></div>
+				<div class="days_to_head"></div>
+				<div class="plant_height"></div>
+				<div class="kernel_weight"></div>
+				<div class="test_weight"></div>
+				<div class="protein_percent"></div>
+				<div id="larger_column" class="bushels_acre" style="font-size: 8pt;">
+					<div class="bushels_acre">(8 datapoints)</div>
+					<div class="bushels_acre">(16 datapoints)</div>
+					<div class="bushels_acre">(24 datapoints)</div>
+				</div>
+			</div>
+			{% for trialentry_dict in trialentry_ranked_list %}
+				{% for variety_name, avg_dict in trialentry_dict.items %}
+				<div class="{{variety_name}} group"> <!--TODO: filter replace space with underscores in this class property-->
+					<div class="row master {% cycle 'odd' 'even' %}">
+						<div class="variety average data"><a href="somewhere">{{ variety_name }}</a></div>
+						<div class="days_to_head average data">{{ avg_dict.1_yr_avg_days_to_head }}</div>
+						<div class="plant_height average data">{{ avg_dict.1_yr_avg_plant_height }}</div>
+						<div class="kernel_weight average data">{{ avg_dict.1_yr_avg_kernel_weight }}</div>
+						<div class="test_weight average data">{{ avg_dict.1_yr_avg_test_weight }}</div>
+						<div class="protein_percent average data">{{ avg_dict.1_yr_avg_protein_percent }}</div>
+						<div class="bushels_acre average data">{{ avg_dict.1_yr_avg_bushels_acre }}</div>
+						<div class="bushels_acre average data">{{ avg_dict.2_yr_avg_bushels_acre }}</div>
+						<div class="bushels_acre average data">{{ avg_dict.3_yr_avg_bushels_acre }}</div>
+					</div>
+					{% for entry in avg_dict.entries %}
+					<div class="row slave {% cycle 'odd' 'even' %}">
+						<div class="row_label" style="font-size: 8pt">{{ entry.harvest_date.date.year }} {{entry.location}}</div>
+						<div class="days_to_head data">{{ entry.days_to_head }}</div>
+						<div class="plant_height data">{{ entry.plant_height }}</div>
+						<div class="kernel_weight data">{{ entry.kernel_weight }}</div>
+						<div class="test_weight data">{{ entry.test_weight }}</div>
+						<div class="protein_percent data">{{ entry.protein_percent }}</div>
+						<div class="bushels_acre data">{{ entry.bushels_acre }}</div>
+					</div>
+					{% endfor %}
 				</div>
 				{% endfor %}
-      </div>
+			<div class="row footer">
+				<div class="row_label">LSD</div>
+				<div class="days_to_head data"></div>
+				<div class="plant_height data"></div>
+				<div class="kernel_weight data"></div>
+				<div class="test_weight data"></div>
+				<div class="protein_percent data"></div>
+				<div class="bushels_acre data"></div>
+				<div class="bushels_acre data"></div>
+				<div class="bushels_acre data"></div>
+			</div>
+			<div class="row thin"></div>
 			{% endfor %}
 		</div>
 	</div>

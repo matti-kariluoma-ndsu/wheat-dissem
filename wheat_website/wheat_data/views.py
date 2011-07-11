@@ -72,7 +72,7 @@ def select_location(request):
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == 'bushels_acre':
 					break;
-			entries_dict = Trial_x_Variety_x_Year(entries).fetch(n_list=[1,2,3], field_list=[field])
+			ranked_entries_list = Trial_x_Variety_x_Year(entries).fetch(n_list=[1,2,3], field_list=[field])
 
 			# TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
 			# TODO: hmm... the back-button works, but it's not obvious it will based on the address bar
@@ -85,7 +85,7 @@ def select_location(request):
 				{ 
 					'location_list': locations,
 					'trialentry_list': entries,
-					'trialentry_dict': entries_dict,
+					'trialentry_ranked_list': ranked_entries_list,
 					'year_list': year_list,
 					'radius' : radius,
 					'lat_list': lat2_list,

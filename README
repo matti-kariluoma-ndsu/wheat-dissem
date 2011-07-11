@@ -1,6 +1,8 @@
-Prereqs:
+Prerequisites:
  Python:
-  Download and Install Python, version 2.4 or greater.
+  Download and Install Python, version 2.4 or greater. (http://www.python.org/download)
+ rpy2:
+	Download and Install python-rpy2. (http://rpy.sourceforge.net/rpy2_download.html)
  Django:
   Download Django (http://www.djangoproject.com/download/)
   Install Django (http://docs.djangoproject.com/en/dev/intro/install/)
@@ -16,9 +18,10 @@ Prereqs:
 		$ cd wadofstuff-django-serializers-1.1.0
 		$ sudo python setup.py install
  
-Install to a fresh machine w/apache (Ubuntu syntax):
+Install to a fresh machine w/apache (Ubuntu/Debian syntax):
  $ sudo apt-get install git-{arch,svn,cvs,daemon-run} sqlite3 \
-     python-{sqlite,flup,psycopg2} subversion apache2 libapache2-mod-wsgi 
+     python-{sqlite,flup,psycopg2,rpy2} subversion apache2 \
+     libapache2-mod-wsgi 
  $ git clone http://github.com/matti-kariluoma-ndsu/wheat-dissem.git
  $ cd wheat-dissem
  $ cat README # this file you are currently reading

@@ -113,15 +113,16 @@ def handle_reference_field(reference_dict, field, data):
 	return return_id
 
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+len_alphabet = len(alphabet)
 def letter(number):
-	j = int(number/(len(alphabet)-1)) - 1
+	j = int(number / (len_alphabet - 1)) - 1
 	
-	if j >= len(alphabet):
+	if j >= len_alphabet:
 		column_letter = str(number) # just bail if we get in trouble
 	elif j >= 0:
-		column_letter = "%s%s" % (alphabet[j % len(alphabet)], alphabet[number % len(alphabet)])
+		column_letter = "%s%s" % (alphabet[j % len_alphabet], alphabet[number % len_alphabet])
 	else:
-		column_letter = "%s" % (alphabet[number % len(alphabet)])
+		column_letter = "%s" % (alphabet[number % len_alphabet])
 	return column_letter
 
 def handle_csv_file(uploaded_file):

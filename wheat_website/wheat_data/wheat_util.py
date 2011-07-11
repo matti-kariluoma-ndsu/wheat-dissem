@@ -190,6 +190,9 @@ class Trial_x_Variety_x_Year:
 		When n_list is not supplied, a 1 year average is assumed. If no 
 		field_list is supplied, results are calculated over all fields. An 
 		optional list of variety names filters which varities are returned.
+		
+		returns a ranked list of dictionaries [ {variety_name: { entries: [objects], 1-yr-avg-fieldname: value, ... } }, ... ]
+		where the ranking is determined by number of locations for that variety.
 		"""
 		if field_list is None:
 			field_list = []
@@ -199,7 +202,9 @@ class Trial_x_Variety_x_Year:
 			
 		a = self._get_averages([1], variety_list, exclusion_fields)
 		b = self._get_averages(n_list, variety_list, field_list)
-		for name in a.keys():
+		
+		# TODO: verify robustness of the following: (does all of b get into a? b.keys()?)
+		for name in a.keys(): 
 			a[name].update(b[name])
 			
-		return a
+		return [a,a]

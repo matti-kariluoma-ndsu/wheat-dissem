@@ -19,10 +19,21 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
   padding:0 0 0 0;
   width:100px;
   text-align:center;}
-.row .data{
-  font-family:'Courier New','Courier','sans-serif';}
+.row {
+  font-family:'Courier New','Courier','sans-serif';
+}
+  
 .slave {
-  display:none;}
+  display:none;
+}
+  
+.row_label {
+	font-size: 8pt; text-align: right; float: right;
+}
+
+.thin {
+	min-height: 50px;
+}
 
 #map {
   float:right;}
