@@ -8,8 +8,8 @@ class Trial_x_Variety_x_Year:
   """
   # A dictionary of variety_name to a year dictionary with Trial_Entry 
   # objects and their count.
-  # {'name': {'year': [count, [trial_entry_objects]]}}
-  _varieties = {}
+  # {(name, location): {'year': [count, [trial_entry_objects]]}}
+  _variety_x_location = {}
   _include_fields = []
   
   def __init__(self):
@@ -51,18 +51,20 @@ class Trial_x_Variety_x_Year:
     # Initialize our inner data structures
 		for entry in query_set:
 			name = str(entry.variety.name) # force evaluation
+			location = str(entry.location.name) 
 			year = str(entry.harvest_date.date.year)
 			try:
-				self._varieties[name][year][0] += 1
-				self._varieties[name][year][1].append(entry)
+				self._variety_x_location[(name, location)][year][0] += 1
+				self._variety_x_location[(name, location)][year][1].append(entry)
 			except KeyError:  # initialize and add the first value
 				try:
-					self._varieties[name][year] = [1, [entry]]
+					self._variety_x_location[(name, location)][year] = [1, [entry]]
 				except KeyError:
-					self._varieties[name] = {}
+					self._variety_x_location[(name, location)] = {}
+					self._variety_x_location[(name, location)][year] = [1, [entry]]
 
     
-  def _most_recent_years_with_sufficient_data(self, variety_name, n_list = None):
+  def _most_recent_years_with_sufficient_data(self, var_loc_key, n_list = None):
     """ 
     Query for the most recent year that has sufficient data to post a 
     result using the variety_name. 
@@ -77,53 +79,53 @@ class Trial_x_Variety_x_Year:
       
     # Returns a list with the first element(s) of a sort-descending list      
     # Remember to `try/except KeyError' when calling this function.
-    return sorted(self._varieties[variety_name].keys(), reverse=True)[:max(n_list):]
+    return sorted(self._variety_x_location[var_loc_key].keys(), reverse=True)[:max(n_list):]
   
-  def _get(self, variety_list = None):
+  def _get(self, variety_x_location_list = None):
     """ 
-    Return all data held in this object matching variety_list. If
-    variety_list is None all data is returned. If a name appears
-    in variety_list that isn't in our data, that fetch for non-existent
+    Return all data held in this object matching variety_x_location_list. If
+    variety_x_location_list is None all data is returned. If a name appears
+    in variety_x_location_list that isn't in our data, that fetch for non-existent
     data silently fails and we continue on. An optional list of field
     names filters by those field names.
     
     TODO: Raise a custom exception to be caught outside this function.
     """
-    if variety_list is None:
-			return self._varieties
+    if variety_x_location_list is None:
+			return self._variety_x_location
 
     inclusion_dict = {}
-    for name in variety_list:
+    for key in variety_x_location_list:
       try:
-        inclusion_dict[name] = self._varieties[name]
+        inclusion_dict[key] = self._variety_x_location[key]
       except KeyError:
         pass # Silently fail
     
     return inclusion_dict
   
-  def _get_recent(self, n_list = None, variety_list = None):
+  def _get_recent(self, n_list = None, variety_x_location_list = None):
     """
     Return the data matching a list of variety_names in this object that
     is most recent in year, and has sufficient data in that year. If
-    n_list is none, the most recent year is returned. If variety_list is
+    n_list is none, the most recent year is returned. If variety_x_location_list is
     None, all recent data are returned. An optional list of field names
     filters by those field names.
     """
-    data = self._get(variety_list)
+    data = self._get(variety_x_location_list)
     
     recent_dict = {}
-    for name in data.keys():
-      years = self._most_recent_years_with_sufficient_data(name, n_list)
+    for var_loc in data.keys():
+      years = self._most_recent_years_with_sufficient_data(var_loc, n_list)
       for year in years:
 				try:
-					recent_dict[name][year] = data[name][year]
+					recent_dict[var_loc][year] = data[var_loc][year]
 				except KeyError:
-					recent_dict[name] = {}
-					recent_dict[name][year] = data[name][year]
+					recent_dict[var_loc] = {}
+					recent_dict[var_loc][year] = data[var_loc][year]
     
     return recent_dict
     
-  def _get_averages(self, n_list = None, variety_list = None, field_list = None):
+  def _get_averages(self, n_list = None, variety_x_location_list = None, field_list = None):
 		"""
 		Given a list of the number of dates to go back (e.g. [1,2,3] for the
 		1-yr, 2-yr, and 3-yr averages), return those averaged data. An 
@@ -139,13 +141,13 @@ class Trial_x_Variety_x_Year:
 
 		averaged = {}
 		years = {}
-		data = self._get_recent(n_list, variety_list)
+		data = self._get_recent(n_list, variety_x_location_list)
     
     
-		for name in data.keys():
+		for var_loc in data.keys():
 			i = 1
-			averaged[name] = {}
-			all_years = sorted(data[name].keys(), reverse=True)
+			averaged[var_loc] = {}
+			all_years = sorted(data[var_loc].keys(), reverse=True)
 			# populate years, a dictionary of {'prefix': [2000, 1999, ...], ...}
 			for year in all_years: # *must* be done on a per variety basis
 				prefix = "%d_yr_avg_" % i
@@ -157,32 +159,32 @@ class Trial_x_Variety_x_Year:
 			for year in all_years:
 				for prefix in years.keys():
 					if year in years[prefix]:
-						for entry in data[name][year][1]:
+						for entry in data[var_loc][year][1]:
 							try:
-								if entry not in averaged[name]['entries']:
-									averaged[name]['entries'].append(entry)
+								if entry not in averaged[var_loc]['entries']:
+									averaged[var_loc]['entries'].append(entry)
 							except KeyError:
-								averaged[name]['entries'] = [entry]
+								averaged[var_loc]['entries'] = [entry]
 							for field in field_list:
 								fieldname = field.name
 								key = "%s%s" % (prefix, fieldname)
 								value = getattr(entry, fieldname)
 								if value != None:
 									try:
-										averaged[name][key][0] += 1 # count
-										averaged[name][key][1] += float(value) # running total
-										#averaged[name][key][2] = (averaged[name][key][2] + averaged[name][key][1]) / averaged[name][key][0] # running average
+										averaged[var_loc][key][0] += 1 # count
+										averaged[var_loc][key][1] += float(value) # running total
+										#averaged[var_loc][key][2] = (averaged[var_loc][key][2] + averaged[var_loc][key][1]) / averaged[var_loc][key][0] # running average
 									except KeyError:
-										averaged[name][key] = [1,float(value)]
-										#averaged[name][key] = [1,float(value),0.0]
+										averaged[var_loc][key] = [1,float(value)]
+										#averaged[var_loc][key] = [1,float(value),0.0]
 			#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
-			for key in averaged[name].keys():
+			for key in averaged[var_loc].keys():
 				if key != 'entries':
-					averaged[name][key] = round(averaged[name][key][1] / averaged[name][key][0], 2)
+					averaged[var_loc][key] = round(averaged[var_loc][key][1] / averaged[var_loc][key][0], 2)
 
 		return averaged
 
-  def fetch(self, n_list = None, variety_list = None, field_list = None):
+  def fetch(self, n_list = None, variety_x_location_list = None, field_list = None):
 		"""
 		Main accessor method for this data. The optional fields n_list and 
 		field_list are used to return a multi-year averaged field, while 
@@ -200,11 +202,13 @@ class Trial_x_Variety_x_Year:
 		else:
 			exclusion_fields = list(set(self._include_fields).difference(set(field_list)))
 			
-		a = self._get_averages([1], variety_list, exclusion_fields)
-		b = self._get_averages(n_list, variety_list, field_list)
+		a = self._get_averages([1], variety_x_location_list, exclusion_fields)
+		b = self._get_averages(n_list, variety_x_location_list, field_list)
 		
+		ranks = range(max(a.values())
+		return_list = []
 		# TODO: verify robustness of the following: (does all of b get into a? b.keys()?)
-		for name in a.keys(): 
-			a[name].update(b[name])
-			
-		return [a,a]
+		for var_loc in a.keys(): 
+			a[var_loc].update(b[var_loc])
+		
+		return [a]
