@@ -177,11 +177,13 @@ class Trial_x_Variety_x_Year:
 									except KeyError:
 										averaged[var_loc][key] = [1,float(value)]
 										#averaged[var_loc][key] = [1,float(value),0.0]
+			
 			#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
+			ranks = []
 			for key in averaged[var_loc].keys():
 				if key != 'entries':
 					averaged[var_loc][key] = round(averaged[var_loc][key][1] / averaged[var_loc][key][0], 2)
-
+					
 		return averaged
 
   def fetch(self, n_list = None, variety_x_location_list = None, field_list = None):
@@ -205,10 +207,17 @@ class Trial_x_Variety_x_Year:
 		a = self._get_averages([1], variety_x_location_list, exclusion_fields)
 		b = self._get_averages(n_list, variety_x_location_list, field_list)
 		
-		ranks = range(max(a.values())
+		
 		return_list = []
 		# TODO: verify robustness of the following: (does all of b get into a? b.keys()?)
+		count = {}
+		ranks = {}
+		names = {}
+		locations = {}
 		for var_loc in a.keys(): 
 			a[var_loc].update(b[var_loc])
+			count[var_loc] = len(a[var_loc]['entries'])
+			names.append(var_loc[0])
+			locations.append(var_loc[1])
 		
 		return [a]
