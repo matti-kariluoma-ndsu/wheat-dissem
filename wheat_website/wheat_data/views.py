@@ -4,7 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from wheat_data import models
 from wheat_data import wheat_forms
-from wheat_data.wheat_util import Trial_x_Variety_x_Year
+from wheat_data.wheat_util import Trial_x_Location_x_Year
 from math import pi, sin, cos, asin, atan2, degrees, radians
 import datetime
 
@@ -72,7 +72,8 @@ def select_location(request):
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == 'bushels_acre':
 					break;
-			ranked_entries_list = Trial_x_Variety_x_Year(entries).fetch(n_list=[1,2,3], field_list=[field])
+          
+			ranked_entries_list = Trial_x_Location_x_Year(query_set=entries, location_set=locations, year_list=year_list).fetch(n_list=[1,2,3], field_list=[field])
 
 			# TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
 			# TODO: hmm... the back-button works, but it's not obvious it will based on the address bar
