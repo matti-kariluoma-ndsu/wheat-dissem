@@ -173,52 +173,85 @@ class Trial_x_Location_x_Year:
 		prev_rank = []
 		cur_rank = []
 		
-		def satisfies_all_locations(name_list, name_to_check):
+		##
+		## USE SETS and always add in alphabetical tuple order.
+		##
+		
+		def satisfies_all_locations(name_list, name_to_check, debug=False):
 			# given all names in name_list already have a location in common
-			locations = []
-			for name in name_list:
-				#print(data[name].keys())
-				locations.extend(data[name].keys())
-			locations = list(set(locations))
-			locations.extend(data[name_to_check].keys())
+			location_years = set()
 			
-			# the key 'count' will be in all, so check for size > 1
-			return len(list(set(locations))) > len(name_list)+1
+			for name in name_list:
+				if debug:
+					print(data[name].keys())
+				for location in data[name].keys():
+					if location != 'count':
+						#for year in data[name][location].keys():
+							#if year != 'check':
+								#location_years.add((location, year))
+								location_years.add(location)
+			print(location_years)
+			check = len(list(location_years))
+			
+			if debug:
+				print(data[name_to_check].keys())
+			for location in data[name_to_check].keys():
+					if location != 'count':
+						#for year in data[name_to_check][location].keys():
+							#if year != 'check':
+								#location_years.add((location, year))
+								location_years.add(location)
+				
+			return len(list(location_years)) > check
 		
 		# rank 0, all names share locations with themselves
 		for name in data.keys():
 			if name != 'count':
 				cur_rank.append([name])
-		ranked_list.append(cur_rank)
-		#print(cur_rank)
-		#print(" ")
+		#ranked_list.append(cur_rank)
+
 		# rank 1, which names form a set with another name?
 		prev_rank = cur_rank
 		cur_rank = []
-		for name in data.keys():
-			if name != 'count':
-				for plist in prev_rank:
-					if satisfies_all_locations(plist, name):
-						plist.append(name)
-						cur_rank.append(plist)
-		ranked_list.append(cur_rank)
-		#print(cur_rank)
-		"""
+		for plist in prev_rank:
+			for name in data.keys():
+				if (name != 'count') and (name not in plist):
+						if satisfies_all_locations(plist, name):
+							plist.append(name)
+							cur_rank.append(plist)
+							break
+		#ranked_list.append(cur_rank)
+
 		# rank 2, which names form a set with two others?		
 		prev_rank = cur_rank
 		cur_rank = []
-		for name in data.keys():
-			if name != 'count':
-				for plist in prev_rank:
-					if satisfies_all_locations(plist, name):
-						plist.append(name)
-						cur_rank.append(plist)
+		for plist in prev_rank:
+			for name in data.keys():
+				if (name != 'count') and (name not in plist):
+						if satisfies_all_locations(plist, name):
+							plist.append(name)
+							cur_rank.append(plist)
+							break
+		#ranked_list.append(cur_rank)
+		
+		# rank 3, which names form a set with three others?		
+		prev_rank = cur_rank
+		cur_rank = []
+		for plist in prev_rank:
+			for name in data.keys():
+				if (name != 'count') and (name not in plist):
+						if satisfies_all_locations(plist, name, True):
+							plist.append(name)
+							cur_rank.append(plist)
+							break
 		ranked_list.append(cur_rank)
-		"""
 		
+		rank = set()
 		for plist in cur_rank:
-			print(len(plist))
+			plist.sort()
+			rank.add(tuple(plist))
 		
+		print(rank)
 		
 		return ranked_list
 	
