@@ -160,7 +160,7 @@ class Trial_x_Location_x_Year:
 	
 	def _get_recent_ranked(self, n_list = None):
 		"""
-		Returns a list of dictionary keys ranked by number of locations x years
+		Returns a list of dictionaries ranked by number of locations x years
 		per variety, filtered first by date such that the n_list most recent
 		years are considered.
 		"""
@@ -172,20 +172,24 @@ class Trial_x_Location_x_Year:
 		
 		for name in data.keys():
 			try:
-				rank_dict[data[name]['count']].append(name)
+				rank_dict[data[name]['count']].update({name: data[name]})
 			except KeyError:
-				rank_dict[data[name]['count']] = [name]
+				rank_dict[data[name]['count']] = {name: data[name]}
 		
-		rank_list = range(max(rank_dict.keys()))
+		maxrank = max(rank_dict.keys())
+		rank_list = range(maxrank)
+		
+		for i in rank_list:
+			rank_list[i] = {} # ensure empty dictionaries 
 		
 		for i in rank_dict.keys():
-			rank_list[i-1] = rank_dict[i]
+			rank_list[maxrank - i] = rank_dict[i]
 		"""
 		first_dict = {}
 		rank_dict = {}
 		last_dict = {}
 		
-		# rank 0, each name with their 
+		# rank 0, each name with their locations
 		for name in data.keys():
 			print("%s: %d" % (name, data[name]['count']))
 			if name != 'count':
@@ -253,8 +257,7 @@ class Trial_x_Location_x_Year:
 						rank_dict[tuple(nlist)] = locations
 		rank_list.append(rank_dict)
 		"""
-		print(rank_dict)
-		
+
 		return rank_list
 	
 	def _get_averages(self, n_list = None, field_list = None):
@@ -271,51 +274,70 @@ class Trial_x_Location_x_Year:
 		if field_list is None: # paranoia
 			field_list = self._include_fields
 
-		averaged = {}
-		years = {}
-		data = self._get_recent_ranked(n_list)
+		data_list = self._get_recent_ranked(n_list)
+		averaged = range(len(data_list))
 		
-		"""
-		for var_loc in data.keys():
-			i = 1
-			averaged[var_loc] = {}
-			all_years = sorted(data[var_loc].keys(), reverse=True)
-			# populate years, a dictionary of {'prefix': [2000, 1999, ...], ...}
-			for year in all_years: # *must* be done on a per variety basis
-				prefix = "%d_yr_avg_" % i
-				for prev_data in years.keys():
-					years[prev_data].append(year) # append this year to each existing element
-				years[prefix] = [year] # make a list containing only this year
-				i += 1
-			# populate averaged, a dictionary {'name': {'prefix'+'field': float, ...}, ...}
-			for year in all_years:
-				for prefix in years.keys():
-					if year in years[prefix]:
-						for entry in data[var_loc][year][1]:
-							try:
-								if entry not in averaged[var_loc]['entries']:
-									averaged[var_loc]['entries'].append(entry)
-							except KeyError:
-								averaged[var_loc]['entries'] = [entry]
-							for field in field_list:
-								fieldname = field.name
-								key = "%s%s" % (prefix, fieldname)
-								value = getattr(entry, fieldname)
-								if value != None:
+		j = 0
+		for rank_dict in data_list:
+			avg_dict = {}
+			for name in rank_dict.keys():
+				avg_dict[name] = {}
+				all_years = set()
+				all_locations = []
+				for location in rank_dict[name].keys():
+					if location != 'count':
+						all_locations.append(location) # TODO: this is a candidate to be stored on populate()
+						for year in rank_dict[name][location].keys():
+							if year != 'count':
+								all_years.add(year) # TODO: this is a candidate to be stored on populate()
+				all_years = sorted(list(all_years), reverse=True)
+
+				# populate years, a dictionary of {'prefix': [2000, 1999, ...], ...}
+				years = {}
+				i = 1
+				for year in all_years: # *must* be done on a per variety basis
+					prefix = "%d_yr_avg_" % i
+					for prev_prefixes in years.keys():
+						years[prev_prefixes].append(year) # append this year to each existing element
+					years[prefix] = [year] # make a list containing only this year
+					i += 1
+
+				# populate avg_dict, a dictionary {'name': {'prefix'+'field': float, ...}, ...}
+				for location in all_locations:
+					for year in all_years:
+						for prefix in years.keys():
+							if year in years[prefix]:
+								try:
+									entries = rank_dict[name][location][year]['entries']
+								except KeyError:
+									continue # skip to next iteration of `for prefix in years.keys()'
+								for entry in entries:
 									try:
-										averaged[var_loc][key][0] += 1 # count
-										averaged[var_loc][key][1] += float(value) # running total
-										#averaged[var_loc][key][2] = (averaged[var_loc][key][2] + averaged[var_loc][key][1]) / averaged[var_loc][key][0] # running average
+										if entry not in avg_dict[name]['entries']:
+											avg_dict[name]['entries'].append(entry)
 									except KeyError:
-										averaged[var_loc][key] = [1,float(value)]
-										#averaged[var_loc][key] = [1,float(value),0.0]
+										avg_dict[name]['entries'] = [entry]
+									for field in field_list:
+										fieldname = field.name
+										key = "%s%s" % (prefix, fieldname)
+										value = getattr(entry, fieldname)
+										if value != None:
+											try:
+												avg_dict[name][key][0] += 1 # count
+												avg_dict[name][key][1] += float(value) # running total
+												#avg_dict[name][key][2] = (avg_dict[name][key][2] + avg_dict[name][key][1]) / avg_dict[name][key][0] # running average
+											except KeyError:
+												avg_dict[name][key] = [1,float(value)]
 			
-			#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
-			ranks = []
-			for key in averaged[var_loc].keys():
-				if key != 'entries':
-					averaged[var_loc][key] = round(averaged[var_loc][key][1] / averaged[var_loc][key][0], 2)
-		"""
+												#avg_dict[name][key] = [1,float(value),0.0]
+				#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
+				for key in avg_dict[name].keys():
+					if key != 'entries':
+						avg_dict[name][key] = round(avg_dict[name][key][1] / avg_dict[name][key][0], 2)			
+			
+			averaged[j] = avg_dict
+			j += 1
+		
 		return averaged
 
 	def fetch(self, n_list = None, field_list = None):
@@ -353,4 +375,4 @@ class Trial_x_Location_x_Year:
 			names.append(var_loc[0])
 			locations.append(var_loc[1])
 		"""
-		return [a]
+		return a
