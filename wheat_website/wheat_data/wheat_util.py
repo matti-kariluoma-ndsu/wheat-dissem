@@ -160,100 +160,102 @@ class Trial_x_Location_x_Year:
 	
 	def _get_recent_ranked(self, n_list = None):
 		"""
-		Returns a list of dictionaries ranked by number of locations x years
+		Returns a list of dictionary keys ranked by number of locations x years
 		per variety, filtered first by date such that the n_list most recent
 		years are considered.
 		"""
 		
 		data = self._get_recent(n_list)
-		#names = self._names
-		#locations = self._locations
-		#years = self._years
-		ranked_list = []
-		prev_rank = []
-		cur_rank = []
 		
-		##
-		## USE SETS and always add in alphabetical tuple order.
-		##
+		rank_list = []
+		rank_dict = {}
 		
-		def satisfies_all_locations(name_list, name_to_check, debug=False):
-			# given all names in name_list already have a location in common
-			location_years = set()
-			
-			for name in name_list:
-				if debug:
-					print(data[name].keys())
+		for name in data.keys():
+			try:
+				rank_dict[data[name]['count']].append(name)
+			except KeyError:
+				rank_dict[data[name]['count']] = [name]
+		
+		rank_list = range(max(rank_dict.keys()))
+		
+		for i in rank_dict.keys():
+			rank_list[i-1] = rank_dict[i]
+		"""
+		first_dict = {}
+		rank_dict = {}
+		last_dict = {}
+		
+		# rank 0, each name with their 
+		for name in data.keys():
+			print("%s: %d" % (name, data[name]['count']))
+			if name != 'count':
+				first_dict[name] = set()
 				for location in data[name].keys():
 					if location != 'count':
-						#for year in data[name][location].keys():
-							#if year != 'check':
-								#location_years.add((location, year))
-								location_years.add(location)
-			print(location_years)
-			check = len(list(location_years))
-			
-			if debug:
-				print(data[name_to_check].keys())
-			for location in data[name_to_check].keys():
-					if location != 'count':
-						#for year in data[name_to_check][location].keys():
-							#if year != 'check':
-								#location_years.add((location, year))
-								location_years.add(location)
-				
-			return len(list(location_years)) > check
-		
-		# rank 0, all names share locations with themselves
-		for name in data.keys():
-			if name != 'count':
-				cur_rank.append([name])
-		#ranked_list.append(cur_rank)
+						for year in data[name][location].keys():
+							if year != 'count':
+								first_dict[name].add((location,year))
+		rank_dict = first_dict
+		rank_list.append(rank_dict)
 
-		# rank 1, which names form a set with another name?
-		prev_rank = cur_rank
-		cur_rank = []
-		for plist in prev_rank:
-			for name in data.keys():
-				if (name != 'count') and (name not in plist):
-						if satisfies_all_locations(plist, name):
-							plist.append(name)
-							cur_rank.append(plist)
-							break
-		#ranked_list.append(cur_rank)
-
-		# rank 2, which names form a set with two others?		
-		prev_rank = cur_rank
-		cur_rank = []
-		for plist in prev_rank:
-			for name in data.keys():
-				if (name != 'count') and (name not in plist):
-						if satisfies_all_locations(plist, name):
-							plist.append(name)
-							cur_rank.append(plist)
-							break
-		#ranked_list.append(cur_rank)
+		# rank 1, pairs of names with their common locations
+		last_dict = first_dict
+		rank_dict = {}
+		for name in last_dict.keys():
+			for oname in first_dict.keys():
+				if oname != name:
+					locations = last_dict[name].union(first_dict[oname])
+					if len(list(locations)) > 0:
+						nlist = [name,oname]
+						nlist.sort()
+						rank_dict[tuple(nlist)] = locations
+		rank_list.append(rank_dict)
 		
-		# rank 3, which names form a set with three others?		
-		prev_rank = cur_rank
-		cur_rank = []
-		for plist in prev_rank:
-			for name in data.keys():
-				if (name != 'count') and (name not in plist):
-						if satisfies_all_locations(plist, name, True):
-							plist.append(name)
-							cur_rank.append(plist)
-							break
-		ranked_list.append(cur_rank)
+		# rank 2
+		last_dict = rank_dict
+		rank_dict = {}
+		for nametuple in last_dict.keys():
+			for oname in first_dict.keys():
+				if oname not in nametuple:
+					locations = last_dict[nametuple].union(first_dict[oname])
+					if len(list(locations)) > 0:
+						nlist = list(nametuple)
+						nlist.append(oname)
+						nlist.sort()
+						rank_dict[tuple(nlist)] = locations
+		rank_list.append(rank_dict)
 		
-		rank = set()
-		for plist in cur_rank:
-			plist.sort()
-			rank.add(tuple(plist))
+		# rank 3
+		last_dict = rank_dict
+		rank_dict = {}
+		for nametuple in last_dict.keys():
+			for oname in first_dict.keys():
+				if oname not in nametuple:
+					locations = last_dict[nametuple].union(first_dict[oname])
+					if len(list(locations)) > 0:
+						nlist = list(nametuple)
+						nlist.append(oname)
+						nlist.sort()
+						rank_dict[tuple(nlist)] = locations
+		rank_list.append(rank_dict)
 		
-		print(rank)
+		# rank 4
+		last_dict = rank_dict
+		rank_dict = {}
+		for nametuple in last_dict.keys():
+			for oname in first_dict.keys():
+				if oname not in nametuple:
+					locations = last_dict[nametuple].union(first_dict[oname])
+					if len(list(locations)) > 0:
+						nlist = list(nametuple)
+						nlist.append(oname)
+						nlist.sort()
+						rank_dict[tuple(nlist)] = locations
+		rank_list.append(rank_dict)
+		"""
+		print(rank_dict)
 		
-		return ranked_list
+		return rank_list
 	
 	def _get_averages(self, n_list = None, field_list = None):
 		"""
