@@ -12,6 +12,7 @@ class Trial_x_Location_x_Year:
   _varieties = {}
   
   # private iterators
+  _names = []
   _locations = []
   _years = []
   _include_fields = []
@@ -81,6 +82,8 @@ class Trial_x_Location_x_Year:
 			name = str(entry.variety.name) # force evaluation
 			location = str(entry.location.name) 
 			year = str(entry.harvest_date.date.year)
+      
+      self._names.append(name)
       
 			try:
       	self._varieties[name]['count'] += 1
@@ -162,7 +165,26 @@ class Trial_x_Location_x_Year:
     """
     
     data = self._get_recent(n_list)
-    ranked_list = [1:{}]
+    names = self._names
+    locations = self._locations
+    years = self._years
+    ranked_list = []
+    
+    # rank 0, all names share locations with themselves
+    ranked_list.append([])
+    for name in data.keys():
+			if name != 'count':
+				ranked_list[0].append(name)
+    
+    # rank 1, which names form a set with another name?
+    ranked_list.append([])
+    for name in data.keys():
+			if name != 'count':
+				for oname in ranked_list[0]:
+					if len(list(set(data[name].keys()).union(set(data[oname].keys())))) > 0:
+						ranked_list[1].append([name, oname])
+				
+				
     
     return ranked_list
   
