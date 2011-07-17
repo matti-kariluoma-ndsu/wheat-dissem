@@ -37,6 +37,11 @@ class Trial_x_Location_x_Year:
 		Calling populate() multiple times is supported, but untested. Your
 		mileage may vary.
 		"""
+		self._varieties = {}
+		self._names = []
+		self._locations = []
+		self._years = []
+		self._include_fields = []
 		# Bring location_set to a consistent state
 		if location_set is None:
 			for entry in query_set:
@@ -183,7 +188,8 @@ class Trial_x_Location_x_Year:
 			rank_list[i] = {} # ensure empty dictionaries 
 		
 		for i in rank_dict.keys():
-			rank_list[maxrank - i] = rank_dict[i]
+			#rank_list[i-1] = rank_dict[i] # smallest rank first
+			rank_list[maxrank - i] = rank_dict[i] # largest rank first
 		"""
 		first_dict = {}
 		rank_dict = {}
@@ -359,20 +365,17 @@ class Trial_x_Location_x_Year:
 		
 		
 		a = self._get_averages([1], exclusion_fields)
-		"""
-		b = self._get_averages(n_list, variety_x_location_list, field_list)
+		b = self._get_averages(n_list, field_list)
 		
-		
-		return_list = []
-		# TODO: verify robustness of the following: (does all of b get into a? b.keys()?)
-		count = {}
-		ranks = {}
-		names = {}
-		locations = {}
-		for var_loc in a.keys(): 
-			a[var_loc].update(b[var_loc])
-			count[var_loc] = len(a[var_loc]['entries'])
-			names.append(var_loc[0])
-			locations.append(var_loc[1])
-		"""
+		for i in range(len(a)):
+			for key in a[i].keys():
+				try:
+					access = b[i]
+				except IndexError:
+					continue
+				try:
+					a[i][key].update(b[i][key])
+				except KeyError:
+					pass
+				
 		return a

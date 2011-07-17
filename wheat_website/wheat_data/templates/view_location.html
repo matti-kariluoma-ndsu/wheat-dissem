@@ -39,7 +39,9 @@
 					<div class="bushels_acre">3 yr</div>
 				</div>
 			</div>
+			<div class="row thin"></div>
 			{% for trialentry_dict in trialentry_ranked_list %}
+			{% if trialentry_dict %}
 			<div class="row subheadings thin">
 				<div class="row_label"></div>
 				<div class="days_to_head"></div>
@@ -91,6 +93,7 @@
 				<div class="bushels_acre data"></div>
 			</div>
 			<div class="row thin"></div>
+			{% endif %}
 			{% endfor %}
 		</div>
 	</div>
