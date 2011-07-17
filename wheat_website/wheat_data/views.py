@@ -73,7 +73,7 @@ def select_location(request):
 				if field.name == 'bushels_acre':
 					break;
           
-			ranked_entries_list = Trial_x_Location_x_Year(query_set=entries, location_set=locations, year_list=year_list).fetch(n_list=[1,2,3], field_list=[field])
+			ranked_entries_list = Trial_x_Location_x_Year(trial_set=entries, location_set=locations, year_list=year_list).fetch(n_list=[1,2,3], field_list=[field])
 
 			# TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
 			# TODO: hmm... the back-button works, but it's not obvious it will based on the address bar
