@@ -277,6 +277,28 @@ class Trial_x_Location_x_Year:
 		prepending `1-yr-avg-' `2-year-avg-' etc. based on the values in 
 		n_list.
 		"""
+		
+		#TODO: work this into the main for-loop below.
+		def custom_sort(trial_set, year_list):
+			return_list = []
+			pre_sort = {}
+			year_list = sorted(year_list, reverse=True)
+	
+			for entry in trial_set:			
+				year = str(entry.harvest_date.date.year)
+				#TODO: sort by year (done), then location
+				location = str(entry.location.name)
+				try:
+					pre_sort[year].append(entry)
+				except KeyError:
+					pre_sort[year] = [entry]
+				
+			for year in year_list:
+				pre_sort[year].sort()
+				return_list.extend(pre_sort[year])
+				
+			return return_list
+		
 		if field_list is None: # paranoia
 			field_list = self._include_fields
 
@@ -342,7 +364,9 @@ class Trial_x_Location_x_Year:
 						avg_dict[name][key] = round(avg_dict[name][key][1] / avg_dict[name][key][0], 2)
 				
 				avg_dict['count'] = rank_dict[name]['count']
-			
+				
+				avg_dict[name]['entries'] = custom_sort(avg_dict[name]['entries'], all_years)
+				
 			averaged[j] = avg_dict
 			j += 1
 		
