@@ -296,13 +296,13 @@ class Trial_x_Location_x_Year:
 						for year in rank_dict[name][location].keys():
 							if year != 'count':
 								all_years.add(year) # TODO: this is a candidate to be stored on populate()
-				all_years = sorted(list(all_years), reverse=True)
-
+				all_years = sorted(list(all_years))
+				
 				# populate years, a dictionary of {'prefix': [2000, 1999, ...], ...}
 				years = {}
-				i = 1
+				i = 0
 				for year in all_years: # *must* be done on a per variety basis
-					prefix = "%d_yr_avg_" % i
+					prefix = "%d_yr_avg_" % (len(all_years) - i)
 					for prev_prefixes in years.keys():
 						years[prev_prefixes].append(year) # append this year to each existing element
 					years[prefix] = [year] # make a list containing only this year
@@ -334,12 +334,14 @@ class Trial_x_Location_x_Year:
 												#avg_dict[name][key][2] = (avg_dict[name][key][2] + avg_dict[name][key][1]) / avg_dict[name][key][0] # running average
 											except KeyError:
 												avg_dict[name][key] = [1,float(value)]
-			
 												#avg_dict[name][key] = [1,float(value),0.0]
+										
 				#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
 				for key in avg_dict[name].keys():
 					if key != 'entries':
-						avg_dict[name][key] = round(avg_dict[name][key][1] / avg_dict[name][key][0], 2)			
+						avg_dict[name][key] = round(avg_dict[name][key][1] / avg_dict[name][key][0], 2)
+				
+				avg_dict['count'] = rank_dict[name]['count']
 			
 			averaged[j] = avg_dict
 			j += 1
@@ -377,5 +379,7 @@ class Trial_x_Location_x_Year:
 					a[i][key].update(b[i][key])
 				except KeyError:
 					pass
-				
+				except AttributeError: # raised when trying to access prefix_count
+					pass
+					
 		return a

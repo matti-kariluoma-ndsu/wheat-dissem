@@ -43,19 +43,20 @@
 			{% for trialentry_dict in trialentry_ranked_list %}
 			{% if trialentry_dict %}
 			<div class="row subheadings thin">
-				<div class="row_label"></div>
+				<div class="row_label">({{trialentry_dict.count}} datapoints)</div>
 				<div class="days_to_head"></div>
 				<div class="plant_height"></div>
 				<div class="kernel_weight"></div>
 				<div class="test_weight"></div>
 				<div class="protein_percent"></div>
 				<div id="larger_column" class="bushels_acre" style="font-size: 8pt;">
-					<div class="bushels_acre">(8 datapoints)</div>
-					<div class="bushels_acre">(16 datapoints)</div>
-					<div class="bushels_acre">(24 datapoints)</div>
+					<div class="bushels_acre"></div>
+					<div class="bushels_acre"></div>
+					<div class="bushels_acre"></div>
 				</div>
 			</div>
 				{% for variety_name, avg_dict in trialentry_dict.items %}
+				{% if variety_name != "count" %}
 				<div class="{{variety_name}} group"> <!--TODO: filter replace space with underscores in this class property-->
 					<div class="row master {% cycle 'odd' 'even' %}">
 						<div class="variety average data"><a href="somewhere">{{ variety_name }}</a></div>
@@ -80,6 +81,7 @@
 					</div>
 					{% endfor %}
 				</div>
+				{% endif %}
 				{% endfor %}
 			<div class="row footer">
 				<div class="row_label">LSD</div>
