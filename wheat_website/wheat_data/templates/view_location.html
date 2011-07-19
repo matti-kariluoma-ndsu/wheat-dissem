@@ -41,7 +41,7 @@
 				<span class="left_sidebar">{{trialentry_dict.count}}</span>
 			</div>
 				{% for variety_name, avg_dict in trialentry_dict.items %}
-				{% if variety_name != "count" %}
+				{% if variety_name != "count" and variety_name != "lsd" %}
 				<div class="{{variety_name}} group"> <!--TODO: filter replace space with underscores in this class property-->
 					<div class="row master {% cycle 'odd' 'even' %}">
 						<div class="variety average data"><a href="somewhere">{{ variety_name }}</a></div>
@@ -70,14 +70,14 @@
 				{% endfor %}
 			<div class="row footer">
 				<div class="row_label">LSD</div>
-				<div class="days_to_head data"></div>
-				<div class="plant_height data"></div>
-				<div class="kernel_weight data"></div>
-				<div class="test_weight data"></div>
-				<div class="protein_percent data"></div>
-				<div class="bushels_acre data"></div>
-				<div class="bushels_acre data"></div>
-				<div class="bushels_acre data no_right_border"></div>
+				<div class="days_to_head data">{{trialentry_dict.lsd.days_to_head}}</div>
+				<div class="plant_height data">{{trialentry_dict.lsd.plant_height}}</div>
+				<div class="kernel_weight data">{{trialentry_dict.lsd.kernel_weight}}</div>
+				<div class="test_weight data">{{trialentry_dict.lsd.test_weight}}</div>
+				<div class="protein_percent data">{{trialentry_dict.lsd.protein_percent}}</div>
+				<div class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</div>
+				<div class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</div>
+				<div class="bushels_acre data no_right_border">{{trialentry_dict.lsd.bushels_acre}}</div>
 			</div>
 			<div class="row thin"></div>
 			{% endif %}

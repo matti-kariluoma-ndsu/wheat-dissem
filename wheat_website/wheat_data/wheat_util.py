@@ -304,6 +304,30 @@ class Trial_x_Location_x_Year:
 				
 			return return_list
 		
+		def number_of_environments(dictionary):
+			return_value = 0
+			for name in dictionary.keys():
+				if name != 'count':
+					try:
+						return_value = len(dictionary[name]['entries'])
+						break
+					except KeyError:
+						continue
+			return return_value
+			
+		def least_square_deviation(dictionary):
+			return_entry = None
+			
+			for name in dictionary.keys():
+				if name != 'count':
+					try:
+						return_entry = dictionary[name]['entries'][0]
+						break
+					except KeyError:
+						continue
+			
+			return return_entry
+		
 		if field_list is None: # paranoia
 			field_list = self._include_fields
 
@@ -368,10 +392,12 @@ class Trial_x_Location_x_Year:
 					if key != 'entries':
 						avg_dict[name][key] = round(avg_dict[name][key][1] / avg_dict[name][key][0], 2)
 				
-				avg_dict['count'] = rank_dict[name]['count']
-				
+				#avg_dict['count'] = rank_dict[name]['count']	
 				avg_dict[name]['entries'] = custom_sort(avg_dict[name]['entries'], all_years, all_locations)
-				
+			
+			if avg_dict:
+				avg_dict['count'] = number_of_environments(avg_dict)
+				avg_dict['lsd'] = least_square_deviation(avg_dict)
 			averaged[j] = avg_dict
 			j += 1
 		

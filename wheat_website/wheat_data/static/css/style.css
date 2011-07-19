@@ -83,7 +83,7 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 
 .right_sidebar {
   position: relative;
-	top: 100px;
+	top: 50px;
 }
 
 .right_sidebar p {
@@ -98,5 +98,5 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	top: 54px; 
 	float: left; 
 	font-weight: bold; 
-	color: #444
+	color: #444;
 }
