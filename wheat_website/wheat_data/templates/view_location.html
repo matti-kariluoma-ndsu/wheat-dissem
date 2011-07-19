@@ -6,7 +6,7 @@
 	{% for location in location_list %}
 	<h2> {{ location.zipcode }} {{ location.zipcode.latitude }}, {{ location.zipcode.longitude }}</h2>
 	{% endfor %}
-	<div id="static_content">
+	<div id="static_content" class="grid_13">
 		<div class="datarows">
 			<div class="row headings">
 				<div class="variety"><h3>Variety</h3></div>
@@ -97,9 +97,11 @@
 			<div class="row thin"></div>
 			{% endif %}
 			{% endfor %}
-		</div>
+	       	</div>
 	</div>
-	
+        <div class="sidebar"><!-- put sidebar cities here --></div>
+	<div class="clear">&#160;</div>
+
 	<!--
 	<div id='dynamic_content'></div>
 	-->
