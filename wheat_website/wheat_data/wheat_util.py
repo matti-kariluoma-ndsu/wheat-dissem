@@ -279,23 +279,28 @@ class Trial_x_Location_x_Year:
 		"""
 		
 		#TODO: work this into the main for-loop below.
-		def custom_sort(trial_set, year_list):
+		def custom_sort(trial_set, year_list, location_list):
 			return_list = []
 			pre_sort = {}
 			year_list = sorted(year_list, reverse=True)
-	
+
 			for entry in trial_set:			
 				year = str(entry.harvest_date.date.year)
 				#TODO: sort by year (done), then location
 				location = str(entry.location.name)
 				try:
-					pre_sort[year].append(entry)
+					pre_sort[year][location].append(entry)
 				except KeyError:
-					pre_sort[year] = [entry]
-				
+					try:
+						pre_sort[year][location] = [entry]
+					except KeyError:
+						pre_sort[year] = {}
+						pre_sort[year][location] = [entry]
+	
 			for year in year_list:
-				pre_sort[year].sort()
-				return_list.extend(pre_sort[year])
+				for location in sorted(pre_sort[year].keys()):
+					pre_sort[year][location].sort()
+					return_list.extend(pre_sort[year][location])
 				
 			return return_list
 		
@@ -365,7 +370,7 @@ class Trial_x_Location_x_Year:
 				
 				avg_dict['count'] = rank_dict[name]['count']
 				
-				avg_dict[name]['entries'] = custom_sort(avg_dict[name]['entries'], all_years)
+				avg_dict[name]['entries'] = custom_sort(avg_dict[name]['entries'], all_years, all_locations)
 				
 			averaged[j] = avg_dict
 			j += 1
