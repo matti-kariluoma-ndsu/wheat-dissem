@@ -63,6 +63,9 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 }
 
 .row .bushels_acre {
-  width:59px;
+  width:60px;
 }
 
+.row .no_right_border {
+	border-right: 0px;
+}

@@ -36,7 +36,7 @@
 				<div id="larger_column" class="bushels_acre">
 					<div class="bushels_acre">1 yr</div>
 					<div class="bushels_acre">2 yr</div>
-					<div class="bushels_acre">3 yr</div>
+					<div class="bushels_acre no_right_border">3 yr</div>
 				</div>
 			</div>
 			<div class="row thin"></div>
@@ -52,7 +52,7 @@
 				<div id="larger_column" class="bushels_acre" style="font-size: 8pt;">
 					<div class="bushels_acre"></div>
 					<div class="bushels_acre"></div>
-					<div class="bushels_acre"></div>
+					<div class="bushels_acre no_right_border"></div>
 				</div>
 			</div>
 				{% for variety_name, avg_dict in trialentry_dict.items %}
@@ -67,7 +67,7 @@
 						<div class="protein_percent average data">{{ avg_dict.1_yr_avg_protein_percent }}</div>
 						<div class="bushels_acre average data">{{ avg_dict.1_yr_avg_bushels_acre }}</div>
 						<div class="bushels_acre average data">{{ avg_dict.2_yr_avg_bushels_acre }}</div>
-						<div class="bushels_acre average data">{{ avg_dict.3_yr_avg_bushels_acre }}</div>
+						<div class="bushels_acre average data no_right_border">{{ avg_dict.3_yr_avg_bushels_acre }}</div>
 					</div>
 					{% for entry in avg_dict.entries %}
 					<div class="row slave {% cycle 'odd' 'even' %}">
@@ -92,7 +92,7 @@
 				<div class="protein_percent data"></div>
 				<div class="bushels_acre data"></div>
 				<div class="bushels_acre data"></div>
-				<div class="bushels_acre data"></div>
+				<div class="bushels_acre data no_right_border"></div>
 			</div>
 			<div class="row thin"></div>
 			{% endif %}
