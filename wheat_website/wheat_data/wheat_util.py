@@ -319,18 +319,27 @@ class Trial_x_Location_x_Year:
 						continue
 			return return_value
 			
-		def least_significant_difference(dictionary):
-			return_entry = None
-			
-			for name in dictionary.keys():
-				if name != 'count':
+		def least_significant_difference(field_dictionary):
+			LSD_dict = {}
+			for key in field_dictionary:
+				count = field_dictionary[key][0]
+				value_list = field_dictionary[key][1]
+				location_list = field_dictionary[key][2]
+				test = len(value_list)
+				if test == len(location_list) and (test == count): # paranoia
 					try:
-						return_entry = dictionary[name]['entries'][0]
+						y = robjects.FloatVector(value_list)
+						trt = robjects.FactorVector(location_list)
+						robjects.globalenv['y'] = y
+						robjects.globalenv['trt'] = trt
+						model = r('aov(y~trt)')
+						df = r['df.residual'](model)
+						MSerr = r['deviance'](model).ro / df[0]
+						LSD_dict[key] = r['LSD.return'](y, trt, df, MSerr)[0]
+					except:
 						break
-					except KeyError:
-						continue
 			
-			return return_entry
+			return LSD_dict
 		
 		if field_list is None: # paranoia
 			field_list = self._include_fields
@@ -341,6 +350,7 @@ class Trial_x_Location_x_Year:
 		j = 0
 		for rank_dict in data_list:
 			avg_dict = {}
+			avg_dict['lsd'] = {}
 			for name in rank_dict.keys():
 				avg_dict[name] = {}
 				all_years = set()
@@ -385,23 +395,28 @@ class Trial_x_Location_x_Year:
 										if value != None:
 											try:
 												avg_dict[name][key][0] += 1 # count
-												avg_dict[name][key][1] += float(value) # running total
-												#avg_dict[name][key][2] = (avg_dict[name][key][2] + avg_dict[name][key][1]) / avg_dict[name][key][0] # running average
+												avg_dict[name][key][1].append(value) # running total
+												avg_dict[name][key][2].append(location)
+												avg_dict['lsd'][key][0] += 1 # doesn't get reset for each name
+												avg_dict['lsd'][key][1].append(value) 
+												avg_dict['lsd'][key][2].append(location)
 											except KeyError:
-												avg_dict[name][key] = [1,float(value)]
-												#avg_dict[name][key] = [1,float(value),0.0]
+												avg_dict[name][key] = [1,[value],[location]]
+												avg_dict['lsd'][key] = [1,[value],[location]]
 										
 				#Either we update the average each insertion, or we iterate over the dict again and calculate the averages...
 				for key in avg_dict[name].keys():
 					if key != 'entries':
-						avg_dict[name][key] = round(avg_dict[name][key][1] / avg_dict[name][key][0], 2)
+						avg_dict[name][key] = round(sum(avg_dict[name][key][1]) / avg_dict[name][key][0], 2)
 				
 				#avg_dict['count'] = rank_dict[name]['count']	
 				avg_dict[name]['entries'] = custom_sort(avg_dict[name]['entries'], all_years, all_locations)
 			
 			if avg_dict:
+				avg_dict['lsd'] = least_significant_difference(avg_dict['lsd'])
+				print(avg_dict['lsd'])
 				avg_dict['count'] = number_of_environments(avg_dict)
-				avg_dict['lsd'] = least_significant_difference(avg_dict)
+			
 			averaged[j] = avg_dict
 			j += 1
 		
