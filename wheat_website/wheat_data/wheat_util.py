@@ -1,5 +1,9 @@
 from wheat_data.models import Trial_Entry #, Date
 
+import rpy2.robjects as robjects # for def least_significant_difference()
+r = robjects.r
+r('library(mattikariluomandsuwheatdissem2011)')
+
 class Trial_x_Location_x_Year:
 	""" 
 	Organizational class for our Trial_Entry x Location x Year data.
@@ -315,7 +319,7 @@ class Trial_x_Location_x_Year:
 						continue
 			return return_value
 			
-		def least_square_deviation(dictionary):
+		def least_significant_difference(dictionary):
 			return_entry = None
 			
 			for name in dictionary.keys():
@@ -397,7 +401,7 @@ class Trial_x_Location_x_Year:
 			
 			if avg_dict:
 				avg_dict['count'] = number_of_environments(avg_dict)
-				avg_dict['lsd'] = least_square_deviation(avg_dict)
+				avg_dict['lsd'] = least_significant_difference(avg_dict)
 			averaged[j] = avg_dict
 			j += 1
 		

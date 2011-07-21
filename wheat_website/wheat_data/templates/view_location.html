@@ -56,7 +56,7 @@
 					</div>
 					{% for entry in avg_dict.entries %}
 					<div class="row slave {% cycle 'odd' 'even' %}">
-						<div class="row_label" style="font-size: 8pt">{{ entry.harvest_date.date.year }} {{entry.location}}</div>
+						<div class="row_label" style="font-size: 8pt">{{entry.location}} ({{ entry.harvest_date.date.year }})</div>
 						<div class="days_to_head data">{{ entry.days_to_head }}</div>
 						<div class="plant_height data">{{ entry.plant_height }}</div>
 						<div class="kernel_weight data">{{ entry.kernel_weight }}</div>

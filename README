@@ -1,4 +1,8 @@
 Prerequisites:
+ R:
+	Download and install R. (http://cran.r-project.org/)
+ agricolae:
+  At the R prompt, type `install.packages("agricolae")' or download from (http://cran.r-project.org/web/packages/agricolae/)
  Python:
   Download and Install Python, version 2.4 or greater. (http://www.python.org/download)
  rpy2:
@@ -35,6 +39,9 @@ Install to a fresh machine w/apache (Ubuntu/Debian syntax):
  $ cd wadofstuff-django-serializers-1.1.0
  $ sudo python setup.py install
  $ cd ..
+ $ echo 'install.packages("agricolae")' | sudo R --vanilla CMD BATCH /dev/stdin /dev/stdout
+ $ tar xzf mattikariluomandsuwheatdissem2011.tar.gz
+ $ sudo R --vanilla CMD INSTALL mattikariluomandsuwheatdissem2011/
  $ cat apache/httpd.conf >> /etc/apache2/httpd.conf # then fix any conflicts
  $ sudo /etc/init.d/apache2 reload # or restart
 
