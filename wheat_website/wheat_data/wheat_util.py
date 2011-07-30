@@ -321,11 +321,13 @@ class Trial_x_Location_x_Year:
 			
 		def least_significant_difference(field_dictionary):
 			LSD_dict = {}
+			"""
 			for key in field_dictionary:
 				count = field_dictionary[key][0]
 				value_list = field_dictionary[key][1]
 				location_list = field_dictionary[key][2]
 				test = len(value_list)
+				
 				if test == len(location_list) and (test == count): # paranoia
 					try:
 						y = robjects.FloatVector(value_list)
@@ -339,7 +341,9 @@ class Trial_x_Location_x_Year:
 					except:
 						break
 			
+			"""
 			return LSD_dict
+			
 		
 		if field_list is None: # paranoia
 			field_list = self._include_fields
@@ -414,7 +418,6 @@ class Trial_x_Location_x_Year:
 			
 			if avg_dict:
 				avg_dict['lsd'] = least_significant_difference(avg_dict['lsd'])
-				print(avg_dict['lsd'])
 				avg_dict['count'] = number_of_environments(avg_dict)
 			
 			averaged[j] = avg_dict
