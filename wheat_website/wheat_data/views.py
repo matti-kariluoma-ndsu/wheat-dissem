@@ -13,11 +13,11 @@ def index(request):
 	if request.method == 'POST':
 		return select_location(request)
 	else:
-		form = wheat_forms.SelectLocationForm()
+		location_form = wheat_forms.SelectLocationForm()
 
 	return render_to_response(
 		'main.html', 
-		{ 'form': form },
+		{ 'location_form': location_form },
 		context_instance=RequestContext(request)
 	)
 

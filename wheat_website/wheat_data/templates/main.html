@@ -1,34 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% for error in error_list %}
-<p style='color: red'>{{ error }}</p>
-{% endfor %}
-<!--
-TODO: Add noscript version of this field to point to the noscript
-version of the view_location page.
+<div>
+	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
+	<hr>
+	<h2>Welcome</h2><br/>
+	<p>Presented here are the data collected during Hard Red Spring Wheat
+	(HRSW) variety trials conducted in North Dakota. Available data 
+	include yield, protein percent, test weight, kernel weight, 
+	plant height, etc.</p>
+	
+	<br/>
+</div>
+<div class="location_form" >
+	{% for error in error_list %}
+	<p style='color: red'>{{ error }}</p>
+	{% endfor %}
+	<!--
+	TODO: Add noscript version of this field to point to the noscript
+	version of the view_location page.
 
-TODO: fix input validation strings return an error.
+	TODO: fix input validation strings return an error.
 
-TODO: Do we need csrf_token?
+	TODO: Do we need csrf_token?
 
-TODO: use get, not post
--->
-<h2 style="align: center;">NDSU Hard Red Spring Wheat Trial Results</h2>
-<hr>
-<h2>Welcome</h2>
-<p>Presented here are the data collected during Hard Red Spring Wheat
-(HRSW) variety trials. Available data include yield, protein percent,
-test weight, kernel weight, plant height, etc.</p>
-<form action="#" method="post">
-  {% csrf_token %}
-  {% for field in form %}
-  <div class="input row">
-    {{ field.errors }}
-    {{ field.label_tag }}: {{ field }}
-  </div>
-  {% endfor %}
-  <input type="submit" value="Submit" />
-</form>
-
+	TODO: use get, not post
+	-->
+	<form action="#" method="post">
+		{% csrf_token %}
+		{% for field in location_form %}
+		<div class="input row">
+			{{ field.errors }}
+			{{ field.label_tag }}: {{ field }}
+		</div>
+		{% endfor %}
+		<input type="submit" value="Submit" />
+	</form>
+</div>
 {% endblock %}

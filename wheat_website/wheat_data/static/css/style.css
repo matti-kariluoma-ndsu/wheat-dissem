@@ -100,3 +100,21 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	font-weight: bold; 
 	color: #444;
 }
+
+/* color scheme from http://www.ethanschoonover.com/solarized */
+/*
+html {
+	background-color: #fdf6e3;
+	color: #657b83;
+	color-profile: sRGB;
+	rendering-intent: auto;
+}
+	
+h1,h2,h3,h4,h5,h6 {
+	color: #586e75;
+	border-color: #657b83;
+}
+a, a:active, a:visited {
+	color: #586e75
+}
+*/
