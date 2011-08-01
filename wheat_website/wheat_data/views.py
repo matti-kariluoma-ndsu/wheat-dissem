@@ -4,8 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from wheat_data import models
 from wheat_data import wheat_forms
-from wheat_data.wheat_util import Trial_x_Location_x_Year
-from math import pi, sin, cos, asin, atan2, degrees, radians
+from wheat_data.wheat_util import Trial_x_Location_x_Year, Locations_from_Zipcode_x_Radius
 import datetime
 
 # Create your views here.
@@ -25,39 +24,8 @@ def select_location(request):
 	if request.method == 'POST':
 		form = wheat_forms.SelectLocationForm(request.POST)
 		if form.is_valid():
-			zipcode = models.Zipcode.objects.filter(zipcode=form.cleaned_data['zipcode'])
-			radius = float(form.cleaned_data['search_radius'])
-			lat2_list = []
-			lon2_list = []
-			locations = []
-			today = datetime.date.today()
-			year_list = [today.year,today.year-1,today.year-2,today.year-3] # Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			try:
-				lat1 = float(zipcode.get().latitude) # should only be one result
-				lon1 = float(zipcode.get().longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
-				lat1 = radians(lat1)
-				lon1 = radians(lon1)
-				R = 6378137.0 # Earth's median radius, in meters
-				d = radius * 1609.344	 # in meters 
-				# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
-				# TODO: have the Location objects grab default lat/long, not user entered
-				bearing_list = [ 0.0, pi/2.0, pi, 3.0*pi/2.0 ] # cardinal directions
-				for theta in bearing_list:
-					lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(theta))
-					lat2_list.append( degrees(lat2) )
-					lon2 = lon1 + atan2(sin(theta)*sin(d/R)*cos(lat1), cos(d/R)-sin(lat1)*sin(lat2))
-					lon2_list.append( degrees(lon2) )
-					lon2 = (lon2+3.0*pi)%(2.0*pi) - pi	# normalise to -180...+180
-				lat2_list = lat2_list[0::2] # discard non-moved points
-				lon2_list = lon2_list[1::2] # both should contain two values, {min, max} lat/long
-				
-				locations = models.Location.objects.filter(
-						zipcode__latitude__range=(str(min(lat2_list)), str(max(lat2_list)))
-					).filter(
-						zipcode__longitude__range=(str(min(lon2_list)), str(max(lon2_list)))
-					)
-				#TODO: We just searched a square, now discard searches that are > x miles away.
-			
+				locations = Locations_from_Zipcode_x_Radius(form.cleaned_data['zipcode'], form.cleaned_data['search_radius']).fetch()
 			except models.Zipcode.DoesNotExist:
 				return render_to_response(
 					'select_location.html', 
@@ -67,7 +35,9 @@ def select_location(request):
 					},
 					context_instance=RequestContext(request)
 				)
-			
+				
+			today = datetime.date.today()
+			year_list = [today.year,today.year-1,today.year-2,today.year-3] # Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			#TODO: reduce this to depth=1, we only need harvest_date.date.year for 3 and variety.name for 2
 			entries = models.Trial_Entry.objects.select_related(depth=3).filter(
 				location__in=locations
@@ -100,9 +70,7 @@ def select_location(request):
 					'trialentry_list': entries,
 					'trialentry_ranked_list': ranked_entries_list,
 					'year_list': year_list,
-					'radius' : radius,
-					'lat_list': lat2_list,
-					'lon_list': lon2_list
+					'radius' : form.cleaned_data['search_radius']
 				}
 			)
 			

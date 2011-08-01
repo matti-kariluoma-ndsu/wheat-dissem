@@ -1,16 +1,92 @@
 from wheat_data.models import Trial_Entry #, Date
+from wheat_data import models
+from math import pi, sin, cos, asin, atan2, degrees, radians
 
-"""
-import rpy2.robjects as robjects # for def least_significant_difference()
-r = robjects.r
-r('library(mattikariluomandsuwheatdissem2011)')
-"""
+class Locations_from_Zipcode_x_Radius:
+	"""
+	Utility class to return a list of locations located a specified
+	distance from a specified point.
+	"""
+	
+	zipcode = ''
+	radius = 0.0
+	
+	def __init__(self):
+		pass
+	
+	def __init__(self, zipcode, radius):
+		"""
+		Initializes internal data structures using the input zipcode and
+		radius. 
+		"""
+		self.populate(zipcode, radius)
+	
+	def populate(self, zipcode, radius):
+		"""
+		Calling populate() multiple times is supported, but untested. YMMV.
+		"""
+		# test if zipcode, radius are strings or floats
+		try:
+			self.zipcode = str(int(float(zipcode)))
+		except ValueError:
+			self.zipcode = ''
+			
+		try:
+			self.radius = float(radius)
+		except ValueError:
+			self.radius = 100.0
+	
+	def fetch(self):
+		"""
+		Returns a list of locations within the specified search area.
+		raises a `models.Zipcode.DoesNotExist'
+		"""
+		lat2_list = []
+		lon2_list = []
+		locations = []
+		zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
+		try:
+			zipcode_object = zipcode_query.get() # should only be one result
+		except models.Zipcode.DoesNotExist:
+			raise  models.Zipcode.DoesNotExist
+		lat1 = float(zipcode_object.latitude) 
+		lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
+		lat1 = radians(lat1)
+		lon1 = radians(lon1)
+		R = 6378137.0 # Earth's median self.radius, in meters
+		d = self.radius * 1609.344	 # in meters 
+		# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
+		# TODO: have the Location objects grab default lat/long, not user entered
+		bearing_list = [ 0.0, pi/2.0, pi, 3.0*pi/2.0 ] # cardinal directions
+		for theta in bearing_list:
+			lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(theta))
+			lat2_list.append( degrees(lat2) )
+			lon2 = lon1 + atan2(sin(theta)*sin(d/R)*cos(lat1), cos(d/R)-sin(lat1)*sin(lat2))
+			lon2_list.append( degrees(lon2) )
+			lon2 = (lon2+3.0*pi)%(2.0*pi) - pi	# normalise to -180...+180
+		lat2_list = lat2_list[0::2] # discard non-moved points
+		lon2_list = lon2_list[1::2] # both should contain two values, {min, max} lat/long
+		
+		locations = models.Location.objects.filter(
+				zipcode__latitude__range=(str(min(lat2_list)), str(max(lat2_list)))
+			).filter(
+				zipcode__longitude__range=(str(min(lon2_list)), str(max(lon2_list)))
+			)
+		#TODO: We just searched a square, now discard searches that are > x miles away.
+		
+		
+		return locations
 
 class Trial_x_Location_x_Year:
 	""" 
 	Organizational class for our Trial_Entry x Location x Year data.
 	Pass in a django queryset and the fields you want to consider for
 	averaging.
+	"""
+	"""
+	import rpy2.robjects as robjects # for def least_significant_difference()
+	r = robjects.r
+	r('library(mattikariluomandsuwheatdissem2011)')
 	"""
 	# A dictionary of variety_name to a year dictionary with Trial_Entry 
 	# objects and their count.
