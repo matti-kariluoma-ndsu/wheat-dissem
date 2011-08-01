@@ -9,6 +9,18 @@ from math import pi, sin, cos, asin, atan2, degrees, radians
 import datetime
 
 # Create your views here.
+def index(request):
+	if request.method == 'POST':
+		return select_location(request)
+	else:
+		form = wheat_forms.SelectLocationForm()
+
+	return render_to_response(
+		'main.html', 
+		{ 'form': form },
+		context_instance=RequestContext(request)
+	)
+
 def select_location(request):
 	if request.method == 'POST':
 		form = wheat_forms.SelectLocationForm(request.POST)
@@ -102,7 +114,6 @@ def select_location(request):
 		{ 'form': form },
 		context_instance=RequestContext(request)
 	)
-	return render_to_response('base.html')
 
 def select_variety(request):
 	if request.method == 'POST':
@@ -136,7 +147,6 @@ def select_variety(request):
 		{ 'form': form },
 		context_instance=RequestContext(request)
 	)
-	return render_to_response('base.html')
 
 
 def add_variety(request):

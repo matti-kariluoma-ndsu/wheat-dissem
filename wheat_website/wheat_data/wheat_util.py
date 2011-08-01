@@ -1,8 +1,10 @@
 from wheat_data.models import Trial_Entry #, Date
 
+"""
 import rpy2.robjects as robjects # for def least_significant_difference()
 r = robjects.r
 r('library(mattikariluomandsuwheatdissem2011)')
+"""
 
 class Trial_x_Location_x_Year:
 	""" 
