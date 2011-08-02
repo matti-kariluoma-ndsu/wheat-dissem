@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="top_spacer"></div>
+	<div id="static_content" class="grid_13">
+		<div class="datarows">
+			<div class="row headings">
+				<div class="variety"><h3>Variety</h3></div>
+			</div>
+			<div class="row subheadings thin">
+				<div class="variety"></div>
+			</div>
+
+			{% for entry in trialentry_list %}
+			<div class="row thin">
+				<span class="left_sidebar">{{trialentry_dict.count}}</span>
+			</div>
+			<div class="{{variety_name}} group"> <!--TODO: filter replace space with underscores in this class property-->
+				<div class="row master {% cycle 'odd' 'even' %}">
+					<div class="row_label" style="font-size: 8pt">{{entry.location}} ({{ entry.harvest_date.date.year }})</div>
+					<div class="days_to_head data">{{ entry.days_to_head }}</div>
+					<div class="plant_height data">{{ entry.plant_height }}</div>
+					<div class="kernel_weight data">{{ entry.kernel_weight }}</div>
+					<div class="test_weight data">{{ entry.test_weight }}</div>
+					<div class="protein_percent data">{{ entry.protein_percent }}</div>
+					<div class="bushels_acre data">{{ entry.bushels_acre }}</div>
+				</div>
+				<div class="row slave {% cycle 'odd' 'even' %}">
+				</div>
+			</div>
+			{% endfor %}
+			<div class="row footer">
+				<div class="row_label">LSD</div>
+				<div class="days_to_head data">{{trialentry_dict.lsd.days_to_head}}</div>
+				<div class="plant_height data">{{trialentry_dict.lsd.plant_height}}</div>
+				<div class="kernel_weight data">{{trialentry_dict.lsd.kernel_weight}}</div>
+				<div class="test_weight data">{{trialentry_dict.lsd.test_weight}}</div>
+				<div class="protein_percent data">{{trialentry_dict.lsd.protein_percent}}</div>
+				<div class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</div>
+				<div class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</div>
+				<div class="bushels_acre data no_right_border">{{trialentry_dict.lsd.bushels_acre}}</div>
+			</div>
+			<div class="row thin"></div>
+	  </div>
+	</div>
+	<div class="right_sidebar">
+		These locations are within {{radius}} miles:
+		{% for location in location_list %}
+		<p >* {{location.name}}</p>
+		{% endfor %}
+	</div>
+	<div class="clear">&#160;</div>
+
+	<!--
+	<div id='dynamic_content'></div>
+	-->
+{% endblock %}
+
+{% load jsonify %}
+{% block jquery %}
+
+  $('.group .master').toggle(
+    function(){
+      $(this).siblings('.slave').show();
+    },
+    function(){
+      $(this).siblings('.slave').hide();  
+    }
+  );
+
+{% endblock %}
