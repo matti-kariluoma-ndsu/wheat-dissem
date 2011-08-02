@@ -10,7 +10,43 @@ import datetime
 # Create your views here.
 def index(request):
 	if request.method == 'POST':
-		return select_location(request)
+		location_form = wheat_forms.SelectLocationForm(request.POST)
+		if location_form.is_valid():
+			try:
+				locations = Locations_from_Zipcode_x_Radius(
+					location_form.cleaned_data['zipcode'],
+					location_form.cleaned_data['search_radius']
+				).fetch()
+			except models.Zipcode.DoesNotExist:
+				return render_to_response(
+					'main.html', 
+					{ 
+						'location_form': location_form,
+						'error_list': ['Sorry, the zipcode: ' + location_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
+					},
+					context_instance=RequestContext(request)
+				)
+			today = datetime.date.today()
+			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
+			year_list = [today.year,today.year-1,today.year-2,today.year-3] 
+			
+			entries = models.Trial_Entry.objects.select_related(depth=3).filter(
+				location__in=locations
+			).filter(
+				harvest_date__in=models.Date.objects.filter(
+					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
+				)
+			)
+			
+			return render_to_response(
+				'tabbed_view.html',
+				{ 
+					'location_list': locations,
+					'trialentry_list': entries,
+					'year_list': year_list,
+					'radius' : location_form.cleaned_data['search_radius']
+				}
+			)
 	else:
 		location_form = wheat_forms.SelectLocationForm()
 
@@ -25,7 +61,10 @@ def select_location(request):
 		form = wheat_forms.SelectLocationForm(request.POST)
 		if form.is_valid():
 			try:
-				locations = Locations_from_Zipcode_x_Radius(form.cleaned_data['zipcode'], form.cleaned_data['search_radius']).fetch()
+				locations = Locations_from_Zipcode_x_Radius(
+					form.cleaned_data['zipcode'],
+					form.cleaned_data['search_radius']
+				).fetch()
 			except models.Zipcode.DoesNotExist:
 				return render_to_response(
 					'select_location.html', 

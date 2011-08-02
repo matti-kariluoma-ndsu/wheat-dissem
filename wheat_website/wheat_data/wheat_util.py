@@ -44,11 +44,13 @@ class Locations_from_Zipcode_x_Radius:
 		lat2_list = []
 		lon2_list = []
 		locations = []
-		zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
+		
 		try:
+			zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
 			zipcode_object = zipcode_query.get() # should only be one result
-		except models.Zipcode.DoesNotExist:
-			raise  models.Zipcode.DoesNotExist
+		except (ValueError, models.Zipcode.DoesNotExist) as instance:
+			raise models.Zipcode.DoesNotExist(instance)
+			
 		lat1 = float(zipcode_object.latitude) 
 		lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
 		lat1 = radians(lat1)
