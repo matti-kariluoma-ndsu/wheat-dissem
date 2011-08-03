@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from wheat_data import models
+from variety_trials_data import models
 from difflib import SequenceMatcher
 #import csv
 

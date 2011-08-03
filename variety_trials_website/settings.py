@@ -1,12 +1,10 @@
-# Django settings for wheat_website project.
+# Django settings for variety_trials_website project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 # Emails the following people when DEBUG=False and an error happens:
 ADMINS = (
-    #('Aaron Frenette', 'aaronfrenette@gmail.com'),
-    #('Adam Helsene', 'adam.helsene@ndsu.edu'),
     #('Matti Kariluoma', 'matti.m.kariluoma@ndsu.edu'),
     #('Nick Kramer', 'darkfuzz@gmail.com')
 )
@@ -79,7 +77,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'wheat_website.urls'
+ROOT_URLCONF = 'variety_trials_website.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -97,10 +95,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     #'django.contrib.admindocs',
-    'wheat_data'
+    'variety_trials_data'
 )
 
-STATIC_URL = 'wheat_data/static'
+STATIC_URL = 'variety_trials_data/static'
 
 SERIALIZATION_MODULES = {
     'json': 'wadofstuff.django.serializers.json'

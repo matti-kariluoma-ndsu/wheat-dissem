@@ -2,8 +2,8 @@ from django.conf.urls.defaults import *
 #from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import list_detail
 from django.conf import settings
-from wheat_data.models import *
-from wheat_data import views
+from variety_trials_data.models import *
+from variety_trials_data import views
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -23,7 +23,7 @@ variety_dictionary = {
 
 urlpatterns = patterns('',
     # Example:
-    # (r'^wheat_website/', include('wheat_website.foo.urls')),
+    # (r'^variety_trials_website/', include('variety_trials_website.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

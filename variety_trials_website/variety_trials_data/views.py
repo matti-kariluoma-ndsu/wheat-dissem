@@ -2,15 +2,15 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
-from wheat_data import models
-from wheat_data import wheat_forms
-from wheat_data.wheat_util import Trial_x_Location_x_Year, Locations_from_Zipcode_x_Radius
+from variety_trials_data import models
+from variety_trials_data import variety_trials_forms
+from variety_trials_data.variety_trials_util import Trial_x_Location_x_Year, Locations_from_Zipcode_x_Radius
 import datetime
 
 # Create your views here.
 def index(request):
 	if request.method == 'POST':
-		location_form = wheat_forms.SelectLocationForm(request.POST)
+		location_form = variety_trials_forms.SelectLocationForm(request.POST)
 		if location_form.is_valid():
 			try:
 				locations = Locations_from_Zipcode_x_Radius(
@@ -48,7 +48,7 @@ def index(request):
 				}
 			)
 	else:
-		location_form = wheat_forms.SelectLocationForm()
+		location_form = variety_trials_forms.SelectLocationForm()
 
 	return render_to_response(
 		'main.html', 
@@ -58,7 +58,7 @@ def index(request):
 
 def select_location(request):
 	if request.method == 'POST':
-		form = wheat_forms.SelectLocationForm(request.POST)
+		form = variety_trials_forms.SelectLocationForm(request.POST)
 		if form.is_valid():
 			try:
 				locations = Locations_from_Zipcode_x_Radius(
@@ -114,7 +114,7 @@ def select_location(request):
 			)
 			
 	else:
-		form = wheat_forms.SelectLocationForm()
+		form = variety_trials_forms.SelectLocationForm()
 
 	return render_to_response(
 		'select_location.html', 
@@ -124,7 +124,7 @@ def select_location(request):
 
 def select_variety(request):
 	if request.method == 'POST':
-		form = wheat_forms.SelectVarietyForm(request.POST)
+		form = variety_trials_forms.SelectVarietyForm(request.POST)
 		if form.is_valid():
 			variety = models.Variety.objects.filter(name=form.cleaned_data['variety'])
 			try:
@@ -147,7 +147,7 @@ def select_variety(request):
 			)
 			
 	else:
-		form = wheat_forms.SelectVarietyForm()
+		form = variety_trials_forms.SelectVarietyForm()
 
 	return render_to_response(
 		'select_variety.html', 
@@ -201,15 +201,15 @@ def add_trial_entry_csv_file(request):
 	# a dictionary, keys are strings (sources of error), values are strings (message)
 	
 	if request.method == 'POST': # If the form has been submitted...
-		form = wheat_forms.UploadCSVForm(request.POST, request.FILES)
+		form = variety_trials_forms.UploadCSVForm(request.POST, request.FILES)
 		if form.is_valid():
-			success, errors = wheat_forms.handle_csv_file(request.FILES['csv_file'])
+			success, errors = variety_trials_forms.handle_csv_file(request.FILES['csv_file'])
 			if success:
 				return HttpResponseRedirect('/success/')
 			else:
-				form = wheat_forms.UploadCSVForm()
+				form = variety_trials_forms.UploadCSVForm()
 	else:	
-		form = wheat_forms.UploadCSVForm()
+		form = variety_trials_forms.UploadCSVForm()
 
 	return render_to_response(
 		'add_from_csv_template.html', 

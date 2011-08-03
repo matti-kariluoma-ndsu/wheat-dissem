@@ -1,5 +1,5 @@
-from wheat_data.models import Trial_Entry #, Date
-from wheat_data import models
+from variety_trials_data.models import Trial_Entry #, Date
+from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians
 
 class Locations_from_Zipcode_x_Radius:
