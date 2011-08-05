@@ -46,9 +46,9 @@ Database/Models development:
   > .schema
   # shows the database schema, look for your old table
   # i.e. if the model you changed was called "Location" in the directory
-  # "wheat_data", then the table is probably called 
-  # "wheat_data_location".
-  > drop table wheat_data_location
+  # "variety_trials_data", then the table is probably called 
+  # "variety_trials_data_location".
+  > drop table variety_trials_data_location
   # Hit Ctrl+D to exit.
   
 Command to put zipcode.csv into a compatible format for importing to the db:
@@ -65,5 +65,5 @@ To populate a table in the testing (sqlite) db:
   $ sqlite> .import import.csv your_table
   $ sqlite> .exit
 
-NOTE: Did a chmod a+w {wheat_website/, wheat_website/sqlite.db} , will need
+NOTE: Did a chmod a+w {variety_trials_website/, variety_trials_website/sqlite.db} , will need
 to be undone when we move on from sqlite.

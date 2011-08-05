@@ -2,6 +2,62 @@ from variety_trials_data.models import Trial_Entry #, Date
 from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians
 
+class Filter_by_Field:
+	"""
+	Utility class to return a formatted dictionary of all given entries,
+	sorted by location name and year, filtered by one field and averaged
+	across.
+	"""
+	
+	field = {'name':''} # default value such that we return nothing if a bogus field is given
+	entries = {}
+	
+	def __init__(self):
+		pass
+	
+	def __init__(self, entries, field, years):
+		"""
+		Initializes internal data structures using the an input list of 
+		entries, a field to filter on, and the years to include.
+		"""
+		return self.populate(entries, field, years)
+	
+	def populate(self, entries, field, years):
+		"""
+		Calling populate() multiple times is supported, but untested. YMMV.
+		"""
+		# test if field is a Trial_Entry field
+		if field in Trial_Entry._meta.fields:
+			self.field = field
+		
+		fieldname = self.field.name
+		
+		for entry in entries:
+			year = str(entry.harvest_date.date.year)
+			location = str(entry.location.name)
+			try:
+				value = getattr(entry, fieldname)
+			except AttributeError:
+				value = None
+			try:
+				self.entries[year][location].append(value)
+			except KeyError:
+				try:
+					self.entries[year][location] = [value]
+				except KeyError:
+					self.entries[year] = {}
+					self.entries[year][location] = [value]
+				
+	
+	def fetch(self):
+		data = {}
+		data['current'] = self.entries[max(self.entries.keys())]
+		
+		for year in sorted(self.entries.keys(), reverse=True):
+			data['current'] = self.entries[year]
+		
+		return data
+
 class Locations_from_Zipcode_x_Radius:
 	"""
 	Utility class to return a list of locations located a specified
@@ -19,7 +75,7 @@ class Locations_from_Zipcode_x_Radius:
 		Initializes internal data structures using the input zipcode and
 		radius. 
 		"""
-		self.populate(zipcode, radius)
+		return self.populate(zipcode, radius)
 	
 	def populate(self, zipcode, radius):
 		"""
