@@ -28,7 +28,7 @@ def index(request):
 				)
 			today = datetime.date.today()
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-			year_list = [today.year,today.year-1,today.year-2,today.year-3] 
+			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
 			
 			entries = models.Trial_Entry.objects.select_related(depth=3).filter(
 				location__in=locations
@@ -38,11 +38,18 @@ def index(request):
 				)
 			)
 			
+			for field in models.Trial_Entry._meta.fields:
+				if field.name == 'bushels_acre':
+					break;    
+			
+			sorted_dict = Filter_by_Field(entries, field, years).fetch()
+			
 			return render_to_response(
 				'tabbed_view.html',
 				{ 
 					'location_list': locations,
 					'trialentry_list': entries,
+					'sorted_dict': sorted_dict,
 					'year_list': year_list,
 					'radius' : location_form.cleaned_data['search_radius']
 				}
@@ -154,7 +161,6 @@ def select_variety(request):
 		{ 'form': form },
 		context_instance=RequestContext(request)
 	)
-
 
 def add_variety(request):
 	DiseaseFormset = inlineformset_factory(models.Variety, models.Disease_Entry)

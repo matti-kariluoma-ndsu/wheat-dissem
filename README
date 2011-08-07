@@ -55,14 +55,15 @@ Command to put zipcode.csv into a compatible format for importing to the db:
   $ rm tmp.csv; i=1; while [ $i -lt 43205 ]; do sed -n -e 's/^/\"'"$i"'\",/' -e ''"$i"' p' zipcode.csv >> tmp.csv ;let i=i+1; done; sed 's/\"//g' tmp.csv > tmp2.csv; sed -n '/.*,.../ p' tmp2.csv > import.csv; rm tmp.csv tmp2.csv
 
 To dump a table from the testing (sqlite) db:
-  $ sqlite> .mode csv
-  $ sqlite> .output your_filename.csv
+  $ sqlite> .separator ";"
+  $ sqlite> .mode list
+  $ sqlite> .output your_filename.list
   $ sqlite> select * from your_table;
   $ sqlite> .exit
  
 To populate a table in the testing (sqlite) db:
-  $ sqlite> .separator ","
-  $ sqlite> .import import.csv your_table
+  $ sqlite> .separator ";"
+  $ sqlite> .import import.list your_table
   $ sqlite> .exit
 
 NOTE: Did a chmod a+w {variety_trials_website/, variety_trials_website/sqlite.db} , will need

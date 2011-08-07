@@ -11,6 +11,7 @@ class Filter_by_Field:
 	
 	field = {'name':''} # default value such that we return nothing if a bogus field is given
 	entries = {}
+	years = []
 	
 	def __init__(self):
 		pass
@@ -30,31 +31,93 @@ class Filter_by_Field:
 		if field in Trial_Entry._meta.fields:
 			self.field = field
 		
+		# test if years are ordered properly
+		test = True;
+		for i in len(years):
+			test = test && (years[i] == sorted(years, reverse=True)[i])
+		
+		if test:
+			self.years = years
+		else:
+			self.years = years # TODO alert the programmer, not the user.
+			#raise
+		
 		fieldname = self.field.name
 		
 		for entry in entries:
 			year = str(entry.harvest_date.date.year)
-			location = str(entry.location.name)
-			try:
-				value = getattr(entry, fieldname)
-			except AttributeError:
-				value = None
-			try:
-				self.entries[year][location].append(value)
-			except KeyError:
+			if year in self.years:
+				name = str(entry.variety.name)
+				location = str(entry.location.name)
 				try:
-					self.entries[year][location] = [value]
-				except KeyError:
-					self.entries[year] = {}
-					self.entries[year][location] = [value]
-				
+					value = getattr(entry, fieldname)
+				except AttributeError:
+					value = None
+				if value != None:
+					try:
+						self.entries[year][name][location].append(value)
+					except KeyError:
+						try:
+							self.entries[year][name][location] = [value]
+						except KeyError:
+							try:
+								self.entries[year][name] = {}
+							except KeyError:
+								self.entries[year] = {}
+								self.entries[year][name] = {}
+							self.entries[year][name][location] = [value]
+		
+		# test if the most recent year has enough data
+		try:
+			test_dict = self.entries[max(self.years)]
+		except KeyError:
+			test_dict = {}
+		
+		if len(test_dict.keys()) < 5:
+			self.years.remove(max(self.years))
+					
 	
 	def fetch(self):
 		data = {}
-		data['current'] = self.entries[max(self.entries.keys())]
+		avg_years = []
 		
-		for year in sorted(self.entries.keys(), reverse=True):
-			data['current'] = self.entries[year]
+		myear = max(self.years)
+		try:
+			current_year = self.entries[myear].keys():
+		except KeyError:
+			current_year = []
+			
+		for name in current_year:
+			for location in self.entries[myear][name]:
+				sum_list = self.entries[myear][name][location]
+				avg_value = sum(sum_list) / len(sum_list)
+				try:
+					data[name][location] = avg_value
+				except KeyError:
+					data[name] = {}
+					data[name][location] = avg_value
+		
+		for year in sorted(self.years):
+			for element in avg_years:
+				element.append(year)
+			avg_years.append([year])
+		
+		for name in data.keys():
+			
+			for element in avg_years:
+				key = '%d-yr' % len(element)
+				
+				for year in element:
+					for names in self.entries[year].keys():
+						for name in names:
+							data[name]['meta'] = {}
+							data[name]['meta'][key] = 0
+							count = 0
+							for location in self.entries[year][name].keys():
+								sum_list = self.entries[year][name][location]
+								data[name]['meta'][key]	+= sum(sum_list)
+								count += len(sum_list)
+							data[name]['meta'][key] = data['meta'][key] / count
 		
 		return data
 
