@@ -4,18 +4,27 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
-from variety_trials_data.variety_trials_util import Trial_x_Location_x_Year, Locations_from_Zipcode_x_Radius
+from variety_trials_data.variety_trials_util import Trial_x_Location_x_Year, Locations_from_Zipcode_x_Radius, Filter_by_Field
 import datetime
+
+def get_entries(locations, year_list):
+	return models.Trial_Entry.objects.select_related(depth=3).filter(
+				location__in=locations
+			).filter(
+				harvest_date__in=models.Date.objects.filter(
+					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
+				)
+			)
 
 # Create your views here.
 def index(request):
 	if request.method == 'POST':
 		location_form = variety_trials_forms.SelectLocationForm(request.POST)
 		if location_form.is_valid():
+			radius = location_form.cleaned_data['search_radius']
 			try:
 				locations = Locations_from_Zipcode_x_Radius(
-					location_form.cleaned_data['zipcode'],
-					location_form.cleaned_data['search_radius']
+					location_form.cleaned_data['zipcode'], radius
 				).fetch()
 			except models.Zipcode.DoesNotExist:
 				return render_to_response(
@@ -30,31 +39,72 @@ def index(request):
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
 			
-			entries = models.Trial_Entry.objects.select_related(depth=3).filter(
-				location__in=locations
-			).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
-				)
-			)
+			entries = get_entries(locations, year_list) 
 			
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == 'bushels_acre':
 					break;    
 			
-			sorted_dict = Filter_by_Field(entries, field, years).fetch()
+			sorted_list = Filter_by_Field(entries, field, year_list).fetch()
+			field_form = variety_trials_forms.SelectFieldForm(initial={
+					'locations': locations,
+					'year_list': year_list,
+					'radius': radius
+				})
+				
+			return render_to_response(
+				'tabbed_view.html',
+				{ 
+					'field_form': field_form,
+					'location_list': locations,
+					'current_year': sorted_list[0][0],
+					'heading_list': sorted_list[0][1::],
+					'sorted_list': sorted_list[1::],
+					'year_list': year_list,
+					'radius' : radius
+				},
+				context_instance=RequestContext(request)
+			)
+	else:
+		location_form = variety_trials_forms.SelectLocationForm()
+
+	return render_to_response(
+		'main.html', 
+		{ 'location_form': location_form },
+		context_instance=RequestContext(request)
+	)
+
+def tabbed_view(request):
+	if request.method == 'POST':
+		field_form = variety_trials_forms.SelectFieldForm(request.POST)
+		if field_form.is_valid():
+			locations = field_form.cleaned_data['locations']
+			year_list = field_form.cleaned_data['year_list']
+			field = field_form.cleaned_data['field']
+			radius = field_form.cleaned_data['radius']
+			
+			sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list).fetch()
+			field_form = variety_trials_forms.SelectFieldForm(initial={
+					'locations': locations,
+					'year_list': year_list,
+					'radius': radius
+				})
 			
 			return render_to_response(
 				'tabbed_view.html',
 				{ 
+					'field_form': field_form
 					'location_list': locations,
-					'trialentry_list': entries,
-					'sorted_dict': sorted_dict,
+					'current_year': sorted_list[0][0],
+					'heading_list': sorted_list[0][1::],
+					'sorted_list': sorted_list[1::],
 					'year_list': year_list,
-					'radius' : location_form.cleaned_data['search_radius']
-				}
+					'radius' : radius
+				},
+				context_instance=RequestContext(request)
 			)
 	else:
+		# seems an error occured...
 		location_form = variety_trials_forms.SelectLocationForm()
 
 	return render_to_response(

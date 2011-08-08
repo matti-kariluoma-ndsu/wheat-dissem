@@ -12,6 +12,7 @@ class Filter_by_Field:
 	field = {'name':''} # default value such that we return nothing if a bogus field is given
 	entries = {}
 	years = []
+	locations = []
 	
 	def __init__(self):
 		pass
@@ -33,8 +34,8 @@ class Filter_by_Field:
 		
 		# test if years are ordered properly
 		test = True;
-		for i in len(years):
-			test = test && (years[i] == sorted(years, reverse=True)[i])
+		for i in range(len(years)):
+			test = test and (years[i] == sorted(years, reverse=True)[i])
 		
 		if test:
 			self.years = years
@@ -43,12 +44,13 @@ class Filter_by_Field:
 			#raise
 		
 		fieldname = self.field.name
-		
+		locations = {} # use a dictionary so we don't have to check for dups
 		for entry in entries:
-			year = str(entry.harvest_date.date.year)
+			year = int(entry.harvest_date.date.year)
 			if year in self.years:
 				name = str(entry.variety.name)
 				location = str(entry.location.name)
+				locations[location] = None
 				try:
 					value = getattr(entry, fieldname)
 				except AttributeError:
@@ -67,6 +69,7 @@ class Filter_by_Field:
 								self.entries[year][name] = {}
 							self.entries[year][name][location] = [value]
 		
+		self.locations = sorted(locations.keys())
 		# test if the most recent year has enough data
 		try:
 			test_dict = self.entries[max(self.years)]
@@ -75,22 +78,28 @@ class Filter_by_Field:
 		
 		if len(test_dict.keys()) < 5:
 			self.years.remove(max(self.years))
+		
 					
 	
 	def fetch(self):
+		"""
+		Returns a list of lists, suitable for a tabular layout. The first
+		list contains the header names, and each other list begins with the
+		variety name, followed by the values correpsonding to the header.
+		"""
 		data = {}
 		avg_years = []
 		
 		myear = max(self.years)
 		try:
-			current_year = self.entries[myear].keys():
+			current_year = self.entries[myear].keys()
 		except KeyError:
 			current_year = []
 			
 		for name in current_year:
 			for location in self.entries[myear][name]:
 				sum_list = self.entries[myear][name][location]
-				avg_value = sum(sum_list) / len(sum_list)
+				avg_value = round(sum(sum_list) / len(sum_list), 2)
 				try:
 					data[name][location] = avg_value
 				except KeyError:
@@ -101,25 +110,50 @@ class Filter_by_Field:
 			for element in avg_years:
 				element.append(year)
 			avg_years.append([year])
-		
-		for name in data.keys():
 			
-			for element in avg_years:
-				key = '%d-yr' % len(element)
-				
-				for year in element:
-					for names in self.entries[year].keys():
-						for name in names:
+		for element in avg_years:
+			key = '%d-yr' % len(element)
+			for year in element:
+				if year in self.entries.keys():
+					for name in self.entries[year].keys():
+						try:
 							data[name]['meta'] = {}
-							data[name]['meta'][key] = 0
-							count = 0
-							for location in self.entries[year][name].keys():
-								sum_list = self.entries[year][name][location]
-								data[name]['meta'][key]	+= sum(sum_list)
-								count += len(sum_list)
-							data[name]['meta'][key] = data['meta'][key] / count
+						except KeyError:
+							data[name] = {}
+							data[name]['meta'] = {}
+						data[name]['meta'][key] = 0
+						count = 0
+						for location in self.entries[year][name].keys():
+							sum_list = self.entries[year][name][location]
+							data[name]['meta'][key]	+= sum(sum_list)
+							count += len(sum_list)
+						data[name]['meta'][key] = round(data[name]['meta'][key] / count, 2)
 		
-		return data
+		return_list = []
+		
+		temp_list = [myear]
+		temp_list.extend(self.locations)
+		for element in sorted(avg_years, reverse=True):
+			temp_list.append('%d-yr' % len(element))
+		return_list.append(temp_list)
+			
+		for name in sorted(data.keys()):
+			temp_list = [name]
+			for location in self.locations:
+				try:
+					value = data[name][location]
+				except KeyError:
+					value = None
+				temp_list.append(value)
+			for element in sorted(avg_years, reverse=True):
+				key = '%d-yr' % len(element)
+				try:
+					value = data[name]['meta'][key]
+				except KeyError:
+					value = None
+				temp_list.append(value)
+			return_list.append(temp_list)
+		return return_list
 
 class Locations_from_Zipcode_x_Radius:
 	"""

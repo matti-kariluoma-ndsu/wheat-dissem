@@ -15,6 +15,12 @@ class SelectLocationForm(forms.Form):
                   )
 	#search_radius = forms.CharField(max_length=5)
 
+class SelectFieldForm(forms.Form):
+	locations = forms.CharField(max_length=5)
+	year_list = forms.CharField(max_length=5)
+	field = forms.CharField(max_length=5)
+	radius = forms.CharField(max_length=5)
+
 class SelectVarietyForm(forms.Form):
 	variety = forms.CharField(max_length=20)
 

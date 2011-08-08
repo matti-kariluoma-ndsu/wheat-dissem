@@ -8,7 +8,7 @@ from variety_trials_data import views
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
-
+"""
 variety_dictionary = {
       # queries for all Variety Rows in the DB
     "queryset" : Variety.objects.all(),
@@ -19,7 +19,7 @@ variety_dictionary = {
       # sends along additional information, notice the lack of '()'
     "extra_context" : {"entry_list" : Trial_Entry.objects.all}
 }
-
+"""
 
 urlpatterns = patterns('',
     # Example:
@@ -33,8 +33,9 @@ urlpatterns = patterns('',
     (r'^$', views.index), # the default view
     (r'^location/', views.select_location),
     (r'^variety/', views.select_variety),
-    (r'^variety_all/', list_detail.object_list, variety_dictionary),
+    #(r'^variety_all/', list_detail.object_list, variety_dictionary),
     #(r'^location/'),
+    (r'^view/(?P<field>[a-z]+)/$', views.tabbed_view)
     (r'^add_variety/', views.add_variety),
     (r'^add_trial/', views.add_trial_entry),
     (r'^add_trials/', views.add_trial_entry_csv_file),

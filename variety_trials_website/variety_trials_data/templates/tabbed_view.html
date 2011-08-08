@@ -2,30 +2,35 @@
 
 {% block content %}
 	<div class="top_spacer"></div>
+	<div>
+		<form action="#" method="post">
+			{% csrf_token %}
+			{% for field in location_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="Submit" />
+		</form>
+	</div>
 	<div id="static_content" class="grid_13">
 		<div class="datarows">
 			<div class="row headings">
-				<div class="variety"><h3>Variety</h3></div>
+				<div class="Variety"><h3>{{current_year}} Variety</h3></div>
+				{% for heading in heading_list %}
+				<div class="{{ heading }}"><h3>{{ heading }}</h3></div>
+				{% endfor %}
 			</div>
 			<div class="row subheadings thin">
 				<div class="variety"></div>
 			</div>
-
-			{% for location, value in sorted_dict.items %}
-			<div class="row thin">
-				<span class="left_sidebar">{{trialentry_dict.count}}</span>
-			</div>
-			<div class="{{variety_name}} group"> <!--TODO: filter replace space with underscores in this class property-->
+			{% for datalist in sorted_list %}
+			<div class="group"> <!--TODO: filter replace space with underscores in this class property-->
 				<div class="row master {% cycle 'odd' 'even' %}">
-					<div class="row_label" style="font-size: 8pt">{{entry.location}} ({{ entry.harvest_date.date.year }})</div>
-					<div class="days_to_head data">{{ entry.days_to_head }}</div>
-					<div class="plant_height data">{{ entry.plant_height }}</div>
-					<div class="kernel_weight data">{{ entry.kernel_weight }}</div>
-					<div class="test_weight data">{{ entry.test_weight }}</div>
-					<div class="protein_percent data">{{ entry.protein_percent }}</div>
-					<div class="bushels_acre data">{{ entry.bushels_acre }}</div>
-				</div>
-				<div class="row slave {% cycle 'odd' 'even' %}">
+					{% for element in datalist %}
+					<div class="{{ element }}">{{ element }}</div>
+					{% endfor %}
 				</div>
 			</div>
 			{% endfor %}
