@@ -95,10 +95,11 @@ class Filter_by_Field:
 			current_year = self.entries[myear].keys()
 		except KeyError:
 			current_year = []
-			
+		
 		for name in current_year:
 			for location in self.entries[myear][name]:
 				sum_list = self.entries[myear][name][location]
+				print sum_list
 				avg_value = round(sum(sum_list) / len(sum_list), 2)
 				try:
 					data[name][location] = avg_value

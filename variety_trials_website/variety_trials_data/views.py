@@ -22,9 +22,10 @@ def index(request):
 		location_form = variety_trials_forms.SelectLocationForm(request.POST)
 		if location_form.is_valid():
 			radius = location_form.cleaned_data['search_radius']
+			zipcode = location_form.cleaned_data['zipcode']
 			try:
 				locations = Locations_from_Zipcode_x_Radius(
-					location_form.cleaned_data['zipcode'], radius
+					zipcode, radius
 				).fetch()
 			except models.Zipcode.DoesNotExist:
 				return render_to_response(
@@ -46,16 +47,15 @@ def index(request):
 					break;    
 			
 			sorted_list = Filter_by_Field(entries, field, year_list).fetch()
-			field_form = variety_trials_forms.SelectFieldForm(initial={
-					'locations': locations,
-					'year_list': year_list,
-					'radius': radius
+			location_form = variety_trials_forms.SelectLocationForm(initial={
+					'zipcode': zipcode,
+					'search_radius': radius
 				})
 				
 			return render_to_response(
 				'tabbed_view.html',
 				{ 
-					'field_form': field_form,
+					'location_form': location_form,
 					'location_list': locations,
 					'current_year': sorted_list[0][0],
 					'heading_list': sorted_list[0][1::],
@@ -74,26 +74,44 @@ def index(request):
 		context_instance=RequestContext(request)
 	)
 
-def tabbed_view(request):
+def tabbed_view(request, fieldname):
 	if request.method == 'POST':
-		field_form = variety_trials_forms.SelectFieldForm(request.POST)
-		if field_form.is_valid():
-			locations = field_form.cleaned_data['locations']
-			year_list = field_form.cleaned_data['year_list']
-			field = field_form.cleaned_data['field']
-			radius = field_form.cleaned_data['radius']
+		location_form = variety_trials_forms.SelectLocationForm(request.POST)
+		if location_form.is_valid():
+			zipcode = location_form.cleaned_data['zipcode']
+			radius = location_form.cleaned_data['search_radius']
+			
+			try:
+				locations = Locations_from_Zipcode_x_Radius(
+					zipcode, radius
+				).fetch()
+			except models.Zipcode.DoesNotExist:
+				return render_to_response(
+					'main.html', 
+					{ 
+						'location_form': location_form,
+						'error_list': ['Sorry, the zipcode: ' + location_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
+					},
+					context_instance=RequestContext(request)
+				)
+			today = datetime.date.today()
+			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
+			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
+			
+			for field in models.Trial_Entry._meta.fields:
+				if field.name == fieldname:
+					break;
 			
 			sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list).fetch()
-			field_form = variety_trials_forms.SelectFieldForm(initial={
-					'locations': locations,
-					'year_list': year_list,
-					'radius': radius
+			location_form = variety_trials_forms.SelectLocationForm(initial={
+					'zipcode': zipcode,
+					'search_radius': radius
 				})
 			
 			return render_to_response(
 				'tabbed_view.html',
 				{ 
-					'field_form': field_form
+					'location_form': location_form,
 					'location_list': locations,
 					'current_year': sorted_list[0][0],
 					'heading_list': sorted_list[0][1::],
