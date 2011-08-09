@@ -53,8 +53,12 @@ def tabbed_view(request, fieldname):
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
-			print fieldname
-			sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list).fetch()
+			
+			try:
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list).fetch()
+			except TypeError:
+				return HttpResponseRedirect("/")
+			
 			location_form = variety_trials_forms.SelectLocationForm(initial={
 					'zipcode': zipcode,
 					'search_radius': radius

@@ -31,6 +31,7 @@ class Filter_by_Field:
 		self.entries = {}
 		self.years = []
 		self.locations = []
+		
 		# test if field is a Trial_Entry field
 		if field in Trial_Entry._meta.fields:
 			self.field = field
@@ -102,7 +103,6 @@ class Filter_by_Field:
 		for name in current_year:
 			for location in self.entries[myear][name]:
 				sum_list = self.entries[myear][name][location]
-				print sum_list
 				avg_value = round(sum(sum_list) / len(sum_list), 2)
 				try:
 					data[name][location] = avg_value
