@@ -50,6 +50,14 @@ def tabbed_view(request, fieldname):
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
 			
+			field_list= []
+			for field in models.Trial_Entry._meta.fields:
+				if (field.get_internal_type() == 'DecimalField' 
+						or field.get_internal_type() == 'PositiveIntegerField' 
+						or field.get_internal_type() == 'SmallIntegerField'
+						or field.get_internal_type() == 'IntegerField'):
+							field_list.append(field.name)
+			
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
@@ -68,6 +76,7 @@ def tabbed_view(request, fieldname):
 				'tabbed_view.html',
 				{ 
 					'location_form': location_form,
+					'field_list': field_list,
 					'location_list': locations,
 					'current_year': sorted_list[0][0],
 					'heading_list': sorted_list[0][1::],
