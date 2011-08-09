@@ -3,7 +3,7 @@
 {% block content %}
 	<div class="top_spacer"></div>
 	<div>
-		<form name="locationform" action="#" method="post">
+		<form name="locationform" action="/view/kernel_weight" method="post">
 			{% csrf_token %}
 			{% for field in location_form %}
 			<div class="input row">
@@ -17,7 +17,7 @@
 	<div id="static_content" class="grid_13">
 		<div class="datarows">
 			<div class="row headings">
-				<div class="Variety"><h3>{{current_year}} Variety <a onclick="document['locationform'].submit(); return false" href="view/kernel_weight/">click</a></h3></div>
+				<div class="Variety"><h3>{{current_year}} Variety <a onclick="document['locationform'].submit(); return false" href="/view/kernel_weight/">click</a></h3></div>
 				{% for heading in heading_list %}
 				<div class="{{ heading }}"><h3>{{ heading }}</h3></div>
 				{% endfor %}

@@ -26,8 +26,11 @@ class Filter_by_Field:
 	
 	def populate(self, entries, field, years):
 		"""
-		Calling populate() multiple times is supported, but untested. YMMV.
 		"""
+		self.field = {'name':''}
+		self.entries = {}
+		self.years = []
+		self.locations = []
 		# test if field is a Trial_Entry field
 		if field in Trial_Entry._meta.fields:
 			self.field = field

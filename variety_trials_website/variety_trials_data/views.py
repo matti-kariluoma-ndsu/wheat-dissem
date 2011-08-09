@@ -18,55 +18,7 @@ def get_entries(locations, year_list):
 
 # Create your views here.
 def index(request):
-	if request.method == 'POST':
-		location_form = variety_trials_forms.SelectLocationForm(request.POST)
-		if location_form.is_valid():
-			radius = location_form.cleaned_data['search_radius']
-			zipcode = location_form.cleaned_data['zipcode']
-			try:
-				locations = Locations_from_Zipcode_x_Radius(
-					zipcode, radius
-				).fetch()
-			except models.Zipcode.DoesNotExist:
-				return render_to_response(
-					'main.html', 
-					{ 
-						'location_form': location_form,
-						'error_list': ['Sorry, the zipcode: ' + location_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
-					},
-					context_instance=RequestContext(request)
-				)
-			today = datetime.date.today()
-			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
-			
-			entries = get_entries(locations, year_list) 
-			
-			for field in models.Trial_Entry._meta.fields:
-				if field.name == 'bushels_acre':
-					break;    
-			
-			sorted_list = Filter_by_Field(entries, field, year_list).fetch()
-			location_form = variety_trials_forms.SelectLocationForm(initial={
-					'zipcode': zipcode,
-					'search_radius': radius
-				})
-				
-			return render_to_response(
-				'tabbed_view.html',
-				{ 
-					'location_form': location_form,
-					'location_list': locations,
-					'current_year': sorted_list[0][0],
-					'heading_list': sorted_list[0][1::],
-					'sorted_list': sorted_list[1::],
-					'year_list': year_list,
-					'radius' : radius
-				},
-				context_instance=RequestContext(request)
-			)
-	else:
-		location_form = variety_trials_forms.SelectLocationForm()
+	location_form = variety_trials_forms.SelectLocationForm()
 
 	return render_to_response(
 		'main.html', 
@@ -101,7 +53,7 @@ def tabbed_view(request, fieldname):
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
-			
+			print fieldname
 			sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list).fetch()
 			location_form = variety_trials_forms.SelectLocationForm(initial={
 					'zipcode': zipcode,
