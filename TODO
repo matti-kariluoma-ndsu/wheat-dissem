@@ -1,0 +1,15 @@
+grep for TODOs
+div -> table for the moment, then back to div when a nice strategy is defined.
+printable view, preferably the view one receives. what about h-bar breaking?
+on /view/*
+	text links on top to buttons, hide unused ones, put them on side?
+	show input form when visited directly
+	title pages and units blurb per page
+	mean = None when data lacking
+	None to -- for webpage
+	locations count per datapoint (varitety)
+database
+	LSD row... where?
+	support for entries that involve multiple locations
+	
+	
