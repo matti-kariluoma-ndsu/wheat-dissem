@@ -8,6 +8,7 @@ on /view/*
 	mean = None when data lacking
 	None to -- for webpage
 	locations count per datapoint (varitety)
+	pull averages into a separate list, use td to separate each year
 database
 	LSD row... where?
 	support for entries that involve multiple locations

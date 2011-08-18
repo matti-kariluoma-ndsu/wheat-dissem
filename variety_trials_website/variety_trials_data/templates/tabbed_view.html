@@ -19,45 +19,38 @@
 		<a onclick="document['{{fieldname}}form'].submit(); return false" href="/view/{{fieldname}}/">{{fieldname}}</a>
 		{% endfor %}
 	</div>
-	<div id="static_content" class="grid_13">
-		<div class="datarows">
-			<div class="row headings">
-				<div class="Variety"><h3>{{current_year}} Variety</h3></div>
+	<div id="static_content">
+		<table border="1">
+			<tr>
+				<td colspan="10" style="text-align:center;">{{current_year}}</td>
+			</tr>
+			<tr >
+				<td class="Variety"><h3> Variety</h3></td>
 				{% for heading in heading_list %}
-				<div class="{{ heading }}"><h3>{{ heading }}</h3></div>
+				<td class="{{ heading }}"><h3>{{ heading }}</h3></td>
 				{% endfor %}
-			</div>
-			<div class="row subheadings thin">
-				<div class="variety"></div>
-			</div>
+			</tr>
+			<tr class="row subheadings thin">
+			</tr>
 			{% for datalist in sorted_list %}
-			<div class="group"> <!--TODO: filter replace space with underscores in this class property-->
-				<div class="row master {% cycle 'odd' 'even' %}">
-					{% for element in datalist %}
-					<div class="{{ element }}">{{ element }}</div>
-					{% endfor %}
-				</div>
-			</div>
+			<tr class="group">
+				{% for element in datalist %}
+				<td class="{{ element }}">{{ element }}</td>
+				{% endfor %}
+			</tr>
 			{% endfor %}
-			<div class="row footer">
-				<div class="row_label">LSD</div>
-				<div class="days_to_head data">{{trialentry_dict.lsd.days_to_head}}</div>
-				<div class="plant_height data">{{trialentry_dict.lsd.plant_height}}</div>
-				<div class="kernel_weight data">{{trialentry_dict.lsd.kernel_weight}}</div>
-				<div class="test_weight data">{{trialentry_dict.lsd.test_weight}}</div>
-				<div class="protein_percent data">{{trialentry_dict.lsd.protein_percent}}</div>
-				<div class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</div>
-				<div class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</div>
-				<div class="bushels_acre data no_right_border">{{trialentry_dict.lsd.bushels_acre}}</div>
-			</div>
-			<div class="row thin"></div>
-	  </div>
-	</div>
-	<div class="right_sidebar">
-		These locations are within {{radius}} miles:
-		{% for location in location_list %}
-		<p >* {{location.name}}</p>
-		{% endfor %}
+			<tr class="row footer">
+				<td class="row_label">LSD</td>
+				<td class="days_to_head data">{{trialentry_dict.lsd.days_to_head}}</td>
+				<td class="plant_height data">{{trialentry_dict.lsd.plant_height}}</td>
+				<td class="kernel_weight data">{{trialentry_dict.lsd.kernel_weight}}</td>
+				<td class="test_weight data">{{trialentry_dict.lsd.test_weight}}</td>
+				<td class="protein_percent data">{{trialentry_dict.lsd.protein_percent}}</td>
+				<td class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</td>
+				<td class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</td>
+				<td class="bushels_acre data no_right_border">{{trialentry_dict.lsd.bushels_acre}}</td>
+			</tr>
+	  </table>
 	</div>
 	<div class="clear">&#160;</div>
 
