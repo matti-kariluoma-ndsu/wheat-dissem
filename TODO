@@ -6,8 +6,9 @@ on /view/*
 	show input form when visited directly
 	title pages and units blurb per page
 	mean = None when data lacking
-	None to -- for webpage
-	locations count per datapoint (varitety)
+	None to -- for webpage 
+	  {{ value|default_if_none:"--"|default:"--"}}
+	locations count per datapoint (variety)
 	pull averages into a separate list, use td to separate each year
 database
 	LSD row... where?
