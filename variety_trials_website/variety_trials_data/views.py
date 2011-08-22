@@ -8,6 +8,8 @@ from variety_trials_data.variety_trials_util import Trial_x_Location_x_Year, Loc
 import datetime
 
 def get_entries(locations, year_list):
+	# We do a depth=2 so we can access entry.variety.name
+	# We do a depth=3 so we can access entry.harvest_date.date.year
 	return models.Trial_Entry.objects.select_related(depth=3).filter(
 				location__in=locations
 			).filter(
@@ -42,6 +44,7 @@ def tabbed_view(request, fieldname):
 					'main.html', 
 					{ 
 						'location_form': location_form,
+						# TODO: set initial fieldname
 						'error_list': ['Sorry, the zipcode: ' + location_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
 					},
 					context_instance=RequestContext(request)
@@ -50,14 +53,6 @@ def tabbed_view(request, fieldname):
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
 			
-			field_list= []
-			for field in models.Trial_Entry._meta.fields:
-				if (field.get_internal_type() == 'DecimalField' 
-						or field.get_internal_type() == 'PositiveIntegerField' 
-						or field.get_internal_type() == 'SmallIntegerField'
-						or field.get_internal_type() == 'IntegerField'):
-							field_list.append(field.name)
-			
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
@@ -65,6 +60,7 @@ def tabbed_view(request, fieldname):
 			try:
 				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list).fetch()
 			except TypeError:
+				# TODO: we can do more for the user than redirect to /
 				return HttpResponseRedirect("/")
 			
 			location_form = variety_trials_forms.SelectLocationForm(initial={
@@ -92,7 +88,10 @@ def tabbed_view(request, fieldname):
 
 	return render_to_response(
 		'main.html', 
-		{ 'location_form': location_form },
+		{ 
+			'location_form': location_form
+			# TODO: set initial fieldname
+		},
 		context_instance=RequestContext(request)
 	)
 
