@@ -1,13 +1,23 @@
-grep for TODOs
+(grep for TODOs)
 div -> table for the moment, then back to div when a nice strategy is defined.
 printable view, preferably the view one receives. what about h-bar breaking?
+	padding: top right bottom left
+	padding: top left_and_right bottom
+	padding: top_and_bottom left_and_right
+	padding: all
+	padding-top:
+	padding-bottom:
+	padding-right:
+	padding-left:
 on /view/*
 	text links on top to buttons, hide unused ones, put them on side?
-	show input form when visited directly
+	(show input form when visited directly)
 	title pages and units blurb per page
+		new row in database... lookup on field.name
 	mean = None when data lacking
-	None to -- for webpage
-	locations count per datapoint (varitety)
+	None to -- for webpage 
+	  {{ value|default_if_none:"--"|default:"--"}}
+	locations count per datapoint (variety)
 	pull averages into a separate list, use td to separate each year
 database
 	LSD row... where?
