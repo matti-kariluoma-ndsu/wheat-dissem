@@ -33,7 +33,7 @@
 			<tr class="row subheadings thin">
 			</tr>
 			{% for datalist in sorted_list %}
-			<tr class="group">
+			<tr class="group {% cycle 'odd' 'even' %}">
 				{% for element in datalist %}
 				<td class="{{ element }}">{{ element }}</td>
 				{% endfor %}

@@ -51,11 +51,11 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
   background-color: #EFE;
 }
 
-.master.even {
+.even {
   background-color: #CCF;
 }
 
-.master.odd {
+.odd {
   background-color: #EEF;
 }
 
