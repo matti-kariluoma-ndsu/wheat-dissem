@@ -53,6 +53,14 @@ def tabbed_view(request, fieldname):
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
 			
+			field_list= []
+			for field in models.Trial_Entry._meta.fields:
+				if (field.get_internal_type() == 'DecimalField' 
+						or field.get_internal_type() == 'PositiveIntegerField' 
+						or field.get_internal_type() == 'SmallIntegerField'
+						or field.get_internal_type() == 'IntegerField'):
+							field_list.append(field.name)
+
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
@@ -132,7 +140,7 @@ def select_location(request):
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == 'bushels_acre':
 					break;
-          
+					
 			ranked_entries_list = Trial_x_Location_x_Year(trial_set=entries, location_set=locations, year_list=year_list).fetch(n_list=[1,2,3], field_list=[field])
 
 			# TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
