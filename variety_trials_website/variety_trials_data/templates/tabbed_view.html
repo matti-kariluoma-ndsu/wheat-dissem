@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {%  load django_math %}
 {% block content %}
+<table>
+<tr>
+<td>
 	<div class="top_spacer"></div>
 	<div class="tabs">
 		{% for fieldname in field_list %}
@@ -16,9 +19,13 @@
 				<input type="submit" value="Submit" />
 			</form>
 		</div>
-		<a onclick="document['{{fieldname}}form'].submit(); return false" href="/view/{{fieldname}}/">{{fieldname}}</a>
+		<div  style="padding: 5px;">
+		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/{{fieldname}}/">{{fieldname}}</a>
+		</div>
 		{% endfor %}
 	</div>
+</td>
+<td>
 	<div id="static_content">
 		<table border='1'>
 			<tr>
@@ -54,7 +61,9 @@
 	  </table>
 	</div>
 	<div class="clear">&#160;</div>
-
+</td>
+</tr>
+</table>
 	<!--
 	<div id='dynamic_content'></div>
 	-->
