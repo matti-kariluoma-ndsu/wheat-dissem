@@ -10,16 +10,16 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
  }
  
 .row {
-  border-top:1px solid #333;
-  border-right:1px solid #333;
-  border-left:1px solid #333;
-  min-height:50px;
+  border-top:1px dotted #666;
+  border-right:1px dotted #666;
+  //border-left:1px dotted #666;
+  //min-height:50px;
   font-family:'Courier New','Courier','sans-serif';
  }
  
 .row div {
-  /*border-left:1px solid #333;*/
-  border-right:1px solid #333;
+  /*border-left:1px dotted #666;*/
+  border-right:1px dotted #666;
   min-height:50px;
   float:left;
   padding:0 0 0 0;
@@ -76,6 +76,9 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	height: 1em;
 }
 
+.bottom_spacer {
+	height: 1em;
+}
 
 .row .no_right_border {
 	border-right: 0px none transparent;
@@ -99,6 +102,17 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	float: left; 
 	font-weight: bold; 
 	color: #444;
+}
+
+.current_year {
+	text-align: center;
+	border-bottom: 1px solid #666;
+}
+
+.padded {
+	padding-left: 1em;
+	padding-right: 1em;
+	border-right: 1px dotted #666;
 }
 
 /* color scheme from http://www.ethanschoonover.com/solarized */
