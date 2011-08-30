@@ -12,4 +12,24 @@ database
 	LSD row... where?
 	support for entries that involve multiple locations
 	
-	
+Goal: Show units/blurb/title page for each field_name in tabbed_view
+Soln 1: Database of VARCHAR() or urls to text files
+Soln 2: Static python dict of values to pass in view.py
+
+Goal: Printable version of tabbed_view when h-bar broken
+Soln 1: Move content s.t. h-bar does not break
+Soln 2: Have a print-view page that shows Soln 1
+
+Goal: Buttons for tabbed_view links
+Soln 1: See Soln 2 of untis/blurb/titles
+
+Goal: Show number of locations (per row?) in tabbed_view
+Soln 1: in util.py, include that data, adjust tabbed_view
+
+Goal: Show LSD
+Problem 1: LSD data is only available per "sheet" which roughly equates
+to mean yields per location x year
+Problem 2: We only have LSD for yield
+Problem 3: We cannot calculate LSD from our averaged data, we need raw
+Problem 4: We have multiple per-calculcated LSDs when a query pulls
+in data from multiple locations/years.
