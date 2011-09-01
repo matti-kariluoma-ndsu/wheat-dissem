@@ -27,7 +27,46 @@ def index(request):
 		{ 'location_form': location_form },
 		context_instance=RequestContext(request)
 	)
-
+	
+# TODO: does this belong in the DB?
+unit_blurbs = {
+	'bushels_acre': ['Yield', 'Bushels per Acre', 
+		'The average number of bushels that can be expected from each acre of farmed land.',
+		'/static/img/button_yield.jpg'],
+	'protein_percent': ['Protein', 'Percent of Mass',
+		'The average percentage of protein usable for baking. 12% or greater is required for export to	many countries.',
+		'/static/img/button_protein_percent.jpg'],
+	'test_weight': ['Test Weight','Pounds per Bushel',
+		'The average weight of each bushel.', '/static/img/button_test_weight.jpg'],
+	'kernel_weight': ['Kernel Weight','Grams per 1000','No Description.',
+		'/static/img/button_kernel_weight.jpg'],
+	'plant_height': ['Plant Height','Inches','No Description.', 
+		'/static/img/button_plant_height.jpg'],
+	'days_to_head': ['Days to Head','Days from Planting','No Description.',
+		'/static/img/button_days_to_head.jpg'],
+	'lodging_factor': ['Lodging Factor','Ranking: 1 (No Lodging) to 9 (Heavy Lodging) ',
+		'No Description.', '/static/img/button_lodging_factor.jpg'],
+	'jday_of_head': ['Julian Day of Head','Days from Jan 1','No Description.',
+		'/static/img/button_jday_of_head.jpg'],
+	'winter_survival_rate': ['Winter Survival Rate','Percentage of Population',
+		'No Description.', '/static/img/button_winter_survival_rate.jpg'],
+	'shatter': ['Shatter Factor','Ranking: 1 (Least Shatter) to 9 (Most Shatter)',
+		'No Description.', '/static/img/button_shatter.jpg'],
+	'seeds_per_round': ['Seeds per Round','1000 per Round','No Description.',
+		'/static/img/button_seeds_per_round.jpg'],
+	'canopy_density': ['Canopy Density Factor','Ranking: 1 (Least Dense) to 9 (Most Dense)',
+		'No Description.', '/static/img/button_canopy_density.jpg'],
+	'canopy_height': ['Canopy Height','Inches','No Description.',
+		'/static/img/button_canopy_height.jpg'],
+	'days_to_flower': ['Days to Flower','Days from Planting','No Description.',
+		'/static/img/button_days_to_flower.jpg'],
+	'seed_oil_percent': ['Seed Oil','Percent of Mass','No Description.',
+		'/static/img/button_seed_oil_percent.jpg'],
+	'seeding_rate': ['Seeding Rate','1000 per Foot','No Description.',
+		'/static/img/button_seeding_rate.jpg'],
+	'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
+		'No Description.', '/static/img/button_moisture_basis.jpg']
+}
 def tabbed_view(request, fieldname):
 	if request.method == 'POST':
 		location_form = variety_trials_forms.SelectLocationForm(request.POST)
