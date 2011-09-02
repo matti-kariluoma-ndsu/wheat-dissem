@@ -6,7 +6,7 @@
 <td>
 	<div class="top_spacer"></div>
 	<div class="tabs">
-		{% for fieldname in field_list %}
+		{% for fieldname, blurb_list in blurbs.items %}
 		<div class="{{fieldname}}" style="display:none">
 			<form name="{{fieldname}}form" action="/view/{{fieldname}}" method="post">
 				{% csrf_token %}
@@ -20,7 +20,7 @@
 			</form>
 		</div>
 		<div  style="padding: 5px;">
-		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/{{fieldname}}/">{{fieldname}}</a>
+		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
 		</div>
 		{% endfor %}
 	</div>
@@ -28,6 +28,16 @@
 <td>
 	<div id="static_content">
 		<table border='1'>
+			<tr>
+				<td colspan="{{ heading_list|length }}">
+					{% for fieldname, blurb_list in blurbs.items %}
+					{% if fieldname == curfield %}
+							<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
+							<p>{{blurb_list.2}}</p>
+					{% endif %}
+					{% endfor %}
+				</td>
+			</tr>
 			<tr>
 				<td colspan="{{ heading_list|length|sub:2 }}" class="current_year">{{current_year}}</td>
 			</tr>

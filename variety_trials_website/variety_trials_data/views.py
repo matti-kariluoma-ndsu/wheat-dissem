@@ -125,7 +125,9 @@ def tabbed_view(request, fieldname):
 					'heading_list': sorted_list[0][1::],
 					'sorted_list': sorted_list[1::],
 					'year_list': year_list,
-					'radius' : radius
+					'radius' : radius,
+					'blurbs' : unit_blurbs,
+					'curfield' : fieldname
 				},
 				context_instance=RequestContext(request)
 			)
