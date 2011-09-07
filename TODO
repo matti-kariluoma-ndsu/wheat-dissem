@@ -33,3 +33,21 @@ Problem 2: We only have LSD for yield
 Problem 3: We cannot calculate LSD from our averaged data, we need raw
 Problem 4: We have multiple per-calculcated LSDs when a query pulls
 in data from multiple locations/years.
+
+Remove mean calculations that are invalid
+Prune empty varieties (for the current year)
+Be able to remove locations/varieties from the report
+Front Page
+	See descriptions of varieties
+	Compare varieties to one another
+Range
+	100
+	200
+	ND
+	MN
+	ALL
+Tabs/buttons
+	prune those that have no data
+	show 2009/2010/2011 (year) buttons
+	Highlight button currently selected
+	bold column headers (current year)
