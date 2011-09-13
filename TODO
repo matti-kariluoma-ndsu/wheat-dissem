@@ -21,7 +21,7 @@ Soln 1: Move content s.t. h-bar does not break
 Soln 2: Have a print-view page that shows Soln 1
 
 Goal: Buttons for tabbed_view links
-Soln 1: See Soln 2 of untis/blurb/titles
+Soln 1: See Soln 2 of units/blurb/titles
 
 Goal: Show number of locations (per row?) in tabbed_view
 Soln 1: in util.py, include that data, adjust tabbed_view
