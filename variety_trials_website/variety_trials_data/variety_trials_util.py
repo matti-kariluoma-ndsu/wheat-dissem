@@ -207,31 +207,33 @@ class Locations_from_Zipcode_x_Radius:
 			zipcode_object = zipcode_query.get() # should only be one result
 		except (ValueError, models.Zipcode.DoesNotExist) as instance:
 			raise models.Zipcode.DoesNotExist(instance)
+		if (self.radius < 1.0) and (self.radius > -1.0):
+			locations = models.Location.objects.all()
+		else:
+			lat1 = float(zipcode_object.latitude) 
+			lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
+			lat1 = radians(lat1)
+			lon1 = radians(lon1)
+			R = 6378137.0 # Earth's median self.radius, in meters
+			d = self.radius * 1609.344	 # in meters 
+			# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
+			# TODO: have the Location objects grab default lat/long, not user entered
+			bearing_list = [ 0.0, pi/2.0, pi, 3.0*pi/2.0 ] # cardinal directions
+			for theta in bearing_list:
+				lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(theta))
+				lat2_list.append( degrees(lat2) )
+				lon2 = lon1 + atan2(sin(theta)*sin(d/R)*cos(lat1), cos(d/R)-sin(lat1)*sin(lat2))
+				lon2_list.append( degrees(lon2) )
+				lon2 = (lon2+3.0*pi)%(2.0*pi) - pi	# normalise to -180...+180
+			lat2_list = lat2_list[0::2] # discard non-moved points
+			lon2_list = lon2_list[1::2] # both should contain two values, {min, max} lat/long
 			
-		lat1 = float(zipcode_object.latitude) 
-		lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
-		lat1 = radians(lat1)
-		lon1 = radians(lon1)
-		R = 6378137.0 # Earth's median self.radius, in meters
-		d = self.radius * 1609.344	 # in meters 
-		# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
-		# TODO: have the Location objects grab default lat/long, not user entered
-		bearing_list = [ 0.0, pi/2.0, pi, 3.0*pi/2.0 ] # cardinal directions
-		for theta in bearing_list:
-			lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(theta))
-			lat2_list.append( degrees(lat2) )
-			lon2 = lon1 + atan2(sin(theta)*sin(d/R)*cos(lat1), cos(d/R)-sin(lat1)*sin(lat2))
-			lon2_list.append( degrees(lon2) )
-			lon2 = (lon2+3.0*pi)%(2.0*pi) - pi	# normalise to -180...+180
-		lat2_list = lat2_list[0::2] # discard non-moved points
-		lon2_list = lon2_list[1::2] # both should contain two values, {min, max} lat/long
-		
-		locations = models.Location.objects.filter(
-				zipcode__latitude__range=(str(min(lat2_list)), str(max(lat2_list)))
-			).filter(
-				zipcode__longitude__range=(str(min(lon2_list)), str(max(lon2_list)))
-			)
-		#TODO: We just searched a square, now discard searches that are > x miles away.
+			locations = models.Location.objects.filter(
+					zipcode__latitude__range=(str(min(lat2_list)), str(max(lat2_list)))
+				).filter(
+					zipcode__longitude__range=(str(min(lon2_list)), str(max(lon2_list)))
+				)
+			#TODO: We just searched a square, now discard searches that are > x miles away.
 		
 		
 		return locations

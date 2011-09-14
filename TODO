@@ -41,13 +41,7 @@ Front Page
 	See descriptions of varieties
 	Compare varieties to one another
 Range
-	100
-	200
-	ND
+	ND # use sentinels?
 	MN
-	ALL
 Tabs/buttons
 	prune those that have no data
-	show 2009/2010/2011 (year) buttons
-	Highlight button currently selected
-	bold column headers (current year)

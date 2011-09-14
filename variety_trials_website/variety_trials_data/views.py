@@ -130,14 +130,13 @@ def tabbed_view(request, yearname, fieldname):
 					'location_form': location_form,
 					'field_list': field_list,
 					'location_list': locations,
-					'current_year': sorted_list[0][0],
+					'curyear': str(sorted_list[0][0]),
 					'heading_list': sorted_list[0][1::],
 					'sorted_list': sorted_list[1::],
 					'years': years,
 					'radius' : radius,
 					'blurbs' : unit_blurbs,
-					'curfield' : fieldname,
-					'curyear' : yearname
+					'curfield' : fieldname
 				},
 				context_instance=RequestContext(request)
 			)

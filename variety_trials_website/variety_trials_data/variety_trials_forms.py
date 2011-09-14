@@ -9,7 +9,7 @@ class SelectLocationForm(forms.Form):
 	search_radius = forms.ChoiceField(
 										widget=forms.RadioSelect(), 
                     choices=(
-                      (100,'100 miles'), (200,'200 miles'), (400,'All of ND'), (800,'All of MN'), (10000, 'All Data')
+                      (100,'100 miles'), (200,'200 miles'), (400,'All of ND'), (800,'All of MN'), (0,'All Data')
                       ),
                     initial='100'
                   )

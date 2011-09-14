@@ -111,6 +111,8 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 .current_year {
 	text-align: center;
 	border-bottom: 1px solid #666;
+	font-weight: bold;
+	font-size: 1.4em;
 }
 
 .padded {
