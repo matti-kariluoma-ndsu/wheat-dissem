@@ -179,9 +179,7 @@ class Filter_by_Field:
 		empty_columns = []
 		for i in range(len(self.locations) - 1):# range of a negative integer returns an empty list
 			empty = True
-			print i
 			for row in return_list[1::]: # skip header row
-				print row
 				empty = empty and (row[i+1] == None) # + 1 to skip past the variety name
 			if empty:
 				empty_columns.append(i+1)
