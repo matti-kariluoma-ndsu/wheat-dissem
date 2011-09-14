@@ -44,8 +44,8 @@ class Filter_by_Field:
 		if test:
 			self.years = years
 		else:
-			self.years = years # TODO alert the programmer, not the user.
-			#raise
+			self.years = years 
+			#raise # TODO alert the programmer, not the user.
 		
 		fieldname = self.field.name
 		locations = {} # use a dictionary so we don't have to check for dups
