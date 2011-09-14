@@ -35,7 +35,6 @@ Problem 4: We have multiple per-calculcated LSDs when a query pulls
 in data from multiple locations/years.
 
 Remove mean calculations that are invalid
-Prune empty varieties (for the current year)
 Be able to remove locations/varieties from the report
 Front Page
 	See descriptions of varieties
