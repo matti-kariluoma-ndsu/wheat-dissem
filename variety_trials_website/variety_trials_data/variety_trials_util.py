@@ -164,14 +164,32 @@ class Filter_by_Field:
 				except KeyError:
 					value = None
 				temp_list.append(value)
-			for element in sorted(avg_years, reverse=True):
-				key = '%d-yr' % len(element)
-				try:
-					value = data[name]['meta'][key]
-				except KeyError:
-					value = None
-				temp_list.append(value)
-			return_list.append(temp_list)
+			# Discard a row (variety) that is all `None'
+			if len([e for e in temp_list if e is not None]) > 1:
+				for element in sorted(avg_years, reverse=True):
+					key = '%d-yr' % len(element)
+					try:
+						value = data[name]['meta'][key]
+					except KeyError:
+						value = None
+					temp_list.append(value)
+				return_list.append(temp_list)
+				
+		# Discard a column (location) that is all `None'
+		empty_columns = []
+		for i in range(len(self.locations) - 1):# range of a negative integer returns an empty list
+			empty = True
+			print i
+			for row in return_list[1::]: # skip header row
+				print row
+				empty = empty and (row[i+1] == None) # + 1 to skip past the variety name
+			if empty:
+				empty_columns.append(i+1)
+		
+		for i in sorted(empty_columns, reverse=True): # reverse transverse so indexes don't change on us	
+			for row in return_list: # include header row
+				del(row[i])
+			
 		return return_list
 
 class Locations_from_Zipcode_x_Radius:
