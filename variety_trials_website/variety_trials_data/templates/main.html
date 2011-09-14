@@ -26,7 +26,7 @@
 
 	TODO: use get, not post
 	-->
-	<form action="view/bushels_acre" method="post">
+	<form action="view/{{curyear}}/bushels_acre" method="post">
 		{% csrf_token %}
 		{% for field in location_form %}
 		<div class="input row">

@@ -5,10 +5,10 @@
 <tr>
 <td>
 	<div class="top_spacer"></div>
-	<div class="tabs">
-		{% for fieldname, blurb_list in blurbs.items %}
-		<div class="{{fieldname}}" style="display:none">
-			<form name="{{fieldname}}form" action="/view/{{fieldname}}" method="post">
+	<div class="tabs years">
+		{% for yearname, year_button_list in years.items %}
+		<div style="display:none">
+			<form name="{{yearname}}form" action="/view/{{yearname}}/{{curfield}}" method="post">
 				{% csrf_token %}
 				{% for field in location_form %}
 				<div class="input row">
@@ -19,8 +19,38 @@
 				<input type="submit" value="Submit" />
 			</form>
 		</div>
-		<div  style="padding: 5px;">
-		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
+		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+		<!--TODO: auto-generate these year button images-->
+		{% if yearname == curyear %}
+		<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/{{yearname}}/{{curfield}}/"><img src="{{year_button_list.1}}"></a>
+		{% else %}
+		<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/{{yearname}}/{{curfield}}/"><img src="{{year_button_list.0}}"></a>
+		{% endif %}
+		</div>
+		{% endfor %}
+	</div>
+</td>
+<td>
+	<div class="tabs units">
+		{% for fieldname, blurb_list in blurbs.items %}
+		<div class="{{fieldname}}" style="display:none">
+			<form name="{{fieldname}}form" action="/view/{{curyear}}/{{fieldname}}" method="post">
+				{% csrf_token %}
+				{% for field in location_form %}
+				<div class="input row">
+					{{ field.errors }}
+					{{ field.label_tag }}: {{ field }}
+				</div>
+				{% endfor %}
+				<input type="submit" value="Submit" />
+			</form>
+		</div>
+		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+		{% if fieldname == curfield %}
+		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
+		{% else %}
+		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
+		{% endif %}
 		</div>
 		{% endfor %}
 	</div>

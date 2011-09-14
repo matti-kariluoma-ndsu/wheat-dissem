@@ -11,7 +11,7 @@ class SelectLocationForm(forms.Form):
                     choices=(
                       (100,'100 miles'), (200,'200 miles'), (400,'All of ND'), (800,'All of MN'), (10000, 'All Data')
                       ),
-                    initial='50'
+                    initial='100'
                   )
 	#search_radius = forms.CharField(max_length=5)
 
