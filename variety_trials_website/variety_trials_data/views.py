@@ -99,7 +99,7 @@ def tabbed_view(request, yearname, fieldname):
 					'/static/img/button_high_year_%s.jpg' % (str(year))
 					]
 				
-			field_list= []
+			field_list = []
 			for field in models.Trial_Entry._meta.fields:
 				if (field.get_internal_type() == 'DecimalField' 
 						or field.get_internal_type() == 'PositiveIntegerField' 
@@ -107,16 +107,20 @@ def tabbed_view(request, yearname, fieldname):
 						or field.get_internal_type() == 'IntegerField'):
 							# Check for empty queries
 							# Raw SQL query... here we go!
-							if len(list(models.Trial_Entry.objects.raw(
-									'SELECT id FROM variety_trials_data_trial_entry WHERE %s IS NOT NULL LIMIT 6',
+							count = 0
+							for object in models.Trial_Entry.objects.raw(
+									"SELECT id FROM variety_trials_data_trial_entry WHERE %s!='' LIMIT 6", #TODO: hardcoded numeric value
 									[field.name]
-								))) > 5: #TODO: hardcoded numeric value
-									field_list.append(field.name)
-
+								):
+									if getattr(object, field.name):
+										count += 1
+							if count > 5:  #TODO: hardcoded numeric value
+								field_list.append(field.name)
+			
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
-								
+			
 			# Remove all fields from `unit_blurbs' that aren't in `field_list'
 			for name in unit_blurbs.keys():
 				if name not in field_list:
