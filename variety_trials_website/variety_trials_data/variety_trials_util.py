@@ -13,24 +13,26 @@ class Filter_by_Field:
 	entries = {}
 	years = []
 	locations = []
+	year = 0
 	
 	def __init__(self):
 		pass
 	
-	def __init__(self, entries, field, years):
+	def __init__(self, entries, field, years, pref_year):
 		"""
 		Initializes internal data structures using the an input list of 
 		entries, a field to filter on, and the years to include.
 		"""
-		return self.populate(entries, field, years)
+		return self.populate(entries, field, years, pref_year)
 	
-	def populate(self, entries, field, years):
+	def populate(self, entries, field, years, pref_year):
 		"""
 		"""
 		self.field = {'name':''}
 		self.entries = {}
 		self.years = []
 		self.locations = []
+		self.year = pref_year
 		
 		# test if field is a Trial_Entry field
 		if field in Trial_Entry._meta.fields:
@@ -46,6 +48,10 @@ class Filter_by_Field:
 		else:
 			self.years = years 
 			#raise # TODO alert the programmer, not the user.
+		
+		# test if year is in the list of years
+		if self.year not in self.years:
+			self.year = max(self.years)
 		
 		fieldname = self.field.name
 		locations = {} # use a dictionary so we don't have to check for dups
@@ -94,11 +100,15 @@ class Filter_by_Field:
 		data = {}
 		avg_years = []
 		
-		myear = max(self.years)
+		myear = self.year
 		try:
 			current_year = self.entries[myear].keys()
 		except KeyError:
-			current_year = []
+			try:
+				myear = max(self.entries.keys())
+				current_year = self.entries[myear].keys()
+			except:
+				current_year = []
 		
 		for name in current_year:
 			for location in self.entries[myear][name]:
@@ -110,7 +120,12 @@ class Filter_by_Field:
 					data[name] = {}
 					data[name][location] = avg_value
 		
-		for year in sorted(self.years):
+		years_less = [myear]
+		for year in self.years:
+			if year < myear:
+				years_less.append(year)
+		
+		for year in sorted(years_less):
 			for element in avg_years:
 				element.append(year)
 			avg_years.append([year])

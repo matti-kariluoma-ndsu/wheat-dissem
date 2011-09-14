@@ -92,6 +92,12 @@ def tabbed_view(request, yearname, fieldname):
 			today = datetime.date.today()
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
+			
+			try:
+				curyear = int(yearname)
+			except ValueError:
+				curyear = max(year_list)
+				
 			years = {}
 			for year in year_list:
 				years[str(year)] = [
@@ -128,7 +134,7 @@ def tabbed_view(request, yearname, fieldname):
 			
 			# TODO: respect/update the cur_year value.
 			try:
-				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list).fetch()
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear).fetch()
 			except TypeError:
 				# TODO: we can do more for the user than redirect to /
 				return HttpResponseRedirect("/")
@@ -144,7 +150,7 @@ def tabbed_view(request, yearname, fieldname):
 					'location_form': location_form,
 					'field_list': field_list,
 					'location_list': locations,
-					'curyear': str(sorted_list[0][0]),
+					'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
 					'heading_list': sorted_list[0][1::],
 					'sorted_list': sorted_list[1::],
 					'years': years,
