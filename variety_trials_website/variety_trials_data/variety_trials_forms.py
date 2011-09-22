@@ -106,14 +106,14 @@ def handle_reference_field(reference_dict, field, data):
 		print "make new %s called %s" % (field, data)
 		try:
 			if isinstance(reference_dict[field][0], models.Date):
-				print str(forms.DateField().clean(data)) # raises a ValidationError
+				str(forms.DateField().clean(data)) # raises a ValidationError
 		except IndexError:
 			pass
 	else: # lookup the existing object 
 		for entry in reference_dict[field]: # if field isn't None, then it's a key
 			if word == str(entry):
 				return_id = entry.id
-				print "found a match for %s: %s, %d" % (data, word, return_id)
+				print "found a match for '%s, %s': %d" % (data, word, return_id)
 				break
 		
 	return return_id
@@ -177,24 +177,27 @@ def handle_csv_file(uploaded_file):
 		else:
 			column_number = 0
 			for column in str(line).replace('"','').split(','):
-				try:
-					name = headers[column_number].strip()
-					if name in insertion_dict.keys():
-						insertion_dict[name] = column.strip()
-					else:
-						if name in reference_dict.keys():
-							try:
-								insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
-							except ValidationError:
-								errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
+				if column.strip() != '':
+					try:
+						name = headers[column_number].strip()
+						if name in insertion_dict.keys() and name not in reference_dict.keys():
+							insertion_dict[name] = column.strip()
 						else:
-							errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
-				except IndexError:
-					errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
+							if name in reference_dict.keys():
+								try:
+									insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
+								except ValidationError:
+									errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
+							else:
+								errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
+					except IndexError:
+						errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
 				column_number += 1
 			model_instance = models.Trial_Entry()
 			for name in insertion_dict.keys():
 				setattr(model_instance, name, insertion_dict[name])
-			#model_instance.save() # ARE YOU BRAVE ENOUGH?
+				insertion_dict[name] = None
+				#print "Writing %s as %s" % (name, insertion_dict[name])
+			model_instance.save() # ARE YOU BRAVE ENOUGH?
 			
 	return (False, errors)
