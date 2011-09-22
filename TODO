@@ -42,3 +42,12 @@ Front Page
 Range
 	ND # use sentinels?
 	MN
+
+LSD:
+	We can do LSDs with just the averages, if we have multiple (in-common) locations
+		show stored LSD for single loactions, else calculate
+	Do a Subset-problem (exponential time?) sort of returned results for common locations
+
+Presentation:
+	Enter Crookston area data for display
+	
