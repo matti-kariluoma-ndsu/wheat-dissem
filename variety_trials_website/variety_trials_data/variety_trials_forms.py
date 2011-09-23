@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from variety_trials_data import models
 from difflib import SequenceMatcher
+import re
 #import csv
 
 class SelectLocationForm(forms.Form):
@@ -103,7 +104,7 @@ def handle_reference_field(reference_dict, field, data):
 	## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
 	
 	if word is None: # create a new object and save it to the db
-		print "make new %s called %s" % (field, data)
+		#print "make new %s called %s" % (field, data)
 		try:
 			if isinstance(reference_dict[field][0], models.Date):
 				str(forms.DateField().clean(data)) # raises a ValidationError
@@ -113,7 +114,7 @@ def handle_reference_field(reference_dict, field, data):
 		for entry in reference_dict[field]: # if field isn't None, then it's a key
 			if word == str(entry):
 				return_id = entry.id
-				print "found a match for '%s, %s': %d" % (data, word, return_id)
+				#print "found a match for '%s, %s': %d" % (data, word, return_id)
 				break
 		
 	return return_id
@@ -166,20 +167,32 @@ def handle_csv_file(uploaded_file):
 	line_number = 0
 	headers = []
 	errors = {}
-	
+	csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
 	
 	for line in uploaded_file:
 		line_number += 1
 		if (skip):
 			if (line_number + 1 > skip_lines):
-				headers = str(line).replace('"','').split(',') # assume the headers are the second row
+				headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
+				for i in range(len(headers)):
+					headers[i] = headers[i].replace('"','') # remove all double quotes
+					headers[i] = headers[i].replace("'",'') # remove all single quotes
+				#print headers
 				skip = False
 		else:
 			column_number = 0
-			for column in str(line).replace('"','').split(','):
+			#print line
+			#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
+			for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
+				if column == ',': # a special case caused by '^,|,$'
+					column = ''
+				column = column.replace('"','')
+				column = column.replace("'",'')
+				#print "column: %s" % (column)
 				if column.strip() != '':
 					try:
 						name = headers[column_number].strip()
+						#print "field: %s" % (name)
 						if name in insertion_dict.keys() and name not in reference_dict.keys():
 							insertion_dict[name] = column.strip()
 						else:
@@ -196,8 +209,8 @@ def handle_csv_file(uploaded_file):
 			model_instance = models.Trial_Entry()
 			for name in insertion_dict.keys():
 				setattr(model_instance, name, insertion_dict[name])
-				insertion_dict[name] = None
 				#print "Writing %s as %s" % (name, insertion_dict[name])
-			model_instance.save() # ARE YOU BRAVE ENOUGH?
+				insertion_dict[name] = None
+			#model_instance.save() # ARE YOU BRAVE ENOUGH?
 			
 	return (False, errors)
