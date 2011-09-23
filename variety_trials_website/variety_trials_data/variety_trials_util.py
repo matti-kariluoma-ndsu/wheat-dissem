@@ -41,7 +41,7 @@ class Filter_by_Field:
 		# test if years are ordered properly
 		test = True;
 		for i in range(len(years)):
-			test = test and (years[i] == sorted(years, reverse=True)[i])
+			test = (test and (years[i] == sorted(years, reverse=True)[i]))
 		
 		if test:
 			self.years = years
@@ -86,7 +86,7 @@ class Filter_by_Field:
 		except KeyError:
 			test_dict = {}
 		
-		if len(test_dict.keys()) < 5:
+		if len(test_dict.keys()) < 5: # TODO: hardcoded numeric value
 			self.years.remove(max(self.years))
 		
 					
@@ -187,6 +187,46 @@ class Filter_by_Field:
 		for i in sorted(empty_columns, reverse=True): # reverse transverse so indexes don't change on us	
 			for row in return_list: # include header row
 				del(row[i])
+		
+		# Sort the list by common locations, add lsd row between groups.
+		# Note: this is the subset problem(?), which is NP-complete
+		subsets = {}
+		for row in return_list[1::]: # skip header row
+			count = 0
+			for element in row[1::]: # skip past variety name
+				if element is not None:
+					count += 1
+			try:
+				subsets[count].append(row)
+			except KeyError:
+				subsets[count] = [row]
+		
+		# Append lsd information for each subset
+		for i in subsets.keys():
+			lsd_list = ['LSD']
+			if i > 1:
+				for j in range(len(self.locations) - len(empty_columns) - 1):
+					csum = 0.0
+					squared_sum = 0.0
+					count = 0
+					for row in subsets[i]:
+						if row[j+1] is not None:
+							csum += float(row[j+1]) # skip past variety name
+							squared_sum += float(row[j+1]) * float(row[j+1])
+							count += 1
+					if count > 0:
+						lsd_list.append(round((squared_sum - (csum * csum)/count)/count, 2))
+					else:
+						lsd_list.append(None)
+						
+			else:
+				pass
+			subsets[i].append(lsd_list)
+		# Write our modified rows back to return_list
+		return_list = [return_list[0]] # erase all rows
+		for i in sorted(subsets.keys(), reverse=True): # put the rows back
+			for row in subsets[i]:
+				return_list.append(row)
 			
 		return return_list
 
