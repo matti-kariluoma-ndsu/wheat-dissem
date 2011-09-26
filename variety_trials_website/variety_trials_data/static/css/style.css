@@ -121,6 +121,14 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	border-right: 1px dotted #666;
 }
 
+.spacer_row {
+	height: 1em;
+}
+
+.LSD_row {
+	background-color: #CFC;
+}
+
 /* color scheme from http://www.ethanschoonover.com/solarized */
 /*
 html {

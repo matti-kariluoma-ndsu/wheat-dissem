@@ -80,23 +80,26 @@
 			<tr class="row subheadings thin">
 			</tr>
 			{% for datalist in sorted_list %}
+			{% if datalist.0 != "LSD" %}
 			<tr class="group {% cycle 'odd' 'even' %}">
 				{% for element in datalist %}
 				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
 				{% endfor %}
 			</tr>
-			{% endfor %}
-			<tr class="row footer">
-				<td class="row_label">LSD</td>
-				<td class="days_to_head data">{{trialentry_dict.lsd.days_to_head}}</td>
-				<td class="plant_height data">{{trialentry_dict.lsd.plant_height}}</td>
-				<td class="kernel_weight data">{{trialentry_dict.lsd.kernel_weight}}</td>
-				<td class="test_weight data">{{trialentry_dict.lsd.test_weight}}</td>
-				<td class="protein_percent data">{{trialentry_dict.lsd.protein_percent}}</td>
-				<td class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</td>
-				<td class="bushels_acre data">{{trialentry_dict.lsd.bushels_acre}}</td>
-				<td class="bushels_acre data no_right_border">{{trialentry_dict.lsd.bushels_acre}}</td>
+			{% else %}
+			<tr class="spacer_row">
+				<td></td>
 			</tr>
+			<tr class="LSD_row">
+				{% for element in datalist %}
+				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
+				{% endfor %}
+			</tr>
+			<tr class="spacer_row">
+				<td></td>
+			</tr>
+			{% endif %}
+			{% endfor %}
 			<tr class="bottom_spacer"></tr>
 	  </table>
 	</div>
