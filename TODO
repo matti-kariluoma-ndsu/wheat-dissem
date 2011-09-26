@@ -49,5 +49,6 @@ LSD:
 	
 Presentation:
 	Do a Subset-problem (exponential time?) sort of returned results for common locations
+	Put data points from higher-order subsets into all lower-order ones.
 	Make cross-state screenshot
 	
