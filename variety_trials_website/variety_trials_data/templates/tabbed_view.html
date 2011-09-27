@@ -79,7 +79,7 @@
 			</tr>
 			<tr class="row subheadings thin">
 			</tr>
-			{% for datalist in sorted_list %}
+		{% for datalist in sorted_list %}
 			{% if datalist.0 != "LSD" %}
 			<tr class="group {% cycle 'odd' 'even' %}">
 				{% for element in datalist %}
@@ -99,7 +99,7 @@
 				<td></td>
 			</tr>
 			{% endif %}
-			{% endfor %}
+		{% endfor %}
 			<tr class="bottom_spacer"></tr>
 	  </table>
 	</div>

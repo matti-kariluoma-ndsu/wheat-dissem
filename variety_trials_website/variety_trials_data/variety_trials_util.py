@@ -1,6 +1,6 @@
 from variety_trials_data.models import Trial_Entry #, Date
 from variety_trials_data import models
-from math import pi, sin, cos, asin, atan2, degrees, radians
+from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt
 
 class Filter_by_Field:
 	"""
@@ -146,7 +146,12 @@ class Filter_by_Field:
 							sum_list = self.entries[year][name][location]
 							data[name]['meta'][key]	+= sum(sum_list)
 							count += len(sum_list)
-						data[name]['meta'][key] = round(data[name]['meta'][key] / count, 2)
+						### TODO: this is the wrong handling of the "don't average a single value, single year" case, it also short circuits 2-yr and 3-yr
+						if count > 1: # don't average out a set of one element
+							data[name]['meta'][key] = round(data[name]['meta'][key] / count, 2)
+						else:
+							data[name]['meta'][key] = None
+						###
 		
 		return_list = []
 		
@@ -204,8 +209,8 @@ class Filter_by_Field:
 		# Append lsd information for each subset
 		for i in subsets.keys():
 			lsd_list = ['LSD']
-			if i > 1:
-				for j in range(len(self.locations) - len(empty_columns) - 1):
+			if (i > 1) and (len(subsets[i]) > 1):
+				for j in range(len(self.locations) - len(empty_columns)):
 					csum = 0.0
 					squared_sum = 0.0
 					count = 0
@@ -215,12 +220,13 @@ class Filter_by_Field:
 							squared_sum += float(row[j+1]) * float(row[j+1])
 							count += 1
 					if count > 0:
-						lsd_list.append(round((squared_sum - (csum * csum)/count)/count, 2))
+						lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
 					else:
 						lsd_list.append(None)
-						
 			else:
-				pass
+				for j in range(len(self.locations) - len(empty_columns)):
+					lsd_list.append(None)
+					
 			subsets[i].append(lsd_list)
 		# Write our modified rows back to return_list
 		return_list = [return_list[0]] # erase all rows
