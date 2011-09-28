@@ -11,6 +11,7 @@ class Filter_by_Field:
 	
 	field = {'name':''} # default value such that we return nothing if a bogus field is given
 	entries = {}
+	lsds = {}
 	years = []
 	locations = []
 	year = 0
@@ -78,6 +79,33 @@ class Filter_by_Field:
 								self.entries[year] = {}
 								self.entries[year][name] = {}
 							self.entries[year][name][location] = [value]
+					
+					value = entry.lsd_05
+					if (value is not None and float(value) > 0.0):
+						pass
+					else:
+						value = entry.hsd_10
+						if (value is not None and float(value) > 0.0):
+							pass
+						else:
+							value = entry.lsd_10
+							if (value is not None and float(value) > 0.0):
+								pass
+							else:
+								value = None
+					
+					try:
+						self.lsds[year][name][location].append(value)
+					except KeyError:
+						try:
+							self.lsds[year][name][location] = [value]
+						except KeyError:
+							try:
+								self.lsds[year][name] = {}
+							except KeyError:
+								self.lsds[year] = {}
+								self.lsds[year][name] = {}
+							self.lsds[year][name][location] = [value]
 		
 		self.locations = sorted(locations.keys())
 		# test if the most recent year has enough data
@@ -114,10 +142,14 @@ class Filter_by_Field:
 			for location in self.entries[myear][name]:
 				sum_list = self.entries[myear][name][location]
 				avg_value = round(sum(sum_list) / len(sum_list), 2)
+				#lsd_list = self.lsds[myear][name][location]
+				#lsd_value = max(lsd_list)
 				try:
+					#data[name][location] = (avg_value, lsd_value) # a tuple
 					data[name][location] = avg_value
 				except KeyError:
 					data[name] = {}
+					#data[name][location] = (avg_value, lsd_value) # a tuple
 					data[name][location] = avg_value
 		
 		years_less = [myear]
@@ -146,6 +178,7 @@ class Filter_by_Field:
 							sum_list = self.entries[year][name][location]
 							data[name]['meta'][key]	+= sum(sum_list)
 							count += len(sum_list)
+							### TODO: de we need to tack on lsd info?
 						### TODO: this is the wrong handling of the "don't average a single value, single year" case, it also short circuits 2-yr and 3-yr
 						if count > 1: # don't average out a set of one element
 							data[name]['meta'][key] = round(data[name]['meta'][key] / count, 2)
@@ -155,10 +188,10 @@ class Filter_by_Field:
 		
 		return_list = []
 		
-		temp_list = [myear]
-		temp_list.extend(self.locations)
+		temp_list = [myear] # header: year 
+		temp_list.extend(self.locations) # header: location names
 		for element in sorted(avg_years, reverse=True):
-			temp_list.append('%d-yr' % len(element))
+			temp_list.append('%d-yr' % len(element)) # header: 1-yr, 2-yr, etc.
 		return_list.append(temp_list)
 			
 		for name in sorted(data.keys()):
