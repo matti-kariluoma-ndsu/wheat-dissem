@@ -242,8 +242,10 @@ class Filter_by_Field:
 		# Append lsd information for each subset
 		for i in subsets.keys():
 			lsd_list = ['LSD']
+			len_locations_remaining = len(self.locations) - len(empty_columns)
 			if (i > 1) and (len(subsets[i]) > 1):
-				for j in range(len(self.locations) - len(empty_columns)):
+				for j in range(len_locations_remaining): # each location
+				### TODO: BRANNGG We need to use the db's stored LSD
 					csum = 0.0
 					squared_sum = 0.0
 					count = 0
@@ -256,9 +258,21 @@ class Filter_by_Field:
 						lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
 					else:
 						lsd_list.append(None)
+				### TODO: BRANNNGG We need to use the db's stored LSD
+				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
+					value = None
+					for row in subsets[i]:
+						value = row[j+len_locations_remaining+1]
+					lsd_list.append(value)
+					
 			else:
-				for j in range(len(self.locations) - len(empty_columns)):
+				for j in range(len_locations_remaining): # each single location
 					lsd_list.append(None)
+				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
+					value = None
+					for row in subsets[i]:
+						value = row[j+len_locations_remaining+1]
+					lsd_list.append(value)
 					
 			subsets[i].append(lsd_list)
 		# Write our modified rows back to return_list
