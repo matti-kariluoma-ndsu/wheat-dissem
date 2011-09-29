@@ -260,10 +260,21 @@ class Filter_by_Field:
 						lsd_list.append(None)
 				### TODO: BRANNNGG We need to use the db's stored LSD
 				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
-					value = None
+					csum = 0.0
+					squared_sum = 0.0
+					count = 0
+
 					for row in subsets[i]:
-						value = row[j+len_locations_remaining+1]
-					lsd_list.append(value)
+						if row[j+len_locations_remaining+1] is not None:
+							csum += float(row[j+len_locations_remaining+1]) # skip past variety name
+							squared_sum += float(row[j+len_locations_remaining+1]) * float(row[j+len_locations_remaining+1])
+							count += 1
+					if count > 0:
+						lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
+					else:
+						lsd_list.append(None)
+
+
 					
 			else:
 				for j in range(len_locations_remaining): # each single location
