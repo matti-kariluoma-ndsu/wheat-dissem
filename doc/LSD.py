@@ -29,7 +29,7 @@ def qnorm(probability):
 	else:
 		return sqrt(2) * erfinv(2*probability - 1)
 		
-def qt(probability, degrees_freedom):
+def qt(probability, degrees_of_freedom):
 	"""
 	A reimplementation of R's qt() function.
 	
@@ -45,7 +45,7 @@ def qt(probability, degrees_freedom):
 	Hill, G. W. (1981) Remark on Algorithm 396, ACM Transactions on 
 	Mathematical Software, 7, 250–1.
 	"""
-	n = degrees_freedom
+	n = degrees_of_freedom
 	P = probability
 	t = 0
 	if (n < 1 or P > 1.0 or P <= 0.0 ):
@@ -86,7 +86,7 @@ def qt(probability, degrees_freedom):
 	
 	return t
 
-def LSD(response_count, degrees_freedom, MSerror, probability):
+def LSD(response_to_treatments, probability):
 	"""
 	A stripped-down reimplementation of LSD.test from the agricoloae
 	package. (http://cran.r-project.org/web/packages/agricolae/index.html)
@@ -94,27 +94,17 @@ def LSD(response_count, degrees_freedom, MSerror, probability):
 	Calculates the Least Significant Difference of a multiple comparisons
 	trial, over a balanced dataset.
 	"""
-	# Calculates the quantile function of the t-distribution using the p-significance and the degrees of freedom given
-	Tprob = qt(probability, degrees_freedom)
-		
-	LSD = Tprob * sqrt(2.0 * MSerror/response_count)
-
-	return LSD
+	trt = response_to_treatments
 	
-
-def main():
-	print qnorm(.01)
-	print qt(.05, 9)
-	y1 = [1, 3, 1, 2]
-	y2 = [1, 3, 1, 2]
-	y3 = [1, 3, 1, 2]
-	trt = [y1, y2, y3]
 	#model = aov(y~trt)
 	#df = df.residual(model)
+	# df is the residual Degrees of Freedom
 	# n are factors, k is responses per factor
 	n = len(trt)
-	k = len(y1) # == len(y2) == len(y3) == len(y4)
-	df = n*(k-1) 
+	k = len(trt[0]) # == len(trt[1]) == ... == len(trt[n])
+	degrees_freedom_of_error = n*(k-1)
+	print degrees_freedom_of_error
+	
 	# SSE is the Error Sum of Squares
 	
 	treatment_means = {}
@@ -127,18 +117,31 @@ def main():
 		treatment_means[i] = sum/float(count)
 	
 	print treatment_means
+	
 	SSE = 0.0
 	for i in range(len(trt)):
 		for j in trt[i]:
 			SSE += (float(j) - treatment_means[i])**2.0
 	
 	print SSE
-	#MS = SSE / redidual degrees of freedom
-	MS = SSE/df
 	
-	print df
-	print MS
-	print LSD(len(trt[0]), df, MS, 0.05)
+	mean_squares_of_error = SSE / degrees_freedom_of_error
+	print mean_squares_of_error
+	
+	Tprob = qt(probability, degrees_freedom_of_error)
+		
+	LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
+
+	return LSD
+	
+
+def main():
+	y1 = [1, 3, 1, 2]
+	y2 = [1, 3, 1, 2]
+	y3 = [1, 3, 1, 2]
+	trt = [y1, y2, y3]
+
+	print LSD(trt, 0.05)
 	
 	
 if __name__ == '__main__':
