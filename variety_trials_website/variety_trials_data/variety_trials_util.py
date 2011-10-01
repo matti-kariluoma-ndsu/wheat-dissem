@@ -27,7 +27,7 @@ class Filter_by_Field:
 		"""
 		return self.populate(entries, field, years, pref_year)
 	
-	def qnorm(probability):
+	def qnorm(self, probability):
 		"""
 		A reimplementation of R's qnorm() function.
 		
@@ -43,7 +43,7 @@ class Filter_by_Field:
 		else:
 			return sqrt(2) * erfinv(2*probability - 1)
 			
-	def qt(probability, degrees_of_freedom):
+	def qt(self, probability, degrees_of_freedom):
 		"""
 		A reimplementation of R's qt() function.
 		
@@ -53,11 +53,11 @@ class Filter_by_Field:
 		
 		This algorithm has been taken (line-by-line) from Hill, G. W. (1970)
 		Algorithm 396: Student's t-quantiles. Communications of the ACM, 
-		13(10), 619–620.
+		13(10), 619-620.
 		
 		Currently unimplemented are the improvements to Algorithm 396 from
 		Hill, G. W. (1981) Remark on Algorithm 396, ACM Transactions on 
-		Mathematical Software, 7, 250–1.
+		Mathematical Software, 7, 250-1.
 		"""
 		n = degrees_of_freedom
 		P = probability
@@ -78,7 +78,7 @@ class Filter_by_Field:
 			y = x**(2.0/float(n))
 		
 			if (y > 0.05 + a):
-				x = qnorm(P*0.5)
+				x = self.qnorm(P*0.5)
 				y = x**2.0
 				
 				if (n < 5):
@@ -100,7 +100,7 @@ class Filter_by_Field:
 		
 		return t
 
-	def LSD(response_to_treatments, probability):
+	def LSD(self, response_to_treatments, probability):
 		"""
 		A stripped-down reimplementation of LSD.test from the agricoloae
 		package. (http://cran.r-project.org/web/packages/agricolae/index.html)
@@ -109,7 +109,6 @@ class Filter_by_Field:
 		trial, over a balanced dataset.
 		"""
 		trt = response_to_treatments
-		
 		#model = aov(y~trt)
 		#df = df.residual(model)
 		# df is the residual Degrees of Freedom
@@ -117,7 +116,6 @@ class Filter_by_Field:
 		n = len(trt)
 		k = len(trt[0]) # == len(trt[1]) == ... == len(trt[n])
 		degrees_freedom_of_error = n*(k-1)
-		print degrees_freedom_of_error
 		
 		# SSE is the Error Sum of Squares
 		
@@ -130,19 +128,14 @@ class Filter_by_Field:
 				count += 1
 			treatment_means[i] = sum/float(count)
 		
-		print treatment_means
-		
 		SSE = 0.0
 		for i in range(len(trt)):
 			for j in trt[i]:
 				SSE += (float(j) - treatment_means[i])**2.0
 		
-		print SSE
-		
 		mean_squares_of_error = SSE / degrees_freedom_of_error
-		print mean_squares_of_error
 		
-		Tprob = qt(probability, degrees_freedom_of_error)
+		Tprob = self.qt(probability, degrees_freedom_of_error)
 			
 		LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
 
@@ -377,35 +370,39 @@ class Filter_by_Field:
 							squared_sum += float(row[j+1]) * float(row[j+1])
 							count += 1
 					if count > 0:
-						lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
+						lsd_list.append(None)
+						#lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
 					else:
 						lsd_list.append(None)
 				### TODO: BRANNNGG We need to use the db's stored LSD
 				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
-					csum = 0.0
-					squared_sum = 0.0
-					count = 0
-
+					location_treatment = {}
+					for k in range(len_locations_remaining):
+						location_treatment[k] = []
+						for row in subsets[i]:
+							if row[k+1] is not None:
+								location_treatment[k].append(float(row[k+1]))
 					for row in subsets[i]:
-						if row[j+len_locations_remaining+1] is not None:
-							csum += float(row[j+len_locations_remaining+1]) # skip past variety name
-							squared_sum += float(row[j+len_locations_remaining+1]) * float(row[j+len_locations_remaining+1])
+						if row[j+1] is not None:
+							float(row[j+1])
 							count += 1
-					if count > 0:
-						lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
+					length = 0
+					for sample in location_treatment.keys():
+						length = len(location_treatment[sample])
+						break
+					balanced = True
+					for treatment in location_treatment.values():
+						if len(treatment) != length:
+							balanced = False
+					if balanced and j == 0:
+						lsd_list.append(round(self.LSD(location_treatment.values(), .05),2))
 					else:
 						lsd_list.append(None)
-
-
-					
 			else:
 				for j in range(len_locations_remaining): # each single location
 					lsd_list.append(None)
 				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
-					value = None
-					for row in subsets[i]:
-						value = row[j+len_locations_remaining+1]
-					lsd_list.append(value)
+					lsd_list.append(None)
 					
 			subsets[i].append(lsd_list)
 		# Write our modified rows back to return_list

@@ -39,11 +39,11 @@ def qt(probability, degrees_of_freedom):
 	
 	This algorithm has been taken (line-by-line) from Hill, G. W. (1970)
 	Algorithm 396: Student's t-quantiles. Communications of the ACM, 
-	13(10), 619–620.
+	13(10), 619-620.
 	
 	Currently unimplemented are the improvements to Algorithm 396 from
 	Hill, G. W. (1981) Remark on Algorithm 396, ACM Transactions on 
-	Mathematical Software, 7, 250–1.
+	Mathematical Software, 7, 250-1.
 	"""
 	n = degrees_of_freedom
 	P = probability
