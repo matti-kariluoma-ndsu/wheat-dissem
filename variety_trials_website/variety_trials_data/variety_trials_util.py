@@ -386,6 +386,10 @@ class Filter_by_Field:
 						if row[j+1] is not None:
 							float(row[j+1])
 							count += 1
+					
+					for key in location_treatment.keys():
+						if len(location_treatment[key]) == 0:
+							del(location_treatment[key])
 					length = 0
 					for sample in location_treatment.keys():
 						length = len(location_treatment[sample])
@@ -395,6 +399,7 @@ class Filter_by_Field:
 						if len(treatment) != length:
 							balanced = False
 					if balanced and j == 0:
+						#print location_treatment.values()
 						lsd_list.append(round(self.LSD(location_treatment.values(), .05),2))
 					else:
 						lsd_list.append(None)
