@@ -129,7 +129,8 @@ def LSD(response_to_treatments, probability):
 	print mean_squares_of_error
 	
 	Tprob = qt(probability, degrees_freedom_of_error)
-		
+	print Tprob
+	
 	LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
 
 	return LSD

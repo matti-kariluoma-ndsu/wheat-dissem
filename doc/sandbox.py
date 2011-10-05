@@ -16,11 +16,11 @@ def main():
 	nelson =    [76.8,	69.1,	74.5,	82.9,	78.2,	69.1,	70.2,	63.0]
 	oklee =     [78.0,	99.8,	83.1,	105.6,77.4,	110.2,94.3,	81.0]
 	perley =    [70.3,	62.3,	68.1,	75.6,	74.5,	67.7,	75.3,	72.3]
-
+	avgs =      [75.99,77.93,74.53,87.29,77.26,82.59,78.94,74.93]
 
 	trt = [barnes, crookston, dickey, fergus, nelson, oklee, perley]
 	
-	print LSD(trt, 0.1)
+	print LSD(trt, 0.05)
 	
 	
 if __name__ == '__main__':
