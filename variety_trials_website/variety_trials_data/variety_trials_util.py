@@ -2,6 +2,7 @@ from variety_trials_data.models import Trial_Entry #, Date
 from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
 from scipy.special import erfinv
+import copy
 
 class Filter_by_Field:
 	"""
@@ -350,21 +351,72 @@ class Filter_by_Field:
 				if element is not None:
 					count += 1
 			try:
-				subsets[count].append(row)
+				subsets[(count, 0)].append(row) # key is (order, minor order)
 			except KeyError:
-				subsets[count] = [row]
+				subsets[(count, 0)] = [row]
+		
+		# Go through each subset and break into more subsets. Each new
+		# subset increases the minor order by 1, but the order is unchanged.
+		
+		for (i, mi) in subsets.keys():
+			if len(subsets[(i, mi)]) > 0:
+				first_row = subsets[(i, mi)][0]						
+				matching = []
+				unmatching = []
+				for row in subsets[(i, mi)]:
+					all_match = True
+					for j in range(len(row)):
+						all_match = all_match and ((row[j] is None and first_row[j] is None) or (row[j] is not None and first_row[j] is not None))
+					if all_match:
+						matching.append(row)
+					else:
+						unmatching.append(row)
+				subsets[(i, mi)] = matching
+				if len(unmatching) > 0:
+					subsets[(i, mi + 1)] = unmatching
+				
+				
+		# put all elements from higher-order groups into lower-order groups,
+		# putting 'None' into non-common locations.
+		subsets_to_copy = {} # can't add to the item we're iterating through
+		for (i, mi) in subsets.keys():
+			blanks = [] # indexes of each empty column
+			if len(subsets[(i, mi)]) > 0:
+				for pos in range(len(subsets[(i, mi)][0])): # iterate through each column in the first row
+					if subsets[(i, mi)][0][pos] is None:
+						blanks.append(pos)
+			for (j, mj) in subsets.keys():
+				if j > i: # add all from higher-order groups.
+					for row in subsets[(j, mj)]:
+						new_row = copy.copy(row) # a shallow copy, will not follow refs
+						doAppend = True
+						for pos in range(len(row)):
+							if pos in blanks:
+								new_row[pos] = None
+							if (new_row[pos] is None) and (pos not in blanks):
+								doAppend = False
+								break
+						if doAppend:
+							try:
+								subsets_to_copy[(i, mi)].append(new_row)
+							except KeyError:
+								subsets_to_copy[(i, mi)] = [new_row]
+		
+		for (i, mi) in subsets_to_copy.keys():
+			for row in subsets_to_copy[(i, mi)]:
+				subsets[(i, mi)].append(row)
 		
 		# Append lsd information for each subset
-		for i in subsets.keys():
+		for (i, mi) in subsets.keys():
 			lsd_list = ['LSD']
 			len_locations_remaining = len(self.locations) - len(empty_columns)
-			if (i > 1) and (len(subsets[i]) > 1):
+			if (i > 1) and (len(subsets[(i, mi)]) > 1):
 				for j in range(len_locations_remaining): # each location
 				### TODO: BRANNGG We need to use the db's stored LSD
 					csum = 0.0
 					squared_sum = 0.0
 					count = 0
-					for row in subsets[i]:
+					for row in subsets[(i, mi)]:
 						if row[j+1] is not None:
 							csum += float(row[j+1]) # skip past variety name
 							squared_sum += float(row[j+1]) * float(row[j+1])
@@ -374,15 +426,15 @@ class Filter_by_Field:
 						#lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
 					else:
 						lsd_list.append(None)
-				### TODO: BRANNNGG We need to use the db's stored LSD
+						
 				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
 					location_treatment = {}
 					for k in range(len_locations_remaining):
 						location_treatment[k] = []
-						for row in subsets[i]:
+						for row in subsets[(i, mi)]:
 							if row[k+1] is not None:
 								location_treatment[k].append(float(row[k+1]))
-					for row in subsets[i]:
+					for row in subsets[(i, mi)]:
 						if row[j+1] is not None:
 							float(row[j+1])
 							count += 1
@@ -409,13 +461,15 @@ class Filter_by_Field:
 				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
 					lsd_list.append(None)
 					
-			subsets[i].append(lsd_list)
+			subsets[(i, mi)].append(lsd_list)
+		
+		
 		# Write our modified rows back to return_list
 		return_list = [return_list[0]] # erase all rows
-		for i in sorted(subsets.keys(), reverse=True): # put the rows back
-			for row in subsets[i]:
+		for (i, mi) in sorted(subsets.keys(), reverse=True): # put the rows back
+			for row in subsets[(i, mi)]:
 				return_list.append(row)
-			
+
 		return return_list
 
 class Locations_from_Zipcode_x_Radius:
