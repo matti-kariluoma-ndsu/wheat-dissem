@@ -13,7 +13,7 @@ alpha <- 0.05
 
 n <- 7 # length(treatment) number of locations
 k <- 8 # length(barnes)
-degrees_freedom_of_error <- n*(k-1)
+degrees_freedom_of_error <- (n-1)*(k-1)
 
 squared_sums_of_error <- 0.0
 squared_sums_of_error <- squared_sums_of_error + sum((mean(barnes) - barnes)^2)

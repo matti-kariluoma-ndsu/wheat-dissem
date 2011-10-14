@@ -116,7 +116,7 @@ class Filter_by_Field:
 		# n are factors, k is responses per factor
 		n = len(trt)
 		k = len(trt[0]) # == len(trt[1]) == ... == len(trt[n])
-		degrees_freedom_of_error = n*(k-1)
+		degrees_freedom_of_error = (n-1)*(k-1)
 		
 		# SSE is the Error Sum of Squares
 		
@@ -211,17 +211,13 @@ class Filter_by_Field:
 								value = None
 					
 					try:
-						self.lsds[year][name][location].append(value)
+						self.lsds[year][location].append(value)
 					except KeyError:
 						try:
-							self.lsds[year][name][location] = [value]
+							self.lsds[year][location] = [value]
 						except KeyError:
-							try:
-								self.lsds[year][name] = {}
-							except KeyError:
-								self.lsds[year] = {}
-								self.lsds[year][name] = {}
-							self.lsds[year][name][location] = [value]
+							self.lsds[year] = {}
+							self.lsds[year][location] = [value]
 		
 		self.locations = sorted(locations.keys())
 		# test if the most recent year has enough data
@@ -257,7 +253,7 @@ class Filter_by_Field:
 		for name in current_year:
 			for location in self.entries[myear][name]:
 				sum_list = self.entries[myear][name][location]
-				avg_value = round(sum(sum_list) / len(sum_list), 2)
+				avg_value = round(sum(sum_list) / len(sum_list), 1)
 				#lsd_list = self.lsds[myear][name][location]
 				#lsd_value = max(lsd_list)
 				try:
@@ -297,7 +293,7 @@ class Filter_by_Field:
 							### TODO: de we need to tack on lsd info?
 						### TODO: this is the wrong handling of the "don't average a single value, single year" case, it also short circuits 2-yr and 3-yr
 						if count > 1: # don't average out a set of one element
-							data[name]['meta'][key] = round(data[name]['meta'][key] / count, 2)
+							data[name]['meta'][key] = round(data[name]['meta'][key] / count, 1)
 						else:
 							data[name]['meta'][key] = None
 						###
@@ -358,23 +354,27 @@ class Filter_by_Field:
 		# Go through each subset and break into more subsets. Each new
 		# subset increases the minor order by 1, but the order is unchanged.
 		
-		for (i, mi) in subsets.keys():
-			if len(subsets[(i, mi)]) > 0:
-				first_row = subsets[(i, mi)][0]						
-				matching = []
-				unmatching = []
-				for row in subsets[(i, mi)]:
-					all_match = True
-					for j in range(len(row)):
-						all_match = all_match and ((row[j] is None and first_row[j] is None) or (row[j] is not None and first_row[j] is not None))
-					if all_match:
-						matching.append(row)
-					else:
-						unmatching.append(row)
-				subsets[(i, mi)] = matching
-				if len(unmatching) > 0:
-					subsets[(i, mi + 1)] = unmatching
-				
+		all_subsets_found = False
+		while not all_subsets_found:
+			all_subsets_found = True # TODO: repeat until all have been sorted into coherent sets.
+			for (i, mi) in subsets.keys():
+				if len(subsets[(i, mi)]) > 0:
+					first_row = subsets[(i, mi)][0]						
+					matching = []
+					unmatching = []
+					for row in subsets[(i, mi)]:
+						all_match = True
+						for j in range(len(row)):
+							all_match = all_match and ((row[j] is None and first_row[j] is None) or (row[j] is not None and first_row[j] is not None))
+						if all_match:
+							matching.append(row)
+						else:
+							unmatching.append(row)
+					subsets[(i, mi)] = matching
+					if len(unmatching) > 0:
+						subsets[(i, mi + 1)] = unmatching
+		
+		
 				
 		# put all elements from higher-order groups into lower-order groups,
 		# putting 'None' into non-common locations.
@@ -406,26 +406,37 @@ class Filter_by_Field:
 			for row in subsets_to_copy[(i, mi)]:
 				subsets[(i, mi)].append(row)
 		
+		# Sort each group alphabetically
+		for (i, mi) in subsets.keys():
+			print "alpha"
+			sorted_variety_names = []
+			for row in subsets[(i, mi)]:
+				if len(row) > 1:
+					sorted_variety_names.append(row[0])
+			sorted_variety_names.sort()
+			new_ordering = []
+			for name in sorted_variety_names:
+				for row in subsets[(i, mi)]:
+					if len(row) > 1:
+						if row[0] == name:
+							new_ordering.append(row)
+			subsets[(i, mi)] = new_ordering
+		
 		# Append lsd information for each subset
 		for (i, mi) in subsets.keys():
 			lsd_list = ['LSD']
 			len_locations_remaining = len(self.locations) - len(empty_columns)
 			if (i > 1) and (len(subsets[(i, mi)]) > 1):
-				for j in range(len_locations_remaining): # each location
-				### TODO: BRANNGG We need to use the db's stored LSD
-					csum = 0.0
-					squared_sum = 0.0
-					count = 0
-					for row in subsets[(i, mi)]:
-						if row[j+1] is not None:
-							csum += float(row[j+1]) # skip past variety name
-							squared_sum += float(row[j+1]) * float(row[j+1])
-							count += 1
-					if count > 0:
-						lsd_list.append(None)
-						#lsd_list.append(round(sqrt((squared_sum - (csum * csum)/count)/count), 2))
+				for location in return_list[0][1:len_locations_remaining+1:]: # each location
+					try:
+						lsds = self.lsds[myear][location]
+					except KeyError:
+						lsds = []
+					if len(lsds) > 1:
+						lsd_list.append(lsds[0])
 					else:
 						lsd_list.append(None)
+					
 						
 				for j in range(len(avg_years)): # each 1-yr, 2-yr etc. average
 					location_treatment = {}
