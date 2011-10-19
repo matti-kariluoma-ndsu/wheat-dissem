@@ -31,11 +31,12 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
     (r'^$', views.index), # the default view
-    (r'^location/', views.select_location),
+    #(r'^location/', views.select_location),
     (r'^variety/', views.select_variety),
     #(r'^variety_all/', list_detail.object_list, variety_dictionary),
     #(r'^location/'),
     (r'^view/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)', views.tabbed_view),
+    (r'^view/variety/', views.varieties_view),
     (r'^add_variety/', views.add_variety),
     (r'^add_trial/', views.add_trial_entry),
     (r'^add_trials/', views.add_trial_entry_csv_file),

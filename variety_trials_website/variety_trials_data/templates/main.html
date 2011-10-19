@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load django_math %}
 {% block content %}
 <div>
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
@@ -36,5 +36,21 @@
 		{% endfor %}
 		<input type="submit" value="Submit" />
 	</form>
+</div>
+<div>
+	<hr>
+	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
+	<form action="view/variety/" method="post">
+		{% csrf_token %}
+		<div class="input row">
+			<select multiple size="{{variety_list|length|divide:4}}">
+				{% for variety in variety_list %}
+				<option value="{{variety}}">{{variety}}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<input type="submit" value="Submit" />
+	</form>
+	
 </div>
 {% endblock %}

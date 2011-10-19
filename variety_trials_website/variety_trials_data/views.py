@@ -4,7 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
-from variety_trials_data.variety_trials_util import Trial_x_Location_x_Year, Locations_from_Zipcode_x_Radius, Filter_by_Field
+from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field
 import datetime
 
 def get_entries(locations, year_list):
@@ -21,10 +21,15 @@ def get_entries(locations, year_list):
 
 def index(request):
 	location_form = variety_trials_forms.SelectLocationForm()
-
+	variety_list = models.Variety.objects.all()
+	
 	return render_to_response(
 		'main.html', 
-		{ 'location_form': location_form, 'curyear': datetime.date.today().year },
+		{ 
+			'location_form': location_form,
+			'variety_list': variety_list,
+			'curyear': datetime.date.today().year 
+		},
 		context_instance=RequestContext(request)
 	)
 
@@ -173,64 +178,32 @@ def tabbed_view(request, yearname, fieldname):
 		context_instance=RequestContext(request)
 	)
 
-def select_location(request):
+def varieties_view(request):
 	if request.method == 'POST':
-		form = variety_trials_forms.SelectLocationForm(request.POST)
+		return HttpResponseRedirect("/")
+		form = variety_trials_forms.SelectVarietiesForm(request.POST)
 		if form.is_valid():
+			variety = models.Variety.objects.filter(name=form.cleaned_data['variety'])
 			try:
-				locations = Locations_from_Zipcode_x_Radius(
-					form.cleaned_data['zipcode'],
-					form.cleaned_data['search_radius']
-				).fetch()
-			except models.Zipcode.DoesNotExist:
+				variety.get()
+			except models.Variety.DoesNotExist:
 				return render_to_response(
-					'select_location.html', 
+					'select_variety.html', 
 					{ 
 						'form': form,
-						'error_list': ['Sorry, the zipcode: ' + form.cleaned_data['zipcode'] + ' doesn\'t match any records']
+						'error_list': ['Sorry, the variety name: ' + form.cleaned_data['variety'] + ' doesn\'t match any records']
 					},
 					context_instance=RequestContext(request)
 				)
-				
-			today = datetime.date.today()
-			year_list = [today.year,today.year-1,today.year-2,today.year-3] # Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-			entries = get_entries(locations, year_list)
-			
-			# TODO: At this point, we may want to consider forking the above 
-			# TODO: code into a script-enabled version, and have the client sort the
-			# TODO: data.
-			
-			for field in models.Trial_Entry._meta.fields:
-				if field.name == 'bushels_acre':
-					break;
-					
-			ranked_entries_list = Trial_x_Location_x_Year(trial_set=entries, location_set=locations, year_list=year_list).fetch(n_list=[1,2,3], field_list=[field])
-
-			# TODO: Use HttpResponseRedirect(), somehow passing the variables, so that the user can use the back-button
-			# TODO: hmm... the back-button works, but it's not obvious it will based on the address bar
-			# TODO: I'd still like this all to use the address bar to pass the user input
-			
-			# TODO: I count 5+n queries being made above. Reduce!
-			
+	
 			return render_to_response(
-				'view_location.html',
+				'view_variety.html',
 				{ 
-					'location_list': locations,
-					'trialentry_list': entries,
-					'trialentry_ranked_list': ranked_entries_list,
-					'year_list': year_list,
-					'radius' : form.cleaned_data['search_radius']
+					'variety_list' : variety.values()
 				}
 			)
-			
 	else:
-		form = variety_trials_forms.SelectLocationForm()
-
-	return render_to_response(
-		'select_location.html', 
-		{ 'form': form },
-		context_instance=RequestContext(request)
-	)
+		return HttpResponseRedirect("/") # send to homepage
 
 def select_variety(request):
 	if request.method == 'POST':
