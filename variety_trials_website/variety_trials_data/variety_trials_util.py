@@ -13,6 +13,7 @@ class Filter_by_Field:
 	
 	field = {'name':''} # default value such that we return nothing if a bogus field is given
 	year = 0 # current year
+	all_varieties = True # whether to use all varieties, or the ones in "varieties"
 	
 	years = [] #year "y"
 	locations = [] # location "l"
@@ -34,6 +35,12 @@ class Filter_by_Field:
 		Initializes internal data structures using the an input list of 
 		entries, a field to filter on, and the years to include.
 		"""
+		self.all_varieties = True
+		return self.populate(entries, field, years, pref_year)
+
+	def __init__(self, entries, field, years, pref_year, varieties_list):
+		self.all_varieties = False
+		self.varieties = varieties_list
 		return self.populate(entries, field, years, pref_year)
 
 	def LSD(self, response_to_treatments, probability):
@@ -180,53 +187,55 @@ class Filter_by_Field:
 			self.year = max(self.years)
 		
 		fieldname = self.field.name
-		locations = {} # use a dictionary so we don't have to check for dups
-		varieties = {}
 		for entry in entries:
 			year = int(entry.harvest_date.date.year)
 			if year in self.years:
-				name = str(entry.variety.name)
 				location = str(entry.location.name)
-				locations[location] = None
-				varieties[name] = None
-				# store our field's value
-				try:
-					value = getattr(entry, fieldname)
-				except AttributeError:
-					value = None
-				if value != None:
+				self.locations.append(location)
+				
+				name = str(entry.variety.name)
+				if self.all_varieties: # if we are using all varieties, add this variety to our list
+					self.varieties.append(name)
+				
+				if name in self.varieties:
+					# store our field's value
 					try:
-						self.entries[(location, name)][year].append(value)
-					except KeyError:
+						value = getattr(entry, fieldname)
+					except AttributeError:
+						value = None
+					if value != None:
 						try:
-							self.entries[(location, name)][year] = [value]
+							self.entries[(location, name)][year].append(value)
 						except KeyError:
-							self.entries[(location, name)] = {}
-							self.entries[(location, name)][year] = [value]
-					
-					# store the lsd from this entry
-					value = entry.lsd_05
-					if (value is not None and float(value) > 0.0):
-						pass
-					else:
-						value = entry.hsd_10
+							try:
+								self.entries[(location, name)][year] = [value]
+							except KeyError:
+								self.entries[(location, name)] = {}
+								self.entries[(location, name)][year] = [value]
+						
+						# store the lsd from this entry
+						value = entry.lsd_05
 						if (value is not None and float(value) > 0.0):
 							pass
 						else:
-							value = entry.lsd_10
+							value = entry.hsd_10
 							if (value is not None and float(value) > 0.0):
 								pass
 							else:
-								value = None
-					
-					try:
-						self.lsds[(location, year)].append(value)
-					except KeyError:
-						self.lsds[(location, year)] = [value]
+								value = entry.lsd_10
+								if (value is not None and float(value) > 0.0):
+									pass
+								else:
+									value = None
+						
+						try:
+							self.lsds[(location, year)].append(value)
+						except KeyError:
+							self.lsds[(location, year)] = [value]
 		
-		# store the list of locations, varieties in this dataset
-		self.locations = sorted(locations.keys())
-		self.varieties = sorted(varieties.keys())
+		# remove duplicates
+		self.locations = sorted(list(set(self.locations)))
+		self.varieties = sorted(list(set(self.varieties)))
 		
 	def fetch(self):
 		"""

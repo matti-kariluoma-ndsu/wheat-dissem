@@ -40,7 +40,7 @@
 <div>
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
-	<form action="view/variety/" method="post">
+	<form action="view/variety/{{curyear}}/bushels_acre" method="post">
 		{% csrf_token %}
 		<div class="input row">
 			<select multiple size="{{variety_list|length|divide:4}}">

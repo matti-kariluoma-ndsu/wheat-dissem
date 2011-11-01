@@ -32,11 +32,10 @@ def index(request):
 		},
 		context_instance=RequestContext(request)
 	)
-
+		
 def tabbed_view(request, yearname, fieldname):
-	if request.method == 'POST':
-		# TODO: does this belong in the DB?
-		unit_blurbs = {
+	# TODO: does this belong in the DB?
+	unit_blurbs = {
 			'bushels_acre': ['Yield', 'Bushels per Acre', 
 				'The average number of bushels that can be expected from each acre of farmed land.',
 				'/static/img/button_yield.jpg','/static/img/button_high_yield.jpg'],
@@ -75,6 +74,8 @@ def tabbed_view(request, yearname, fieldname):
 			'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
 		}
+	
+	if request.method == 'POST':
 		location_form = variety_trials_forms.SelectLocationForm(request.POST)
 		if location_form.is_valid():
 			zipcode = location_form.cleaned_data['zipcode']
@@ -93,10 +94,11 @@ def tabbed_view(request, yearname, fieldname):
 						'error_list': ['Sorry, the zipcode: ' + location_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
 					},
 					context_instance=RequestContext(request)
-				)
+				) 
+			
 			today = datetime.date.today()
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-			year_list = [today.year, today.year-1, today.year-2, today.year-3] 
+			year_list = [today.year, today.year-1, today.year-2, today.year-3]
 			
 			try:
 				curyear = int(yearname)
@@ -167,40 +169,126 @@ def tabbed_view(request, yearname, fieldname):
 			)
 	else:
 		# seems an error occured...
-		location_form = variety_trials_forms.SelectLocationForm()
+		return HttpResponseRedirect("/") # send to homepage
 
-	return render_to_response(
-		'main.html', 
-		{ 
-			'location_form': location_form
-			# TODO: set initial fieldname
-		},
-		context_instance=RequestContext(request)
-	)
-
-def varieties_view(request):
-	if request.method == 'POST':
-		return HttpResponseRedirect("/")
-		form = variety_trials_forms.SelectVarietiesForm(request.POST)
-		if form.is_valid():
-			variety = models.Variety.objects.filter(name=form.cleaned_data['variety'])
-			try:
-				variety.get()
-			except models.Variety.DoesNotExist:
-				return render_to_response(
-					'select_variety.html', 
-					{ 
-						'form': form,
-						'error_list': ['Sorry, the variety name: ' + form.cleaned_data['variety'] + ' doesn\'t match any records']
-					},
-					context_instance=RequestContext(request)
-				)
+def varieties_view(request, yearname, fieldname):
+	# TODO: does this belong in the DB?
+	unit_blurbs = {
+			'bushels_acre': ['Yield', 'Bushels per Acre', 
+				'The average number of bushels that can be expected from each acre of farmed land.',
+				'/static/img/button_yield.jpg','/static/img/button_high_yield.jpg'],
+			'protein_percent': ['Protein', 'Percent of Mass',
+				'The average percentage of protein usable for baking. 12% or greater is required for export to	many countries.',
+				'/static/img/button_protein_percent.jpg', '/static/img/button_high_protein_percent.jpg'],
+			'test_weight': ['Test Weight','Pounds per Bushel',
+				'The average weight of each bushel.', '/static/img/button_test_weight.jpg',
+				'/static/img/button_high_test_weight.jpg'],
+			'kernel_weight': ['Kernel Weight','Grams per 1000','No Description.',
+				'/static/img/button_kernel_weight.jpg', '/static/img/button_high_kernel_weight.jpg'],
+			'plant_height': ['Plant Height','Inches','No Description.', 
+				'/static/img/button_plant_height.jpg', '/static/img/button_high_plant_height.jpg'],
+			'days_to_head': ['Days to Head','Days from Planting','No Description.',
+				'/static/img/button_days_to_head.jpg', '/static/img/button_high_days_to_head.jpg'],
+			'lodging_factor': ['Lodging Factor','Ranking: 1 (No Lodging) to 9 (Heavy Lodging) ',
+				'No Description.', '/static/img/button_lodging_factor.jpg', '/static/img/button_high_lodging_factor.jpg'],
+			'jday_of_head': ['Julian Day of Head','Days from Jan 1','No Description.',
+				'/static/img/button_jday_of_head.jpg', '/static/img/button_high_jday_of_head.jpg'],
+			'winter_survival_rate': ['Winter Survival Rate','Percentage of Population',
+				'No Description.', '/static/img/button_winter_survival_rate.jpg', '/static/img/button_high_winter_survival_rate.jpg'],
+			'shatter': ['Shatter Factor','Ranking: 1 (Least Shatter) to 9 (Most Shatter)',
+				'No Description.', '/static/img/button_shatter.jpg', '/static/img/button_high_shatter.jpg'],
+			'seeds_per_round': ['Seeds per Round','1000 per Round','No Description.',
+				'/static/img/button_seeds_per_round.jpg', '/static/img/button_high_seeds_per_round.jpg'],
+			'canopy_density': ['Canopy Density Factor','Ranking: 1 (Least Dense) to 9 (Most Dense)',
+				'No Description.', '/static/img/button_canopy_density.jpg', '/static/img/button_high_canopy_density.jpg'],
+			'canopy_height': ['Canopy Height','Inches','No Description.',
+				'/static/img/button_canopy_height.jpg', '/static/img/button_high_canopy_height.jpg'],
+			'days_to_flower': ['Days to Flower','Days from Planting','No Description.',
+				'/static/img/button_days_to_flower.jpg', '/static/img/button_high_days_to_flower.jpg'],
+			'seed_oil_percent': ['Seed Oil','Percent of Mass','No Description.',
+				'/static/img/button_seed_oil_percent.jpg', '/static/img/button_high_seed_oil_percent.jpg'],
+			'seeding_rate': ['Seeding Rate','1000 per Foot','No Description.',
+				'/static/img/button_seeding_rate.jpg', '/static/img/button_high_seeding_rate.jpg'],
+			'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
+				'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
+		}
 	
+	if request.method == 'POST':
+		#return HttpResponseRedirect("/")
+		#form = variety_trials_forms.SelectVarietiesForm(request.POST)
+		#if form.is_valid():
+			varieties = ["Ada", "Albany", "Barlow"]
+			
+			locations = models.Location.objects.all() # all locations
+			
+			today = datetime.date.today()
+			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
+			year_list = [today.year, today.year-1, today.year-2, today.year-3]
+			
+			try:
+				curyear = int(yearname)
+			except ValueError:
+				curyear = max(year_list)
+			
+			curyear = 2009
+			
+			years = {}
+			for year in year_list:
+				years[str(year)] = [
+					'/static/img/button_year_%s.jpg' % (str(year)),
+					'/static/img/button_high_year_%s.jpg' % (str(year))
+					]
+
+			
+			field_list = []
+			for field in models.Trial_Entry._meta.fields:
+				if (field.get_internal_type() == 'DecimalField' 
+						or field.get_internal_type() == 'PositiveIntegerField' 
+						or field.get_internal_type() == 'SmallIntegerField'
+						or field.get_internal_type() == 'IntegerField'):
+							# Check for empty queries
+							# Raw SQL query... here we go!
+							count = 0
+							for object in models.Trial_Entry.objects.raw(
+									"SELECT id FROM variety_trials_data_trial_entry WHERE %s!='' LIMIT 6", #TODO: hardcoded numeric value
+									[field.name]
+								):
+									if getattr(object, field.name):
+										count += 1
+							if count > 5:  #TODO: hardcoded numeric value
+								field_list.append(field.name)
+			
+			for field in models.Trial_Entry._meta.fields:
+				if field.name == fieldname:
+					break
+			
+			# Remove all fields from `unit_blurbs' that aren't in `field_list'
+			for name in unit_blurbs.keys():
+				if name not in field_list:
+					del(unit_blurbs[name])
+			
+			# TODO: respect/update the cur_year value.
+			try:
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch()
+			except TypeError:
+				# TODO: we can do more for the user than redirect to /
+				return HttpResponseRedirect("/")
+			
 			return render_to_response(
-				'view_variety.html',
+				'tabbed_view.html',
 				{ 
-					'variety_list' : variety.values()
-				}
+					'location_form': {},
+					'field_list': field_list,
+					'location_list': locations,
+					'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
+					'heading_list': sorted_list[0][1::],
+					'sorted_list': sorted_list[1::],
+					'years': years,
+					'radius' : 0.0,
+					'blurbs' : unit_blurbs,
+					'curfield' : fieldname
+				},
+				context_instance=RequestContext(request)
 			)
 	else:
 		return HttpResponseRedirect("/") # send to homepage
