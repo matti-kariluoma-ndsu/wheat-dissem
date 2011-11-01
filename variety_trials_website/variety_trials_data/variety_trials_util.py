@@ -29,18 +29,18 @@ class Filter_by_Field:
 	
 	def __init__(self):
 		pass
-	
-	def __init__(self, entries, field, years, pref_year):
+
+	def __init__(self, entries, field, years, pref_year, varieties_list):
 		"""
 		Initializes internal data structures using the an input list of 
 		entries, a field to filter on, and the years to include.
 		"""
-		self.all_varieties = True
-		return self.populate(entries, field, years, pref_year)
-
-	def __init__(self, entries, field, years, pref_year, varieties_list):
-		self.all_varieties = False
-		self.varieties = varieties_list
+		if len(varieties_list) > 0:
+			self.all_varieties = False
+			self.varieties = varieties_list #TODO: check these names
+		else:
+			self.all_varieties = True
+		
 		return self.populate(entries, field, years, pref_year)
 
 	def LSD(self, response_to_treatments, probability):

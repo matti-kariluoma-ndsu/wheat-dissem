@@ -73,7 +73,7 @@ def tabbed_view(request, yearname, fieldname):
 				'/static/img/button_seeding_rate.jpg', '/static/img/button_high_seeding_rate.jpg'],
 			'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
-		}
+	}
 	
 	if request.method == 'POST':
 		location_form = variety_trials_forms.SelectLocationForm(request.POST)
@@ -141,7 +141,7 @@ def tabbed_view(request, yearname, fieldname):
 			
 			# TODO: respect/update the cur_year value.
 			try:
-				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear).fetch()
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, []).fetch()
 			except TypeError:
 				# TODO: we can do more for the user than redirect to /
 				return HttpResponseRedirect("/")
@@ -211,7 +211,7 @@ def varieties_view(request, yearname, fieldname):
 				'/static/img/button_seeding_rate.jpg', '/static/img/button_high_seeding_rate.jpg'],
 			'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
-		}
+	}
 	
 	if request.method == 'POST':
 		#return HttpResponseRedirect("/")
