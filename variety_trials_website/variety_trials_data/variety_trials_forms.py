@@ -114,7 +114,7 @@ def handle_reference_field(reference_dict, field, data):
 		for entry in reference_dict[field]: # if field isn't None, then it's a key
 			if word == str(entry):
 				return_id = entry.id
-				#print "found a match for '%s, %s': %d" % (data, word, return_id)
+				#print "found a match for '%s', '%s': %d" % (data, word, return_id)
 				break
 		
 	return return_id
