@@ -460,9 +460,11 @@ class Filter_by_Field:
 					temp_row.append(None)
 			if len(lsd_list) > 0:
 				# append 1-yr lsd
-				temp_row.append(
-					round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 2)
-				)
+				try:
+					value = round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 2)
+				except:
+					value = None
+				temp_row.append(value)
 			else:
 				temp_row.append(None)
 			# append 2-yr, ... lsds
@@ -484,9 +486,11 @@ class Filter_by_Field:
 					multiple_year_lsd_list.append(variety_across_years)
 				
 				if append_me:
-					temp_row.append(
-						round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 2)
-					)
+					try:
+						value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 2)
+					except:
+						value = None
+					temp_row.append(value)
 				else:
 					temp_row.append(None)
 			subset_list.append(temp_row)
