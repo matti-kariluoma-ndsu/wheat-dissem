@@ -42,8 +42,6 @@ class Filter_by_Field:
 			self.all_varieties = True
 			self.varieties = []
 			
-		print self.varieties
-		print entries
 		return self.populate(entries, field, years, pref_year)
 
 	def LSD(self, response_to_treatments, probability):
