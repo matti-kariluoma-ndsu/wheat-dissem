@@ -22,8 +22,11 @@ class SelectFieldForm(forms.Form):
 	field = forms.CharField(max_length=5)
 	radius = forms.CharField(max_length=5)
 
-class SelectVarietyForm(forms.Form):
-	variety = forms.CharField(max_length=20)
+class SelectVarietiesForm(forms.Form):
+	varieties = forms.ModelMultipleChoiceField(
+								widget=forms.SelectMultiple(attrs={'size': 20}),
+								queryset=models.Variety.objects.all()
+							)
 
 class UploadCSVForm(forms.Form):
 	csv_file  = forms.FileField()

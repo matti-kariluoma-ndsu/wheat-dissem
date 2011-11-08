@@ -40,7 +40,10 @@ class Filter_by_Field:
 			self.varieties = varieties_list #TODO: check these names
 		else:
 			self.all_varieties = True
-		
+			self.varieties = []
+			
+		print self.varieties
+		print entries
 		return self.populate(entries, field, years, pref_year)
 
 	def LSD(self, response_to_treatments, probability):
@@ -164,7 +167,6 @@ class Filter_by_Field:
 		self.field = {'name':''}
 		self.years = []
 		self.locations = []
-		self.varieties = []
 		self.year = pref_year
 		
 		# test if field is a Trial_Entry field
@@ -196,7 +198,7 @@ class Filter_by_Field:
 				name = str(entry.variety.name)
 				if self.all_varieties: # if we are using all varieties, add this variety to our list
 					self.varieties.append(name)
-				
+					
 				if name in self.varieties:
 					# store our field's value
 					try:
@@ -232,7 +234,7 @@ class Filter_by_Field:
 							self.lsds[(location, year)].append(value)
 						except KeyError:
 							self.lsds[(location, year)] = [value]
-		
+							
 		# remove duplicates
 		self.locations = sorted(list(set(self.locations)))
 		self.varieties = sorted(list(set(self.varieties)))

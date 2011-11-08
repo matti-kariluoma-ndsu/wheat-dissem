@@ -21,12 +21,14 @@ def get_entries(locations, year_list):
 
 def index(request):
 	location_form = variety_trials_forms.SelectLocationForm()
+	varieties_form = variety_trials_forms.SelectVarietiesForm()
 	variety_list = models.Variety.objects.all()
 	
 	return render_to_response(
 		'main.html', 
 		{ 
 			'location_form': location_form,
+			'varieties_form': varieties_form,
 			'variety_list': variety_list,
 			'curyear': datetime.date.today().year 
 		},
@@ -214,12 +216,11 @@ def varieties_view(request, yearname, fieldname):
 	}
 	
 	if request.method == 'POST':
-		#return HttpResponseRedirect("/")
-		#form = variety_trials_forms.SelectVarietiesForm(request.POST)
-		#if form.is_valid():
-			varieties = ["Ada", "Albany", "Barlow"]
+		varieties_form = variety_trials_forms.SelectVarietiesForm(request.POST)
+		if varieties_form.is_valid():
 			
-			locations = models.Location.objects.all() # all locations
+			varieties = varieties_form.cleaned_data['varieties']
+			locations = models.Location.objects.all()
 			
 			today = datetime.date.today()
 			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
@@ -229,17 +230,14 @@ def varieties_view(request, yearname, fieldname):
 				curyear = int(yearname)
 			except ValueError:
 				curyear = max(year_list)
-			
-			curyear = 2009
-			
+				
 			years = {}
 			for year in year_list:
 				years[str(year)] = [
 					'/static/img/button_year_%s.jpg' % (str(year)),
 					'/static/img/button_high_year_%s.jpg' % (str(year))
 					]
-
-			
+				
 			field_list = []
 			for field in models.Trial_Entry._meta.fields:
 				if (field.get_internal_type() == 'DecimalField' 
@@ -260,38 +258,51 @@ def varieties_view(request, yearname, fieldname):
 			
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
-					break
+					break;
 			
 			# Remove all fields from `unit_blurbs' that aren't in `field_list'
 			for name in unit_blurbs.keys():
 				if name not in field_list:
 					del(unit_blurbs[name])
 			
+			
+			variety_list = []
+			for variety in varieties:
+				variety_list.append(str(variety.name))
+				#variety_list.append(variety.name)
+				
+			
 			# TODO: respect/update the cur_year value.
 			try:
-				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch()
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, variety_list).fetch()
 			except TypeError:
 				# TODO: we can do more for the user than redirect to /
 				return HttpResponseRedirect("/")
 			
+			vartieties_form = variety_trials_forms.SelectVarietiesForm(initial={
+					'varieties': varieties
+				})
+			
 			return render_to_response(
 				'tabbed_view.html',
-				{ 
-					'location_form': {},
+				{
+					'location_form': varieties_form,
 					'field_list': field_list,
 					'location_list': locations,
 					'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
 					'heading_list': sorted_list[0][1::],
 					'sorted_list': sorted_list[1::],
 					'years': years,
-					'radius' : 0.0,
+					'radius' : 0,
 					'blurbs' : unit_blurbs,
 					'curfield' : fieldname
 				},
 				context_instance=RequestContext(request)
 			)
 	else:
+		# seems an error occured...
 		return HttpResponseRedirect("/") # send to homepage
+
 
 def select_variety(request):
 	if request.method == 'POST':

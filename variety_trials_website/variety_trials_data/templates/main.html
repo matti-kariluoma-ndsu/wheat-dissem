@@ -42,13 +42,12 @@
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
 	<form action="view/variety/{{curyear}}/bushels_acre" method="post">
 		{% csrf_token %}
+		{% for field in varieties_form %}
 		<div class="input row">
-			<select multiple size="{{variety_list|length|divide:4}}">
-				{% for variety in variety_list %}
-				<option value="{{variety}}">{{variety}}</option>
-				{% endfor %}
-			</select>
+			{{ field.errors }}
+			{{ field.label_tag }}: {{ field }}
 		</div>
+		{% endfor %}
 		<input type="submit" value="Submit" />
 	</form>
 	
