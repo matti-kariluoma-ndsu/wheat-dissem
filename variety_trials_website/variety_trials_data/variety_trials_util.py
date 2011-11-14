@@ -14,6 +14,9 @@ class Filter_by_Field:
 	field = {'name':''} # default value such that we return nothing if a bogus field is given
 	year = 0 # current year
 	all_varieties = True # whether to use all varieties, or the ones in "varieties"
+	# also used to show different data for varieties/locations view.
+	# TODO: pull out into common-function call to make this boolean's use
+	# more clear, instead of needing to search for where it's used.
 	
 	years = [] #year "y"
 	locations = [] # location "l"
@@ -330,9 +333,6 @@ class Filter_by_Field:
 		for num_times in range(3): # TODO: hard-coded numeric value
 			break_into_subsets()
 		
-		# put all elements from higher-order groups into lower-order groups,
-		# putting 'None' into non-common locations.
-		
 		# intialize a dictionary of orders
 		major_orders = {}
 		for key in self.groups.keys():
@@ -340,14 +340,33 @@ class Filter_by_Field:
 				major_orders[key[0]].append(key)
 			except KeyError:
 				major_orders[key[0]] = [key]
-		
-		# use the prepared dictionary and add higher-order to all lower-order
-		for order in major_orders.keys(): # reverse-traverse
+				
+		if self.all_varieties: # if we are the locations view
+			# put all elements from higher-order groups into lower-order groups,
+			# putting 'None' into non-common locations.
+			for order in major_orders.keys(): # reverse-traverse
+				for key in self.groups.keys():
+					if key[0] < order: # if this group's order is smaller than another, add all from the higher order
+						for larger_group_key in major_orders[order]:
+							for v in self.groups[larger_group_key]:
+								self.groups[key].append(v)
+		else: # if we are the varieties view
+			# find the biggest group(s) representing the chosen varieties, then delete the rest
+			ordered_groups_keys = sorted(self.groups.keys(), reverse=True)
+			groups_keys_save = []
+			
+			for v in self.varieties:
+				ordered_groups_pos = 0
+				while ordered_groups_pos < len(ordered_groups_keys):
+					if v in self.groups[ordered_groups_keys[ordered_groups_pos]]:
+						groups_keys_save.append(ordered_groups_keys[ordered_groups_pos])
+						break # break the while loop
+					ordered_groups_pos += 1
+			# delete non-matching
 			for key in self.groups.keys():
-				if key[0] < order: # if this group's order is smaller than another, add all from the higher order
-					for larger_group_key in major_orders[order]:
-						for v in self.groups[larger_group_key]:
-							self.groups[key].append(v)
+				if key not in groups_keys_save:
+					del self.groups[key]
+				
 		
 		# make a list of years to average over
 		avg_years = []
@@ -390,112 +409,115 @@ class Filter_by_Field:
 					except KeyError:
 						pass
 			
-			# add the values for this subset
-			for v in sorted(self.groups[key]): # Sort each group alphabetically
-				temp_row = [v]
-				append_me = True
-				one_year_sums = []
-				
-				for l in self.locations:
-					if l not in locations: # ensure all subgroups only show data for common locations
-						temp_row.append(None)
-					else:
-						try:
-							values = self.entries[(l,v)][self.year]
-							value = round(sum(values)/len(values), 2)
-							temp_row.append(value)
-							one_year_sums.append(value) # will not contain None
-						except KeyError:
-							if l in locations: # this variety is from a higher-order set, but does not have data for one of our common locations
-								append_me = False
-								break
-							temp_row.append(None)
-							
-				if append_me:
-					if len(one_year_sums) > 1: # if we have two or more datapoints
-						# append 1-yr avg
-						temp_row.append(round(sum(one_year_sums)/len(one_year_sums), 2))
-					else:
-						append_me = False # cause the 2-yr,... to short-circuit
-						temp_row.append(None)
-					# append 2-yr, ... avgs
-					for years_to_average in avg_years[1::]: # skip past 1-yr avg
-						sum_list = []
-						for year in years_to_average:
-							if append_me: # only continue while there are no errors
-								if year != self.year: # we already retrieved the data for this year
-									for l in locations:
-										try:
-											values = self.entries[(l,v)][year]
-											value = round(sum(values)/len(values), 2)
-											sum_list.append(value)
-										except KeyError:
-											append_me = False
-											break
-								else:
-									sum_list.extend(one_year_sums)
-						
-						if append_me and len(sum_list) > 1:
-							temp_row.append(round(sum(sum_list)/len(sum_list), 2))
-						else:
-							temp_row.append(None)
-					subset_list.append(temp_row)
+				# add the values for this subset
+				for v in sorted(self.groups[key]): # Sort each group alphabetically
+					temp_row = [v]
+					append_me = True
+					one_year_sums = []
 					
-			# prepare a list to compute lsd on, by removing all "None" from this subset
-			lsd_list = []
-			for row in subset_list:
-				not_none = []
-				for cell in row[1:len(self.locations)+1:]: # skip past first column (the variety name), and do not include n-yr avgs
-					if cell is not None:
-						not_none.append(cell)
-				if len(not_none) > 1:
-					lsd_list.append(not_none)
-			# append the calculated lsd row for this subset
-			
-			temp_row = ["LSD"]
-			for l in self.locations:
-				try:
-					temp_row.append(max(self.lsds[(l, self.year)])) #TODO: smarter logic needed
-				except KeyError:
-					temp_row.append(None)
-			if len(lsd_list) > 0:
-				# append 1-yr lsd
-				try:
-					value = round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 2)
-				except:
-					value = None
-				temp_row.append(value)
-			else:
-				temp_row.append(None)
-			# append 2-yr, ... lsds
-			append_me = True # reset error flag
-			for years_to_average in avg_years[1::]: # skip past 1-yr avg
-				multiple_year_lsd_list = []	
-				for v in sorted(self.groups[key]): #TODO: we iterated through this already...
-					variety_across_years = []
-					for year in years_to_average:						
-						if append_me:
-							for l in locations:
-								try:
-									values = self.entries[(l,v)][year]
-									value = round(sum(values)/len(values), 2)
-																
-								except KeyError:
+					for l in self.locations:
+						if l not in locations: # ensure all subgroups only show data for common locations
+							temp_row.append(None)
+						else:
+							try:
+								values = self.entries[(l,v)][self.year]
+								value = round(sum(values)/len(values), 2)
+								temp_row.append(value)
+								one_year_sums.append(value) # will not contain None
+							except KeyError:
+								if l in locations: # this variety is from a higher-order set, but does not have data for one of our common locations
 									append_me = False
 									break
-					multiple_year_lsd_list.append(variety_across_years)
+								temp_row.append(None)
+								
+					if append_me:
+						if len(one_year_sums) > 1: # if we have two or more datapoints
+							# append 1-yr avg
+							temp_row.append(round(sum(one_year_sums)/len(one_year_sums), 2))
+						else:
+							append_me = False # cause the 2-yr,... to short-circuit
+							temp_row.append(None)
+						# append 2-yr, ... avgs
+						for years_to_average in avg_years[1::]: # skip past 1-yr avg
+							sum_list = []
+							for year in years_to_average:
+								if append_me: # only continue while there are no errors
+									if year != self.year: # we already retrieved the data for this year
+										for l in locations:
+											try:
+												values = self.entries[(l,v)][year]
+												value = round(sum(values)/len(values), 2)
+												sum_list.append(value)
+											except KeyError:
+												append_me = False
+												break
+									else:
+										sum_list.extend(one_year_sums)
+							
+							if append_me and len(sum_list) > 1:
+								temp_row.append(round(sum(sum_list)/len(sum_list), 2))
+							else:
+								temp_row.append(None)
+						subset_list.append(temp_row)
+						
+				# prepare a list to compute lsd on, by removing all "None" from this subset
+				lsd_list = []
+				for row in subset_list:
+					not_none = []
+					for cell in row[1:len(self.locations)+1:]: # skip past first column (the variety name), and do not include n-yr avgs
+						if cell is not None:
+							not_none.append(cell)
+					if len(not_none) > 1:
+						lsd_list.append(not_none)
+				# append the calculated lsd row for this subset
 				
-				if append_me:
+				temp_row = ["LSD"]
+				for l in self.locations:
+					if l in locations:
+						try:
+							temp_row.append(max(self.lsds[(l, self.year)])) #TODO: smarter logic needed
+						except KeyError:
+							temp_row.append(None)
+					else:
+						temp_row.append(None)
+				if len(lsd_list) > 0:
+					# append 1-yr lsd
 					try:
-						value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 2)
+						value = round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 2)
 					except:
 						value = None
 					temp_row.append(value)
 				else:
 					temp_row.append(None)
-			subset_list.append(temp_row)
-				
-			return_list.extend(subset_list) # append the lists inside subset_list to return_list
+				# append 2-yr, ... lsds
+				append_me = True # reset error flag
+				for years_to_average in avg_years[1::]: # skip past 1-yr avg
+					multiple_year_lsd_list = []	
+					for v in sorted(self.groups[key]): #TODO: we iterated through this already...
+						variety_across_years = []
+						for year in years_to_average:						
+							if append_me:
+								for l in locations:
+									try:
+										values = self.entries[(l,v)][year]
+										value = round(sum(values)/len(values), 2)
+																	
+									except KeyError:
+										append_me = False
+										break
+						multiple_year_lsd_list.append(variety_across_years)
+					
+					if append_me:
+						try:
+							value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 2)
+						except:
+							value = None
+						temp_row.append(value)
+					else:
+						temp_row.append(None)
+				subset_list.append(temp_row)
+					
+				return_list.extend(subset_list) # append the lists inside subset_list to return_list
 
 		return return_list
 

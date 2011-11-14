@@ -22,6 +22,12 @@ class SelectFieldForm(forms.Form):
 	field = forms.CharField(max_length=5)
 	radius = forms.CharField(max_length=5)
 
+class SelectLocationsForm(forms.Form):
+	locations = forms.ModelMultipleChoiceField(
+								widget=forms.SelectMultiple(attrs={'size': 20}),
+								queryset=models.Location.objects.all()
+							)
+							
 class SelectVarietiesForm(forms.Form):
 	varieties = forms.ModelMultipleChoiceField(
 								widget=forms.SelectMultiple(attrs={'size': 20}),

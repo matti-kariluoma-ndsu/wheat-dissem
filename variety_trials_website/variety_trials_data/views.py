@@ -154,7 +154,7 @@ def tabbed_view(request, yearname, fieldname):
 				})
 			
 			return render_to_response(
-				'tabbed_view.html',
+				'tabbed_view_locations.html',
 				{ 
 					'location_form': location_form,
 					'field_list': field_list,
@@ -284,9 +284,9 @@ def varieties_view(request, yearname, fieldname):
 				})
 			
 			return render_to_response(
-				'tabbed_view.html',
+				'tabbed_view_varieties.html',
 				{
-					'location_form': varieties_form,
+					'varieties_form': varieties_form,
 					'field_list': field_list,
 					'location_list': locations,
 					'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different

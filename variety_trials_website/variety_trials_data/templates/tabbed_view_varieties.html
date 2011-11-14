@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load django_math %}
+{% block content %}
+<table>
+<tr>
+<td>
+	<div class="top_spacer"></div>
+	<div class="tabs years">
+		{% for yearname, year_button_list in years.items %}
+		<div style="display:none">
+			<form name="{{yearname}}form" action="/view/variety/{{yearname}}/{{curfield}}" method="post">
+				{% csrf_token %}
+				{% for field in varieties_form %}
+				<div class="input row">
+					{{ field.errors }}
+					{{ field.label_tag }}: {{ field }}
+				</div>
+				{% endfor %}
+				<input type="submit" value="Submit" />
+			</form>
+		</div>
+		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+		<!--TODO: auto-generate these year button images-->
+		{% if yearname == curyear %}
+		<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/variety/{{yearname}}/{{curfield}}/"><img src="{{year_button_list.1}}"></a>
+		{% else %}
+		<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/variety/{{yearname}}/{{curfield}}/"><img src="{{year_button_list.0}}"></a>
+		{% endif %}
+		</div>
+		{% endfor %}
+	</div>
+</td>
+<td>
+	<div class="tabs units">
+		{% for fieldname, blurb_list in blurbs.items %}
+		<div class="{{fieldname}}" style="display:none">
+			<form name="{{fieldname}}form" action="/view/variety/{{curyear}}/{{fieldname}}" method="post">
+				{% csrf_token %}
+				{% for field in varieties_form %}
+				<div class="input row">
+					{{ field.errors }}
+					{{ field.label_tag }}: {{ field }}
+				</div>
+				{% endfor %}
+				<input type="submit" value="Submit" />
+			</form>
+		</div>
+		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+		{% if fieldname == curfield %}
+		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/variety/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
+		{% else %}
+		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/variety//{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
+		{% endif %}
+		</div>
+		{% endfor %}
+	</div>
+</td>
+<td>
+	<div id="static_content">
+		<table border='1'>
+			<tr>
+				<td colspan="{{ heading_list|length }}">
+					{% for fieldname, blurb_list in blurbs.items %}
+					{% if fieldname == curfield %}
+							<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
+							<p>{{blurb_list.2}}</p>
+					{% endif %}
+					{% endfor %}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="{{ heading_list|length|sub:2 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+			</tr>
+			<tr >
+				<td class="Variety padded"><h3> Variety</h3></td>
+				{% for heading in heading_list %}
+				<td class="{{ heading }} padded"><h3>{{ heading }}</h3></td>
+				{% endfor %}
+			</tr>
+			<tr class="row subheadings thin">
+			</tr>
+		{% for datalist in sorted_list %}
+			{% if datalist.0 != "LSD" %}
+			<tr class="group {% cycle 'odd' 'even' %}">
+				{% for element in datalist %}
+				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
+				{% endfor %}
+			</tr>
+			{% else %}
+			<tr class="spacer_row">
+				<td></td>
+			</tr>
+			<tr class="LSD_row">
+				{% for element in datalist %}
+				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
+				{% endfor %}
+			</tr>
+			<tr class="spacer_row">
+				<td></td>
+			</tr>
+			{% endif %}
+		{% endfor %}
+			<tr class="bottom_spacer"></tr>
+	  </table>
+	</div>
+	<div class="clear">&#160;</div>
+</td>
+</tr>
+</table>
+	<!--
+	<div id='dynamic_content'></div>
+	-->
+{% endblock %}
+
+{% load jsonify %}
+{% block jquery %}
+
+  $('.group .master').toggle(
+    function(){
+      $(this).siblings('.slave').show();
+    },
+    function(){
+      $(this).siblings('.slave').hide();  
+    }
+  );
+
+{% endblock %}
