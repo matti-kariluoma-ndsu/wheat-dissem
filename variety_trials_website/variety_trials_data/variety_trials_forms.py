@@ -3,9 +3,8 @@ from django.core.exceptions import ValidationError
 from variety_trials_data import models
 from difflib import SequenceMatcher
 import re
-#import csv
 
-class SelectLocationForm(forms.Form):
+class SelectLocationByZipcodeRadiusForm(forms.Form):
 	zipcode = forms.CharField(max_length=5)  
 	search_radius = forms.ChoiceField(
 										widget=forms.RadioSelect(), 
@@ -21,17 +20,17 @@ class SelectFieldForm(forms.Form):
 	year_list = forms.CharField(max_length=5)
 	field = forms.CharField(max_length=5)
 	radius = forms.CharField(max_length=5)
-
-class SelectLocationsForm(forms.Form):
-	locations = forms.ModelMultipleChoiceField(
-								widget=forms.SelectMultiple(attrs={'size': 20}),
-								queryset=models.Location.objects.all()
-							)
 							
 class SelectVarietiesForm(forms.Form):
 	varieties = forms.ModelMultipleChoiceField(
 								widget=forms.SelectMultiple(attrs={'size': 20}),
 								queryset=models.Variety.objects.all()
+							)
+
+class SelectLocationsForm(SelectVarietiesForm):
+	locations = forms.ModelMultipleChoiceField(
+								widget=forms.SelectMultiple(attrs={'size': 20}),
+								queryset=models.Location.objects.all()
 							)
 
 class UploadCSVForm(forms.Form):
@@ -70,7 +69,7 @@ class fuzzy_spellchecker():
 				if  date == name: 
 					corrected = name
 					break
-				#else:
+				#else: # Let's not try to fuzzy-match a date. Just create a new date.
 					#m = SequenceMatcher(None, date, name)
 					#ratios[name] = m.ratio()
 					#print "%s ? %s: %f" % (word, name, m.ratio())

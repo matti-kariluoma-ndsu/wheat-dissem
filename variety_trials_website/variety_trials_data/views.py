@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.forms.models import inlineformset_factory
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field
@@ -20,22 +20,82 @@ def get_entries(locations, year_list):
 			)
 
 def index(request):
-	location_form = variety_trials_forms.SelectLocationForm()
+	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
 	varieties_form = variety_trials_forms.SelectVarietiesForm()
 	variety_list = models.Variety.objects.all()
 	
 	return render_to_response(
 		'main.html', 
 		{ 
-			'location_form': location_form,
+			'zipcode_radius_form': zipcode_radius_form,
 			'varieties_form': varieties_form,
 			'variety_list': variety_list,
 			'curyear': datetime.date.today().year 
 		},
 		context_instance=RequestContext(request)
 	)
-		
-def tabbed_view(request, yearname, fieldname):
+
+def locations_view(request, yearname, fieldname):
+	if request.method == 'POST':
+		locations_form = variety_trials_forms.SelectLocationsForm(request.POST)
+		if locations_form.is_valid():
+			locations = locations_form.cleaned_data['locations']
+			varieties = locations_form.cleaned_data['varieties']
+			return tabbed_view(request, yearname, fieldname, locations, varieties)
+		else:
+			return HttpResponseRedirect("/") # send to homepage
+	else:
+		return HttpResponseRedirect("/") # send to homepage
+
+def zipcode_view(request, yearname, fieldname):
+	if request.method == 'POST':
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.POST)
+		if zipcode_radius_form.is_valid():
+			zipcode = zipcode_radius_form.cleaned_data['zipcode']
+			radius = zipcode_radius_form.cleaned_data['search_radius']
+			
+			try:
+				locations = Locations_from_Zipcode_x_Radius(
+					zipcode, radius
+				).fetch()
+			except models.Zipcode.DoesNotExist:
+				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
+						'radius': zipcode_radius_form.cleaned_data['search_radius']
+					})
+				return render_to_response(
+					'main.html', 
+					{ 
+						'zipcode_radius_form': zipcode_radius_form,
+						'error_list': ['Sorry, the zipcode: ' + zipcode_radius_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
+					},
+					context_instance=RequestContext(request)
+				) 
+			
+			varieties = []
+			
+			for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
+				varieties.append(entry.variety)
+			
+			return tabbed_view(request, yearname, fieldname, locations, varieties)
+			
+		else:
+			zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
+					'zipcode': zipcode_radius_form.cleaned_data['zipcode'],
+					'radius': zipcode_radius_form.cleaned_data['search_radius']
+				})
+			return render_to_response(
+					'main.html', 
+					{ 
+						'zipcode_radius_form': zipcode_radius_form,
+						'error_list': ['Sorry, the zipcode: ' + zipcode_radius_form.cleaned_data['zipcode'] + ' didn\'t return any results.']
+					},
+					context_instance=RequestContext(request)
+				)
+	else:
+		# seems an error occured...
+		return HttpResponseRedirect("/") # send to homepage
+
+def tabbed_view(request, yearname, fieldname, locations, varieties):
 	# TODO: does this belong in the DB?
 	unit_blurbs = {
 			'bushels_acre': ['Yield', 'Bushels per Acre', 
@@ -75,103 +135,79 @@ def tabbed_view(request, yearname, fieldname):
 				'/static/img/button_seeding_rate.jpg', '/static/img/button_high_seeding_rate.jpg'],
 			'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
-	}
+	}		
+
+	today = datetime.date.today()
+	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
+	year_list = [today.year, today.year-1, today.year-2, today.year-3]
 	
-	if request.method == 'POST':
-		location_form = variety_trials_forms.SelectLocationForm(request.POST)
-		if location_form.is_valid():
-			zipcode = location_form.cleaned_data['zipcode']
-			radius = location_form.cleaned_data['search_radius']
-			
-			try:
-				locations = Locations_from_Zipcode_x_Radius(
-					zipcode, radius
-				).fetch()
-			except models.Zipcode.DoesNotExist:
-				return render_to_response(
-					'main.html', 
-					{ 
-						'location_form': location_form,
-						# TODO: set initial fieldname
-						'error_list': ['Sorry, the zipcode: ' + location_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
-					},
-					context_instance=RequestContext(request)
-				) 
-			
-			today = datetime.date.today()
-			# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-			year_list = [today.year, today.year-1, today.year-2, today.year-3]
-			
-			try:
-				curyear = int(yearname)
-			except ValueError:
-				curyear = max(year_list)
-				
-			years = {}
-			for year in year_list:
-				years[str(year)] = [
-					'/static/img/button_year_%s.jpg' % (str(year)),
-					'/static/img/button_high_year_%s.jpg' % (str(year))
-					]
-				
-			field_list = []
-			for field in models.Trial_Entry._meta.fields:
-				if (field.get_internal_type() == 'DecimalField' 
-						or field.get_internal_type() == 'PositiveIntegerField' 
-						or field.get_internal_type() == 'SmallIntegerField'
-						or field.get_internal_type() == 'IntegerField'):
-							# Check for empty queries
-							# Raw SQL query... here we go!
-							count = 0
-							for object in models.Trial_Entry.objects.raw(
-									"SELECT id FROM variety_trials_data_trial_entry WHERE %s!='' LIMIT 6", #TODO: hardcoded numeric value
-									[field.name]
-								):
-									if getattr(object, field.name):
-										count += 1
-							if count > 5:  #TODO: hardcoded numeric value
-								field_list.append(field.name)
-			
-			for field in models.Trial_Entry._meta.fields:
-				if field.name == fieldname:
-					break;
-			
-			# Remove all fields from `unit_blurbs' that aren't in `field_list'
-			for name in unit_blurbs.keys():
-				if name not in field_list:
-					del(unit_blurbs[name])
-			
-			# TODO: respect/update the cur_year value.
-			try:
-				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, []).fetch()
-			except TypeError:
-				# TODO: we can do more for the user than redirect to /
-				return HttpResponseRedirect("/")
-			
-			location_form = variety_trials_forms.SelectLocationForm(initial={
-					'zipcode': zipcode,
-					'search_radius': radius
-				})
-			
-			return render_to_response(
-				'tabbed_view_locations.html',
-				{ 
-					'location_form': location_form,
-					'field_list': field_list,
-					'location_list': locations,
-					'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
-					'heading_list': sorted_list[0][1::],
-					'sorted_list': sorted_list[1::],
-					'years': years,
-					'radius' : radius,
-					'blurbs' : unit_blurbs,
-					'curfield' : fieldname
-				},
-				context_instance=RequestContext(request)
-			)
-	else:
-		# seems an error occured...
-		return HttpResponseRedirect("/") # send to homepage
+	try:
+		curyear = int(yearname)
+	except ValueError:
+		curyear = max(year_list)
+		
+	years = {}
+	for year in year_list:
+		years[str(year)] = [
+			'/static/img/button_year_%s.jpg' % (str(year)),
+			'/static/img/button_high_year_%s.jpg' % (str(year))
+			]
+		
+	field_list = []
+	for field in models.Trial_Entry._meta.fields:
+		if (field.get_internal_type() == 'DecimalField' 
+				or field.get_internal_type() == 'PositiveIntegerField' 
+				or field.get_internal_type() == 'SmallIntegerField'
+				or field.get_internal_type() == 'IntegerField'):
+					# Check for empty queries
+					# Raw SQL query... here we go!
+					count = 0
+					for object in models.Trial_Entry.objects.raw(
+							"SELECT id FROM variety_trials_data_trial_entry WHERE %s!='' LIMIT 6", #TODO: hardcoded numeric value
+							[field.name]
+						):
+							if getattr(object, field.name):
+								count += 1
+					if count > 5:  #TODO: hardcoded numeric value
+						field_list.append(field.name)
+	
+	for field in models.Trial_Entry._meta.fields:
+		if field.name == fieldname:
+			break;
+	
+	# Remove all fields from `unit_blurbs' that aren't in `field_list'
+	for name in unit_blurbs.keys():
+		if name not in field_list:
+			del(unit_blurbs[name])
+	
+	# TODO: respect/update the cur_year value.
+	try:
+		sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch()
+	except TypeError:
+		# TODO: we can do more for the user than redirect to /
+		return HttpResponseRedirect("/")
+	
+	locations_form = variety_trials_forms.SelectLocationsForm(initial={
+			'locations': locations,
+			'varieties': varieties
+		})
+	
+	return render_to_response(
+		'tabbed_view.html',
+		{ 
+			'locations_form': locations_form,
+			'field_list': field_list,
+			'location_list': locations,
+			'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
+			'heading_list': sorted_list[0][1::],
+			'sorted_list': sorted_list[1::],
+			'years': years,
+			'blurbs' : unit_blurbs,
+			'curfield' : fieldname
+		},
+		context_instance=RequestContext(request)
+	)
+	
 
 def varieties_view(request, yearname, fieldname):
 	# TODO: does this belong in the DB?

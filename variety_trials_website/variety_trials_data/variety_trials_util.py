@@ -33,14 +33,16 @@ class Filter_by_Field:
 	def __init__(self):
 		pass
 
-	def __init__(self, entries, field, years, pref_year, varieties_list):
+	def __init__(self, entries, field, years, pref_year, varieties):
 		"""
 		Initializes internal data structures using the an input list of 
 		entries, a field to filter on, and the years to include.
 		"""
-		if len(varieties_list) > 0:
+		if len(varieties) > 0:
 			self.all_varieties = False
-			self.varieties = varieties_list #TODO: check these names
+			self.varieties = []
+			for variety in varieties:
+				self.varieties.append(variety.name)
 		else:
 			self.all_varieties = True
 			self.varieties = []
