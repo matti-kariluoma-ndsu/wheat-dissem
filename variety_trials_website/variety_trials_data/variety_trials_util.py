@@ -502,7 +502,7 @@ class Filter_by_Field:
 								for l in locations:
 									try:
 										values = self.entries[(l,v)][year]
-										value = round(sum(values)/len(values), 0)
+										value = round(sum(values)/len(values), 2)
 										variety_for_year.append(value)
 									except KeyError:
 										append_me = False
@@ -511,9 +511,6 @@ class Filter_by_Field:
 					
 					if append_me:
 						try:
-							for sublist in multiple_year_lsd_list:
-								print sublist
-							print '\n\n'
 							value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 2)
 						except:
 							value = None

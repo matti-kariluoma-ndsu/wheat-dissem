@@ -178,7 +178,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties):
 	# Remove all fields from `unit_blurbs' that aren't in `field_list'
 	for name in unit_blurbs.keys():
 		if name not in field_list:
-			del(unit_blurbs[name])
+			del unit_blurbs[name]
 	
 	# TODO: respect/update the cur_year value.
 	try:
@@ -299,18 +299,11 @@ def varieties_view(request, yearname, fieldname):
 			# Remove all fields from `unit_blurbs' that aren't in `field_list'
 			for name in unit_blurbs.keys():
 				if name not in field_list:
-					del(unit_blurbs[name])
-			
-			
-			variety_list = []
-			for variety in varieties:
-				variety_list.append(str(variety.name))
-				#variety_list.append(variety.name)
+					del unit_blurbs[name]
 				
-			
 			# TODO: respect/update the cur_year value.
 			try:
-				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, variety_list).fetch()
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch()
 			except TypeError:
 				# TODO: we can do more for the user than redirect to /
 				return HttpResponseRedirect("/")
