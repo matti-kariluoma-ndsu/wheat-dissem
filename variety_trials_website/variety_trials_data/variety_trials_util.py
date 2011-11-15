@@ -496,21 +496,24 @@ class Filter_by_Field:
 				for years_to_average in avg_years[1::]: # skip past 1-yr avg
 					multiple_year_lsd_list = []	
 					for v in sorted(self.groups[key]): #TODO: we iterated through this already...
-						variety_across_years = []
-						for year in years_to_average:						
+						for year in years_to_average:
+							variety_for_year = []
 							if append_me:
 								for l in locations:
 									try:
 										values = self.entries[(l,v)][year]
-										value = round(sum(values)/len(values), 2)
-																	
+										value = round(sum(values)/len(values), 0)
+										variety_for_year.append(value)
 									except KeyError:
 										append_me = False
 										break
-						multiple_year_lsd_list.append(variety_across_years)
+							multiple_year_lsd_list.append(variety_for_year)
 					
 					if append_me:
 						try:
+							for sublist in multiple_year_lsd_list:
+								print sublist
+							print '\n\n'
 							value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 2)
 						except:
 							value = None
