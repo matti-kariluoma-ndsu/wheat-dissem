@@ -73,8 +73,8 @@ def zipcode_view(request, yearname, fieldname):
 			
 			varieties = []
 			
-			for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
-				varieties.append(entry.variety)
+			#for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
+				#varieties.append(entry.variety)
 			
 			return tabbed_view(request, yearname, fieldname, locations, varieties)
 			
