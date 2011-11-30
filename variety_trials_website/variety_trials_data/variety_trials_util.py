@@ -38,15 +38,10 @@ class Filter_by_Field:
 		Initializes internal data structures using the an input list of 
 		entries, a field to filter on, and the years to include.
 		"""
-		if len(varieties) > 0:
-			self.all_varieties = False
-			self.varieties = []
-			for variety in varieties:
-				self.varieties.append(variety.name)
-		else:
-			self.all_varieties = True
-			self.varieties = []
-			
+		self.varieties = [] # reset the variable, otherwise we see the last added to our new ones (TODO: might be a useful feature)
+		for variety in varieties:
+			self.varieties.append(variety.name)
+
 		return self.populate(entries, field, years, pref_year)
 
 	def LSD(self, response_to_treatments, probability):
@@ -199,8 +194,6 @@ class Filter_by_Field:
 				self.locations.append(location)
 				
 				name = str(entry.variety.name)
-				if self.all_varieties: # if we are using all varieties, add this variety to our list
-					self.varieties.append(name)
 					
 				if name in self.varieties:
 					# store our field's value
@@ -242,7 +235,7 @@ class Filter_by_Field:
 		self.locations = sorted(list(set(self.locations)))
 		self.varieties = sorted(list(set(self.varieties)))
 		
-	def fetch(self):
+	def fetch(self, reduce_to_one_set=False):
 		"""
 		Returns a list of lists, suitable for a tabular layout. The first
 		list contains the year and location names, and each other list 
@@ -343,16 +336,7 @@ class Filter_by_Field:
 			except KeyError:
 				major_orders[key[0]] = [key]
 				
-		if self.all_varieties: # if we are the locations view
-			# put all elements from higher-order groups into lower-order groups,
-			# putting 'None' into non-common locations.
-			for order in major_orders.keys(): # reverse-traverse
-				for key in self.groups.keys():
-					if key[0] < order: # if this group's order is smaller than another, add all from the higher order
-						for larger_group_key in major_orders[order]:
-							for v in self.groups[larger_group_key]:
-								self.groups[key].append(v)
-		else: # if we are the varieties view
+		if reduce_to_one_set: # if we are the varieties view
 			# find the biggest group(s) representing the chosen varieties, then delete the rest
 			ordered_groups_keys = sorted(self.groups.keys(), reverse=True)
 			groups_keys_save = []
@@ -368,7 +352,16 @@ class Filter_by_Field:
 			for key in self.groups.keys():
 				if key not in groups_keys_save:
 					del self.groups[key]
-				
+					
+		else: # if we are the locations view
+			# put all elements from higher-order groups into lower-order groups,
+			# putting 'None' into non-common locations.
+			for order in major_orders.keys(): # reverse-traverse
+				for key in self.groups.keys():
+					if key[0] < order: # if this group's order is smaller than another, add all from the higher order
+						for larger_group_key in major_orders[order]:
+							for v in self.groups[larger_group_key]:
+								self.groups[key].append(v)
 		
 		# make a list of years to average over
 		avg_years = []

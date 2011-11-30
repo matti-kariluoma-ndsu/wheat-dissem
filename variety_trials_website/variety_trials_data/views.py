@@ -73,8 +73,8 @@ def zipcode_view(request, yearname, fieldname):
 			
 			varieties = []
 			
-			#for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
-				#varieties.append(entry.variety)
+			for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
+				varieties.append(entry.variety)
 			
 			return tabbed_view(request, yearname, fieldname, locations, varieties)
 			
@@ -303,7 +303,7 @@ def varieties_view(request, yearname, fieldname):
 				
 			# TODO: respect/update the cur_year value.
 			try:
-				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch()
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch(reduce_to_one_set=True)
 			except TypeError:
 				# TODO: we can do more for the user than redirect to /
 				return HttpResponseRedirect("/")
