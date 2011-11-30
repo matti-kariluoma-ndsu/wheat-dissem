@@ -86,6 +86,9 @@ def main():
 			rbo7[i],sabin[i],samson[i],select[i],tom[i],vantage[i]])
 	
 	print LSD(trt, 0.05)
+	# TODO
+	# get SSE: 13236
+	# expect SSE: 7759
 	
 	
 if __name__ == '__main__':
