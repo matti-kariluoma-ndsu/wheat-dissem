@@ -235,7 +235,7 @@ class Filter_by_Field:
 		self.locations = sorted(list(set(self.locations)))
 		self.varieties = sorted(list(set(self.varieties)))
 		
-	def fetch(self, reduce_to_one_set=False):
+	def fetch(self, reduce_to_one_subset=False):
 		"""
 		Returns a list of lists, suitable for a tabular layout. The first
 		list contains the year and location names, and each other list 
@@ -336,7 +336,7 @@ class Filter_by_Field:
 			except KeyError:
 				major_orders[key[0]] = [key]
 				
-		if reduce_to_one_set: # if we are the varieties view
+		if reduce_to_one_subset: # if we are the varieties view
 			# find the biggest group(s) representing the chosen varieties, then delete the rest
 			ordered_groups_keys = sorted(self.groups.keys(), reverse=True)
 			groups_keys_save = []
@@ -352,7 +352,31 @@ class Filter_by_Field:
 			for key in self.groups.keys():
 				if key not in groups_keys_save:
 					del self.groups[key]
-					
+			
+			# for the groups that remain, delete the non-common locations until one subset remains
+			locations_save = []
+			
+			for l in self.locations:
+				add_location = True
+				for key in self.groups.keys():
+					for v in self.groups[key]:
+						try:
+							if self.entries[(l,v)][self.year] is None:
+								add_location = False
+								break # don't check anymore groups
+						except KeyError:
+							add_location = False
+							break # don't check anymore groups
+				if add_location:
+					locations_save.append(l)
+			print locations_save
+			if len(locations_save) > 0: # if any locations remain, replace
+				self.locations = locations_save
+				# put all into one group
+				new_groups = {}
+				new_groups[(1,0)] = list(self.varieties) # make a copy
+				self.groups = new_groups
+
 		else: # if we are the locations view
 			# put all elements from higher-order groups into lower-order groups,
 			# putting 'None' into non-common locations.

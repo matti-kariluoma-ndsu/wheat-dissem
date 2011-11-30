@@ -33,3 +33,4 @@ Dec 12 - Cassselton
 A/B testing for these two events?
 live or screenshot?
 
+Break the subset logic apart from the list-generation logic.

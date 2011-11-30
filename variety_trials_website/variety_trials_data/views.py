@@ -303,7 +303,7 @@ def varieties_view(request, yearname, fieldname):
 				
 			# TODO: respect/update the cur_year value.
 			try:
-				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch(reduce_to_one_set=True)
+				sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch(reduce_to_one_subset=True)
 			except TypeError:
 				# TODO: we can do more for the user than redirect to /
 				return HttpResponseRedirect("/")
