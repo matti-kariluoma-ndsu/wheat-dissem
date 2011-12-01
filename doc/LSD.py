@@ -13,7 +13,7 @@
 from math import sqrt, pi, cos, sin, exp
 from scipy.special import erfinv
 
-def LSD(response_to_treatments, probability, randomized_block_design=False):
+def LSD(response_to_treatments, probability):
 	"""
 	A stripped-down reimplementation of LSD.test from the agricoloae
 	package. (http://cran.r-project.org/web/packages/agricolae/index.html)
@@ -118,21 +118,15 @@ def LSD(response_to_treatments, probability, randomized_block_design=False):
 			total += float(trt[i][j])
 		block_means[j] = total/n
 	
+	grand_mean = sum(treatment_means.values()) / float(n)
+	
 	# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
 	SSE = 0.0
-	if randomized_block_design: # if trt is a randomized block design
-		grand_mean = sum(treatment_means.values()) / float(n)
-		for i in range(n): # n == len(trt)
-			for j in range(k):
-				SSE += (float(trt[i][j]) - treatment_means[i] - block_means[j] + grand_mean)**2.0
-	else:
-		for i in range(len(trt)):
-			for j in range(k):
-				SSE += (float(trt[i][j]) - treatment_means[i])**2.0
-	
+	for i in range(n): # n == len(trt)
+		for j in range(k):
+			SSE += (float(trt[i][j]) - treatment_means[i] - block_means[j] + grand_mean)**2.0
 	
 	print "SSE: %f\n" % (SSE)
-	#TODO: SSE is wrong.
 	
 	mean_squares_of_error = SSE / degrees_freedom_of_error
 	

@@ -135,21 +135,28 @@ class Filter_by_Field:
 		k = len(trt[0]) # == len(trt[1]) == ... == len(trt[n])
 		degrees_freedom_of_error = (n-1)*(k-1)
 		
-		# SSE is the Error Sum of Squares
-		
 		treatment_means = {}
-		for i in range(len(trt)):
-			sum = 0.0
-			count = 0
-			for j in trt[i]:
-				sum += float(j)
-				count += 1
-			treatment_means[i] = sum/float(count)
+		for i in range(n): # n == len(trt)
+			total = 0.0
+			for j in range(k):
+				total += float(trt[i][j])
+			treatment_means[i] = total/k
+			
+		block_means = {}
+		for j in range(k):
+			total = 0.0
+			for i in range(n):
+				total += float(trt[i][j])
+			block_means[j] = total/n
 		
+		grand_mean = sum(treatment_means.values()) / float(n)
+		
+		# SSE is the Error Sum of Squares
+		# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
 		SSE = 0.0
-		for i in range(len(trt)):
-			for j in trt[i]:
-				SSE += (float(j) - treatment_means[i])**2.0
+		for i in range(n): # n == len(trt)
+			for j in range(k):
+				SSE += (float(trt[i][j]) - treatment_means[i] - block_means[j] + grand_mean)**2.0
 		
 		mean_squares_of_error = SSE / degrees_freedom_of_error
 		
