@@ -106,32 +106,20 @@ def LSD(response_to_treatments, probability):
 	
 	# SSE is the Error Sum of Squares
 	
-	#treatment_means = {}
-	#for i in range(len(trt)):
-		#total = 0.0
-		#count = 0
-		#for j in trt[i]:
-			#total += float(j)
-			#count += 1
-		#treatment_means[i] = total/float(count)
-	
 	treatment_means = {}
-	count = len(trt[0]) # assume all trt are the same length
-	for i in range(count):
+	for i in range(len(trt)):
 		total = 0.0
-		for j in range(len(trt)):
-			total += float(trt[j][i])
-		treatment_means[i] = total / float(len(trt))
+		count = 0
+		for j in trt[i]:
+			total += float(j)
+			count += 1
+		treatment_means[i] = total/float(count)
 			
-	#SSE = 0.0
-	#for i in range(len(trt)):
-		#for j in trt[i]:
-			#SSE += (float(j) - treatment_means[i])**2.0
-	
 	SSE = 0.0
-	for i in range(count):
-		for j in range(len(trt)):
-			SSE += (float(trt[j][i]) - treatment_means[i])**2.0
+	for i in range(len(trt)):
+		for j in trt[i]:
+			SSE += (float(j) - treatment_means[i])**2.0
+	
 	
 	print "SSE: %f\n" % (SSE)
 	#TODO: SSE is wrong.

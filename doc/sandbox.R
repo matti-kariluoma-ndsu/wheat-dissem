@@ -7,6 +7,7 @@ nelson <-		c(76.8,	69.1,	74.5,	82.9,	78.2,	69.1,	70.2,	63.0)
 oklee <-		c(78.0,	99.8,	83.1,	105.6,77.4,	110.2,94.3,	81.0)
 perley <-		c(70.3,	62.3,	68.1,	75.6,	74.5,	67.7,	75.3,	72.3)
 
+
 # treatment <- c(barnes, crookston, dickey, fergus, nelson, oklee, perley)
 
 alpha <- 0.05
@@ -28,5 +29,20 @@ squared_sums_of_error <- squared_sums_of_error + sum((mean(perley) - perley)^2)
 mean_squares_of_error <- squared_sums_of_error / degrees_freedom_of_error
 
 LSD <- qt(1 - alpha/2, degrees_freedom_of_error) * sqrt(2.0 * mean_squares_of_error / k)
+#print(LSD)
 
+trt <- read.table('data.R', header=T) # 22 Entries, at 12 Environments == 264 observations
+k <- 12 
+
+# http://www.statmethods.net/stats/anova.html
+model <- aov(Yield~Environment+Entry, data=trt)
+print (model)
+
+degrees_freedom_of_error <- df.residual(model)
+print(c("df", degrees_freedom_of_error))
+
+mean_squares_of_error <- deviance(model) / degrees_freedom_of_error
+print(c("MSE", mean_squares_of_error))
+
+LSD <- qt(1 - alpha/2, degrees_freedom_of_error) * sqrt(2.0 * mean_squares_of_error / k)
 print(LSD)

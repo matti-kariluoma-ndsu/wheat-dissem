@@ -85,10 +85,14 @@ def main():
 			cromwell[i],faller[i],glenn[i],jenna[i],kelby[i],knudson[i],marshall[i],oklee[i],
 			rbo7[i],sabin[i],samson[i],select[i],tom[i],vantage[i]])
 	
+	#print LSD(trt, 0.05)
+	
+	trt = [ada,albany,barlow,blade,breaker,brennan,brick,briggs,
+			cromwell,faller,glenn,jenna,kelby,knudson,marshall,oklee,
+			rbo7,sabin,samson,select,tom,vantage]
+	
 	print LSD(trt, 0.05)
-	# TODO
-	# get SSE: 13236
-	# expect SSE: 7759
+	
 	
 	
 if __name__ == '__main__':
