@@ -296,6 +296,14 @@ class Filter_by_Field:
 			if (count > 0): # discard rows with no data
 				self.groups[(count,0)].append(v)
 		
+		# remove empty groups
+		groups_to_delete = []
+		for key in self.groups:
+			if len(self.groups[key]) == 0: # if the list is empty
+				groups_to_delete.append(key)
+		for key in groups_to_delete:
+			del self.groups[key]
+		
 		def break_into_subsets():
 			# Go through each subset and break into more subsets.
 			new_subsets = {}
@@ -520,6 +528,7 @@ class Filter_by_Field:
 				for years_to_average in avg_years[1::]: # skip past 1-yr avg
 					multiple_year_lsd_list = []	
 					for v in sorted(self.groups[key]): #TODO: we iterated through this already...
+						variety_across_years = []
 						for year in years_to_average:
 							variety_for_year = []
 							if append_me:
@@ -531,7 +540,8 @@ class Filter_by_Field:
 									except KeyError:
 										append_me = False
 										break
-							multiple_year_lsd_list.append(variety_for_year)
+							variety_across_years.extend(variety_for_year)
+						multiple_year_lsd_list.append(variety_across_years)
 					
 					if append_me:
 						try:

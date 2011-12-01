@@ -49,7 +49,7 @@ def main():
 			cromwell,faller,glenn,jenna,kelby,knudson,marshall,oklee,
 			rbo7,sabin,samson,select,tom,vantage]
 	
-	print LSD(trt, 0.05, randomized_block_design=True)
+	print LSD(trt, 0.05)
 	
 	
 	
