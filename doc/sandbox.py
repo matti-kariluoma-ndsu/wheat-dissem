@@ -45,53 +45,11 @@ def main():
 	tom = [96.9,	101.1,	93.7,	80.1,	84.8,	84.7,	76,	90,	53,	65.0,	77.2,	51.9]
 	vantage = [87.1,	96.2,	72.3,	91.1,	82.4,	77.0,	78,	98,	64,	68.0,	80.2,	53.1]
 	
-	trt = [ada[0:3],albany[0:3],barlow[0:3],blade[0:3],breaker[0:3],brennan[0:3],brick[0:3],briggs[0:3],
-		cromwell[0:3],faller[0:3],glenn[0:3],jenna[0:3],kelby[0:3],knudson[0:3],marshall[0:3],oklee[0:3],
-		rbo7[0:3],sabin[0:3],samson[0:3],select[0:3],tom[0:3],vantage[0:3],
-		ada[3:6],albany[3:6],barlow[3:6],blade[3:6],breaker[3:6],brennan[3:6],brick[3:6],briggs[3:6],
-		cromwell[3:6],faller[3:6],glenn[3:6],jenna[3:6],kelby[3:6],knudson[3:6],marshall[3:6],oklee[3:6],
-		rbo7[3:6],sabin[3:6],samson[3:6],select[3:6],tom[3:6],vantage[3:6],
-		ada[6:9],albany[6:9],barlow[6:9],blade[6:9],breaker[6:9],brennan[6:9],brick[6:9],briggs[6:9],
-		cromwell[6:9],faller[6:9],glenn[6:9],jenna[6:9],kelby[6:9],knudson[6:9],marshall[6:9],oklee[6:9],
-		rbo7[6:9],sabin[6:9],samson[6:9],select[6:9],tom[6:9],vantage[6:9],
-		ada[9:12],albany[9:12],barlow[9:12],blade[9:12],breaker[9:12],brennan[9:12],brick[9:12],briggs[9:12],
-		cromwell[9:12],faller[9:12],glenn[9:12],jenna[9:12],kelby[9:12],knudson[9:12],marshall[9:12],oklee[9:12],
-		rbo7[9:12],sabin[9:12],samson[9:12],select[9:12],tom[9:12],vantage[9:12]]
-	
-	
-	#print LSD(trt, 0.05)
-	
-	trt = [ada[9:12],albany[9:12],barlow[9:12],blade[9:12],breaker[9:12],brennan[9:12],brick[9:12],briggs[9:12],
-		cromwell[9:12],faller[9:12],glenn[9:12],jenna[9:12],kelby[9:12],knudson[9:12],marshall[9:12],oklee[9:12],
-		rbo7[9:12],sabin[9:12],samson[9:12],select[9:12],tom[9:12],vantage[9:12]]
-	
-	#print LSD(trt, 0.05)
-	
-	trt = [[ada[9],albany[9],barlow[9],blade[9],breaker[9],brennan[9],brick[9],briggs[9],
-		cromwell[9],faller[9],glenn[9],jenna[9],kelby[9],knudson[9],marshall[9],oklee[9],
-		rbo7[9],sabin[9],samson[9],select[9],tom[9],vantage[9]],
-		[ada[10],albany[10],barlow[10],blade[10],breaker[10],brennan[10],brick[10],briggs[10],
-		cromwell[10],faller[10],glenn[10],jenna[10],kelby[10],knudson[10],marshall[10],oklee[10],
-		rbo7[10],sabin[10],samson[10],select[10],tom[10],vantage[10]],
-		[ada[11],albany[11],barlow[11],blade[11],breaker[11],brennan[11],brick[11],briggs[11],
-		cromwell[11],faller[11],glenn[11],jenna[11],kelby[11],knudson[11],marshall[11],oklee[11],
-		rbo7[11],sabin[11],samson[11],select[11],tom[11],vantage[11]]]
-	
-	#print LSD(trt, 0.05)
-	
-	trt = []
-	for i in range(len(ada)):
-		trt.append([ada[i],albany[i],barlow[i],blade[i],breaker[i],brennan[i],brick[i],briggs[i],
-			cromwell[i],faller[i],glenn[i],jenna[i],kelby[i],knudson[i],marshall[i],oklee[i],
-			rbo7[i],sabin[i],samson[i],select[i],tom[i],vantage[i]])
-	
-	#print LSD(trt, 0.05)
-	
 	trt = [ada,albany,barlow,blade,breaker,brennan,brick,briggs,
 			cromwell,faller,glenn,jenna,kelby,knudson,marshall,oklee,
 			rbo7,sabin,samson,select,tom,vantage]
 	
-	print LSD(trt, 0.05)
+	print LSD(trt, 0.05, randomized_block_design=True)
 	
 	
 	

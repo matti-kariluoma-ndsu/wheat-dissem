@@ -13,7 +13,7 @@
 from math import sqrt, pi, cos, sin, exp
 from scipy.special import erfinv
 
-def LSD(response_to_treatments, probability):
+def LSD(response_to_treatments, probability, randomized_block_design=False):
 	"""
 	A stripped-down reimplementation of LSD.test from the agricoloae
 	package. (http://cran.r-project.org/web/packages/agricolae/index.html)
@@ -99,26 +99,36 @@ def LSD(response_to_treatments, probability):
 	#model = aov(y~trt)
 	#df = df.residual(model)
 	# df is the residual Degrees of Freedom
-	# n are factors, k is responses per factor
-	n = len(trt)
-	k = len(trt[0]) # == len(trt[1]) == ... == len(trt[n])
+	# n are factors, k is responses per factor (treatments)
+	n = len(trt) 
+	k = len(trt[0]) # == len(trt[1]) == ... == len(trt[n]) iff we have a balanced design
 	degrees_freedom_of_error = (n-1)*(k-1)
 	
-	# SSE is the Error Sum of Squares
-	
 	treatment_means = {}
-	for i in range(len(trt)):
+	for i in range(n): # n == len(trt)
 		total = 0.0
-		count = 0
-		for j in trt[i]:
-			total += float(j)
-			count += 1
-		treatment_means[i] = total/float(count)
-			
+		for j in range(k):
+			total += float(trt[i][j])
+		treatment_means[i] = total/k
+		
+	block_means = {}
+	for j in range(k):
+		total = 0.0
+		for i in range(n):
+			total += float(trt[i][j])
+		block_means[j] = total/n
+	
+	# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
 	SSE = 0.0
-	for i in range(len(trt)):
-		for j in trt[i]:
-			SSE += (float(j) - treatment_means[i])**2.0
+	if randomized_block_design: # if trt is a randomized block design
+		grand_mean = sum(treatment_means.values()) / float(n)
+		for i in range(n): # n == len(trt)
+			for j in range(k):
+				SSE += (float(trt[i][j]) - treatment_means[i] - block_means[j] + grand_mean)**2.0
+	else:
+		for i in range(len(trt)):
+			for j in range(k):
+				SSE += (float(trt[i][j]) - treatment_means[i])**2.0
 	
 	
 	print "SSE: %f\n" % (SSE)
