@@ -455,7 +455,7 @@ class Filter_by_Field:
 						else:
 							try:
 								values = self.entries[(l,v)][self.year]
-								value = round(sum(values)/len(values), 2)
+								value = round(sum(values)/len(values), 2) # TODO: is round necessary here?
 								temp_row.append(value)
 								one_year_sums.append(value) # will not contain None
 							except KeyError:
@@ -517,7 +517,7 @@ class Filter_by_Field:
 				if len(lsd_list) > 0:
 					# append 1-yr lsd
 					try:
-						value = round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 2)
+						value = round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 1)
 					except:
 						value = None
 					temp_row.append(value)
@@ -545,7 +545,7 @@ class Filter_by_Field:
 					
 					if append_me:
 						try:
-							value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 2)
+							value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 1)
 						except:
 							value = None
 						temp_row.append(value)
