@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+      "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  <title>Wheat Dissemination</title>
+  <meta name="generator" content="Amaya, see http://www.w3.org/Amaya/">
+  <meta name="description" content="Wheat variety trials online data directory.">
+  <meta name="author" content="M. Kariluoma, N. Kramer">
+	<!-- color scheme from http://www.ethanschoonover.com/solarized -->
+
+  <!--  Mobile Viewport Fix
+        j.mp/mobileviewport & davidbcalhoun.com/2010/viewport-metatag 
+  device-width : Occupy full width of the screen in its current orientation
+  initial-scale = 1.0 retains dimensions instead of zooming out if page height > device height
+  maximum-scale = 1.0 retains dimensions instead of zooming in if page width < device width
+  -->
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+
+  <!-- Place favicon.ico and apple-touch-icon.png in the root of your domain and delete these references -->
+  <link rel="shortcut icon" href="/static/img/favicon.ico">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+
+  <!-- CSS : implied media="all" -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- For the less-enabled mobile browsers like Opera Mini -->
+  <link rel="stylesheet" media="handheld" href="/static/css/handheld.css">
+ 
+  <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
+  <script src="/static/js/modernizr-1.5.min.js"></script>
+</head>
+
+<body style="background-color: #deefc9">
+<div style="width: 96%; margin-top: 0%; margin-left: 2%; margin-right: 2%;">
+<table border="0" style="width: 100%; border-collapse:collapse; background-color:#FFC; background-image:url('curve2.png'); background-repeat: no-repeat; background-size: 100%">
+  <tbody>
+
+    <tr>
+      <td colspan="6" style="height: 1em" ></td>
+    </tr>
+    <tr style="text-align: center; font-weight: bold;">
+      <td>Height</td>
+      <td>Test Weight</td>
+      <td style="background-color: #FFC;">Yield</td>
+      <td>Seed Rate</td>
+      <td>Days to Head</td>
+      <td></td>
+    </tr>
+    </tr>
+
+    <tr style="text-align: center; font-size: .75em; color: grey;">
+      <td></td>
+      <td></td>
+      <td style="background-color: #FFC;">2011</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr style="text-align: center; font-size: .75em; color: grey;">
+      <td></td>
+      <td></td>
+      <td style="background-color: #FFC;">2010</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr style="text-align: center; font-size: .75em; color: grey;">
+      <td></td>
+      <td></td>
+      <td style="background-color: #FFC;">2009</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<table border="0" style="width: 100%; background-color:#FFC;">
+  <tbody>
+    <tr>
+      <td colspan="6" style="font-size: 1.5em; font-weight:bold; width: 20%; text-align:right; background-color:#FFC">Yield (2010)</td>
+    </tr>
+    <tr>
+      <td colspan="6">
+				<div class="django_content">
+					{% block content %}
+					{% endblock %}
+				</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</body>
+</html>

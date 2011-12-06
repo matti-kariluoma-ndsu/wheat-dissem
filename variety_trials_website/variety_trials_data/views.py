@@ -50,7 +50,7 @@ def locations_view(request, yearname, fieldname):
 	else:
 		return HttpResponseRedirect("/") # send to homepage
 
-def zipcode_view(request, yearname, fieldname):
+def zipcode_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'POST':
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.POST)
 		if zipcode_radius_form.is_valid():
@@ -79,7 +79,7 @@ def zipcode_view(request, yearname, fieldname):
 			for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
 				varieties.append(entry.variety)
 			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, one_subset=False)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
 			
 		else:
 			zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
@@ -98,7 +98,7 @@ def zipcode_view(request, yearname, fieldname):
 		# seems an error occured...
 		return HttpResponseRedirect("/") # send to homepage
 
-def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset):
+def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None):
 	# TODO: does this belong in the DB?
 	unit_blurbs = {
 			'bushels_acre': ['Yield', 'Bushels per Acre', 
@@ -195,24 +195,80 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset):
 			'varieties': varieties
 		})
 	
-	return render_to_response(
-		'tabbed_view.html',
-		{ 
-			'locations_form': locations_form,
-			'field_list': field_list,
-			'location_list': locations,
-			'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
-			'heading_list': sorted_list[0][1::],
-			'sorted_list': sorted_list[1::],
-			'years': years,
-			'blurbs' : unit_blurbs,
-			'curfield' : fieldname
-		},
-		context_instance=RequestContext(request)
-	)
+	try:
+		ab = int(abtest)
+	except ValueError:
+		ab = None
+	except TypeError:
+		ab = None
+			
+	if (ab is None):
+		return render_to_response(
+			'tabbed_view.html',
+			{ 
+				'locations_form': locations_form,
+				'field_list': field_list,
+				'location_list': locations,
+				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
+				'heading_list': sorted_list[0][1::],
+				'sorted_list': sorted_list[1::],
+				'years': years,
+				'blurbs' : unit_blurbs,
+				'curfield' : fieldname
+			},
+			context_instance=RequestContext(request)
+		)
+	elif (ab == 0):
+		return render_to_response(
+			'tabbed_view_ndsu.html',
+			{ 
+				'locations_form': locations_form,
+				'field_list': field_list,
+				'location_list': locations,
+				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
+				'heading_list': sorted_list[0][1::],
+				'sorted_list': sorted_list[1::],
+				'years': years,
+				'blurbs' : unit_blurbs,
+				'curfield' : fieldname
+			},
+			context_instance=RequestContext(request)
+		)
+	elif (ab == 1):
+		return render_to_response(
+			'tabbed_view_w3.html',
+			{ 
+				'locations_form': locations_form,
+				'field_list': field_list,
+				'location_list': locations,
+				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
+				'heading_list': sorted_list[0][1::],
+				'sorted_list': sorted_list[1::],
+				'years': years,
+				'blurbs' : unit_blurbs,
+				'curfield' : fieldname
+			},
+			context_instance=RequestContext(request)
+		)
+	elif (ab == 2):
+		return render_to_response(
+			'tabbed_view_w12.html',
+			{ 
+				'locations_form': locations_form,
+				'field_list': field_list,
+				'location_list': locations,
+				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
+				'heading_list': sorted_list[0][1::],
+				'sorted_list': sorted_list[1::],
+				'years': years,
+				'blurbs' : unit_blurbs,
+				'curfield' : fieldname
+			},
+			context_instance=RequestContext(request)
+		)
 	
 
-def varieties_view(request, yearname, fieldname):
+def varieties_view(request, yearname, fieldname, abtest=None):
 	
 	if request.method == 'POST':
 		varieties_form = variety_trials_forms.SelectVarietiesForm(request.POST)
@@ -221,7 +277,7 @@ def varieties_view(request, yearname, fieldname):
 			varieties = varieties_form.cleaned_data['varieties']
 			locations = models.Location.objects.all()
 			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, one_subset=True)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, True, abtest)
 			
 		else:
 			return HttpResponseRedirect("/") # send to homepage
