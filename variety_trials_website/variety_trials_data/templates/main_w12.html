@@ -1,9 +1,12 @@
-{% extends "base.html" %}
+{% extends "w12_frame.html" %}
 {% load django_math %}
 {% block content %}
+<div style="width: 96%; margin-top: 0%; margin-left: 2%; margin-right: 2%; background-color:#FFC;">
 <div>
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
-	<hr>
+</div>
+<div style="height:1em; background-color: #deefc9;"></div>
+<div>
 	<h2>Welcome</h2><br/>
 	<p>Presented here are the data collected during Hard Red Spring Wheat
 	(HRSW) variety trials conducted in North Dakota. Available data 
@@ -11,14 +14,15 @@
 	plant height, etc.</p>
 	
 	<br/>
-	Other color schemes of this website:
+		Other color schemes of this website:
 	<ul>
-		<li>Version 1 (current)</li>
+		<li><a href="/">Version 1</a></li>
 		<li><a href="/0/">Version 2</a></li>
 		<li><a href="/1/">Version 3</a></li>
-		<li><a href="/2/">Version 4</a></li>
+		<li>Version 4 (current)</li>
 	</ul>
 </div>
+<div style="height:1em; background-color: #deefc9;"></div>
 <div class="location_form" >
 	{% for error in error_list %}
 	<p style='color: red'>{{ error }}</p>
@@ -33,7 +37,7 @@
 
 	TODO: use get, not post
 	-->
-	<form action="/view/{{curyear}}/bushels_acre/" method="post">
+	<form action="/view/{{curyear}}/bushels_acre/2/" method="post">
 		{% csrf_token %}
 		{% for field in zipcode_radius_form %}
 		<div class="input row">
@@ -44,10 +48,10 @@
 		<input type="submit" value="Submit" />
 	</form>
 </div>
+<div style="height:1em; background-color: #deefc9;"></div>
 <div>
-	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
-	<form action="/view/variety/{{curyear}}/bushels_acre/" method="post">
+	<form action="/view/variety/{{curyear}}/bushels_acre/2/" method="post">
 		{% csrf_token %}
 		{% for field in varieties_form %}
 		<div class="input row">
@@ -58,5 +62,6 @@
 		<input type="submit" value="Submit" />
 	</form>
 	
+</div>
 </div>
 {% endblock %}

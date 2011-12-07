@@ -19,21 +19,68 @@ def get_entries(locations, year_list):
 				)
 			)
 
-def index(request):
+def index(request, abtest=None):
 	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
 	varieties_form = variety_trials_forms.SelectVarietiesForm()
 	variety_list = models.Variety.objects.all()
 	
-	return render_to_response(
-		'main.html', 
-		{ 
-			'zipcode_radius_form': zipcode_radius_form,
-			'varieties_form': varieties_form,
-			'variety_list': variety_list,
-			'curyear': datetime.date.today().year 
-		},
-		context_instance=RequestContext(request)
-	)
+	if abtest is None:
+		return render_to_response(
+			'main.html', 
+			{ 
+				'zipcode_radius_form': zipcode_radius_form,
+				'varieties_form': varieties_form,
+				'variety_list': variety_list,
+				'curyear': datetime.date.today().year 
+			},
+			context_instance=RequestContext(request)
+		)
+	else:
+		ab = int(abtest)
+		if ab == 0:
+			return render_to_response(
+				'main_ndsu.html', 
+				{ 
+					'zipcode_radius_form': zipcode_radius_form,
+					'varieties_form': varieties_form,
+					'variety_list': variety_list,
+					'curyear': datetime.date.today().year 
+				},
+				context_instance=RequestContext(request)
+			)
+		elif ab == 1:
+			return render_to_response(
+				'main_w3.html', 
+				{ 
+					'zipcode_radius_form': zipcode_radius_form,
+					'varieties_form': varieties_form,
+					'variety_list': variety_list,
+					'curyear': datetime.date.today().year 
+				},
+				context_instance=RequestContext(request)
+			)
+		elif ab == 2:
+			return render_to_response(
+				'main_w12.html', 
+				{ 
+					'zipcode_radius_form': zipcode_radius_form,
+					'varieties_form': varieties_form,
+					'variety_list': variety_list,
+					'curyear': datetime.date.today().year 
+				},
+				context_instance=RequestContext(request)
+			)
+		else:
+			return render_to_response(
+				'main.html', 
+				{ 
+					'zipcode_radius_form': zipcode_radius_form,
+					'varieties_form': varieties_form,
+					'variety_list': variety_list,
+					'curyear': datetime.date.today().year 
+				},
+				context_instance=RequestContext(request)
+			)
 
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'POST':
