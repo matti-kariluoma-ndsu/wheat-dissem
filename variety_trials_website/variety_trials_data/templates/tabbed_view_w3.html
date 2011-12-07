@@ -1,14 +1,44 @@
 {% extends "w3_frame.html" %}
 {% load django_math %}
 {% block content %}
-<table>
-<tr>
-<td>
-	<div class="top_spacer"></div>
-	<div class="tabs years">
+<table border="0" style="width: 100%; border-collapse:collapse; background-color:#c5932e;">
+  <tbody>
+    <tr>
+      <td colspan="6" style="height: 1em" ></td>
+    </tr>
+    <tr style="text-align: center; font-weight: bold;">
+		<div class="tabs units">
+		{% for fieldname, blurb_list in blurbs.items %}
+			<div class="{{fieldname}}" style="display:none">
+				<form name="{{fieldname}}form" action="/view/location/{{curyear}}/{{fieldname}}/1" method="post">
+					{% csrf_token %}
+					{% for field in locations_form %}
+					<div class="input row">
+						{{ field.errors }}
+						{{ field.label_tag }}: {{ field }}
+					</div>
+					{% endfor %}
+					<input type="submit" value="{{fieldname}} submit" />
+				</form>
+			</div>
+		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+		{% if fieldname == curfield %}
+		<td style="background-color: #f7b033; border: 1px solid #fac757; border-bottom: 1px solid #c5932e;">
+		{% else %}
+		<td>
+		{% endif %}
+			<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/1/">
+			{{fieldname}}
+			</a>
+		</td>
+		</div>
+		{% endfor %}
+	</div>
+    </tr>
+    <div class="tabs years">
 		{% for yearname, year_button_list in years.items %}
 		<div style="display:none">
-			<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}" method="post">
+			<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}/1" method="post">
 				{% csrf_token %}
 				{% for field in locations_form %}
 				<div class="input row">
@@ -26,45 +56,42 @@
 			</form>
 		</div>
 		
-		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 		<!--TODO: auto-generate these year button images-->
 		
-		<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/"> 
 		{% if yearname == curyear %}
-			<img src="{{year_button_list.1}}">
+		<tr style="background-color: #fac757; text-align: center; font-size: .75em; color: grey;">
+      <td></td>
+      <td></td>
+      <td style="background-color: #f7b033; border: 1px solid #c5932e;">
 		{% else %}
-			<img src="{{year_button_list.0}}">
+		<tr style="text-align: center; font-size: .75em; color: grey;">
+      <td></td>
+      <td></td>
+			<td style="background-color: #fac757; border: 1px solid #c5932e;">
 		{% endif %}
-		</a>
-		</div>
+				<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/1/">
+				{{yearname}}
+				</a>
+      </td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
 		{% endfor %}
 	</div>
-</td>
-<td>
-	<div class="tabs units">
-		{% for fieldname, blurb_list in blurbs.items %}
-		<div class="{{fieldname}}" style="display:none">
-			<form name="{{fieldname}}form" action="/view/location/{{curyear}}/{{fieldname}}" method="post">
-				{% csrf_token %}
-				{% for field in locations_form %}
-				<div class="input row">
-					{{ field.errors }}
-					{{ field.label_tag }}: {{ field }}
-				</div>
-				{% endfor %}
-				<input type="submit" value="{{fieldname}} submit" />
-			</form>
-		</div>
-		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-		{% if fieldname == curfield %}
-		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
-		{% else %}
-		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
-		{% endif %}
-		</div>
-		{% endfor %}
-	</div>
-</td>
+  </tbody>
+</table>
+<table border="0" style="width: 100%; background-color:#c5932e;">
+  <tbody>
+    <tr>
+      <td colspan="6" style="font-size: 1.5em; font-weight:bold; width: 20%; text-align:right;">{{curfield}} ({{curyear}})</td>
+    </tr>
+    <tr>
+      <td colspan="6">
+				<div class="django_content">
+<table>
+<tr>
+
 <td>
 	<div id="static_content">
 		<table border='1'>
@@ -79,7 +106,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td colspan="{{ heading_list|length|sub:2 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+				<td colspan="{{ heading_list|length }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
 			</tr>
 			<tr >
 				<td class="Variety padded"><h3> Variety</h3></td>
@@ -120,6 +147,11 @@
 	<!--
 	<div id='dynamic_content'></div>
 	-->
+				</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
 {% endblock %}
 
 {% load jsonify %}

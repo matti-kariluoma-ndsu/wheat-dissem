@@ -35,7 +35,7 @@ def index(request):
 		context_instance=RequestContext(request)
 	)
 
-def locations_view(request, yearname, fieldname):
+def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'POST':
 		locations_form = variety_trials_forms.SelectLocationsForm(request.POST)
 		if locations_form.is_valid():
@@ -43,7 +43,7 @@ def locations_view(request, yearname, fieldname):
 			locations = locations_form.cleaned_data['locations']
 			varieties = locations_form.cleaned_data['varieties']
 			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, one_subset=False)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
 			
 		else:
 			return HttpResponseRedirect("/") # send to homepage

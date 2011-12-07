@@ -33,64 +33,8 @@
 
 <body style="background-color: #deefc9">
 <div style="width: 96%; margin-top: 0%; margin-left: 2%; margin-right: 2%;">
-<table border="0" style="width: 100%; border-collapse:collapse; background-color:#FFC; background-image:url('/static/img/curve2.png'); background-repeat: no-repeat; background-size: 100%">
-  <tbody>
-
-    <tr>
-      <td colspan="6" style="height: 1em" ></td>
-    </tr>
-    <tr style="text-align: center; font-weight: bold;">
-      <td>Height</td>
-      <td>Test Weight</td>
-      <td style="background-color: #FFC;">Yield</td>
-      <td>Seed Rate</td>
-      <td>Days to Head</td>
-      <td></td>
-    </tr>
-    </tr>
-
-    <tr style="text-align: center; font-size: .75em; color: grey;">
-      <td></td>
-      <td></td>
-      <td style="background-color: #FFC;">2011</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr style="text-align: center; font-size: .75em; color: grey;">
-      <td></td>
-      <td></td>
-      <td style="background-color: #FFC;">2010</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr style="text-align: center; font-size: .75em; color: grey;">
-      <td></td>
-      <td></td>
-      <td style="background-color: #FFC;">2009</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
-</table>
-
-<table border="0" style="width: 100%; background-color:#FFC;">
-  <tbody>
-    <tr>
-      <td colspan="6" style="font-size: 1.5em; font-weight:bold; width: 20%; text-align:right; background-color:#FFC">Yield (2010)</td>
-    </tr>
-    <tr>
-      <td colspan="6">
-				<div class="django_content">
-					{% block content %}
-					{% endblock %}
-				</div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+	{% block content %}
+	{% endblock %}
 </div>
 </body>
 </html>
