@@ -173,6 +173,9 @@ class Filter_by_Field:
 		self.years = []
 		self.locations = []
 		self.year = pref_year
+		self.entries = {}
+		self.groups = {}
+		self.lsds = {}
 		
 		# test if field is a Trial_Entry field
 		if field in Trial_Entry._meta.fields:

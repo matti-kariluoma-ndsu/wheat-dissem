@@ -59,6 +59,22 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
   background-color: #EEF;
 }
 
+.w12_even {
+  background-color: #c6d055;
+}
+
+.w12_odd {
+  background-color: #aa5;
+}
+
+.w3_even {
+  background-color: #663;
+}
+
+.w3_odd {
+  background-color: #EEF;
+}
+
 .subheadings {
   font-size: .8em;
 }

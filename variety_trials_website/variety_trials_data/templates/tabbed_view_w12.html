@@ -1,83 +1,101 @@
 {% extends "w12_frame.html" %}
 {% load django_math %}
 {% block content %}
+<div class="tabs years">
+{% for yearname, year_button_list in years.items %}
+<div style="display:none">
+	<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}/2" method="post">
+		{% csrf_token %}
+		{% for field in locations_form %}
+		<div class="input row">
+			{{ field.errors }}
+			{{ field.label_tag }}: {{ field }}
+		</div>
+		{% endfor %}
+		{% for field in varieties_form %}
+		<div class="input row">
+			{{ field.errors }}
+			{{ field.label_tag }}: {{ field }}
+		</div>
+		{% endfor %}
+		<input type="submit" value="{{yearname}} submit" />
+	</form>
+</div>
+{% endfor %}
+</div>
+
+<div class="tabs units">
+{% for fieldname, blurb_list in blurbs.items %}
+	<div class="{{fieldname}}" style="display:none">
+		<form name="{{fieldname}}form" action="/view/location/{{curyear}}/{{fieldname}}/2" method="post">
+			{% csrf_token %}
+			{% for field in locations_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="{{fieldname}} submit" />
+		</form>
+	</div>
+{% endfor %}
+</div>
+
 <table border="0" style="width: 100%; border-collapse:collapse; background-color:#FFC; background-image:url('/static/img/curve2.png'); background-repeat: no-repeat; background-size: 100%">
   <tbody>
 
     <tr>
-      <td colspan="6" style="height: 1em" ></td>
+      <td colspan="6" style="height: 2em" ></td>
     </tr>
     <tr style="text-align: center; font-weight: bold;">
-		<div class="tabs units">
-		{% for fieldname, blurb_list in blurbs.items %}
-			<div class="{{fieldname}}" style="display:none">
-				<form name="{{fieldname}}form" action="/view/location/{{curyear}}/{{fieldname}}/2" method="post">
-					{% csrf_token %}
-					{% for field in locations_form %}
-					<div class="input row">
-						{{ field.errors }}
-						{{ field.label_tag }}: {{ field }}
-					</div>
-					{% endfor %}
-					<input type="submit" value="{{fieldname}} submit" />
-				</form>
-			</div>
+		<div>
+			{% for fieldname, blurb_list in blurbs.items %}
 		<div > <!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 		{% if fieldname == curfield %}
 		<td style="background-color: #ffc; ">
+			{{blurb_list.0}}
+		</td>
 		{% else %}
 		<td>
-		{% endif %}
 			<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/2/">
-			{{fieldname}}
+			{{blurb_list.0}}
 			</a>
 		</td>
+		{% endif %}
+			
+		
 		</div>
 		{% endfor %}
 	</div>
     </tr>
 
-		<div class="tabs years">
+		<div>
 		{% for yearname, year_button_list in years.items %}
-		<div style="display:none">
-			<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}/2" method="post">
-				{% csrf_token %}
-				{% for field in locations_form %}
-				<div class="input row">
-					{{ field.errors }}
-					{{ field.label_tag }}: {{ field }}
-				</div>
-				{% endfor %}
-				{% for field in varieties_form %}
-				<div class="input row">
-					{{ field.errors }}
-					{{ field.label_tag }}: {{ field }}
-				</div>
-				{% endfor %}
-				<input type="submit" value="{{yearname}} submit" />
-			</form>
-		</div>
-		
-		<!--TODO: auto-generate these year button images-->
-		
 		{% if yearname == curyear %}
-		<tr style="text-align: center; font-size: .75em; color: grey;">
+		<tr style="text-align: center; font-size: .75em; color: black;">
+			{% for fieldname, blurb_list in blurbs.items %}
+			{% if fieldname == curfield %}
+      <td style="background-color: #ffc;">	
+				{{yearname}}
+      </td>
+      {% else %}
       <td></td>
-      <td></td>
-      <td style="background-color: #ffc;">
+			{% endif %}
+			{% endfor %}
 		{% else %}
 		<tr style="text-align: center; font-size: .75em; color: grey;">
-      <td></td>
-      <td></td>
+			{% for fieldname, blurb_list in blurbs.items %}
+			{% if fieldname == curfield %}
 			<td style="background-color: #ffc;">
-		{% endif %}
 				<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/2/">
 				{{yearname}}
 				</a>
       </td>
+      {% else %}
       <td></td>
-      <td></td>
-      <td></td>
+			{% endif %}
+			{% endfor %}
+		{% endif %}
     </tr>
 		{% endfor %}
 	</div>
@@ -86,16 +104,22 @@
 
 <table border="0" style="width: 100%; background-color:#FFC;">
   <tbody>
-    <tr>
-      <td colspan="6" style="font-size: 1.5em; font-weight:bold; width: 20%; text-align:right; background-color:#FFC">{{curfield}} ({{curyear}})</td>
-    </tr>
+
     <tr>
       <td colspan="6">
 				<div class="django_content">
-<table>
+<table border="0" style="margin: 1em; background-color: #c6d055">
 <tr>
-<td>
-	
+
+	<td colspan="6" style="font-size: 1.5em; font-weight:bold; width: 20%; text-align:right; ">
+				{% for fieldname, blurb_list in blurbs.items %}
+				{% if fieldname == curfield %}
+						{{blurb_list.0}} ({{curyear}})
+				{% endif %}
+				{% endfor %}
+			</td>
+</tr>
+<tr>
 <td>
 	<div id="static_content">
 		<table border='1'>
@@ -122,7 +146,7 @@
 			</tr>
 		{% for datalist in sorted_list %}
 			{% if datalist.0 != "LSD" %}
-			<tr class="group {% cycle 'master_odd' 'master_even' %}">
+			<tr class="group {% cycle 'w12_odd' 'w12_even' %}">
 				{% for element in datalist %}
 				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
 				{% endfor %}
@@ -131,7 +155,7 @@
 			<tr class="spacer_row">
 				<td></td>
 			</tr>
-			<tr class="LSD_row">
+			<tr style="background-color: #FFC;">
 				{% for element in datalist %}
 				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
 				{% endfor %}
