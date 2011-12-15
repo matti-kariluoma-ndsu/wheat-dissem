@@ -34,3 +34,26 @@ A/B testing for these two events?
 live or screenshot?
 
 Break the subset logic apart from the list-generation logic.
+
+* add back 50mi
+* proper sentinels/other for nd/mn/all
+* put 1,2,3 yr averages as first columns
+* _always_ 1,0 sig figs
+* align right on data, line up decimal points
+
+* make cols same size
+
+* title cols for each subset
+
+* add (x) for locations
+* add [] for varieties, a "compare selected" button
+  * honor selected locales? or grab all?
+
+* look at un-breaking h-bar
+* look at an all-data view, only showing 1-2-3 for the data
+
+* make sure each print will let us know what we are looking at
+
+* look at printable version
+* look at seeing seed sellers
+
