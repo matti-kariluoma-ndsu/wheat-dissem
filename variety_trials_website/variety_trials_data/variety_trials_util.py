@@ -387,7 +387,7 @@ class Filter_by_Field:
 							break # don't check anymore groups
 				if add_location:
 					locations_save.append(l)
-			print locations_save
+			#print locations_save
 			if len(locations_save) > 0: # if any locations remain, replace
 				self.locations = locations_save
 				# put all into one group
