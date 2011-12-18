@@ -5,13 +5,18 @@ from difflib import SequenceMatcher
 import re
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
-	zipcode = forms.CharField(max_length=5)  
+	zipcode = forms.CharField(max_length=5, required=False)  
 	search_radius = forms.ChoiceField(
 										widget=forms.RadioSelect(), 
                     choices=(
-                      (100,'100 miles'), (200,'200 miles'), (400,'All of ND'), (800,'All of MN'), (0,'All Data')
+                      (50, '50 miles'), 
+                      (100,'100 miles'), 
+                      (200,'200 miles'), 
+                      ('ND','All of ND'), 
+                      ('MN','All of MN'), 
+                      ('ALL','All Data')
                       ),
-                    initial='100'
+                    initial='50'
                   )
 	#search_radius = forms.CharField(max_length=5)
 

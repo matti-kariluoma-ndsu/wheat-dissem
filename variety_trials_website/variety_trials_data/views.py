@@ -109,14 +109,17 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					zipcode, radius
 				).fetch()
 			except models.Zipcode.DoesNotExist:
-				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
+				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
 						'radius': zipcode_radius_form.cleaned_data['search_radius']
 					})
 				return render_to_response(
 					'main.html', 
 					{ 
 						'zipcode_radius_form': zipcode_radius_form,
-						'error_list': ['Sorry, the zipcode: ' + zipcode_radius_form.cleaned_data['zipcode'] + ' doesn\'t match any records']
+						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
+						'variety_list': models.Variety.objects.all(),
+						'curyear': datetime.date.today().year,
+						'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
 					},
 					context_instance=RequestContext(request)
 				) 
@@ -137,7 +140,10 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					'main.html', 
 					{ 
 						'zipcode_radius_form': zipcode_radius_form,
-						'error_list': ['Sorry, the zipcode: ' + zipcode_radius_form.cleaned_data['zipcode'] + ' didn\'t return any results.']
+						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
+						'variety_list': models.Variety.objects.all(),
+						'curyear': datetime.date.today().year,
+						'error_list': ['Sorry, the zipcode: "' + zipcode_radius_form.cleaned_data['zipcode'] + '" didn\'t return any results.']
 					},
 					context_instance=RequestContext(request)
 				)

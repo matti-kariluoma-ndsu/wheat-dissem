@@ -568,6 +568,7 @@ class Locations_from_Zipcode_x_Radius:
 	
 	zipcode = ''
 	radius = 0.0
+	radius_sentinels = ['ALL', 'ND', 'MN']
 	
 	def __init__(self):
 		pass
@@ -588,29 +589,49 @@ class Locations_from_Zipcode_x_Radius:
 			self.zipcode = str(int(float(zipcode)))
 		except ValueError:
 			self.zipcode = ''
-			
-		try:
-			self.radius = float(radius)
-		except ValueError:
-			self.radius = 100.0
+		
+		
+		if radius in self.radius_sentinels: # if we are doing a specific search
+			self.radius = radius
+		else: # get the numeric value
+			try:
+				self.radius = float(radius)
+			except ValueError:
+				self.radius = 100.0
 	
 	def fetch(self):
 		"""
 		Returns a list of locations within the specified search area.
 		raises a `models.Zipcode.DoesNotExist'
 		"""
-		lat2_list = []
-		lon2_list = []
 		locations = []
+		skip_lookup = False
 		
-		try:
-			zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
-			zipcode_object = zipcode_query.get() # should only be one result
-		except (ValueError, models.Zipcode.DoesNotExist) as instance:
-			raise models.Zipcode.DoesNotExist(instance)
-		if (self.radius < 1.0) and (self.radius > -1.0):
-			locations = models.Location.objects.all()
-		else:
+		if self.radius in self.radius_sentinels:
+			skip_lookup = True
+			if self.radius == 'ALL':
+				locations = models.Location.objects.all()
+			elif self.radius == 'ND':
+				locations = models.Location.objects.select_related(
+					depth=2).filter(zipcode__in=models.Zipcode.objects.filter(state__iexact="nd"))
+				print locations
+			elif self.radius == 'MN':
+				locations = models.Location.objects.select_related(
+					depth=2).filter(zipcode__in=models.Zipcode.objects.filter(state__iexact="mn"))
+			else:
+				self.radius = 50.0
+				skip_lookup = False
+		
+		if not skip_lookup:
+			lat2_list = []
+			lon2_list = []
+			
+			try:
+				zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
+				zipcode_object = zipcode_query.get() # should only be one result
+			except (ValueError, models.Zipcode.DoesNotExist) as instance:
+				raise models.Zipcode.DoesNotExist(instance)
+
 			lat1 = float(zipcode_object.latitude) 
 			lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
 			lat1 = radians(lat1)
