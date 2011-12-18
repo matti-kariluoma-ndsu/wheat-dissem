@@ -40,10 +40,6 @@ Break the subset logic apart from the list-generation logic.
 * remove 1,2,3 if no data in all
 * calculate n-yr when able, don't short-circuit
 
-* make cols same size
-
-* title cols for each subset
-
 * add (x) for locations
 * add [] for varieties, a "compare selected" button
   * honor selected locales? or grab all?

@@ -77,7 +77,7 @@
 	<div id="static_content">
 		<table border='1'>
 			<tr>
-				<td colspan="{{ heading_list|length }}">
+				<td colspan="{{ heading_list|length|add:1 }}">
 					{% for fieldname, blurb_list in blurbs.items %}
 					{% if fieldname == curfield %}
 							<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
@@ -87,35 +87,46 @@
 				</td>
 			</tr>
 			<tr>
-				<td colspan="{{ heading_list|length|sub:2 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+				<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
 			</tr>
 			<tr >
 				<td class="Variety padded"><h3> Variety</h3></td>
 				{% for heading in heading_list %}
-				<td class="{{ heading }} padded"><h3>{{ heading }}</h3></td>
+				<td class="padded"><h3>{{ heading }}</h3></td>
 				{% endfor %}
 			</tr>
 			<tr class="row subheadings thin">
 			</tr>
 		{% for datalist in sorted_list %}
-			{% if datalist.0 != "LSD" %}
-			<tr class="group {% cycle 'master_odd' 'master_even' %}">
+			{% if datalist.0 == "Variety" %}
+			<tr class="spacer_row">
+				<td></td>
+			</tr>
+			<tr>
+				<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+			</tr>
+			<tr class="Variety padded">
 				{% for element in datalist %}
-				<td class='padded'>{{ element|default_if_none:"--" }}</td>
+				<td class='padded'><h3>{{ element }}</h3></td>
 				{% endfor %}
 			</tr>
 			{% else %}
+			{% if datalist.0 == "LSD" %}
 			<tr class="spacer_row">
 				<td></td>
 			</tr>
 			<tr class="LSD_row">
 				{% for element in datalist %}
-				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
+				<td class='padded'>{{ element|default_if_none:"--" }}</td>
 				{% endfor %}
 			</tr>
-			<tr class="spacer_row">
-				<td></td>
+			{% else %}
+			<tr class="group {% cycle 'master_odd' 'master_even' %}">
+				{% for element in datalist %}
+				<td class='padded'>{{ element|default_if_none:"--" }}</td>
+				{% endfor %}
 			</tr>
+			{% endif %}
 			{% endif %}
 		{% endfor %}
 			<tr class="bottom_spacer"></tr>

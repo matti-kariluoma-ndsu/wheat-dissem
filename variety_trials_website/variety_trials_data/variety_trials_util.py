@@ -432,6 +432,10 @@ class Filter_by_Field:
 			head_row.append(l)
 		return_list.append(head_row) # append first row
 		
+		# the header between each group
+		next_header = ['Variety']
+		next_header.extend(head_row[1::])
+		
 		# construct the rest of the rows
 		for key in sorted(self.groups.keys(), reverse=True): # for each subset
 			subset_list = []
@@ -568,8 +572,9 @@ class Filter_by_Field:
 				subset_list.append(temp_row)
 					
 				return_list.extend(subset_list) # append the lists inside subset_list to return_list
+				return_list.append(next_header) # append another header row
 
-		return return_list
+		return return_list[:len(return_list)-1:] # remove last row, a header row with nothing under it
 
 class Locations_from_Zipcode_x_Radius:
 	"""
@@ -625,7 +630,6 @@ class Locations_from_Zipcode_x_Radius:
 			elif self.radius == 'ND':
 				locations = models.Location.objects.select_related(
 					depth=2).filter(zipcode__in=models.Zipcode.objects.filter(state__iexact="nd"))
-				print locations
 			elif self.radius == 'MN':
 				locations = models.Location.objects.select_related(
 					depth=2).filter(zipcode__in=models.Zipcode.objects.filter(state__iexact="mn"))
