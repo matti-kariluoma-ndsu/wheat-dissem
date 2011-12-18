@@ -423,12 +423,13 @@ class Filter_by_Field:
 		
 		# append header row
 		head_row = [self.year] # first (row, column) value is the current year
-		for l in self.locations:
-			head_row.append(l)
+		
 		# constuct column headers for n-yr averaging
 		for element in avg_years:
 			n_yr = '%d-yr' % len(element)
 			head_row.append(n_yr);
+		for l in self.locations:
+			head_row.append(l)
 		return_list.append(head_row) # append first row
 		
 		# construct the rest of the rows
@@ -458,7 +459,7 @@ class Filter_by_Field:
 						else:
 							try:
 								values = self.entries[(l,v)][self.year]
-								value = round(sum(values)/len(values), 2) # TODO: is round necessary here?
+								value = round(sum(values)/len(values), 1) # TODO: is round necessary here?
 								temp_row.append(value)
 								one_year_sums.append(value) # will not contain None
 							except KeyError:
@@ -470,10 +471,13 @@ class Filter_by_Field:
 					if append_me:
 						if len(one_year_sums) > 1: # if we have two or more datapoints
 							# append 1-yr avg
-							temp_row.append(round(sum(one_year_sums)/len(one_year_sums), 2))
+							#temp_row.append(round(sum(one_year_sums)/len(one_year_sums), 1))
+							# prepend 1-yr avg, after the variety name
+							temp_row.insert(1, round(sum(one_year_sums)/len(one_year_sums), 1))
 						else:
 							append_me = False # cause the 2-yr,... to short-circuit
-							temp_row.append(None)
+							#temp_row.append(None)
+							temp_row.insert(1, None)
 						# append 2-yr, ... avgs
 						for years_to_average in avg_years[1::]: # skip past 1-yr avg
 							sum_list = []
@@ -483,7 +487,7 @@ class Filter_by_Field:
 										for l in locations:
 											try:
 												values = self.entries[(l,v)][year]
-												value = round(sum(values)/len(values), 2)
+												value = round(sum(values)/len(values), 1)
 												sum_list.append(value)
 											except KeyError:
 												append_me = False
@@ -492,9 +496,13 @@ class Filter_by_Field:
 										sum_list.extend(one_year_sums)
 							
 							if append_me and len(sum_list) > 1:
-								temp_row.append(round(sum(sum_list)/len(sum_list), 2))
+								# append
+								#temp_row.append(round(sum(sum_list)/len(sum_list), 1))
+								# prepend, after the 1-yr avg
+								temp_row.insert(2, round(sum(sum_list)/len(sum_list), 1))
 							else:
-								temp_row.append(None)
+								#temp_row.append(None)
+								temp_row.insert(2, None)
 						subset_list.append(temp_row)
 						
 				# prepare a list to compute lsd on, by removing all "None" from this subset
@@ -509,14 +517,7 @@ class Filter_by_Field:
 				# append the calculated lsd row for this subset
 				
 				temp_row = ["LSD"]
-				for l in self.locations:
-					if l in locations:
-						try:
-							temp_row.append(max(self.lsds[(l, self.year)])) #TODO: smarter logic needed
-						except KeyError:
-							temp_row.append(None)
-					else:
-						temp_row.append(None)
+				
 				if len(lsd_list) > 0:
 					# append 1-yr lsd
 					try:
@@ -538,7 +539,7 @@ class Filter_by_Field:
 								for l in locations:
 									try:
 										values = self.entries[(l,v)][year]
-										value = round(sum(values)/len(values), 2)
+										value = round(sum(values)/len(values), 1)
 										variety_for_year.append(value)
 									except KeyError:
 										append_me = False
@@ -554,6 +555,16 @@ class Filter_by_Field:
 						temp_row.append(value)
 					else:
 						temp_row.append(None)
+						
+				for l in self.locations:
+					if l in locations:
+						try:
+							temp_row.append(max(self.lsds[(l, self.year)])) #TODO: smarter logic needed
+						except KeyError:
+							temp_row.append(None)
+					else:
+						temp_row.append(None)
+						
 				subset_list.append(temp_row)
 					
 				return_list.extend(subset_list) # append the lists inside subset_list to return_list

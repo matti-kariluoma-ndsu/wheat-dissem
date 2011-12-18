@@ -135,6 +135,7 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	padding-left: 1em;
 	padding-right: 1em;
 	border-right: 1px dotted #666;
+	text-align: right;
 }
 
 .spacer_row {

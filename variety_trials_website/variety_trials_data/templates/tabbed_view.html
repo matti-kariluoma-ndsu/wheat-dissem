@@ -101,7 +101,7 @@
 			{% if datalist.0 != "LSD" %}
 			<tr class="group {% cycle 'master_odd' 'master_even' %}">
 				{% for element in datalist %}
-				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
+				<td class='padded'>{{ element|default_if_none:"--" }}</td>
 				{% endfor %}
 			</tr>
 			{% else %}

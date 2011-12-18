@@ -35,11 +35,10 @@ live or screenshot?
 
 Break the subset logic apart from the list-generation logic.
 
-** REGRESSION ** /view/variety/ pages use the view/location/ form
+** REGRESSION ** /view/variety/ pages use the /view/location/ form
 
-* put 1,2,3 yr averages as first columns
-* _always_ 1,0 sig figs
-* align right on data, line up decimal points
+* remove 1,2,3 if no data in all
+* calculate n-yr when able, don't short-circuit
 
 * make cols same size
 
