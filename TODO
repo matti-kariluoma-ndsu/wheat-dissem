@@ -40,10 +40,7 @@ Break the subset logic apart from the list-generation logic.
 * remove 1,2,3 if no data in all
 * calculate n-yr when able, don't short-circuit
 
-* remove (x) for avgs
-* put (x) on all group headers
-
-* add [] for varieties, a "compare selected" button
+* add a "compare selected" button
   * honor selected locales? or grab all?
 
 * look at un-breaking h-bar
