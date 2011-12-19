@@ -92,7 +92,7 @@
 			<tr >
 				<td class="Variety padded"><h3> Variety</h3></td>
 				{% for heading in heading_list %}
-				<td class="padded"><h3>{{ heading }}</h3></td>
+				<td class="padded"><h3>{{ heading.0 }}</h3><a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}form'].submit(); return false">(x)</a></td>
 				{% endfor %}
 			</tr>
 			<tr class="row subheadings thin">
@@ -142,6 +142,19 @@
 {% endblock %}
 
 {% load jsonify %}
+
+{% block javascript %}
+
+	function unselect_location(location_value) {
+		$("#id_locations option[value='"+location_value+"']").removeAttr("selected");
+	}
+	
+	function select_location(location_value) {
+		$("#id_locations option:contains(location_value)").attr("selected","selected");
+	}
+
+{% endblock %}
+
 {% block jquery %}
 
   $('.group .master').toggle(
