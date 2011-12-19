@@ -92,13 +92,17 @@
 			<tr >
 				<td class="Variety padded"><h3> Variety</h3></td>
 				{% for heading in heading_list %}
-				<td class="padded"><h3>{{ heading.0 }}</h3><a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}form'].submit(); return false">(x)</a></td>
+				<td class="padded"><h3>{{ heading.0 }}</h3>
+				{% if heading.1 != -1 %}
+				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}form'].submit(); return false">(x)</a>
+				{% endif %}
+				</td>
 				{% endfor %}
 			</tr>
 			<tr class="row subheadings thin">
 			</tr>
 		{% for datalist in sorted_list %}
-			{% if datalist.0 == "Variety" %}
+			{% if datalist.0.0 == "Variety" %}
 			<tr class="spacer_row">
 				<td></td>
 			</tr>
@@ -106,8 +110,12 @@
 				<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
 			</tr>
 			<tr class="Variety padded">
-				{% for element in datalist %}
-				<td class='padded'><h3>{{ element }}</h3></td>
+				{% for heading in datalist %}
+				<td class="padded"><h3>{{ heading.0 }}</h3>
+					{% if heading.1 != -1 %}
+					<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}form'].submit(); return false">(x)</a>
+					{% endif %}
+				</td>
 				{% endfor %}
 			</tr>
 			{% else %}
@@ -123,7 +131,17 @@
 			{% else %}
 			<tr class="group {% cycle 'master_odd' 'master_even' %}">
 				{% for element in datalist %}
-				<td class='padded'>{{ element|default_if_none:"--" }}</td>
+					{% if datalist.0 == element %}
+					<td class='padded' style="text-align: left;">
+						<form>
+							<input type="checkbox" name="{{ element.0 }}" value="{{ element.0 }}" /> {{ element.0 }}
+						</form>
+					</td>
+					{% else %}
+					<td class='padded'>
+						{{ element|default_if_none:"--" }}
+					</td>
+					{% endif %}
 				{% endfor %}
 			</tr>
 			{% endif %}
@@ -150,7 +168,15 @@
 	}
 	
 	function select_location(location_value) {
-		$("#id_locations option:contains(location_value)").attr("selected","selected");
+		$("#id_locations option[value='"+location_value+"']").attr("selected","selected");
+	}
+	
+	function unselect_variety(variety_value) {
+		$("#id_varieties option[value='"+variety_value+"']").removeAttr("selected");
+	}
+	
+	function select_variety(variety_value) {
+		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
 	}
 
 {% endblock %}

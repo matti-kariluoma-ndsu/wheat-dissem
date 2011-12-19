@@ -427,13 +427,18 @@ class Filter_by_Field:
 		# constuct column headers for n-yr averaging
 		for element in avg_years:
 			n_yr = '%d-yr' % len(element)
-			head_row.append(n_yr);
+			head_row.append((n_yr, -1)) # tuple: (name, id)
 		for l in self.locations:
-			head_row.append(l)
+			location_id = -1
+			try:
+				location_id = models.Location.objects.get(name__iexact=l).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
+			except:
+				pass
+			head_row.append((l, location_id))
 		return_list.append(head_row) # append first row
 		
 		# the header between each group
-		next_header = ['Variety']
+		next_header = [('Variety', -1)]
 		next_header.extend(head_row[1::])
 		
 		# construct the rest of the rows
@@ -453,7 +458,12 @@ class Filter_by_Field:
 			
 				# add the values for this subset
 				for v in sorted(self.groups[key]): # Sort each group alphabetically
-					temp_row = [v]
+					variety_id = -1
+					try:
+						variety_id = models.Variety.objects.get(name__iexact=v).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
+					except:
+						pass
+					temp_row = [(v, variety_id)] # tuple: (name, id)
 					append_me = True
 					one_year_sums = []
 					

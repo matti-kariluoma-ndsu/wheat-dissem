@@ -260,13 +260,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	#TODO: this is very bad for the database...
 	try:
-		for element in sorted_list[0][1::]:
-			location_id = -1 # if we aren't a location, e.g. '1-yr'
-			try:
-				location_id = models.Location.objects.get(name__iexact=element).id
-			except:
-				pass
-			heading_list.append((element, location_id))
+		curyear = str(sorted_list[0][0]) # we sent a preference for curyear, but what was returned may be different
 	except IndexError: # will happen if all locations have been deselected...
 		sorted_list = [[curyear]]
 		return HttpResponseRedirect("/")
@@ -279,8 +273,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 				'locations_form': locations_form,
 				'field_list': field_list,
 				'location_list': locations,
-				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
-				'heading_list': heading_list,
+				'curyear': curyear,
+				'heading_list': sorted_list[0][1::],
 				'sorted_list': sorted_list[1::],
 				'years': years,
 				'blurbs' : unit_blurbs,
@@ -295,8 +289,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 				'locations_form': locations_form,
 				'field_list': field_list,
 				'location_list': locations,
-				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
-				'heading_list': heading_list,
+				'curyear': curyear,
+				'heading_list': sorted_list[0][1::],
 				'sorted_list': sorted_list[1::],
 				'years': years,
 				'blurbs' : unit_blurbs,
@@ -311,8 +305,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 				'locations_form': locations_form,
 				'field_list': field_list,
 				'location_list': locations,
-				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
-				'heading_list': heading_list,
+				'curyear': curyear,
+				'heading_list': sorted_list[0][1::],
 				'sorted_list': sorted_list[1::],
 				'years': years,
 				'blurbs' : unit_blurbs,
@@ -327,8 +321,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 				'locations_form': locations_form,
 				'field_list': field_list,
 				'location_list': locations,
-				'curyear': str(sorted_list[0][0]), # we sent a preference for curyear, but what was returned may be different
-				'heading_list': heading_list,
+				'curyear': curyear,
+				'heading_list': sorted_list[0][1::],
 				'sorted_list': sorted_list[1::],
 				'years': years,
 				'blurbs' : unit_blurbs,
