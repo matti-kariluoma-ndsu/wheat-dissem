@@ -57,3 +57,21 @@ Break the subset logic apart from the list-generation logic.
 * look at printable version
 * look at seeing seed sellers
 
+* implement artist's work _before_ early Jan meeting with ag.ndsu
+
+* enter lsds for older data
+* add a link to home/start over
+* "back" button support? GET instead of POST?
+* mult-year avg still culling, other wierd behavior
+  * 56716, 50mi
+* cut off at 3-yrs
+* message if v-v union is empty, from "compare selected" button
+* dropdown/add -> submit for v-v on main page
+  * message if v-v union empty
+* look at distance-sort instead of lexigraphical for location names
+* "compare selected" should do nothing if 0 or 1 varieties are selected
+  * message?
+* add "All" button at top
+* email jochum w/ summary of system.
+* cols not same sized on v-v view?
+
