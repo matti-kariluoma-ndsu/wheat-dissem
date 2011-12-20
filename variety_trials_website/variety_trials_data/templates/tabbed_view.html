@@ -161,7 +161,7 @@
 			<tr>
 				<td>
 				<form>
-					<input type="submit" value="Compare Selected" onclick="document['{{curfield}}_variety_form'].submit(); return false">
+					<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
 				</form>
 				</td>
 			</tr>
@@ -179,7 +179,7 @@
 					{% if datalist.0 == element %}
 					<td class='padded' style="text-align: left; width: 120px;">
 						<form>
-							<input type="checkbox" name="{{ element.0 }}" value="{{ element.0 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
+							<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
 						</form>
 					</td>
 					{% else %}
@@ -222,6 +222,26 @@
 	
 	function select_variety(variety_value) {
 		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
+	}
+
+	function submit_variety_comparison() {
+		$("#id_varieties").each(
+			function() {
+				$("#id_varieties option").removeAttr("selected");
+			}
+		);
+		
+		$('.variety_checkbox').each( 
+			function() {
+				if ($(this).attr('checked'))
+				{
+					select_variety($(this).attr('value'));
+				}
+			}
+		);
+		
+		document['{{curfield}}_variety_form'].submit();
+		return false;
 	}
 
 {% endblock %}

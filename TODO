@@ -36,11 +36,12 @@ live or screenshot?
 Break the subset logic apart from the list-generation logic.
 
 ** REGRESSION ** /view/variety/ pages use the /view/location/ form
+  * this causes all sorts of wierdness as when the (x) and [] are used
 
 * remove 1,2,3 if no data in all
 * calculate n-yr when able, don't short-circuit
 
-* add a "compare selected" button
+* for "compare selected" checkboxes: []
   * honor selected locales? or grab all?
 
 * look at un-breaking h-bar
