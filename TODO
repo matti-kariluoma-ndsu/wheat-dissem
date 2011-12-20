@@ -43,6 +43,9 @@ Break the subset logic apart from the list-generation logic.
 
 * for "compare selected" checkboxes: []
   * honor selected locales? or grab all?
+  * cannot compare albany/ any other variety with multiple entries.
+    * allow looking for larger of the many?
+    * of course, manually delete the ones we know about atm
 
 * look at un-breaking h-bar
 * look at an all-data view, only showing 1-2-3 for the data
