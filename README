@@ -2,8 +2,11 @@ Prerequisites:
  Python:
   Download and Install Python, version 2.4 or greater. (http://www.python.org/download)
  Scipy:
-	Download and install scipy, version 0.7 or greater. (http://www.scipy.org/download)
+  Download and install scipy, version 0.7 or greater. (http://www.scipy.org/download)
  Django:
+  Ensure a previous version of Django is not installed; run 
+   $ python -c  "import django; print django.get_version()"
+  If so, remove it before continuing.
   Download Django (http://www.djangoproject.com/download/)
   Install Django (http://docs.djangoproject.com/en/dev/intro/install/)
   Verify Django is installed correctly:
@@ -19,6 +22,10 @@ Prerequisites:
 		$ sudo python setup.py install
  
 Install to a fresh machine w/apache (Ubuntu/Debian syntax):
+NOTE: Ensure a previous version of Django is not installed; run 
+ $ python -c  "import django; print django.get_version()"
+If so, remove it before continuing.
+
  $ sudo apt-get install git-{arch,svn,cvs,daemon-run} sqlite3 \
      python-{sqlite,flup,psycopg2,rpy2,scipy} subversion apache2 \
      libapache2-mod-wsgi 
