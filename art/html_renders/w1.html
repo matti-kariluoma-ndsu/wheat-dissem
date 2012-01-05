@@ -13,12 +13,13 @@ div#logo-pad {
 	padding: 0.5em;
 }
 div#logo-content {
+	position: relative;
 	background-color: #949b31;
-	height: 5em;
+	height: 4em;
 }
 img#logo-img {
 	height: 1.8em;
-	margin-top: 1.6em;
+	margin-top: 1.1em;
 	margin-right: 2em;
 	float: right;
 	display: inline;
@@ -26,15 +27,14 @@ img#logo-img {
 p#logo-txt {
 	margin: 0.5em;
 	display: inline;
-	color: #fac656;
+	color: #ffcd76;
 	font-size: 3em;
 	font-family: serif;
 }
 
 div#menu {
-	padding: 1.2em;
 	position: absolute;
-	top: 3.4em;
+	top: 2.65em;
 }
 div.menu-item {
 	border-radius: 0.4em;
@@ -45,11 +45,20 @@ div.menu-item {
 	font-size: 1.05em;
 	//background-color: #fac656;
 }
+div.submenu-item {
+	position: relative;
+	top: -0.8em;
+	margin: -0.3em;
+	padding: 0.3em;
+}
 p.menu-item {
 	display: inline;
 	position: relative;
 	top: -0.2em;
 	left: -0.2em;
+}
+p.submenu-item {
+	font-size: .6em;
 }
 div.menu-hi {
 	background-image: url('button_hi.png');
@@ -64,6 +73,7 @@ div.menu-lo {
 
 div#data-title {
 	padding-right: 2.5em;
+	margin-top: 1.5em;
 	text-align: right;
 }
 
@@ -87,7 +97,72 @@ div#data-content {
 <div id="logo-pad">
 	<div id="logo-content">
 	<p id="logo-txt">NDSU</p> <img id="logo-img" src="wheat.png">
-	</div>
+	<div id="menu">
+		<table border='0'>
+			<tr>
+				<td>	
+
+					<div class="menu-item menu-hi" id="menu-yield">
+					<p class="menu-item">Yield</p>
+					</div>
+
+				</td>
+				<td>
+
+					<div class="menu-item menu-lo" id="menu-weight">
+					<p class="menu-item">Test Weight</p>
+					</div>
+					
+				</td>
+				<td>
+					
+					<div class="menu-item menu-lo" id="menu-height">
+					<p class="menu-item">Height</p>
+					</div>
+					
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="submenu-item menu-item menu-hi">
+					<p class="menu-item submenu-item">2011</p>
+					</div>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="submenu-item menu-item menu-lo">
+					<p class="menu-item submenu-item">2010</p>
+					</div>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="submenu-item menu-item menu-lo">
+					<p class="menu-item submenu-item">2009</p>
+					</div>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+			</tr>
+		</table>
+
+
+
+</div>
+</div>
+
+
 </div>
 
 <div id="data-title">
@@ -115,36 +190,6 @@ div#data-content {
 	</div>
 </div>
 
-<div id="menu">
-		<table border='0'>
-			<tr>
-				<td>	
-
-					<div class="menu-item menu-hi" id="menu-yield">
-					<p class="menu-item">Yield</p>
-					</div>
-
-				</td>
-				<td>
-
-					<div class="menu-item menu-lo" id="menu-weight">
-					<p class="menu-item">Test Weight</p>
-					</div>
-					
-				</td>
-				<td>
-					
-					<div class="menu-item menu-lo" id="menu-height">
-					<p class="menu-item">Height</p>
-					</div>
-					
-				</td>
-			</tr>
-		</table>
-
-
-
-</div>
 
 </body>
 </html>
