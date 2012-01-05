@@ -44,30 +44,25 @@ img#logo-foot {
 
 div#menu {
 }
-div.menu-item {
+div.menu-item-wrap {
+	margin-left: 0.4em;
+	margin-right: 0.4em;
 	border-radius: 0.4em;
-	padding: 1.0em;
+	padding: 0.2em;
+	background-color: #fac656;
+}
+div.menu-item {
+	padding: 0.5em;
 	border-radius: 0.4em;
 	text-align: center;
 	color: #949b31;
 	font-size: 1.05em;
-	//background-color: #fac656;
-}
-p.menu-item {
-	display: inline;
-	position: relative;
-	top: -0.2em;
-	left: -0.2em;
 }
 div.menu-hi {
-	background-image: url('button_hi.png');
-	background-size: 100% 100%;
-	background-repeat: no;
+	background-color: #f9b853;
 }
 div.menu-lo {
-	background-image: url('button_lo.png');
-	background-size: 100% 100%;
-	background-repeat: no;
+	background-color: #fac656;
 }
 
 div#data-title {
@@ -78,10 +73,6 @@ div#data-title {
 p#data-txt {
 	display: inline;
 	color: #949b31;
-	background-color: #fdcd7d;
-	border-radius: 0.4em;
-	padding: 0.1em;
-	//color: #fdcd7d;
 	font-size: 1.6em;
 	font-family: serif;
 }
@@ -118,25 +109,25 @@ img#data-foot {
 		<table border='0'>
 			<tr>
 				<td>	
-
+					<div class="menu-item-wrap">
 					<div class="menu-item menu-hi" id="menu-yield">
-					<p class="menu-item">Yield</p>
+					Yield
 					</div>
-
+					</div>	
 				</td>
 				<td>
-
+					<div class="menu-item-wrap">
 					<div class="menu-item menu-lo" id="menu-weight">
-					<p class="menu-item">Test Weight</p>
+					Test Weight
 					</div>
-					
+					</div>
 				</td>
 				<td>
-					
+					<div class="menu-item-wrap">
 					<div class="menu-item menu-lo" id="menu-height">
-					<p class="menu-item">Height</p>
+					Height
 					</div>
-					
+					</div>
 				</td>
 			</tr>
 		</table>
