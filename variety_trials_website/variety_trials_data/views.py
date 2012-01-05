@@ -31,7 +31,7 @@ def index(request, abtest=None):
 				'zipcode_radius_form': zipcode_radius_form,
 				'varieties_form': varieties_form,
 				'variety_list': variety_list,
-				'curyear': datetime.date.today().year 
+				'curyear': datetime.date.today().year-1
 			},
 			context_instance=RequestContext(request)
 		)
@@ -44,29 +44,29 @@ def index(request, abtest=None):
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year 
+					'curyear': datetime.date.today().year-1
 				},
 				context_instance=RequestContext(request)
 			)
 		elif ab == 1:
 			return render_to_response(
-				'main_w3.html', 
+				'main_w1.html', 
 				{ 
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year 
+					'curyear': datetime.date.today().year-1
 				},
 				context_instance=RequestContext(request)
 			)
 		elif ab == 2:
 			return render_to_response(
-				'main_w12.html', 
+				'main_r1.html', 
 				{ 
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year 
+					'curyear': datetime.date.today().year-1
 				},
 				context_instance=RequestContext(request)
 			)
@@ -77,7 +77,7 @@ def index(request, abtest=None):
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year 
+					'curyear': datetime.date.today().year-1
 				},
 				context_instance=RequestContext(request)
 			)
@@ -195,7 +195,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 
 	today = datetime.date.today()
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-	year_list = [today.year, today.year-1, today.year-2, today.year-3]
+	year_list = [today.year-1, today.year-2, today.year-3]
 	
 	try:
 		curyear = int(yearname)
@@ -300,7 +300,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		)
 	elif (ab == 1):
 		return render_to_response(
-			'tabbed_view_w3.html',
+			'tabbed_view_w1.html',
 			{ 
 				'locations_form': locations_form,
 				'field_list': field_list,
@@ -316,7 +316,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		)
 	elif (ab == 2):
 		return render_to_response(
-			'tabbed_view_w12.html',
+			'tabbed_view_r1.html',
 			{ 
 				'locations_form': locations_form,
 				'field_list': field_list,
