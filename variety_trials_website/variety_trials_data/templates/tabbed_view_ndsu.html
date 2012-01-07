@@ -1,10 +1,10 @@
 {% extends "ndsu_frame.html" %}
 {% load django_math %}
 {% block content %}
-<div class="tabs units">
+<div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}form" action="/view/location/{{curyear}}/{{fieldname}}" method="post">
+		<form name="{{fieldname}}_location_form" action="/view/location/{{curyear}}/{{fieldname}}/" method="post">
 			{% csrf_token %}
 			{% for field in locations_form %}
 			<div class="input row">
@@ -17,10 +17,48 @@
 	</div>
 	{% endfor %}
 </div>
-<div class="tabs years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname, year_button_list in years.items %}
 	<div style="display:none">
-		<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}" method="post">
+		<form name="{{yearname}}_location_form" action="/view/location/{{yearname}}/{{curfield}}/" method="post">
+			{% csrf_token %}
+			{% for field in locations_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			{% for field in varieties_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="{{yearname}} submit" />
+		</form>
+	</div>
+	{% endfor %}
+</div>
+<div class="variety_form units">
+	{% for fieldname, blurb_list in blurbs.items %}
+	<div class="{{fieldname}}" style="display:none">
+		<form name="{{fieldname}}_variety_form" action="/view/variety/{{curyear}}/{{fieldname}}/" method="post">
+			{% csrf_token %}
+			{% for field in locations_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="{{fieldname}} submit" />
+		</form>
+	</div>
+	{% endfor %}
+</div>
+<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+	{% for yearname, year_button_list in years.items %}
+	<div style="display:none">
+		<form name="{{yearname}}_variety_form" action="/view/variety/{{yearname}}/{{curfield}}/" method="post">
 			{% csrf_token %}
 			{% for field in locations_form %}
 			<div class="input row">
@@ -48,9 +86,9 @@
 	<div >
 	{% for fieldname, blurb_list in blurbs.items %}
 		{% if fieldname == curfield %}
-		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
 		{% else %}
-		<a onclick="document['{{fieldname}}form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
 		{% endif %}
 	{% endfor %}
 	</div>
@@ -61,7 +99,7 @@
 	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname, year_button_list in years.items %}
 		<!--TODO: auto-generate these year button images-->
-		<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/">
+		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
 			<img src="{{year_button_list.1}}">
 		{% else %}
@@ -77,7 +115,7 @@
 	<div id="static_content">
 		<table border='1'>
 			<tr>
-				<td colspan="{{ heading_list|length }}">
+				<td colspan="{{ heading_list|length|add:1 }}">
 					{% for fieldname, blurb_list in blurbs.items %}
 					{% if fieldname == curfield %}
 							<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
@@ -87,35 +125,71 @@
 				</td>
 			</tr>
 			<tr>
-				<td colspan="{{ heading_list|length|sub:2 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+				<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
 			</tr>
 			<tr >
 				<td class="Variety padded"><h3> Variety</h3></td>
 				{% for heading in heading_list %}
-				<td class="{{ heading }} padded"><h3>{{ heading }}</h3></td>
+				<td class="padded"><h3>{{ heading.0 }}</h3>
+				{% if heading.1 != -1 %}
+				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+				{% endif %}
+				</td>
 				{% endfor %}
 			</tr>
 			<tr class="row subheadings thin">
 			</tr>
 		{% for datalist in sorted_list %}
-			{% if datalist.0 != "LSD" %}
-			<tr class="group {% cycle 'master_odd' 'master_even' %}">
-				{% for element in datalist %}
-				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
+			{% if datalist.0.0 == "Variety" %}
+			<tr class="spacer_row">
+				<td></td>
+			</tr>
+			<tr>
+				<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+			</tr>
+			<tr class="Variety padded">
+				{% for heading in datalist %}
+				<td class="padded"><h3>{{ heading.0 }}</h3>
+					{% if heading.1 != -1 %}
+					<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+					{% endif %}
+				</td>
 				{% endfor %}
 			</tr>
 			{% else %}
+			{% if datalist.0 == "LSD" %}
+			<tr>
+				<td>
+				<form>
+					<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
+				</form>
+				</td>
+			</tr>
 			<tr class="spacer_row">
 				<td></td>
 			</tr>
 			<tr class="LSD_row">
 				{% for element in datalist %}
-				<td class='{{ element }} padded'>{{ element|default_if_none:"--" }}</td>
+				<td class='padded'>{{ element|default_if_none:"--" }}</td>
 				{% endfor %}
 			</tr>
-			<tr class="spacer_row">
-				<td></td>
+			{% else %}
+			<tr class="group {% cycle 'master_odd' 'master_even' %}">
+				{% for element in datalist %}
+					{% if datalist.0 == element %}
+					<td class='padded' style="text-align: left; width: 120px;">
+						<form>
+							<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
+						</form>
+					</td>
+					{% else %}
+					<td class='padded'>
+						{{ element|default_if_none:"--" }}
+					</td>
+					{% endif %}
+				{% endfor %}
 			</tr>
+			{% endif %}
 			{% endif %}
 		{% endfor %}
 			<tr class="bottom_spacer"></tr>
@@ -131,6 +205,47 @@
 {% endblock %}
 
 {% load jsonify %}
+
+{% block javascript %}
+
+	function unselect_location(location_value) {
+		$("#id_locations option[value='"+location_value+"']").removeAttr("selected");
+	}
+	
+	function select_location(location_value) {
+		$("#id_locations option[value='"+location_value+"']").attr("selected","selected");
+	}
+	
+	function unselect_variety(variety_value) {
+		$("#id_varieties option[value='"+variety_value+"']").removeAttr("selected");
+	}
+	
+	function select_variety(variety_value) {
+		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
+	}
+
+	function submit_variety_comparison() {
+		$("#id_varieties").each(
+			function() {
+				$("#id_varieties option").removeAttr("selected");
+			}
+		);
+		
+		$('.variety_checkbox').each( 
+			function() {
+				if ($(this).attr('checked'))
+				{
+					select_variety($(this).attr('value'));
+				}
+			}
+		);
+		
+		document['{{curfield}}_variety_form'].submit();
+		return false;
+	}
+
+{% endblock %}
+
 {% block jquery %}
 
   $('.group .master').toggle(
