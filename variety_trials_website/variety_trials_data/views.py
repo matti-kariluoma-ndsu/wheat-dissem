@@ -23,6 +23,7 @@ def index(request, abtest=None):
 	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
 	varieties_form = variety_trials_forms.SelectVarietiesForm()
 	variety_list = models.Variety.objects.all()
+	curyear = datetime.date.today().year - 1
 	
 	if abtest is None:
 		return render_to_response(
@@ -31,7 +32,7 @@ def index(request, abtest=None):
 				'zipcode_radius_form': zipcode_radius_form,
 				'varieties_form': varieties_form,
 				'variety_list': variety_list,
-				'curyear': datetime.date.today().year-1
+				'curyear': curyear
 			},
 			context_instance=RequestContext(request)
 		)
@@ -44,7 +45,7 @@ def index(request, abtest=None):
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year-1
+					'curyear': curyear
 				},
 				context_instance=RequestContext(request)
 			)
@@ -55,7 +56,7 @@ def index(request, abtest=None):
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year-1
+					'curyear': curyear
 				},
 				context_instance=RequestContext(request)
 			)
@@ -66,7 +67,7 @@ def index(request, abtest=None):
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year-1
+					'curyear': curyear
 				},
 				context_instance=RequestContext(request)
 			)
@@ -77,7 +78,7 @@ def index(request, abtest=None):
 					'zipcode_radius_form': zipcode_radius_form,
 					'varieties_form': varieties_form,
 					'variety_list': variety_list,
-					'curyear': datetime.date.today().year-1
+					'curyear': curyear
 				},
 				context_instance=RequestContext(request)
 			)
@@ -192,10 +193,10 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
 	}		
-
-	today = datetime.date.today()
+	
+	this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-	year_list = [today.year-1, today.year-2, today.year-3]
+	year_list = [this_year, this_year-1, this_year-2]
 	
 	try:
 		curyear = int(yearname)
@@ -330,7 +331,6 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			},
 			context_instance=RequestContext(request)
 		)
-	
 
 def varieties_view(request, yearname, fieldname, abtest=None):
 	
@@ -347,7 +347,6 @@ def varieties_view(request, yearname, fieldname, abtest=None):
 			return HttpResponseRedirect("/") # send to homepage
 	else:
 		return HttpResponseRedirect("/") # send to homepage
-
 
 def select_variety(request):
 	if request.method == 'POST':

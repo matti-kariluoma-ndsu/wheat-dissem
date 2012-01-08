@@ -49,22 +49,10 @@ Break the subset logic apart from the list-generation logic.
     * allow looking for larger of the many?
     * of course, manually delete the ones we know about atm
 
-* look at un-breaking h-bar
-* look at an all-data view, only showing 1-2-3 for the data
-
 * make sure each print will let us know what we are looking at
-
 * look at printable version
+  <link media="print" rel="stylesheet">
 * look at seeing seed sellers
-
-* implement artist's work _before_ early Jan meeting with ag.ndsu
-	add dropshadows
-	add inner-box highlight
-	flip colors
-	flip from square/round
-	flip to other graphics?
-	do curvy from r0-1
-	do boxesfrom r0, meld from r1
 
 * enter lsds for older data
 * add a link to home/start over
@@ -79,15 +67,14 @@ Break the subset logic apart from the list-generation logic.
 * "compare selected" should do nothing if 0 or 1 varieties are selected
   * message?
 * add "All" button at top
-* email jochum w/ summary of system.
 * cols not same sized on v-v view?
 
 * 50 mi 58501, 2010, Kidder County has an index of -1, why?
 
+* look at un-breaking h-bar
+* look at an all-data view, only showing 1-2-3 for the data
+
 Notes from Jan 5 meeting:
-Ndsu css
-ndsu logo float
-white bg matching ndsu css text
 zipcode to means only, distance on h
  button to view source data
  note of # locations in each  result

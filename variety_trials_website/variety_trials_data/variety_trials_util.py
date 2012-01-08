@@ -181,30 +181,22 @@ class Filter_by_Field:
 		if field in Trial_Entry._meta.fields:
 			self.field = field
 		
-		# test if years are ordered properly
-		test = True;
-		for i in range(len(years)):
-			test = (test and (years[i] == sorted(years, reverse=True)[i]))
-		
-		if test:
-			self.years = years
-		else:
-			self.years = years 
-			#raise # TODO alert the programmer, not the user.
+		# order years properly
+		self.years = sorted(years, reverse=True)
 		
 		# test if year is in the list of years
 		if self.year not in self.years:
 			self.year = max(self.years)
 		
+		# grab data pertaining to our field
 		fieldname = self.field.name
 		for entry in entries:
 			year = int(entry.harvest_date.date.year)
 			if year in self.years:
 				location = str(entry.location.name)
 				self.locations.append(location)
-				
 				name = str(entry.variety.name)
-					
+							
 				if name in self.varieties:
 					# store our field's value
 					try:
@@ -419,7 +411,9 @@ class Filter_by_Field:
 			
 		avg_years = sorted(avg_years, reverse=True) # order them 1-yr, 2-yr, ...
 		
+		#
 		# construct rows from our data
+		#
 		
 		# append header row
 		head_row = [self.year] # first (row, column) value is the current year
