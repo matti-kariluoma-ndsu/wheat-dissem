@@ -3,7 +3,108 @@ from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
 from scipy.special import erfinv
 import copy
+from operator import add, attrgetter
 
+class Location_Variety_Year_Table():
+	"""
+	Utility functions on top of an array
+	"""
+	_data = []
+	_location_indexes = {}
+	_variety_indexes = {}
+	_year_indexes = {}
+	_field_indexes = {}
+	_locations_len = 0
+	_varieties_len = 0
+	_years_len = 0
+	_fields_len = 0
+	
+	def __init__(self):
+		pass
+		
+	def __init__(self, entries, locations, varieties, years, fields):
+		return self.populate(entries, locations, varieties, years, fields)
+		
+	def populate(self, entries, locations, varieties, years, fields):
+		self._locations_len = len(locations)
+		self._varieties_len = len(varieties)
+		self._years_len = len(years)
+		self._fields_len = len(fields)
+		
+		self._location_indexes = dict(zip(locations, range(self._locations_len)))
+		self._variety_indexes = dict(zip(varieties, range(self._varieties_len)))
+		self._year_indexes = dict(zip(years, range(self._years_len)))
+		self._field_indexes = dict(zip(fields, range(self._fields_len)))
+		
+		append = self._data.append # function pointer
+		
+		for l in locations:
+			location_list = []
+			entries_by_location = [entry for entry in entries if entry.location.name == l.name]
+			for v in varieties:
+				variety_list = []
+				entries_by_location_variety = [entry for entry in entries_by_location if entry.variety.name == v.name]
+				for y in years:
+					year_list = []
+					entries_by_location_variety_year = [entry for entry in entries_by_location_variety if int(entry.harvest_date.date.year) == y] # an empty list if no data
+					for f in fields:
+						field_avg = None
+						len_lvy = len(entries_by_location_variety_year)
+						if len_lvy > 0:
+							try:
+								field_avg = reduce(add, [float(getattr(entry, f.name)) for entry in entries_by_location_variety_year]))
+							except:
+								field_avg = None
+						if (field_avg > 0): # and not None
+							year_list.append(field_avg/len_lvy)
+						else: # if None: append(None)
+							year_list.append(field_avg)
+					variety_list.append(year_list)
+				location_list.append(variety_list)
+			append(location_list)
+					
+	def fetch_for_location(self, location):
+		return self._data[self._location_indexes[location]]
+	
+	def fetch_for_variety(self, variety):
+		return [location_list[self._variety_indexes[variety]] for location_list in self._data]
+			
+	def fetch_for_year(self, year):
+		return [variety_list[self._year_indexes[year]] for variety_list in [l for l in self._data]]
+		
+	def fetch_for_field(self, field):
+		return [year_list[self._field_indexes[field]] for year_list in [v for v in [l for l in self._data]]]
+		
+	def fetch_for_location_variety(self, location, variety):
+		return self.fetch_for_location(location)[self._variety_indexes[variety]]
+		
+	def fetch_for_location_year(self, location, year):
+		return [variety_list[self._year_indexes[year]] for variety_list in self.fetch_for_location(location)]
+				
+	def fetch_for_location_field(self, location, field):
+		return [year_list[self._field_indexes[field]] for year_list in [v for v in self.fetch_for_location(location)]]
+		
+	def fetch_for_variety_year(self, variety, year):
+		return [variety_list[self._year_indexes[year]] for variety_list in self.fetch_for_variety(variety)]
+		
+	def fetch_for_variety_field(self, variety, field):
+		return [year_list[self._field_indexes[field]] for year_list in [v for v in self.fetch_for_variety(variety)]]
+		
+	def fetch_for_year_field(self, year, field):
+		return [year_list[self._field_indexes[field]] for year_list in self.fetch_for_year(year)]
+		
+	def fetch_for_location_variety_year(self, location, variety, year):
+		return self.fetch_for_location_variety(location, variety)[self._year_indexes[year]]
+		
+	def fetch_for_location_variety_field(self, location, variety, field):
+		return [year_list[self._field_indexes[field]] for year_list in self.fetch_for_location_variety(location, variety)]
+		
+	def fetch_for_variety_year_field(self, variety, year, field):
+		return [year_list[self._field_indexes[field]] for year_list in self.fetch_for_variety_year(variety, year)]
+	
+	def fetch_for_location_variety_year_field(self, location, variety, year, field):
+		return self.fetch_for_location_variety_year(location, variety, year)[self._field_indexes[field]]
+	
 class Filter_by_Field:
 	"""
 	Utility class to return a formatted dictionary of all given entries,
@@ -11,9 +112,7 @@ class Filter_by_Field:
 	across.
 	"""
 	
-	field = {'name':''} # default value such that we return nothing if a bogus field is given
 	year = 0 # current year
-	all_varieties = True # whether to use all varieties, or the ones in "varieties"
 	# also used to show different data for varieties/locations view.
 	# TODO: pull out into common-function call to make this boolean's use
 	# more clear, instead of needing to search for where it's used.
@@ -23,26 +122,28 @@ class Filter_by_Field:
 	varieties = [] # variety "v"
 	
 	# all data
-	entries = {} # {(l,v): {y: [43.2, ...] y: [34.2], ...}, ...}
+	entries = None # List of Trial_Entry from the db
+	# year = int(entry.harvest_date.date.year) 
+	# location = str(entry.location.name)
+	# variety = str(entry.variety.name)
+	# value = getattr(entry, field.name) (field in Trial_Entry._meta.fields)
+	
 	# data (with duplicates) separated into balanced subsets
 	groups = {} # {(major,minor): [v, ...], ...}
 	# lsds of the data
 	lsds = {} # {(l,y): [12.2, ...], ...}
 	
-	
+
 	def __init__(self):
 		pass
 
-	def __init__(self, entries, field, years, pref_year, varieties):
+	def __init__(self, entries, locations, varieties, years, pref_year):
 		"""
 		Initializes internal data structures using the an input list of 
 		entries, a field to filter on, and the years to include.
 		"""
-		self.varieties = [] # reset the variable, otherwise we see the last added to our new ones (TODO: might be a useful feature)
-		for variety in varieties:
-			self.varieties.append(variety.name)
-
-		return self.populate(entries, field, years, pref_year)
+		
+		return self.populate(self, entries, locations, varieties, years, pref_year)
 
 	def LSD(self, response_to_treatments, probability):
 		"""
@@ -166,76 +267,39 @@ class Filter_by_Field:
 
 		return LSD
 		
-	def populate(self, entries, field, years, pref_year):
+	def populate(self, entries, locations, varieties, years, pref_year):
 		"""
 		"""
-		self.field = {'name':''}
+		# re-init to zero (persistent between each user's session)
+		# TODO: consider not recalculating absolutely everything?
 		self.years = []
 		self.locations = []
+		self.varieties = []
 		self.year = pref_year
-		self.entries = {}
+		self.entries = []
 		self.groups = {}
 		self.lsds = {}
-		
-		# test if field is a Trial_Entry field
-		if field in Trial_Entry._meta.fields:
-			self.field = field
-		
-		# order years properly
-		self.years = sorted(years, reverse=True)
 		
 		# test if year is in the list of years
 		if self.year not in self.years:
 			self.year = max(self.years)
 		
-		# grab data pertaining to our field
-		fieldname = self.field.name
-		for entry in entries:
-			year = int(entry.harvest_date.date.year)
-			if year in self.years:
-				location = str(entry.location.name)
-				self.locations.append(location)
-				name = str(entry.variety.name)
-							
-				if name in self.varieties:
-					# store our field's value
-					try:
-						value = getattr(entry, fieldname)
-					except AttributeError:
-						value = None
-					if value != None:
-						try:
-							self.entries[(location, name)][year].append(value)
-						except KeyError:
-							try:
-								self.entries[(location, name)][year] = [value]
-							except KeyError:
-								self.entries[(location, name)] = {}
-								self.entries[(location, name)][year] = [value]
-						
-						# store the lsd from this entry
-						value = entry.lsd_05
-						if (value is not None and float(value) > 0.0):
-							pass
-						else:
-							value = entry.hsd_10
-							if (value is not None and float(value) > 0.0):
-								pass
-							else:
-								value = entry.lsd_10
-								if (value is not None and float(value) > 0.0):
-									pass
-								else:
-									value = None
-						
-						try:
-							self.lsds[(location, year)].append(value)
-						except KeyError:
-							self.lsds[(location, year)] = [value]
-							
+		self.entries = entries
+		
+		self.varieties = varieties
+		self.locations = locations
+		
+		"""
+		self.raw_varieties = varieties
+		self.raw_locations = locations
+		
+		self.varieties = [variety.name for variety in varieties]
+		self.locations = [location.name for location in locations]
+		
 		# remove duplicates
 		self.locations = sorted(list(set(self.locations)))
 		self.varieties = sorted(list(set(self.varieties)))
+		"""
 		
 	def fetch(self, reduce_to_one_subset=False):
 		"""
@@ -251,26 +315,92 @@ class Filter_by_Field:
 		"""
 		
 		return_list = []
+		
+		# make a list of years to average over
+		avg_years = []
+		
+		# find all years before the current year, inclusive
+		def f(x): return (x <= self.year)
+		
+		append = avg_years.append
+		# construct a list for n-yr averaging e.g. [[2010], [2010, 2009], [2010, 2009, 2008]]
+		for year in sorted(filter(f, self.years)):
+			for element in avg_years:
+				element.append(year)
+			append([year])
+			
+		avg_years = sorted(avg_years, reverse=True) # order them 1-yr, 2-yr, ...
+		
+		#
+		# construct rows from our data
+		#
+		
+		# append header row
+		head_row = [self.year] # first (row, column) value is the current year
+		
+		append = head_row.append
+		
+		# constuct column headers for n-yr averaging
+		append([ (n_yr = '%d-yr' % len(element), -1) for element in avg_years])
+		
+		# censure empty locations before we append them to the header
+		"""
+		# make sum tables while going through all of it
+		
+		for l in self.locations:
+			for y in self.years:
+				location_year_entries = reduce(add, [location_entry[y] for location_entry in self.entries.fetch_for_location(l.name)]) # list addition
 				
-		# Discard a column (location) that is all `None'
+				if (len(location_year_entries) == 0):
+					sum_location_year[(l, y)] = None
+				else:
+					sum_location_year[(l, y)] = reduce(add, [float(getattr(entry, self.field.name)) for entry in location_year_entries]) # float addition
+					
+			if (sum_location_year[(l, self.year)] is None):
+				empty_locations.append(l)
+		"""
+		"""
+		sums_location_year = {}
 		empty_locations = []
+		# Discard a column (location) that is empty
 		for l in self.locations:
 			empty = True
 			for v in self.varieties:
-				try:
-					empty = empty and (self.entries[(l,v)][self.year] is None)
-					if not empty:
-						break
-				except KeyError:
-					pass
+				for y in self.years:
+					location_variety_year_entries = reduce(add, self.entries.fetch_for_location_variety(l, v, y)) # list addition
+					if y is self.year:
+						empty = empty or (len(location_year_entries) == 0)
+						sum_location_year[(l, v, y)] = None
+					else
+					if (len(location_year_entries) == 0):
+						sum_location_year[(l, y)] = None
+					else:
+						sum_location_year[(l, y)] = reduce(add, [float(getattr(entry, self.field.name)) 
+				if not empty:
+					break
 			if empty:
 				empty_locations.append(l)
-		
+				
+		# remove empty locations
 		self.locations = sorted(list(
 					set(self.locations).difference(
 					set(empty_locations))
-			))
+			), key=attrgetter('name')) #TODO: distance sort instead of alphabetical by name
+		"""
+		# construct column headers for locations
+		append([ (l.name, l.id) for l in self.locations])
+			
+		return_list.append(head_row) # append first row
 		
+		# the header between each group
+		next_header = [('Variety', -1)]
+		next_header.extend(head_row[1::])
+		
+		
+		
+		
+			
+		"""
 		# initialize the groups variable
 		self.groups = {}
 		for i in range(len(self.locations)):
@@ -396,44 +526,8 @@ class Filter_by_Field:
 						for larger_group_key in major_orders[order]:
 							for v in self.groups[larger_group_key]:
 								self.groups[key].append(v)
+		"""
 		
-		# make a list of years to average over
-		avg_years = []
-		
-		# find all years before the current year, inclusive
-		def f(x): return (x <= self.year)
-				
-		# construct a list for n-yr averaging e.g. [[2010], [2010, 2009], [2010, 2009, 2008]]
-		for year in sorted(filter(f, self.years)):
-			for element in avg_years:
-				element.append(year)
-			avg_years.append([year])		
-			
-		avg_years = sorted(avg_years, reverse=True) # order them 1-yr, 2-yr, ...
-		
-		#
-		# construct rows from our data
-		#
-		
-		# append header row
-		head_row = [self.year] # first (row, column) value is the current year
-		
-		# constuct column headers for n-yr averaging
-		for element in avg_years:
-			n_yr = '%d-yr' % len(element)
-			head_row.append((n_yr, -1)) # tuple: (name, id)
-		for l in self.locations:
-			location_id = -1
-			try:
-				location_id = models.Location.objects.get(name__iexact=l).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
-			except:
-				pass
-			head_row.append((l, location_id))
-		return_list.append(head_row) # append first row
-		
-		# the header between each group
-		next_header = [('Variety', -1)]
-		next_header.extend(head_row[1::])
 		
 		# construct the rest of the rows
 		for key in sorted(self.groups.keys(), reverse=True): # for each subset

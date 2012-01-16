@@ -4,15 +4,18 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
-from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field
+from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, Location_Variety_Year_Table
 import datetime
+from operator import attrgetter
 
-def get_entries(locations, year_list):
+def get_entries(locations, varieties, year_list):
 	# We do a depth=2 so we can access entry.variety.name
 	# We do a depth=3 so we can access entry.harvest_date.date.year
 	#TODO: Somehow reduce this to depth=1
 	return models.Trial_Entry.objects.select_related(depth=3).filter(
 				location__in=locations
+			).filter(
+				variety__in=varieties
 			).filter(
 				harvest_date__in=models.Date.objects.filter(
 					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
@@ -231,15 +234,31 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	for field in models.Trial_Entry._meta.fields:
 		if field.name == fieldname:
 			break;
-	
+	"""
+	# test if field is a Trial_Entry field
+	if field in Trial_Entry._meta.fields:
+		self.field = field
+	elif field is 'all':
+		#TODO: impl
+		self.field = type('null_field', (object,), dict(name=''))
+	else:
+		self.field = type('null_field', (object,), dict(name=''))
+	"""
 	# Remove all fields from `unit_blurbs' that aren't in `field_list'
 	for name in unit_blurbs.keys():
 		if name not in field_list:
 			del unit_blurbs[name]
 	
+	locations = sorted(locations, key=attrgetter('name')) #TODO: distance sort instead of alphabetical by name
+	varieties = sorted(varieties, key=attrgetter('name'))
+	year_list = sorted(year_list, reverse=True)
+	
+	# TODO: save this data between calls, by removing/adding specific data to it rather than recalculating it all
+	entries = Location_Variety_Year_Table(get_entries(locations, varieties, year_list), locations, varieties, year_list, [field])
+	
 	# TODO: respect/update the cur_year value.
 	try:
-		sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch(reduce_to_one_subset=one_subset)
+		sorted_list = Filter_by_Field(entries, locations, varieties, year_list, curyear).fetch(reduce_to_one_subset=one_subset)
 	except TypeError:
 		# TODO: we can do more for the user than redirect to /
 		return HttpResponseRedirect("/")
@@ -255,9 +274,6 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		ab = None
 	except TypeError:
 		ab = None
-	
-	# turn the headers from a list of names to a tuple of (location_name, location_id)
-	heading_list = []
 	
 	#TODO: this is very bad for the database...
 	try:
