@@ -5,7 +5,7 @@ from scipy.special import erfinv
 import copy
 from operator import add, attrgetter
 
-class Location_Variety_Year_Table():
+class Location_Variety_Year_Field_Table():
 	"""
 	Utility functions on top of an array
 	"""
@@ -14,13 +14,13 @@ class Location_Variety_Year_Table():
 	_variety_indexes = {}
 	_year_indexes = {}
 	_field_indexes = {}
+	_location_range = []
+	_variety_range = []
+	_year_range = []
 	_locations_len = 0
 	_varieties_len = 0
 	_years_len = 0
 	_fields_len = 0
-	
-	def __init__(self):
-		pass
 		
 	def __init__(self, entries, locations, varieties, years, fields):
 		return self.populate(entries, locations, varieties, years, fields)
@@ -31,9 +31,13 @@ class Location_Variety_Year_Table():
 		self._years_len = len(years)
 		self._fields_len = len(fields)
 		
-		self._location_indexes = dict(zip(locations, range(self._locations_len)))
-		self._variety_indexes = dict(zip(varieties, range(self._varieties_len)))
-		self._year_indexes = dict(zip(years, range(self._years_len)))
+		self._location_range = range(self._locations_len)
+		self._varieties_range = range(self._varieties_len)
+		self._years_range = range(self._years_len)
+		
+		self._location_indexes = dict(zip(locations, self._location_range))
+		self._variety_indexes = dict(zip(varieties, self._varieties_range))
+		self._year_indexes = dict(zip(years, self._years_range))
 		self._field_indexes = dict(zip(fields, range(self._fields_len)))
 		
 		append = self._data.append # function pointer
@@ -52,12 +56,12 @@ class Location_Variety_Year_Table():
 						len_lvy = len(entries_by_location_variety_year)
 						if len_lvy > 0:
 							try:
-								field_avg = reduce(add, [float(getattr(entry, f.name)) for entry in entries_by_location_variety_year]))
+								field_avg = reduce(add, [float(getattr(entry, f.name)) for entry in entries_by_location_variety_year])
 							except:
 								field_avg = None
-						if (field_avg > 0): # and not None
+						if (field_avg > 0): # implied: and not None
 							year_list.append(field_avg/len_lvy)
-						else: # if None: append(None)
+						else: # implied: if None: append(None)
 							year_list.append(field_avg)
 					variety_list.append(year_list)
 				location_list.append(variety_list)
@@ -67,28 +71,59 @@ class Location_Variety_Year_Table():
 		return self._data[self._location_indexes[location]]
 	
 	def fetch_for_variety(self, variety):
-		return [location_list[self._variety_indexes[variety]] for location_list in self._data]
+		return [self._data[l][self._variety_indexes[variety]] for l in self._location_range]
 			
 	def fetch_for_year(self, year):
-		return [variety_list[self._year_indexes[year]] for variety_list in [l for l in self._data]]
+		#return [self._data[l][v][self._year_indexes[year]] for (l,v) in (self._location_range, self._variety_range)]
+		return_list = []
+		append = return_list.append
+		y = self._year_indexes[year]
+		for l in self._location_range:
+			for v in self._variety_range:
+				append(self._data[l][v][y])
+		return return_list
 		
 	def fetch_for_field(self, field):
-		return [year_list[self._field_indexes[field]] for year_list in [v for v in [l for l in self._data]]]
+		#return [self._data[l][v][y][self._field_indexes[field]] for (l,v,y) in (self._location_range, self._variety_range, self._year_range)]
+		return_list = []
+		append = return_list.append
+		f = self._field_indexes[field]
+		for l in self._location_range:
+			for v in self._variety_range:
+				for y in self._year_range:
+					append(self._data[l][v][y][f])
+		return return_list
 		
 	def fetch_for_location_variety(self, location, variety):
 		return self.fetch_for_location(location)[self._variety_indexes[variety]]
 		
 	def fetch_for_location_year(self, location, year):
-		return [variety_list[self._year_indexes[year]] for variety_list in self.fetch_for_location(location)]
-				
+		return [self.fetch_for_location(location)[v][self._year_indexes[year]] for v in self._variety_range]
+		
 	def fetch_for_location_field(self, location, field):
-		return [year_list[self._field_indexes[field]] for year_list in [v for v in self.fetch_for_location(location)]]
+		#return [self.fetch_for_location(location)[v][y][self._field_indexes[field]] for (v,y) in (self._variety_range, self._year_range)]
+		return_list = []
+		append = return_list.append
+		l = self.fetch_for_location(location)
+		f = self._field_indexes[field]
+		for v in self._variety_range:
+			for y in self._year_range:
+				append(l[v][y][f])
+		return return_list
 		
 	def fetch_for_variety_year(self, variety, year):
 		return [variety_list[self._year_indexes[year]] for variety_list in self.fetch_for_variety(variety)]
 		
 	def fetch_for_variety_field(self, variety, field):
-		return [year_list[self._field_indexes[field]] for year_list in [v for v in self.fetch_for_variety(variety)]]
+		#return [variety_list[y][self._field_indexes[field]] for (variety_list, y) in (self.fetch_for_variety(variety), self._year_range)]
+		return_list = []
+		append = return_list.append
+		varietie_list = self.fetch_for_variety(variety)
+		f = self._field_indexes[field]
+		for v in variety_list:
+			for y in self._year_range:
+				append(v[y][f])
+		return return_list
 		
 	def fetch_for_year_field(self, year, field):
 		return [year_list[self._field_indexes[field]] for year_list in self.fetch_for_year(year)]
@@ -97,15 +132,15 @@ class Location_Variety_Year_Table():
 		return self.fetch_for_location_variety(location, variety)[self._year_indexes[year]]
 		
 	def fetch_for_location_variety_field(self, location, variety, field):
-		return [year_list[self._field_indexes[field]] for year_list in self.fetch_for_location_variety(location, variety)]
+		return [self.fetch_for_location_variety(location, variety)[y][self._field_indexes[field]] for y in self._year_range]
 		
 	def fetch_for_variety_year_field(self, variety, year, field):
-		return [year_list[self._field_indexes[field]] for year_list in self.fetch_for_variety_year(variety, year)]
+		return [variety_year_list[self._field_indexes[field]] for variety_year_list in self.fetch_for_variety_year(variety, year)]
 	
 	def fetch_for_location_variety_year_field(self, location, variety, year, field):
 		return self.fetch_for_location_variety_year(location, variety, year)[self._field_indexes[field]]
-	
-class Filter_by_Field:
+
+class LSD_Calculator:
 	"""
 	Utility class to return a formatted dictionary of all given entries,
 	sorted by location name and year, filtered by one field and averaged
@@ -133,10 +168,6 @@ class Filter_by_Field:
 	# lsds of the data
 	lsds = {} # {(l,y): [12.2, ...], ...}
 	
-
-	def __init__(self):
-		pass
-
 	def __init__(self, entries, locations, varieties, years, pref_year):
 		"""
 		Initializes internal data structures using the an input list of 
@@ -683,9 +714,6 @@ class Locations_from_Zipcode_x_Radius:
 	zipcode = ''
 	radius = 0.0
 	radius_sentinels = ['ALL', 'ND', 'MN']
-	
-	def __init__(self):
-		pass
 	
 	def __init__(self, zipcode, radius):
 		"""

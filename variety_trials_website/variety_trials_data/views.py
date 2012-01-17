@@ -4,7 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
-from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, Location_Variety_Year_Table
+from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, Location_Variety_Year_Field_Table
 import datetime
 from operator import attrgetter
 
@@ -254,7 +254,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	year_list = sorted(year_list, reverse=True)
 	
 	# TODO: save this data between calls, by removing/adding specific data to it rather than recalculating it all
-	entries = Location_Variety_Year_Table(get_entries(locations, varieties, year_list), locations, varieties, year_list, [field])
+	entries = Location_Variety_Year_Field_Table(get_entries(locations, varieties, year_list), locations, varieties, year_list, [field])
 	
 	# TODO: respect/update the cur_year value.
 	try:
