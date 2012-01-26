@@ -118,7 +118,7 @@ class Location_Variety_Year_Field_Table():
 		#return [variety_list[y][self._field_indexes[field]] for (variety_list, y) in (self.fetch_for_variety(variety), self._year_range)]
 		return_list = []
 		append = return_list.append
-		varietie_list = self.fetch_for_variety(variety)
+		variety_list = self.fetch_for_variety(variety)
 		f = self._field_indexes[field]
 		for v in variety_list:
 			for y in self._year_range:
