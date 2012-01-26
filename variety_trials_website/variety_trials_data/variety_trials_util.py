@@ -176,34 +176,30 @@ class LSD_Calculator:
 	across.
 	"""
 	
-	year = 0 # current year
-	# also used to show different data for varieties/locations view.
-	# TODO: pull out into common-function call to make this boolean's use
-	# more clear, instead of needing to search for where it's used.
 	
-	years = [] #year "y"
+	
+	
 	locations = [] # location "l"
 	varieties = [] # variety "v"
+	years = [] #year "y"
+	year = 0 # current year we are viewing
+	field = None
 	
 	# all data
-	entries = None # List of Trial_Entry from the db
-	# year = int(entry.harvest_date.date.year) 
-	# location = str(entry.location.name)
-	# variety = str(entry.variety.name)
-	# value = getattr(entry, field.name) (field in Trial_Entry._meta.fields)
+	entries = None # a Location_Variety_Year_Field_Table object
 	
 	# data (with duplicates) separated into balanced subsets
 	groups = {} # {(major,minor): [v, ...], ...}
 	# lsds of the data
 	lsds = {} # {(l,y): [12.2, ...], ...}
 	
-	def __init__(self, entries, locations, varieties, years, pref_year):
+	def __init__(self, entries_table, locations, varieties, years, pref_year, field):
 		"""
 		Initializes internal data structures using the an input list of 
 		entries, a field to filter on, and the years to include.
 		"""
 		
-		return self.populate(self, entries, locations, varieties, years, pref_year)
+		return self.populate(self, entries_table, locations, varieties, years, pref_year, field)
 
 	def LSD(self, response_to_treatments, probability):
 		"""
@@ -327,27 +323,24 @@ class LSD_Calculator:
 
 		return LSD
 		
-	def populate(self, entries, locations, varieties, years, pref_year):
+	def populate(self, entries_table, locations, varieties, years, pref_year):
 		"""
 		"""
-		# re-init to zero (persistent between each user's session)
-		# TODO: consider not recalculating absolutely everything?
-		self.years = []
-		self.locations = []
-		self.varieties = []
+		
+		self.years = years
+		self.locations = locations
+		self.varieties = varieties
 		self.year = pref_year
-		self.entries = []
-		self.groups = {}
+		self.entries = entries_table
+		
+		# re-init to empty (persistent between each user's session)
+		# TODO: consider not recalculating absolutely everything?
+		self.groups = {} 
 		self.lsds = {}
 		
 		# test if year is in the list of years
 		if self.year not in self.years:
 			self.year = max(self.years)
-		
-		self.entries = entries
-		
-		self.varieties = varieties
-		self.locations = locations
 		
 		"""
 		self.raw_varieties = varieties
