@@ -56,44 +56,42 @@ class Location_Variety_Year_Field_Table():
 		self._fields_len = len(fields)
 		
 		self._location_range = range(self._locations_len)
-		self._varieties_range = range(self._varieties_len)
-		self._years_range = range(self._years_len)
+		self._variety_range = range(self._varieties_len)
+		self._year_range = range(self._years_len)
 		
 		self._location_indexes = dict(zip(locations, self._location_range))
-		self._variety_indexes = dict(zip(varieties, self._varieties_range))
-		self._year_indexes = dict(zip(years, self._years_range))
+		self._variety_indexes = dict(zip(varieties, self._variety_range))
+		self._year_indexes = dict(zip(years, self._year_range))
 		self._field_indexes = dict(zip(fields, range(self._fields_len)))
 		
 		append = self._data.append # function pointer
 		
 		for l in locations:
 			location_list = []
+			lappend = location_list.append
 			entries_by_location = [entry for entry in entries if entry.location.name == l.name]
-			#print entries_by_location
 			for v in varieties:
 				variety_list = []
+				vappend = variety_list.append
 				entries_by_location_variety = [entry for entry in entries_by_location if entry.variety.name == v.name]
-				#print entries_by_location_variety
 				for y in years:
 					year_list = []
+					yappend = year_list.append
 					entries_by_location_variety_year = [entry for entry in entries_by_location_variety if int(entry.harvest_date.date.year) == y] # an empty list if no data
-					#print entries_by_location_variety_year
 					for f in fields:
 						field_avg = None
 						len_lvy = len(entries_by_location_variety_year)
 						if len_lvy > 0:
-							#print [float(getattr(entry, f.name)) for entry in entries_by_location_variety_year]
 							try:
 								field_avg = reduce(add, [float(getattr(entry, f.name)) for entry in entries_by_location_variety_year])
 							except:
 								field_avg = None
-						#print field_avg
 						if (field_avg > 0): # implied: and not None
-							year_list.append(field_avg/len_lvy)
+							yappend(field_avg/len_lvy)
 						else: # implied: if None: append(None)
-							year_list.append(field_avg)
-					variety_list.append(year_list)
-				location_list.append(variety_list)
+							yappend(field_avg)
+					vappend(year_list)
+				lappend(variety_list)
 			append(location_list)
 		
 		#print self._data
@@ -110,8 +108,11 @@ class Location_Variety_Year_Field_Table():
 		append = return_list.append
 		y = self._year_indexes[year]
 		for l in self._location_range:
+			location_list = []
+			lappend = location_list.append
 			for v in self._variety_range:
-				append(self._data[l][v][y])
+				lappend(self._data[l][v][y])
+			append(location_list)
 		return return_list
 		
 	def fetch_for_field(self, field):
@@ -120,9 +121,15 @@ class Location_Variety_Year_Field_Table():
 		append = return_list.append
 		f = self._field_indexes[field]
 		for l in self._location_range:
+			location_list = []
+			lappend = location_list.append
 			for v in self._variety_range:
+				variety_list = []
+				vappend = variety_list.append
 				for y in self._year_range:
-					append(self._data[l][v][y][f])
+					vappend(self._data[l][v][y][f])
+				lappend(variety_list)
+			append(location_list)
 		return return_list
 		
 	def fetch_for_location_variety(self, location, variety):
@@ -138,8 +145,11 @@ class Location_Variety_Year_Field_Table():
 		l = self.fetch_for_location(location)
 		f = self._field_indexes[field]
 		for v in self._variety_range:
+			variety_list = []
+			vappend = variety_list.append
 			for y in self._year_range:
-				append(l[v][y][f])
+				vappend(l[v][y][f])
+			append(variety_list)
 		return return_list
 		
 	def fetch_for_variety_year(self, variety, year):
@@ -149,15 +159,25 @@ class Location_Variety_Year_Field_Table():
 		#return [variety_list[y][self._field_indexes[field]] for (variety_list, y) in (self.fetch_for_variety(variety), self._year_range)]
 		return_list = []
 		append = return_list.append
-		variety_list = self.fetch_for_variety(variety)
 		f = self._field_indexes[field]
-		for v in variety_list:
+		for v in self.fetch_for_variety(variety):
+			variety_list = []
+			vappend = variety_list.append
 			for y in self._year_range:
-				append(v[y][f])
+				vappend(v[y][f])
+			append(variety_list)
 		return return_list
 		
 	def fetch_for_year_field(self, year, field):
-		return [year_list[self._field_indexes[field]] for year_list in self.fetch_for_year(year)]
+		return_list = []
+		append = return_list.append
+		for y in self.fetch_for_year(year):
+			year_list = []
+			yappend = year_list.append
+			for l in y:
+				yappend(l[self._field_indexes[field]])
+			append(year_list)
+		return return_list
 		
 	def fetch_for_location_variety_year(self, location, variety, year):
 		return self.fetch_for_location_variety(location, variety)[self._year_indexes[year]]
@@ -165,12 +185,14 @@ class Location_Variety_Year_Field_Table():
 	def fetch_for_location_variety_field(self, location, variety, field):
 		return [self.fetch_for_location_variety(location, variety)[y][self._field_indexes[field]] for y in self._year_range]
 		
+	def fetch_for_location_year_field(self, location, year, field):
+		return [self.fetch_for_location(location)[v][self._year_indexes[year]][self._field_indexes[field]] for v in self._variety_range]
+		
 	def fetch_for_variety_year_field(self, variety, year, field):
 		return [variety_year_list[self._field_indexes[field]] for variety_year_list in self.fetch_for_variety_year(variety, year)]
 	
 	def fetch_for_location_variety_year_field(self, location, variety, year, field):
 		return self.fetch_for_location_variety_year(location, variety, year)[self._field_indexes[field]]
-
 
 def main():
 	
@@ -204,6 +226,19 @@ def main():
 	y = years[2]
 	f = fields[0]
 	print "%s %s %d %s" % (l.name, v.name, y, f.name)
+	print table.fetch_for_location_variety_year_field(l, v, y, f)
+	
+	print "%s %s %d" % (l.name, v.name, y)
+	print table.fetch_for_location_variety_year(l,v,y)
+	
+	print "%s %d %s" % (v.name, y, f.name)
+	print table.fetch_for_variety_year_field(v,y,f)
+	
+	print "%s %d %s" % (l.name, y, f.name)
+	print table.fetch_for_location_year_field(l,y,f)
+	
+	print "%s %s %s" % (l.name, v.name, f.name)
+	print table.fetch_for_location_variety_field(l,v,f)
 	
 	print "%s %s" % (l.name, v.name)
 	print table.fetch_for_location_variety(l, v)
@@ -211,11 +246,14 @@ def main():
 	print "%s %d" % (l.name, y)
 	print table.fetch_for_location_year(l, y)
 	
-	print "%s %s" % (v.name, f.name)
-	print table.fetch_for_variety_field(v, f)
+	print "%s %s" % (l.name, f.name)
+	print table.fetch_for_location_field(l, f)
 	
 	print "%s %d" % (v.name, y)
 	print table.fetch_for_variety_year(v,y)
+	
+	print "%s %s" % (v.name, f.name)
+	print table.fetch_for_variety_field(v, f)
 	
 	print "%d %s" % (y, f.name)
 	print table.fetch_for_year_field(y, f)
