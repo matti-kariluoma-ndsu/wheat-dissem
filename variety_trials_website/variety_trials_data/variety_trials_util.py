@@ -26,11 +26,14 @@ class LSD_Calculator:
 	year_indexes = {}
 	
 	# all data
-	entries = {} # {v: [43.2, ...], [34.2, ...], [45.2, ...], ...}
-	# data (with duplicates) separated into balanced subsets
-	groups = {} # {(major,minor): [v, ...], ...}
+	entries = {} # {v: [[43.2, ...], [34.2, ...], [45.2, ...]], ...}
 	# lsds of the data
 	lsds = {} # {(l,y): [12.2, ...], ...}
+	# (count, avg) of the data at each variety x year
+	entry_avgs # {v: [(9, 43.5), (9, 45.3), (10, 52.2)], ...}
+	# data (with duplicates) separated into balanced subsets
+	groups = {} # {(major,minor): [v, ...], ...}
+	
 	
 	
 	def __init__(self):
@@ -203,7 +206,7 @@ class LSD_Calculator:
 			append(None)
 			l_i[l] = count
 			count += 1
-		# year_list = [None, None, ..., None]
+		# location_list = [None, None, ..., None]
 		
 		#initialize self.year_indexes
 		y_i = self.year_indexes
@@ -214,7 +217,7 @@ class LSD_Calculator:
 			append(location_list)
 			y_i[y] = count
 			count += 1
-		# variety_list = [[None, ...], [None, ...], [None, ...]]
+		# year_list = [[None, ...], [None, ...], [None, ...]]
 		
 		for v in varieties:
 			self.entries[v.name] = list(year_list) # make a copy of year_list
@@ -274,8 +277,40 @@ class LSD_Calculator:
 		
 		return_list = []
 		
+		# Utility function to sum our variety x year data
+		def add_not_none(x,y):
+			"""
+			It is very important to prepend 0 to any iterable passed into
+			this function, since we don't check if x is not None, only y.
+			
+			If using the reduce() function, chain([0], data) is a good way
+			to prepend a zero to an iterable: 
+			
+			i.e. data_sum = reduce(add_if_not_none, chain([0], data))
+			"""
+			if y: # if y is not None and y is not 0
+				return x+y
+			else:
+				return x
 		
-		# Discard a column (location) that is all `None'
+		def len_not_none(l):
+			"""
+			returns the length of a list that is None padded.
+			"""
+			return len([i for i in l if i is not None])
+		
+		# compute averages per variety/location
+		for v in self.varieties:
+			year_list = self.entries[v]
+			for y in self.years_indexes.values():
+				l = year_list[y] # location_list
+				len_l = len_not_none(l)
+				self.entry_avgs[v] = (len_l, reduce(add_not_none, chain([0], l)) / len_l)
+		
+		
+		# Discard a column (location) that is all `None' in the current year
+		#  NOTE: the location is in our dataset because it has data for one 
+		#   of the three most recent years, not necessarily the current.
 		empty_locations = []
 		for l in self.locations:
 			empty = True
@@ -288,11 +323,6 @@ class LSD_Calculator:
 					pass
 			if empty:
 				empty_locations.append(l)
-		
-		self.locations = sorted(list(
-					set(self.locations).difference(
-					set(empty_locations))
-			))
 		
 		# initialize the groups variable
 		self.groups = {}
