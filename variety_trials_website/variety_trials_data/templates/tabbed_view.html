@@ -127,6 +127,9 @@
 			<tr>
 				<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
 			</tr>
+			<tr>
+				<td colspan="{{ heading_list|length|add:1 }}" style="border-bottom: 1px solid black;">Data for {{heading_list|length|sub:3}} site-years:</td>
+			</tr>
 			<tr >
 				<td class="Variety padded"><h3> Variety</h3></td>
 				{% for heading in heading_list %}
@@ -146,6 +149,9 @@
 			</tr>
 			<tr>
 				<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+			</tr>
+			<tr>
+				<td colspan="{{ heading_list|length|add:1 }}" style="border-bottom: 1px solid black;">Data for {{heading_list|length|sub:3}} site-years:</td>
 			</tr>
 			<tr class="Variety padded">
 				{% for heading in datalist %}

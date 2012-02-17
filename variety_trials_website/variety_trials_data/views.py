@@ -4,7 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
-from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field
+from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
 
 def get_entries(locations, year_list):
@@ -125,10 +125,14 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					context_instance=RequestContext(request)
 				) 
 			
+			
+			#TODO: there must be a better way to populate the varieties list
 			varieties = []
 			
 			for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
 				varieties.append(entry.variety)
+			
+			varieties = list(set(varieties)) # remove duplicates
 			
 			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
 			
@@ -239,7 +243,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	# TODO: respect/update the cur_year value.
 	try:
-		sorted_list = Filter_by_Field(get_entries(locations, year_list), field, year_list, curyear, varieties).fetch(reduce_to_one_subset=one_subset)
+		sorted_list = LSD_Calculator(get_entries(locations, year_list), locations, varieties, year_list, curyear, field).fetch(reduce_to_one_subset=one_subset)
 	except TypeError:
 		# TODO: we can do more for the user than redirect to /
 		return HttpResponseRedirect("/")

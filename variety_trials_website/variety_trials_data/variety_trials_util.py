@@ -2,6 +2,8 @@ from variety_trials_data.models import Trial_Entry #, Date
 from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
 from scipy.special import erfinv
+from itertools import chain
+from operator import attrgetter
 import copy
 
 class LSD_Calculator:
@@ -30,14 +32,9 @@ class LSD_Calculator:
 	# lsds of the data
 	lsds = {} # {(l,y): [12.2, ...], ...}
 	# (count, avg) of the data at each variety x year
-	entry_avgs # {v: [(9, 43.5), (9, 45.3), (10, 52.2)], ...}
+	entry_avgs = {} # {v: [(9, 43.5), (9, 45.3), (10, 52.2)], ...}
 	# data (with duplicates) separated into balanced subsets
 	groups = {} # {(major,minor): [v, ...], ...}
-	
-	
-	
-	def __init__(self):
-		pass
 
 	def __init__(self, entries, locations, varieties, years, pref_year, field):
 		"""
@@ -169,11 +166,12 @@ class LSD_Calculator:
 
 		return LSD
 		
-	def populate(self, entries, field, years, pref_year):
+	def populate(self, entries, locations, varieties, years, pref_year, field):
 		"""
 		For each variety, store three lists, one for each year.
 		order by location, and place None when there is no data.
 		"""
+		
 		# init to empty
 		self.location_indexes = {}
 		self.year_indexes = {}
@@ -181,8 +179,6 @@ class LSD_Calculator:
 		self.groups = {}
 		self.lsds = {}
 		
-		self.locations = locations
-		self.varieties = varieties
 		self.year = pref_year
 		self.field = field
 		
@@ -193,37 +189,28 @@ class LSD_Calculator:
 		if self.year not in self.years:
 			self.year = max(self.years)
 		
+		
+		# order locations, varieties
+		self.locations = sorted(locations, key=attrgetter('name'))
+		self.varieties = sorted(varieties, key=attrgetter('name'))
+		
 		#
 		# initialize self.entries, self.lsds
 		#
 		
 		# initialize self.location_indexes
+		self.location_indexes = dict(zip(self.locations, range(len(self.locations))))
 		l_i = self.location_indexes
-		count = 0
-		location_list = []
-		append = location_list.append
-		for l in self.locations:
-			append(None)
-			l_i[l] = count
-			count += 1
-		# location_list = [None, None, ..., None]
 		
 		#initialize self.year_indexes
+		
+		self.year_indexes = dict(zip(self.years, range(len(self.years))))
 		y_i = self.year_indexes
-		count = 0
-		year_list = []
-		append = year_list.append
-		for y in self.years:
-			append(location_list)
-			y_i[y] = count
-			count += 1
-		# year_list = [[None, ...], [None, ...], [None, ...]]
 		
 		for v in varieties:
-			self.entries[v.name] = list(year_list) # make a copy of year_list
-			self.lsds[v.name] = list(year_list) # make a copy of year_list
-		
-		#self.entries = {name1: [[], [], []], name2: [[], [], []], ...}
+			self.entries[v] = [[None for l in self.locations] for y in self.years]
+		for l in locations:
+			self.lsds[l] = [None for y in self.years]
 		
 		# grab data pertaining to our field
 		fieldname = self.field.name
@@ -231,19 +218,18 @@ class LSD_Calculator:
 			year = int(entry.harvest_date.date.year)
 			if year in self.years:
 				location = entry.location
-				variety = entry.variety
+				v = entry.variety
 							
-				if variety in self.varieties:
+				if v in self.varieties:
 					# store our field's value
 					try:
 						value = getattr(entry, fieldname)
 					except AttributeError:
 						value = None
-					if value != None:
-						v = variety.name
+					if value is not None:
 						y = y_i[year]
 						l = l_i[location]
-						self.entries[v][y][l] = value
+						self.entries[v][y][l] = float(value)
 						
 						# store the lsd from this entry
 						value = entry.lsd_05
@@ -260,7 +246,8 @@ class LSD_Calculator:
 								else:
 									value = None
 						
-						self.lsds[v][l][y] = value
+						self.lsds[location][y] = value
+		#print sentries
 		
 	def fetch(self, reduce_to_one_subset=False):
 		"""
@@ -277,7 +264,7 @@ class LSD_Calculator:
 		
 		return_list = []
 		
-		# Utility function to sum our variety x year data
+		# Utility functions to average our variety x year data
 		def add_not_none(x,y):
 			"""
 			It is very important to prepend 0 to any iterable passed into
@@ -295,34 +282,36 @@ class LSD_Calculator:
 		
 		def len_not_none(l):
 			"""
-			returns the length of a list that is None padded.
+			Returns the length of a list that is None padded.
 			"""
 			return len([i for i in l if i is not None])
 		
-		# compute averages per variety/location
+		
+		# compute averages per variety/year/location
+		years = sorted(self.year_indexes.values())
 		for v in self.varieties:
+			self.entry_avgs[v] = []
+			append = self.entry_avgs[v].append
 			year_list = self.entries[v]
-			for y in self.years_indexes.values():
+			for y in years:
 				l = year_list[y] # location_list
 				len_l = len_not_none(l)
-				self.entry_avgs[v] = (len_l, reduce(add_not_none, chain([0], l)) / len_l)
+				if len_l:
+					append((len_l, float(reduce(add_not_none, chain([0], l))) / len_l)) # a 2-tuple, (len, avg)
+				else:
+					append((len_l, 0.0))
 		
 		
 		# Discard a column (location) that is all `None' in the current year
-		#  NOTE: the location is in our dataset because it has data for one 
-		#   of the three most recent years, not necessarily the current.
+		# Is this still a problem? should the sql query return such locations?
+		# can we control for the Location l has data from n years ago, but
+		# not this year?
+		"""
+		cy_i = self.years_indexes[self.year] #current_year_index
 		empty_locations = []
-		for l in self.locations:
-			empty = True
-			for v in self.varieties:
-				try:
-					empty = empty and (self.entries[(l,v)][self.year] is None)
-					if not empty:
-						break
-				except KeyError:
-					pass
-			if empty:
-				empty_locations.append(l)
+		for len_avg in self.entry_avgs.values():
+			pass
+		"""
 		
 		# initialize the groups variable
 		self.groups = {}
@@ -332,6 +321,8 @@ class LSD_Calculator:
 		# Sort by common locations
 		# Note: this is the subset problem(?), which is NP-complete
 		
+		# We already have this data in self.entry_avgs
+		"""
 		# for each variety, count the number of locations we have data
 		for v in self.varieties:
 			count = 0
@@ -343,8 +334,16 @@ class LSD_Calculator:
 					pass
 			if (count > 0): # discard rows with no data
 				self.groups[(count,0)].append(v)
+		"""
+		cy_i = self.year_indexes[self.year] #current_year_index
+		for entry in self.entry_avgs.items(): # entry = (key, value)
+			count = entry[1][cy_i][0]
+			if count:
+				self.groups[(count, 0)].append(entry[0]) # .append(key)
+			
 		
 		# remove empty groups
+		
 		groups_to_delete = []
 		for key in self.groups:
 			if len(self.groups[key]) == 0: # if the list is empty
@@ -352,6 +351,8 @@ class LSD_Calculator:
 		for key in groups_to_delete:
 			del self.groups[key]
 		
+		
+		"""
 		def break_into_subsets():
 			# Go through each subset and break into more subsets.
 			new_subsets = {}
@@ -387,7 +388,45 @@ class LSD_Calculator:
 				))
 				new_key = (key[0], key[1]+1) # increase the minor order by one
 				self.groups[new_key] = new_subsets[key]
+		"""	
+		
+		
+		l_indexes = self.location_indexes
+		def break_into_subsets():
+			# Go through each subset and break into more subsets.
+			new_subsets = {}
+			for entry in self.groups.items():
+				key = entry[0]
+				variety_subset = entry[1]
+				if (len(variety_subset) > 1): # only try to subdivde sets that have two or more members
+					v = variety_subset[0]
+					"""
+					locations = []
+					for l in l_indexes:
+						if self.entries[v][cy_i][l] is not None:
+							locations.append(l)
+					"""
+					locations = [l for l in l_indexes.values() if self.entries[v][cy_i][l] is not None]
+
+					new_subset = []
+					for v in variety_subset[1::]: # skip past variety_subset[0]
+						balanced = True
+						for l in locations: # only iterate over locations in variety_subset[0]
+							balanced = balanced and self.entries[v][cy_i][l] is not None
+						if not balanced:
+							new_subset.append(v)
+					if len(new_subset) > 0:
+						new_subsets[key] = new_subset # save result for post-processing
 				
+			# insert the subsets into self.groups
+			for key in new_subsets.keys():
+				self.groups[key] = sorted(list(
+						set(self.groups[key]).difference(
+						set(new_subsets[key]))
+				))
+				new_key = (key[0], key[1]+1) # increase the minor order by one
+				self.groups[new_key] = new_subsets[key]
+		
 		for num_times in range(3): # TODO: hard-coded numeric value
 			break_into_subsets()
 		
@@ -398,7 +437,8 @@ class LSD_Calculator:
 				major_orders[key[0]].append(key)
 			except KeyError:
 				major_orders[key[0]] = [key]
-				
+		
+		"""
 		if reduce_to_one_subset: # if we are the varieties view
 			# find the biggest group(s) representing the chosen varieties, then delete the rest
 			ordered_groups_keys = sorted(self.groups.keys(), reverse=True)
@@ -441,14 +481,16 @@ class LSD_Calculator:
 				self.groups = new_groups
 
 		else: # if we are the locations view
-			# put all elements from higher-order groups into lower-order groups,
-			# putting 'None' into non-common locations.
-			for order in major_orders.keys(): # reverse-traverse
-				for key in self.groups.keys():
-					if key[0] < order: # if this group's order is smaller than another, add all from the higher order
-						for larger_group_key in major_orders[order]:
-							for v in self.groups[larger_group_key]:
-								self.groups[key].append(v)
+		"""
+		
+		# put all elements from higher-order groups into lower-order groups,
+		# putting 'None' into non-common locations.
+		for order in major_orders.keys(): # reverse-traverse
+			for key in self.groups.keys():
+				if key[0] < order: # if this group's order is smaller than another, add all from the higher order
+					for larger_group_key in major_orders[order]:
+						for v in self.groups[larger_group_key]:
+							self.groups[key].append(v)
 		
 		# make a list of years to average over
 		avg_years = []
@@ -476,12 +518,7 @@ class LSD_Calculator:
 			n_yr = '%d-yr' % len(element)
 			head_row.append((n_yr, -1)) # tuple: (name, id)
 		for l in self.locations:
-			location_id = -1
-			try:
-				location_id = models.Location.objects.get(name__iexact=l).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
-			except:
-				pass
-			head_row.append((l, location_id))
+			head_row.append((l.name, l.id))
 		return_list.append(head_row) # append first row
 		
 		# the header between each group
@@ -492,53 +529,44 @@ class LSD_Calculator:
 		for key in sorted(self.groups.keys(), reverse=True): # for each subset
 			subset_list = []
 			locations = []
-			
 			# define the locations that need to be printed for this subset
 			if len(self.groups[key]) > 0:
 				variety = self.groups[key][0]
-				for l in self.locations:
-					try:
-						if self.entries[(l,variety)][self.year] is not None:
-							locations.append(l)
-					except KeyError:
-						pass
-			
+				for l in l_indexes.values():
+					if self.entries[variety][cy_i][l] is not None:
+						locations.append(l)
+				
 				# add the values for this subset
-				for v in sorted(self.groups[key]): # Sort each group alphabetically
-					variety_id = -1
-					try:
-						variety_id = models.Variety.objects.get(name__iexact=v).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
-					except:
-						pass
-					temp_row = [(v, variety_id)] # tuple: (name, id)
+				for v in sorted(self.groups[key], key=attrgetter('name')): # Sort each group alphabetically
+					temp_row = [(v.name, v.id)] # tuple: (name, id)
 					append_me = True
 					one_year_sums = []
 					
-					for l in self.locations:
+					for l in l_indexes.values():
 						if l not in locations: # ensure all subgroups only show data for common locations
 							temp_row.append(None)
 						else:
-							try:
-								values = self.entries[(l,v)][self.year]
-								value = round(sum(values)/len(values), 1) # TODO: is round necessary here?
+							value = self.entries[v][cy_i][l]
+							
+							if value is not None:
+								value = round(value, 1) # TODO: is round necessary here?
 								temp_row.append(value)
 								one_year_sums.append(value) # will not contain None
-							except KeyError:
+							else:
+								"""
 								if l in locations: # this variety is from a higher-order set, but does not have data for one of our common locations
 									append_me = False
 									break
+								"""
 								temp_row.append(None)
 								
 					if append_me:
 						if len(one_year_sums) > 1: # if we have two or more datapoints
-							# append 1-yr avg
-							#temp_row.append(round(sum(one_year_sums)/len(one_year_sums), 1))
 							# prepend 1-yr avg, after the variety name
 							temp_row.insert(1, round(sum(one_year_sums)/len(one_year_sums), 1))
 						else:
-							append_me = False # cause the 2-yr,... to short-circuit
-							#temp_row.append(None)
 							temp_row.insert(1, None)
+							
 						# append 2-yr, ... avgs
 						for years_to_average in avg_years[1::]: # skip past 1-yr avg
 							sum_list = []
@@ -546,33 +574,32 @@ class LSD_Calculator:
 							for year in years_to_average:
 								if append_me: # only continue while there are no errors
 									if year != self.year: # we already retrieved the data for this year
-										for l in locations:
-											try:
-												values = self.entries[(l,v)][year]
-												value = round(sum(values)/len(values), 1)
-												sum_list.append(value)
-											except KeyError:
+										for l in l_indexes.values():
+											
+											value = self.entries[v][self.year_indexes[year]][l]
+											if value is not None:
+												sum_list.append(round(value, 1))
+											"""
+											else:
 												append_me = False
 												break
+											"""
 									else:
 										sum_list.extend(one_year_sums)
 							
 							if append_me and len(sum_list) > 1:
-								# append
-								#temp_row.append(round(sum(sum_list)/len(sum_list), 1))
 								# prepend, after the 1-yr avg
-								
 								temp_row.insert(2, round(sum(sum_list)/len(sum_list), 1))
 							else:
-								#temp_row.append(None)
 								temp_row.insert(2, None)
 						subset_list.append(temp_row)
 						
 				# prepare a list to compute lsd on, by removing all "None" from this subset
+				
 				lsd_list = []
 				for row in subset_list:
 					not_none = []
-					for cell in row[1:len(self.locations)+1:]: # skip past first column (the variety name), and do not include n-yr avgs
+					for cell in row[len(avg_years)+1::]: # skip past first column (the variety name), and do not include n-yr avgs
 						if cell is not None:
 							not_none.append(cell)
 					if len(not_none) > 1:
@@ -590,23 +617,25 @@ class LSD_Calculator:
 					temp_row.append(value)
 				else:
 					temp_row.append(None)
+				print "multyear"
 				# append 2-yr, ... lsds
 				append_me = True # reset error flag
 				for years_to_average in avg_years[1::]: # skip past 1-yr avg
 					multiple_year_lsd_list = []	
-					for v in sorted(self.groups[key]): #TODO: we iterated through this already...
+					for v in sorted(self.groups[key], key=attrgetter('name')): #TODO: we iterated through this already...
 						variety_across_years = []
 						for year in years_to_average:
 							variety_for_year = []
 							if append_me:
 								for l in locations:
-									try:
-										values = self.entries[(l,v)][year]
-										value = round(sum(values)/len(values), 1)
-										variety_for_year.append(value)
-									except KeyError:
+									value = self.entries[v][self.year_indexes[year]][l]
+									if value is not None:
+										variety_for_year.append(round(value,1))
+									"""
+									else:
 										append_me = False
 										break
+									"""
 							variety_across_years.extend(variety_for_year)
 						multiple_year_lsd_list.append(variety_across_years)
 					
@@ -618,18 +647,20 @@ class LSD_Calculator:
 						temp_row.append(value)
 					else:
 						temp_row.append(None)
-						
-				for l in self.locations:
-					if l in locations:
-						try:
-							temp_row.append(max(self.lsds[(l, self.year)])) #TODO: smarter logic needed
-						except KeyError:
+				
+				for l in self.location_indexes:
+					if self.location_indexes[l] in locations:
+						value = self.lsds[l][cy_i] #TODO: smarter logic needed
+						if value is not None:
+							temp_row.append(value)
+						else:
 							temp_row.append(None)
 					else:
 						temp_row.append(None)
 						
 				subset_list.append(temp_row)
-					
+				
+				
 				return_list.extend(subset_list) # append the lists inside subset_list to return_list
 				return_list.append(next_header) # append another header row
 

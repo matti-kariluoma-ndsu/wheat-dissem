@@ -85,4 +85,6 @@ Priority queue
 	2,3-yr data appearing, lsds for it
 	all-field view
 	only show 1,2,3-yr avg, no longer ask for 50,100,etc. 
-	
+
+Why does Carrington 2011 bushels_acre return 25 up to 41?
+Why does Kidder County 2011 bushels_acre show up twice with different values?
