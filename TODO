@@ -88,3 +88,9 @@ Priority queue
 
 Why does Carrington 2011 bushels_acre return 25 up to 41?
 Why does Kidder County 2011 bushels_acre show up twice with different values?
+
+future:
+	sort by proximity
+	UI for entering data, confirmation/error pages
+	Table showing noughts for each variety x location x year data has been entered for
+		mouseover to see number
