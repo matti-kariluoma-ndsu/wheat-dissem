@@ -245,6 +245,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	try:
 		sorted_list = LSD_Calculator(get_entries(locations, year_list), locations, varieties, year_list, curyear, field).fetch(reduce_to_one_subset=one_subset)
 	except TypeError:
+		print "Errored out!"
 		# TODO: we can do more for the user than redirect to /
 		return HttpResponseRedirect("/")
 	
