@@ -250,7 +250,6 @@ class LSD_Calculator:
 									value = None
 						
 						self.lsds[location][y] = value
-		#print sentries
 		
 	def fetch(self, reduce_to_one_subset=False):
 		"""
@@ -374,7 +373,7 @@ class LSD_Calculator:
 					self.groups_loc[new_key][y] = [l for l in self.locations if self.entries[v][y][l_indexes[l]] is not None]
 		
 		# make more subgroups, and update the locations for each new subgroup
-		for num_times in range(5): # TODO: hard-coded numeric value
+		for num_times in range(3): # TODO: hard-coded numeric value
 			break_into_subsets()
 		
 		#TODO: mayhap this check should be done before break_into_subsets()?
@@ -423,7 +422,7 @@ class LSD_Calculator:
 			"""
 		else: # if we are the locations view
 			# Add all varieties from larger subsets to smaller subsets
-			add_all_varieties_from_larger_subsets = True
+			add_all_varieties_from_larger_subsets = False
 			if add_all_varieties_from_larger_subsets:
 				"""
 				common_varieties = []
@@ -438,7 +437,11 @@ class LSD_Calculator:
 					common_buffer.extend(self.groups[key])
 				"""
 				for key in sorted(self.groups.keys(), reverse=True):
-					print key
+					for lkey in [lesser_key for lesser_key in self.groups.keys() if lesser_key[0] <= key[0]]: # python does compares on tuples well
+						if lkey is not key: # ignore the case where we are the same key
+							self.groups[lkey].extend(self.groups[key])
+							self.groups[lkey] = list(set(self.groups[lkey])) # remove duplicates
+				
 		#
 		# make a list of years to average over
 		#
@@ -446,13 +449,13 @@ class LSD_Calculator:
 		
 		# find all years before the current year, inclusive
 		def f(x): return (x <= self.year)
-				
+		
 		# construct a list for n-yr averaging e.g. [[2010], [2010, 2009], [2010, 2009, 2008]]
 		for year in sorted(filter(f, self.years)):
 			for element in avg_years:
 				element.append(year)
 			avg_years.append([year])		
-			
+		
 		avg_years = sorted(avg_years, reverse=True) # order them 1-yr, 2-yr, ...
 		
 		#
@@ -576,8 +579,8 @@ class LSD_Calculator:
 			
 			if len(lsd_list) > 0:
 				# append 1-yr lsd
-				print "calculating lsd:"
-				print lsd_list
+				#print "calculating lsd:"
+				#print lsd_list
 				try:
 					value = round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 1)
 				except:
@@ -612,12 +615,12 @@ class LSD_Calculator:
 				# now go through and drop any larger than the minimum length
 				
 				if append_me:
-					print "calculating multyear lsd:"
-					print multiple_year_lsd_list
+					#print "calculating multyear lsd:"
+					#print multiple_year_lsd_list
 					try:
 						value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 1)
 					except:
-						print "problem in multyear lsd"
+						#print "problem in multyear lsd"
 						value = None
 					temp_row.append(value)
 				else:
