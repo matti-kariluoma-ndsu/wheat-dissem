@@ -291,26 +291,7 @@ class LSD_Calculator:
 			"""
 			Returns the length of a list that is None padded.
 			"""
-			return len([i for i in l if i is not None])
-		
-		
-		# compute averages per variety/year/location
-		# we don't use this computed average, so why calculate it?
-		"""
-		years = sorted(self.year_indexes.values())
-		for v in self.varieties:
-			self.entry_avgs[v] = []
-			append = self.entry_avgs[v].append
-			year_list = self.entries[v]
-			for y in years:
-				l = year_list[y] # location_list
-				len_l = len_not_none(l)
-				if len_l:
-					append((len_l, float(reduce(add_not_none, chain([0], l))) / len_l)) # a 2-tuple, (len, avg)
-				else:
-					append((len_l, 0.0))
-		"""
-		
+			return len([i for i in l if i is not None])	
 		
 		#
 		# Sort by common locations
@@ -337,10 +318,9 @@ class LSD_Calculator:
 		# populate an initial guess on the locations in each group
 		for key in self.groups:
 			v = self.groups[key][0]
-			locations = []
+			self.groups_loc[key] = [None, None, None] # _heavily_ assumes we are only dealing with 3 years
 			for y in self.year_indexes.values():
-				locations.extend([l for l in range(len(self.entries[v][y])) if self.entries[v][y][l] is not None])
-			self.groups_loc[key] = [l for l in self.locations if l_indexes[l] in list(set(locations))] # remove duplicates
+				self.groups_loc[key][y] = [l for l in self.locations if self.entries[v][y][l_indexes[l]] is not None]
 		
 		
 		def break_into_subsets():
@@ -361,41 +341,40 @@ class LSD_Calculator:
 					"""
 					#locations = [l for l in l_indexes.values() if self.entries[v][cy_i][l] is not None]
 					
-					
-					if key in self.groups_loc.keys():
-						locats = self.groups_loc[key]
-					else: # TODO: We should never need to take this else branch
-						locats = [l for l in self.locations if self.entries[v][cy_i][l_indexes[l]] is not None]
+					for y in self.year_indexes.values():
+						if key in self.groups_loc.keys():
+							locats = self.groups_loc[key][y]
+						else: # TODO: We should never need to take this else branch
+							locats = [l for l in self.locations if self.entries[v][y][l_indexes[l]] is not None]
 
-					new_subset = []
-					for v in variety_subset[1::]: # skip past variety_subset[0]
-						balanced = True
-						for l in locats: # only iterate over locations in variety_subset[0]
-							balanced = balanced and self.entries[v][cy_i][l_indexes[l]] is not None
-						if not balanced:
-							new_subset.append(v)
+						new_subset = []
+						for v in variety_subset[1::]: # skip past variety_subset[0]
+							balanced = True
+							for l in locats: # only iterate over locations in variety_subset[0]
+								balanced = balanced and self.entries[v][y][l_indexes[l]] is not None
+							if not balanced:
+								new_subset.append(v)
 					if len(new_subset) > 0:
 						new_subsets[key] = new_subset # save result for post-processing
 				
 			# insert the subsets into self.groups
 			for entry in new_subsets.items():
 				key = entry[0]
-				self.groups[key] = sorted(list(
+				self.groups[key] = list(
 						set(self.groups[key]).difference(
 						set(new_subsets[key]))
-				))
+				)
 				new_key = (key[0], key[1]+1) # increase the minor order by one
 				self.groups[new_key] = new_subsets[key]
 				v = self.groups[new_key][0]
 				
 				# which locations are in this new subset?
-				locations = []
+				self.groups_loc[new_key] = [None, None, None] # _heavily_ assumes we are only dealing with 3 years
 				for y in self.year_indexes.values():
-					locations.extend([l for l in range(len(self.entries[v][y])) if self.entries[v][y][l] is not None])
-				self.groups_loc[new_key] = [l for l in self.locations if l_indexes[l] in list(set(locations))] # remove duplicates
+					self.groups_loc[new_key][y] = [l for l in self.locations if self.entries[v][y][l_indexes[l]] is not None]
 		
 		# make more subgroups, and update the locations for each new subgroup
-		for num_times in range(3): # TODO: hard-coded numeric value
+		for num_times in range(5): # TODO: hard-coded numeric value
 			break_into_subsets()
 		
 		#TODO: mayhap this check should be done before break_into_subsets()?
@@ -444,8 +423,9 @@ class LSD_Calculator:
 			"""
 		else: # if we are the locations view
 			# Add all varieties from larger subsets to smaller subsets
-			add_all_varieties_from_larger_subsets = False
+			add_all_varieties_from_larger_subsets = True
 			if add_all_varieties_from_larger_subsets:
+				"""
 				common_varieties = []
 				common_buffer = []
 				common_key = len(self.locations)
@@ -456,7 +436,9 @@ class LSD_Calculator:
 					common_key = key[0] # the major order
 					self.groups[key].extend(common_varieties)
 					common_buffer.extend(self.groups[key])
-		
+				"""
+				for key in sorted(self.groups.keys(), reverse=True):
+					print key
 		#
 		# make a list of years to average over
 		#
@@ -502,7 +484,12 @@ class LSD_Calculator:
 			
 			# define the locations that need to be printed for this subset
 			if key in self.groups_loc:
-				locations = [l_indexes[l] for l in self.groups_loc[key]]
+				#locations = [l_indexes[l] for l in self.groups_loc[key][cy_i]] # TODO: do we need to consider the other years here?
+				# TODO: kludge, adds unececssary locales, much extra processing. should changfe 'locations' for each year when doing multyear
+				locations = []
+				for y in self.year_indexes.values():
+					locations.extend([l_indexes[l] for l in self.groups_loc[key][y]])
+				locations = list(set(locations)) # remove duplicates
 			else:
 				locations = []
 				if len(self.groups[key]) > 0:
@@ -589,8 +576,8 @@ class LSD_Calculator:
 			
 			if len(lsd_list) > 0:
 				# append 1-yr lsd
-				#print "calculating lsd:"
-				#print lsd_list
+				print "calculating lsd:"
+				print lsd_list
 				try:
 					value = round(self.LSD(response_to_treatments=lsd_list, probability=0.05), 1)
 				except:
@@ -613,8 +600,7 @@ class LSD_Calculator:
 								if value is not None:
 									variety_for_year.append(round(value,1))
 								else:
-									pass
-									#print "multyear lsd error on: \t%s %s %s" % (v, year, l)
+									pass #print "multyear lsd error on: \t%s %s %s" % (v, year, l)
 								"""
 								else:
 									append_me = False
@@ -626,12 +612,12 @@ class LSD_Calculator:
 				# now go through and drop any larger than the minimum length
 				
 				if append_me:
-					#print "calculating multyear lsd:"
-					#print multiple_year_lsd_list
+					print "calculating multyear lsd:"
+					print multiple_year_lsd_list
 					try:
 						value = round(self.LSD(response_to_treatments=multiple_year_lsd_list, probability=0.05), 1)
 					except:
-						#print "problem in multyear lsd"
+						print "problem in multyear lsd"
 						value = None
 					temp_row.append(value)
 				else:
