@@ -528,11 +528,12 @@ class LSD_Calculator:
 							temp_row.append(None)
 							
 				if append_me:
+					avg_list = []
 					if len(one_year_sums) > 1: # if we have two or more datapoints
 						# prepend 1-yr avg, after the variety name
-						temp_row.insert(1, round(sum(one_year_sums)/len(one_year_sums), 1))
+						avg_list.append(round(sum(one_year_sums)/len(one_year_sums), 1))
 					else:
-						temp_row.insert(1, None)
+						avg_list.append(None)
 						
 					# append 2-yr, ... avgs
 					for years_to_average in avg_years[1::]: # skip past 1-yr avg
@@ -556,11 +557,14 @@ class LSD_Calculator:
 						
 						if append_me and len(sum_list) > 1:
 							# prepend, after the 1-yr avg
-							temp_row.insert(2, round(sum(sum_list)/len(sum_list), 1))
+							avg_list.append(round(sum(sum_list)/len(sum_list), 1))
 						else:
-							temp_row.insert(2, None)
+							avg_list.append(None)
 					subset_list.append(temp_row)
-				
+					
+					for cell in avg_list[::-1]: # reverse-traverse the list
+						temp_row.insert(1, cell)
+					
 			#	
 			# prepare a list to compute lsd on, by removing all "None" from this subset
 			#
