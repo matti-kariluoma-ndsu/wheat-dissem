@@ -25,64 +25,18 @@ def index(request, abtest=None):
 	variety_list = models.Variety.objects.all()
 	curyear = datetime.date.today().year - 1
 	
-	if abtest is None:
-		return render_to_response(
-			'main.html', 
-			{ 
-				'zipcode_radius_form': zipcode_radius_form,
-				'varieties_form': varieties_form,
-				'variety_list': variety_list,
-				'curyear': curyear
-			},
-			context_instance=RequestContext(request)
-		)
-	else:
-		ab = int(abtest)
-		if ab == 0:
-			return render_to_response(
-				'main_ndsu.html', 
-				{ 
-					'zipcode_radius_form': zipcode_radius_form,
-					'varieties_form': varieties_form,
-					'variety_list': variety_list,
-					'curyear': curyear
-				},
-				context_instance=RequestContext(request)
-			)
-		elif ab == 1:
-			return render_to_response(
-				'main_w1.html', 
-				{ 
-					'zipcode_radius_form': zipcode_radius_form,
-					'varieties_form': varieties_form,
-					'variety_list': variety_list,
-					'curyear': curyear
-				},
-				context_instance=RequestContext(request)
-			)
-		elif ab == 2:
-			return render_to_response(
-				'main_r1.html', 
-				{ 
-					'zipcode_radius_form': zipcode_radius_form,
-					'varieties_form': varieties_form,
-					'variety_list': variety_list,
-					'curyear': curyear
-				},
-				context_instance=RequestContext(request)
-			)
-		else:
-			return render_to_response(
-				'main.html', 
-				{ 
-					'zipcode_radius_form': zipcode_radius_form,
-					'varieties_form': varieties_form,
-					'variety_list': variety_list,
-					'curyear': curyear
-				},
-				context_instance=RequestContext(request)
-			)
 
+	return render_to_response(
+		'main_ndsu.html', 
+		{ 
+			'zipcode_radius_form': zipcode_radius_form,
+			'varieties_form': varieties_form,
+			'variety_list': variety_list,
+			'curyear': curyear
+		},
+		context_instance=RequestContext(request)
+	)
+		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'POST':
 		locations_form = variety_trials_forms.SelectLocationsForm(request.POST)
@@ -114,7 +68,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 						'radius': zipcode_radius_form.cleaned_data['search_radius']
 					})
 				return render_to_response(
-					'main.html', 
+					'main_ndsu.html', 
 					{ 
 						'zipcode_radius_form': zipcode_radius_form,
 						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
@@ -142,7 +96,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					'radius': zipcode_radius_form.cleaned_data['search_radius']
 				})
 			return render_to_response(
-					'main.html', 
+					'main_ndsu.html', 
 					{ 
 						'zipcode_radius_form': zipcode_radius_form,
 						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
@@ -270,71 +224,23 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		sorted_list = [[curyear]]
 		return HttpResponseRedirect("/")
 		
+
+	return render_to_response(
+		'tabbed_view_ndsu.html',
+		{ 
+			'locations_form': locations_form,
+			'field_list': field_list,
+			'location_list': locations,
+			'curyear': curyear,
+			'heading_list': sorted_list[0][1::],
+			'sorted_list': sorted_list[1::],
+			'years': years,
+			'blurbs' : unit_blurbs,
+			'curfield' : fieldname
+		},
+		context_instance=RequestContext(request)
+	)
 	
-	if (ab is None):
-		return render_to_response(
-			'tabbed_view.html',
-			{ 
-				'locations_form': locations_form,
-				'field_list': field_list,
-				'location_list': locations,
-				'curyear': curyear,
-				'heading_list': sorted_list[0][1::],
-				'sorted_list': sorted_list[1::],
-				'years': years,
-				'blurbs' : unit_blurbs,
-				'curfield' : fieldname
-			},
-			context_instance=RequestContext(request)
-		)
-	elif (ab == 0):
-		return render_to_response(
-			'tabbed_view_ndsu.html',
-			{ 
-				'locations_form': locations_form,
-				'field_list': field_list,
-				'location_list': locations,
-				'curyear': curyear,
-				'heading_list': sorted_list[0][1::],
-				'sorted_list': sorted_list[1::],
-				'years': years,
-				'blurbs' : unit_blurbs,
-				'curfield' : fieldname
-			},
-			context_instance=RequestContext(request)
-		)
-	elif (ab == 1):
-		return render_to_response(
-			'tabbed_view_w1.html',
-			{ 
-				'locations_form': locations_form,
-				'field_list': field_list,
-				'location_list': locations,
-				'curyear': curyear,
-				'heading_list': sorted_list[0][1::],
-				'sorted_list': sorted_list[1::],
-				'years': years,
-				'blurbs' : unit_blurbs,
-				'curfield' : fieldname
-			},
-			context_instance=RequestContext(request)
-		)
-	elif (ab == 2):
-		return render_to_response(
-			'tabbed_view_r1.html',
-			{ 
-				'locations_form': locations_form,
-				'field_list': field_list,
-				'location_list': locations,
-				'curyear': curyear,
-				'heading_list': sorted_list[0][1::],
-				'sorted_list': sorted_list[1::],
-				'years': years,
-				'blurbs' : unit_blurbs,
-				'curfield' : fieldname
-			},
-			context_instance=RequestContext(request)
-		)
 
 def varieties_view(request, yearname, fieldname, abtest=None):
 	
