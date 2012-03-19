@@ -378,48 +378,52 @@ class LSD_Calculator:
 		
 		#TODO: mayhap this check should be done before break_into_subsets()?
 		if reduce_to_one_subset: # if we are the varieties view
-			pass
-			"""
 			# find the biggest group(s) representing the chosen varieties, then delete the rest
-			ordered_groups_keys = sorted(self.groups.keys(), reverse=True)
-			groups_keys_save = []
+			most_varieties = []
+			max_len = max(map(len, self.groups.values()))
+			for key in sorted(self.groups.keys(), reverse=True):
+				if len(self.groups[key]) >= max_len:
+					most_varieties.append(key)
 			
-			for v in self.varieties:
-				ordered_groups_pos = 0
-				while ordered_groups_pos < len(ordered_groups_keys):
-					if v in self.groups[ordered_groups_keys[ordered_groups_pos]]:
-						groups_keys_save.append(ordered_groups_keys[ordered_groups_pos])
-						break # break the while loop
-					ordered_groups_pos += 1
-			# delete non-matching
-			for key in self.groups.keys():
-				if key not in groups_keys_save:
-					del self.groups[key]
 			
-			# for the groups that remain, delete the non-common locations until one subset remains
-			locations_save = []
-			
-			for l in self.locations:
-				add_location = True
-				for key in self.groups.keys():
-					for v in self.groups[key]:
-						try:
-							if self.entries[(l,v)][self.year] is None:
-								add_location = False
-								break # don't check anymore groups
-						except KeyError:
-							add_location = False
-							break # don't check anymore groups
-				if add_location:
-					locations_save.append(l)
-			#print locations_save
-			if len(locations_save) > 0: # if any locations remain, replace
-				self.locations = locations_save
-				# put all into one group
-				new_groups = {}
-				new_groups[(1,0)] = list(self.varieties) # make a copy
-				self.groups = new_groups
 			"""
+			# for the groups that remain, delete the non-common locations until one subset remains
+			init_locale = self.groups_loc[most_varieties[0]]
+			common_locations = []
+			for locations in init_locale:
+				common_locations.extend(locations)
+			common_locations = dict(zip(common_locations, common_locations)) # make a copy as a dictionary
+			
+			for key in most_varieties[1::]: # skip first
+				for locations in self.groups_loc[key]:
+					to_delete = []
+					for location in common_locations:
+						if location not in locations:
+							to_delete.append(location)
+					for location in to_delete:
+						del common_locations[location]
+			"""
+			# commented out since we don't have that many 3-yr complete data
+			
+			# delete non-common locations with respect to the selected year
+			init_locale = self.groups_loc[most_varieties[0]]
+			common_locations = init_locale[cy_i]
+			common_locations = dict(zip(common_locations, common_locations)) # make a copy as a dictionary
+			
+			for key in most_varieties[1::]: # skip first
+				to_delete = []
+				for location in common_locations:
+					if location not in self.groups_loc[key][cy_i]:
+						to_delete.append(location)
+				for location in to_delete:
+					del common_locations[location]
+			
+			# put all into one group
+			del self.groups
+			del self.groups_loc
+			order = len(common_locations)
+			self.groups[((order,order,order),0)] = list(self.varieties)
+			self.groups_loc[((order,order,order),0)] = [list(common_locations), list(common_locations), list(common_locations)]# TODO: heavily assumes 3-yrs
 		else: # if we are the locations view
 			# Add all varieties from larger subsets to smaller subsets
 			add_all_varieties_from_larger_subsets = False
@@ -441,7 +445,8 @@ class LSD_Calculator:
 						if lkey is not key: # ignore the case where we are the same key
 							self.groups[lkey].extend(self.groups[key])
 							self.groups[lkey] = list(set(self.groups[lkey])) # remove duplicates
-				
+		
+		print self.groups
 		#
 		# make a list of years to average over
 		#
@@ -470,9 +475,14 @@ class LSD_Calculator:
 			n_yr = '%d-yr' % len(element)
 			head_row.append((n_yr, -1)) # tuple: (name, id)
 		l_indexes_values = []
-		for l in sorted(self.locations, key=attrgetter('name')):
-			l_indexes_values.append(l_indexes[l])
-			head_row.append((l.name, l.id))
+		if reduce_to_one_subset: # if we are the varieties view
+			for l in sorted(self.groups_loc.values()[0][0], key=attrgetter('name')): ##TODO: Super-kludge
+				l_indexes_values.append(l_indexes[l])
+				head_row.append((l.name, l.id))
+		else:
+			for l in sorted(self.locations, key=attrgetter('name')):
+				l_indexes_values.append(l_indexes[l])
+				head_row.append((l.name, l.id))
 		return_list.append(head_row) # append first row
 		
 		# the header between each group
@@ -630,15 +640,27 @@ class LSD_Calculator:
 				else:
 					temp_row.append(None)
 			
-			for l in self.location_indexes:
-				if self.location_indexes[l] in locations:
-					value = self.lsds[l][cy_i] #TODO: smarter logic needed
-					if value is not None:
-						temp_row.append(value)
+			if reduce_to_one_subset: # if we are the varieties view
+				for l in sorted(self.groups_loc.values()[0][0], key=attrgetter('name')): ##TODO: Super-kludge	
+					if self.location_indexes[l]  in locations:
+						value = self.lsds[l][cy_i] #TODO: smarter logic needed
+						if value is not None:
+							temp_row.append(value)
+						else:
+							temp_row.append(None)
 					else:
 						temp_row.append(None)
-				else:
-					temp_row.append(None)
+					
+			else:
+				for l in self.location_indexes:
+					if self.location_indexes[l] in locations:
+						value = self.lsds[l][cy_i] #TODO: smarter logic needed
+						if value is not None:
+							temp_row.append(value)
+						else:
+							temp_row.append(None)
+					else:
+						temp_row.append(None)
 					
 			subset_list.append(temp_row)
 			
