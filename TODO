@@ -1,55 +1,17 @@
 (grep for TODOs)
 div -> table for the moment, then back to div when a nice strategy is defined.
-printable view, preferably the view one receives. what about h-bar breaking?
 on /view/*
 	text links on top to buttons, put them on side?
 	(show input form when visited directly)
 	locations count per datapoint (variety)
-database
-	LSD row... where?
-	support for entries that involve multiple locations
 
-Goal: Printable version of tabbed_view when h-bar broken
-Soln 1: Move content s.t. h-bar does not break
-Soln 2: Have a print-view page that shows Soln 1
-
-Goal: Show number of locations (per row?) in tabbed_view
-Soln 1: in util.py, include that data, adjust tabbed_view
-
-Remove mean calculations that are invalid
-Be able to remove locations/varieties from the report
-Front Page
 	See descriptions of varieties
-	Compare varieties to one another
-Range
-	ND # use sentinels?
-	MN
-
-calculate 2-4yr avg whenever available seems to be short-circuiting
-For variety-to-varioety cull non-common locales
-Add to lesser subsets broken?
-Dec 8 - jochum
-Dec 12 - Cassselton
-A/B testing for these two events?
-live or screenshot?
 
 Break the subset logic apart from the list-generation logic.
 
 ** REGRESSION ** /view/variety/ pages use the /view/location/ form
   * this causes all sorts of wierdness as when the (x) and [] are used
 
-** REGRESSION ** /view/variety doesn't seem to be putting varieties into one group very well.
-
-* remove 1,2,3 if no data in all
-* calculate n-yr when able, don't short-circuit
-
-* for "compare selected" checkboxes: []
-  * honor selected locales? or grab all? Grab all, otherwise we are shwoing the same as last time.
-  * cannot compare albany/ any other variety with multiple entries.
-    * allow looking for larger of the many?
-    * of course, manually delete the ones we know about atm
-
-* make sure each print will let us know what we are looking at
 * look at printable version
   <link media="print" rel="stylesheet">
 * look at seeing seed sellers
@@ -59,7 +21,6 @@ Break the subset logic apart from the list-generation logic.
 * "back" button support? GET instead of POST?
 * mult-year avg still culling, other wierd behavior
   * 56716, 50mi
-* cut off at 3-yrs
 * message if v-v union is empty, from "compare selected" button
 * dropdown/add -> submit for v-v on main page
   * message if v-v union empty
@@ -67,12 +28,10 @@ Break the subset logic apart from the list-generation logic.
 * "compare selected" should do nothing if 0 or 1 varieties are selected
   * message?
 * add "All" button at top
+ * only show n-yr avgs of each field
 * cols not same sized on v-v view?
 
 * 50 mi 58501, 2010, Kidder County has an index of -1, why?
-
-* look at un-breaking h-bar
-* look at an all-data view, only showing 1-2-3 for the data
 
 Notes from Jan 5 meeting:
 zipcode to means only, distance on h
@@ -94,4 +53,5 @@ future:
 	UI for entering data, confirmation/error pages
 	Table showing noughts for each variety x location x year data has been entered for
 		mouseover to see number
-A strange bug: in the compare varieities view, the data is sometimes not expunged...
+
+** REGRESSION ** in the compare varieities view, the data is sometimes not expunged...
