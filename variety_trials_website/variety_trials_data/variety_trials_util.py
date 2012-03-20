@@ -446,7 +446,7 @@ class LSD_Calculator:
 							self.groups[lkey].extend(self.groups[key])
 							self.groups[lkey] = list(set(self.groups[lkey])) # remove duplicates
 		
-		print self.groups
+		#print self.groups
 		#
 		# make a list of years to average over
 		#
