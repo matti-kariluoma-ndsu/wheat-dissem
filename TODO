@@ -57,10 +57,7 @@ future:
 ** REGRESSION ** in the compare varieities view, the data is sometimes not expunged...
 
 Notes from 2012-Mar-20 Meeting
- * For NDSU view
-		* Header graphic mathcing the ag extension's
-		* Headings too big, text too small
-		H-bar gone in some browsers?
+	*	H-bar gone in some browsers?
 	* only show buttons for yield, protein, test weight
 	* Sort 2009,10,11 buttons
 	* Remove empty locations (feature for Jochum) on extension version, keep on 134

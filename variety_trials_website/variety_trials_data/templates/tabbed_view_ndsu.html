@@ -115,9 +115,7 @@
 {% block content %}
 <div class="top_spacer"></div>
 
-
-
-<div id="static_content">
+<div id="django_trial_results_content">
 	<table border='1'>
 		<tr>
 			<td colspan="{{ heading_list|length|add:1 }}">
@@ -133,9 +131,9 @@
 			<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
 		</tr>
 		<tr >
-			<td class="Variety padded"><h3> Variety</h3></td>
+			<td class="Variety padded"><h4> Variety</h4></td>
 			{% for heading in heading_list %}
-			<td class="padded"><h3>{{ heading.0 }}</h3>
+			<td class="padded"><h4>{{ heading.0 }}</h4>
 			{% if heading.1 != -1 %}
 			<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
 			{% endif %}
