@@ -1,6 +1,6 @@
 {% extends "ag_ndsu_frame.html" %}
 {% load django_math %}
-{% block content %}
+{% block navigation %}
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
@@ -78,127 +78,130 @@
 	{% endfor %}
 </div>
 
-<div class="top_spacer"></div>
-
-<table>
-<tr>
-<td><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-	<div >
+<ul class="navTree navTreeLevel0">
 	{% for fieldname, blurb_list in blurbs.items %}
+	<li class="navTreeItem navTreeTopNode">
 		{% if fieldname == curfield %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/">
+			* {{fieldname}}
+		</a>
 		{% else %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/">
+			{{fieldname}}
+		</a>
 		{% endif %}
+	</li>
 	{% endfor %}
-	</div>
-</td>
-</tr>
-<tr>
-<td><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+</ul>
+<hr>
+<ul class="navTree navTreeLevel0">
+	<!--TODO: auto-generate these year button images-->
 	{% for yearname, year_button_list in years.items %}
-		<!--TODO: auto-generate these year button images-->
+	<li class="navTreeItem navTreeTopNode">
 		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
-			<img src="{{year_button_list.1}}">
+			* {{yearname}}
 		{% else %}
-			<img src="{{year_button_list.0}}">
+			{{yearname}}
 		{% endif %}
 		</a>
+	</li>
 	{% endfor %}
-	</div>
-</td>
-</tr>
-<tr>
-<td colspan="2">
-	<div id="static_content">
-		<table border='1'>
-			<tr>
-				<td colspan="{{ heading_list|length|add:1 }}">
-					{% for fieldname, blurb_list in blurbs.items %}
-					{% if fieldname == curfield %}
-							<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
-							<p>{{blurb_list.2}}</p>
-					{% endif %}
-					{% endfor %}
-				</td>
-			</tr>
-			<tr>
-				<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
-			</tr>
-			<tr >
-				<td class="Variety padded"><h3> Variety</h3></td>
-				{% for heading in heading_list %}
-				<td class="padded"><h3>{{ heading.0 }}</h3>
+</ul>
+
+
+{% endblock %}
+
+{% block content %}
+<div class="top_spacer"></div>
+
+
+
+<div id="static_content">
+	<table border='1'>
+		<tr>
+			<td colspan="{{ heading_list|length|add:1 }}">
+				{% for fieldname, blurb_list in blurbs.items %}
+				{% if fieldname == curfield %}
+						<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
+						<p>{{blurb_list.2}}</p>
+				{% endif %}
+				{% endfor %}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+		</tr>
+		<tr >
+			<td class="Variety padded"><h3> Variety</h3></td>
+			{% for heading in heading_list %}
+			<td class="padded"><h3>{{ heading.0 }}</h3>
+			{% if heading.1 != -1 %}
+			<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+			{% endif %}
+			</td>
+			{% endfor %}
+		</tr>
+		<tr class="row subheadings thin">
+		</tr>
+	{% for datalist in sorted_list %}
+		{% if datalist.0.0 == "Variety" %}
+		<tr class="spacer_row">
+			<td></td>
+		</tr>
+		<tr>
+			<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+		</tr>
+		<tr class="Variety padded">
+			{% for heading in datalist %}
+			<td class="padded"><h3>{{ heading.0 }}</h3>
 				{% if heading.1 != -1 %}
 				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
 				{% endif %}
+			</td>
+			{% endfor %}
+		</tr>
+		{% else %}
+		{% if datalist.0 == "LSD" %}
+		<tr>
+			<td>
+			<form>
+				<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
+			</form>
+			</td>
+		</tr>
+		<tr class="spacer_row">
+			<td></td>
+		</tr>
+		<tr class="LSD_row">
+			{% for element in datalist %}
+			<td class='padded'>{{ element|default_if_none:"--" }}</td>
+			{% endfor %}
+		</tr>
+		{% else %}
+		<tr class="group {% cycle 'master_odd' 'master_even' %}">
+			{% for element in datalist %}
+				{% if datalist.0 == element %}
+				<td class='padded' style="text-align: left; width: 120px;">
+					<form>
+						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
+					</form>
 				</td>
-				{% endfor %}
-			</tr>
-			<tr class="row subheadings thin">
-			</tr>
-		{% for datalist in sorted_list %}
-			{% if datalist.0.0 == "Variety" %}
-			<tr class="spacer_row">
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
-			</tr>
-			<tr class="Variety padded">
-				{% for heading in datalist %}
-				<td class="padded"><h3>{{ heading.0 }}</h3>
-					{% if heading.1 != -1 %}
-					<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
-					{% endif %}
+				{% else %}
+				<td class='padded'>
+					{{ element|default_if_none:"--" }}
 				</td>
-				{% endfor %}
-			</tr>
-			{% else %}
-			{% if datalist.0 == "LSD" %}
-			<tr>
-				<td>
-				<form>
-					<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
-				</form>
-				</td>
-			</tr>
-			<tr class="spacer_row">
-				<td></td>
-			</tr>
-			<tr class="LSD_row">
-				{% for element in datalist %}
-				<td class='padded'>{{ element|default_if_none:"--" }}</td>
-				{% endfor %}
-			</tr>
-			{% else %}
-			<tr class="group {% cycle 'master_odd' 'master_even' %}">
-				{% for element in datalist %}
-					{% if datalist.0 == element %}
-					<td class='padded' style="text-align: left; width: 120px;">
-						<form>
-							<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
-						</form>
-					</td>
-					{% else %}
-					<td class='padded'>
-						{{ element|default_if_none:"--" }}
-					</td>
-					{% endif %}
-				{% endfor %}
-			</tr>
-			{% endif %}
-			{% endif %}
-		{% endfor %}
-			<tr class="bottom_spacer"></tr>
-	  </table>
-	</div>
-	<div class="clear">&#160;</div>
-</td>
-</tr>
-</table>
+				{% endif %}
+			{% endfor %}
+		</tr>
+		{% endif %}
+		{% endif %}
+	{% endfor %}
+		<tr class="bottom_spacer"></tr>
+  </table>
+</div>
+<div class="clear">&#160;</div>
+
 	<!--
 	<div id='dynamic_content'></div>
 	-->
