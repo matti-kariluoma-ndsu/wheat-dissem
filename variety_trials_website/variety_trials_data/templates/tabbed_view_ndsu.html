@@ -83,11 +83,11 @@
 	<li class="navTreeItem navTreeTopNode">
 		{% if fieldname == curfield %}
 		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/">
-			* {{fieldname}}
+			* {{blurb_list.0}}
 		</a>
 		{% else %}
 		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/">
-			{{fieldname}}
+			{{blurb_list.0}}
 		</a>
 		{% endif %}
 	</li>
@@ -199,9 +199,6 @@
 </div>
 <div class="clear">&#160;</div>
 
-	<!--
-	<div id='dynamic_content'></div>
-	-->
 {% endblock %}
 
 {% load jsonify %}

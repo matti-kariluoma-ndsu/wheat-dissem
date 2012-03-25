@@ -58,7 +58,6 @@ future:
 
 Notes from 2012-Mar-20 Meeting
 	*	H-bar gone in some browsers?
-	* only show buttons for yield, protein, test weight
 	* Remove empty locations (feature for Jochum) on extension version, keep on 134
 	* Display (how?) the number of site-years in each avg calc
 		* footnote?
