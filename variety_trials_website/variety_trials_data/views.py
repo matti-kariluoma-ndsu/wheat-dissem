@@ -161,13 +161,6 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	except ValueError:
 		curyear = max(year_list)
 		
-	years = {}
-	for year in year_list:
-		years[str(year)] = [
-			'/static/img/button_year_%s.jpg' % (str(year)),
-			'/static/img/button_high_year_%s.jpg' % (str(year))
-			]
-		
 	field_list = []
 	for field in models.Trial_Entry._meta.fields:
 		if (field.get_internal_type() == 'DecimalField' 
@@ -234,7 +227,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			'curyear': curyear,
 			'heading_list': sorted_list[0][1::],
 			'sorted_list': sorted_list[1::],
-			'years': years,
+			'years': year_list,
 			'blurbs' : unit_blurbs,
 			'curfield' : fieldname
 		},

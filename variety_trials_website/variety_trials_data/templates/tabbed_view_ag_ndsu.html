@@ -18,7 +18,7 @@
 	{% endfor %}
 </div>
 <div class="tabs years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-	{% for yearname, year_button_list in years.items %}
+	{% for yearname in years %}
 	<div style="display:none">
 		<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}" method="post">
 			{% csrf_token %}
@@ -59,13 +59,13 @@
 <tr>
 <td><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-	{% for yearname, year_button_list in years.items %}
-		<!--TODO: auto-generate these year button images-->
+	{% for yearname in years %}
+		
 		<a onclick="document['{{yearname}}form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
-			<img src="{{year_button_list.1}}">
+			* {{yearname}}
 		{% else %}
-			<img src="{{year_button_list.0}}">
+			{{yearname}}
 		{% endif %}
 		</a>
 	{% endfor %}

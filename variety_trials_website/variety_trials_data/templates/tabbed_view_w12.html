@@ -2,7 +2,7 @@
 {% load django_math %}
 {% block content %}
 <div class="tabs years">
-{% for yearname, year_button_list in years.items %}
+{% for yearname in years %}
 <div style="display:none">
 	<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}/2" method="post">
 		{% csrf_token %}
@@ -70,7 +70,7 @@
     </tr>
 
 		<div>
-		{% for yearname, year_button_list in years.items %}
+		{% for yearname in years %}
 		{% if yearname == curyear %}
 		<tr style="text-align: center; font-size: .75em; color: black;">
 			{% for fieldname, blurb_list in blurbs.items %}

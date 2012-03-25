@@ -19,7 +19,7 @@
 </div>
 
 <div class="tabs years">
-	{% for yearname, year_button_list in years.items %}
+	{% for yearname in years %}
 	<div style="display:none">
 		<form name="{{yearname}}form" action="/view/location/{{yearname}}/{{curfield}}/1" method="post">
 			{% csrf_token %}
@@ -68,9 +68,7 @@
 	</div>
     </tr>
     <div>
-		{% for yearname, year_button_list in years.items %}
-		
-		<!--TODO: auto-generate these year button images-->
+		{% for yearname in years %}
 		
 		{% if yearname == curyear %}
 		<tr style="background-color: #fac757; text-align: center; font-size: .75em; color: black;">
