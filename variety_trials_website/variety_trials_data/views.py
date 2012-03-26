@@ -218,8 +218,12 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	except IndexError: # will happen if all locations have been deselected...
 		sorted_list = [[curyear]]
 		return HttpResponseRedirect("/")
-		
-
+	
+	if one_subset: # the variety view
+		view = 'variety'
+	else: # the location view
+		view = 'location'
+	
 	return render_to_response(
 		'tabbed_view_ndsu.html',
 		{ 
@@ -231,7 +235,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			'sorted_list': sorted_list[1::],
 			'years': year_list,
 			'blurbs' : unit_blurbs,
-			'curfield' : fieldname
+			'curfield' : fieldname,
+			'view': view
 		},
 		context_instance=RequestContext(request)
 	)

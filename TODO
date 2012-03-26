@@ -60,6 +60,7 @@ Notes from 2012-Mar-20 Meeting
 	*	H-bar gone in some browsers?
 	* Remove empty locations (feature for Jochum) on extension version, keep on 134
 	* Display (how?) the number of site-years in each avg calc
+		* need to give the view the length of the 1,2,3-yr list
 		* footnote?
 	* Fix up the transition from variety-location views
 		* send the string "variety" or "location"?

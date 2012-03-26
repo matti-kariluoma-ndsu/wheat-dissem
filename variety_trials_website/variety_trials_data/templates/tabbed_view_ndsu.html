@@ -82,11 +82,11 @@
 	{% for fieldname, blurb_list in blurbs.items %}
 	<li class="navTreeItem navTreeTopNode">
 		{% if fieldname == curfield %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/">
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
 			* {{blurb_list.0}}
 		</a>
 		{% else %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/">
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
 			{{blurb_list.0}}
 		</a>
 		{% endif %}
@@ -97,7 +97,7 @@
 <ul class="navTree navTreeLevel0">
 	{% for yearname in years %}
 	<li class="navTreeItem navTreeTopNode">
-		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/">
+		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
 			* {{yearname}}
 		{% else %}

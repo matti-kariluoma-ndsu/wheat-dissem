@@ -515,7 +515,7 @@ class LSD_Calculator:
 			# add the values for this subset
 			#
 			for v in sorted(self.groups[key], key=attrgetter('name')): # Sort each group alphabetically
-				temp_row = [(v.name, v.id)] # tuple: (name, id)
+				temp_row = [(v.name, v.id)+key] # tuple: (name, id, #curyear, #curyear-1, #curyear-2)
 				append_me = True
 				one_year_sums = []
 				
