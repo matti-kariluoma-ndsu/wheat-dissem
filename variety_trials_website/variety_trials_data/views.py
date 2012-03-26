@@ -214,7 +214,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	#TODO: this is very bad for the database...
 	try:
-		curyear = str(sorted_list[0][0]) # we sent a preference for curyear, but what was returned may be different
+		curyear = sorted_list[0][0] # we sent a preference for curyear, but what was returned may be different
 	except IndexError: # will happen if all locations have been deselected...
 		sorted_list = [[curyear]]
 		return HttpResponseRedirect("/")
