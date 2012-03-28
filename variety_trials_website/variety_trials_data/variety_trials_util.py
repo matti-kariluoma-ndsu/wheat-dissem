@@ -446,6 +446,7 @@ class LSD_Calculator:
 							self.groups[lkey].extend(self.groups[key])
 							self.groups[lkey] = list(set(self.groups[lkey])) # remove duplicates
 		
+			
 		#print self.groups
 		#
 		# make a list of years to average over
@@ -466,6 +467,7 @@ class LSD_Calculator:
 		#
 		# construct header rows
 		#
+		remove_non_common_locations_in_current_year = True
 		
 		# header row
 		head_row = [self.year] # first (row, column) value is the current year
@@ -480,9 +482,18 @@ class LSD_Calculator:
 				l_indexes_values.append(l_indexes[l])
 				head_row.append((l.name, l.id))
 		else:
-			for l in sorted(self.locations, key=attrgetter('name')):
-				l_indexes_values.append(l_indexes[l])
-				head_row.append((l.name, l.id))
+			if remove_non_common_locations_in_current_year:
+				years_locations = []
+				for key in self.groups_loc:
+					years_locations.extend(self.groups_loc[key][cy_i])
+				years_locations = list(set(years_locations))
+				for l in sorted(years_locations, key=attrgetter('name')):
+					l_indexes_values.append(l_indexes[l])
+					head_row.append((l.name, l.id))
+			else:
+				for l in sorted(self.locations, key=attrgetter('name')):
+					l_indexes_values.append(l_indexes[l])
+					head_row.append((l.name, l.id))
 		return_list.append(head_row) # append first row
 		
 		# the header between each group
@@ -492,6 +503,7 @@ class LSD_Calculator:
 		#
 		# construct the rest of the rows
 		#
+		
 		for key in sorted(self.groups.keys(), reverse=True): # for each subset
 			subset_list = []
 			
@@ -500,9 +512,12 @@ class LSD_Calculator:
 				#locations = [l_indexes[l] for l in self.groups_loc[key][cy_i]] # TODO: do we need to consider the other years here?
 				# TODO: kludge, adds unececssary locales, much extra processing. should changfe 'locations' for each year when doing multyear
 				locations = []
-				for y in self.year_indexes.values():
-					locations.extend([l_indexes[l] for l in self.groups_loc[key][y]])
-				locations = list(set(locations)) # remove duplicates
+				if remove_non_common_locations_in_current_year:
+					locations = [l_indexes[l] for l in self.groups_loc[key][cy_i]]
+				else:
+					for y in self.year_indexes.values():
+						locations.extend([l_indexes[l] for l in self.groups_loc[key][y]])
+					locations = list(set(locations)) # remove duplicates
 			else:
 				locations = []
 				if len(self.groups[key]) > 0:
