@@ -4,7 +4,7 @@
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_location_form" action="/view/location/{{curyear}}/{{fieldname}}/" method="post">
+		<form name="{{fieldname}}_location_form" action="/varietyselectiontool/view/location/{{curyear}}/{{fieldname}}/" method="post">
 			{% csrf_token %}
 			{% for field in locations_form %}
 			<div class="input row">
@@ -20,7 +20,7 @@
 <div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname, year_button_list in years.items %}
 	<div style="display:none">
-		<form name="{{yearname}}_location_form" action="/view/location/{{yearname}}/{{curfield}}/" method="post">
+		<form name="{{yearname}}_location_form" action="/varietyselectiontool/view/location/{{yearname}}/{{curfield}}/" method="post">
 			{% csrf_token %}
 			{% for field in locations_form %}
 			<div class="input row">
@@ -42,7 +42,7 @@
 <div class="variety_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_variety_form" action="/view/variety/{{curyear}}/{{fieldname}}/" method="post">
+		<form name="{{fieldname}}_variety_form" action="/varietyselectiontool/view/variety/{{curyear}}/{{fieldname}}/" method="post">
 			{% csrf_token %}
 			{% for field in locations_form %}
 			<div class="input row">
@@ -58,7 +58,7 @@
 <div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname, year_button_list in years.items %}
 	<div style="display:none">
-		<form name="{{yearname}}_variety_form" action="/view/variety/{{yearname}}/{{curfield}}/" method="post">
+		<form name="{{yearname}}_variety_form" action="/varietyselectiontool/view/variety/{{yearname}}/{{curfield}}/" method="post">
 			{% csrf_token %}
 			{% for field in locations_form %}
 			<div class="input row">
@@ -86,9 +86,9 @@
 	<div >
 	{% for fieldname, blurb_list in blurbs.items %}
 		{% if fieldname == curfield %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/varietyselectiontool/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.4}}"></a>
 		{% else %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/varietyselectiontool/view/location/{{curyear}}/{{fieldname}}/"><img src="{{blurb_list.3}}"></a>
 		{% endif %}
 	{% endfor %}
 	</div>
@@ -99,7 +99,7 @@
 	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname, year_button_list in years.items %}
 		<!--TODO: auto-generate these year button images-->
-		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/location/{{yearname}}/{{curfield}}/">
+		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/varietyselectiontool/view/location/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
 			<img src="{{year_button_list.1}}">
 		{% else %}

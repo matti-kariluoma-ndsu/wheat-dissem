@@ -9,8 +9,10 @@
 	(HRSW) variety trials conducted in North Dakota. Available data 
 	include yield, protein percent, test weight, kernel weight, 
 	plant height, etc.</p>
-	
+
 	<br/>
+<!--	
+
 	Other color schemes of this website:
 	<ul>
 		<li>Version 1 (current)</li>
@@ -18,6 +20,7 @@
 		<li><a href="/1/">Version 3</a></li>
 		<li><a href="/2/">Version 4</a></li>
 	</ul>
+-->
 </div>
 <div class="location_form" >
 	{% for error in error_list %}
@@ -33,7 +36,7 @@
 
 	TODO: use get, not post
 	-->
-	<form action="/view/{{curyear}}/bushels_acre/" method="post">
+	<form action="view/{{curyear}}/bushels_acre/" method="post">
 		{% csrf_token %}
 		{% for field in zipcode_radius_form %}
 		<div class="input row">
@@ -47,7 +50,7 @@
 <div>
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
-	<form action="/view/variety/{{curyear}}/bushels_acre/" method="post">
+	<form action="view/variety/{{curyear}}/bushels_acre/" method="post">
 		{% csrf_token %}
 		{% for field in varieties_form %}
 		<div class="input row">
