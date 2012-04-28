@@ -100,10 +100,11 @@ processing.
 
 Someone will need to implement "LSD(list[][], alpha):" in javascript.
 
-** REGRESSION ** /view/variety/ pages use the /view/location/ form
-  * this causes all sorts of wierdness as when the (x) and [] are used
-
-* look at printable version
+The intent of this website is to replace the printed booklets that
+the Plant Sciences dept currently prints and distributes. They already
+have pdf versions of their booklets available on the website, and our
+project would like to deliver in a form familiar to that. Modern
+browsers support 
   <link media="print" rel="stylesheet">
 * look at seeing seed sellers
 
