@@ -6,7 +6,6 @@ TEMPLATE_DEBUG = DEBUG
 # Emails the following people when DEBUG=False and an error happens:
 ADMINS = (
     #('Matti Kariluoma', 'matti.m.kariluoma@ndsu.edu'),
-    #('Nick Kramer', 'darkfuzz@gmail.com')
 )
 
 MANAGERS = ADMINS
@@ -85,10 +84,11 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+## TODO: Disable the sessions, auth, admin, etc. apps we don't need
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
-	'django.contrib.sessions',
+		'django.contrib.sessions',
     #'django.contrib.sites',
     #'django.contrib.messages',
     # Uncomment the next line to enable the admin:

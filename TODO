@@ -1,8 +1,86 @@
 (grep for TODOs)
-div -> table for the moment, then back to div when a nice strategy is defined.
-on /view/*
-	text links on top to buttons, put them on side?
-	(show input form when visited directly)
+./urls.py:    ## TODO: There are 3 views of our data, reduce to 2 if not 1.
+
+./settings.py:## TODO: Disable the sessions, auth, admin, etc. apps we don't need
+
+./variety_trials_data/variety_trials_forms.py:	## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
+./variety_trials_data/variety_trials_forms.py:	# TODO: Consider not save() -ing each line, maybe do batches of ~100?
+
+./variety_trials_data/templates/main.html:	TODO: Add noscript version of this field to point to the noscript
+./variety_trials_data/templates/main.html:	TODO: fix input validation strings return an error.
+./variety_trials_data/templates/main.html:	TODO: Do we need csrf_token?
+./variety_trials_data/templates/main.html:	TODO: use get, not post
+
+./variety_trials_data/templates/tabbed_view.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+./variety_trials_data/templates/tabbed_view.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+./variety_trials_data/templates/tabbed_view.html:<td><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+./variety_trials_data/templates/tabbed_view.html:<td><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+./variety_trials_data/templates/tabbed_view.html:	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+./variety_trials_data/templates/tabbed_view.html:		<!--TODO: auto-generate these year button images-->
+./variety_trials_data/templates/tabbed_view.html:				<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+./variety_trials_data/templates/tabbed_view.html:				<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+
+./variety_trials_data/templates/add_from_csv_template.html:	<!--TODO: auto generate this file from the model-->
+
+./variety_trials_data/views.py:	#TODO: Somehow reduce this to depth=1
+./variety_trials_data/views.py:			#TODO: there must be a better way to populate the varieties list
+./variety_trials_data/views.py:	# TODO: does this belong in the DB?
+./variety_trials_data/views.py:							"SELECT id FROM variety_trials_data_trial_entry WHERE %s!='' LIMIT 6", #TODO: hardcoded numeric value
+./variety_trials_data/views.py:					if count > 5:  #TODO: hardcoded numeric value
+./variety_trials_data/views.py:	# TODO: respect/update the cur_year value.
+./variety_trials_data/views.py:		# TODO: we can do more for the user than redirect to /
+./variety_trials_data/views.py:	#TODO: this is very bad for the database...
+
+./variety_trials_data/variety_trials_util.py:	# TODO: pull out into common-function call to make this boolean's use
+./variety_trials_data/variety_trials_util.py:				raise BaseException # TODO: raise a standard/helpful error
+./variety_trials_data/variety_trials_util.py:				raise BaseException #TODO: raise a standard/helpful error
+./variety_trials_data/variety_trials_util.py:		# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+./variety_trials_data/variety_trials_util.py:			count = [0,0,0] # TODO: _Heavily_ assumes we are only using the last three years
+./variety_trials_data/variety_trials_util.py:						else: # TODO: We should never need to take this else branch
+./variety_trials_data/variety_trials_util.py:		for num_times in range(3): # TODO: hard-coded numeric value
+./variety_trials_data/variety_trials_util.py:		#TODO: mayhap this check should be done before break_into_subsets()?
+./variety_trials_data/variety_trials_util.py:			self.groups_loc[((order,order,order),0)] = [list(common_locations), list(common_locations), list(common_locations)]# TODO: heavily assumes 3-yrs
+./variety_trials_data/variety_trials_util.py:			for l in sorted(self.groups_loc.values()[0][0], key=attrgetter('name')): ##TODO: Super-kludge
+./variety_trials_data/variety_trials_util.py:				#locations = [l_indexes[l] for l in self.groups_loc[key][cy_i]] # TODO: do we need to consider the other years here?
+./variety_trials_data/variety_trials_util.py:				# TODO: kludge, adds unececssary locales, much extra processing. should changfe 'locations' for each year when doing multyear
+./variety_trials_data/variety_trials_util.py:							value = round(value, 1) # TODO: is round necessary here?
+./variety_trials_data/variety_trials_util.py:				for v in sorted(self.groups[key], key=attrgetter('name')): #TODO: we iterated through this already...
+./variety_trials_data/variety_trials_util.py:				for l in sorted(self.groups_loc.values()[0][0], key=attrgetter('name')): ##TODO: Super-kludge	
+./variety_trials_data/variety_trials_util.py:						value = self.lsds[l][cy_i] #TODO: smarter logic needed
+./variety_trials_data/variety_trials_util.py:						value = self.lsds[l][cy_i] #TODO: smarter logic needed
+./variety_trials_data/variety_trials_util.py:	# TODO: pull out into common-function call to make this boolean's use
+./variety_trials_data/variety_trials_util.py:		self.varieties = [] # reset the variable, otherwise we see the last added to our new ones (TODO: might be a useful feature)
+./variety_trials_data/variety_trials_util.py:				raise BaseException # TODO: raise a standard/helpful error
+./variety_trials_data/variety_trials_util.py:				raise BaseException #TODO: raise a standard/helpful error
+./variety_trials_data/variety_trials_util.py:		# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+./variety_trials_data/variety_trials_util.py:		for num_times in range(3): # TODO: hard-coded numeric value
+./variety_trials_data/variety_trials_util.py:				location_id = models.Location.objects.get(name__iexact=l).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
+./variety_trials_data/variety_trials_util.py:						variety_id = models.Variety.objects.get(name__iexact=v).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
+./variety_trials_data/variety_trials_util.py:								value = round(sum(values)/len(values), 1) # TODO: is round necessary here?
+./variety_trials_data/variety_trials_util.py:					for v in sorted(self.groups[key]): #TODO: we iterated through this already...
+./variety_trials_data/variety_trials_util.py:							temp_row.append(max(self.lsds[(l, self.year)])) #TODO: smarter logic needed
+./variety_trials_data/variety_trials_util.py:			# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
+./variety_trials_data/variety_trials_util.py:			# TODO: have the Location objects grab default lat/long, not user entered
+./variety_trials_data/variety_trials_util.py:			#TODO: We just searched a square, now discard searches that are > x miles away.
+
+"tabbed_view" is set up using a hierarchy of tables. It would be nicer 
+if instead "tabbed_view" used <div> tags with a good class structure
+to keep the data aligned. Furthermore, it may be possible to represent
+the cells as objects and reduce the need for the server to explicitly
+make the table structure.
+
+The links on "tabbed_view" aren't really hyperlinks to other pages, they
+use javascript to reload the page with new parameters. This won't work 
+if javascript is disabled. Also, would an image hyperlink, or some other
+method, be more clear then a text hyperlink?
+
+The main page has a form that points to "view/column_name/year", but
+if that page is visited directly (or bookmarked) the data does not 
+display. We need to support a GET version of the page (or just use GET
+only) in addition to our already implemented POST version using the 
+aforementioned form.
+
+When viewing the query on "tabbed_view"
 	locations count per datapoint (variety)
 
 	See descriptions of varieties
