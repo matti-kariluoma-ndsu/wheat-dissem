@@ -80,12 +80,25 @@ display. We need to support a GET version of the page (or just use GET
 only) in addition to our already implemented POST version using the 
 aforementioned form.
 
-When viewing the query on "tabbed_view"
-	locations count per datapoint (variety)
+When viewing the query on "tabbed_view", the data is separated into
+many sub-tables. We need to show the amount of underlying data that went
+into the reported 1-yr, 2-yr, and 3-yr means, as well as into the LSD
+calculation. (In the code, this is the three-tuple (x,y,z) key to the
+self.groups dictionary.)
 
-	See descriptions of varieties
+When viewing the data, we print the variety and locations names. Each
+variety should have a hyperlink (ideally a scroll-over box) to 
+information about that particular variety. This can be bogus text
+at this time, a student of Plant Sciences will write the actual text.
 
-Break the subset logic apart from the list-generation logic.
+LSD_Calculator.fetch() is really three functions, one where sub-tables 
+are generated, one where lsds for those sub-tables are calculated, and
+another where everything is collated into an output table. The latter
+step (collated into output table) for sure needs to be cut out into
+a separate method, and all three are candidates for client-side 
+processing.
+
+Someone will need to implement "LSD(list[][], alpha):" in javascript.
 
 ** REGRESSION ** /view/variety/ pages use the /view/location/ form
   * this causes all sorts of wierdness as when the (x) and [] are used
