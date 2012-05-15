@@ -21,7 +21,7 @@
 
 	TODO: fix input validation strings return an error.
 
-	
+	TODO: Do we need csrf_token?
 
 	TODO: use get, not post
 	-->
@@ -39,6 +39,7 @@
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
 	<form action="/view/variety/{{curyear}}/bushels_acre/0/" method="GET">
+		{% csrf_token %}
 		{% for field in varieties_form %}
 		<div class="input row">
 			{{ field.errors }}
