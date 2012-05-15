@@ -129,16 +129,16 @@
 		<tr>
 			<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
 		</tr>
-		<tr >
-			<td class="Variety padded"><h4> Variety</h4></td>
+		<div class = "wrap">
+			<div class="Variety padded"><h4> Variety</h4></div>
 			{% for heading in heading_list %}
-			<td class="padded"><h4>{{ heading.0 }}</h4>
+			<div class="padded"><h4>{{ heading.0 }}</h4>
 			{% if heading.1 != -1 %}
 			<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
 			{% endif %}
-			</td>
+			</div>
 			{% endfor %}
-		</tr>
+		</div>
 		<tr class="row subheadings thin">
 		</tr>
 	{% for datalist in sorted_list %}
