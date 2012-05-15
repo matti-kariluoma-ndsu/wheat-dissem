@@ -62,8 +62,8 @@ def index(request, abtest=None):
 	)
 		
 def locations_view(request, yearname, fieldname, abtest=None):
-	if request.method == 'POST':
-		locations_form = variety_trials_forms.SelectLocationsForm(request.POST)
+	if request.method == 'GET':
+		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
 		if locations_form.is_valid():
 			
 			locations = locations_form.cleaned_data['locations']
@@ -77,8 +77,8 @@ def locations_view(request, yearname, fieldname, abtest=None):
 		return HttpResponseRedirect("/") # send to homepage
 
 def zipcode_view(request, yearname, fieldname, abtest=None):
-	if request.method == 'POST':
-		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.POST)
+	if request.method == 'GET':
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if zipcode_radius_form.is_valid():
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			radius = zipcode_radius_form.cleaned_data['search_radius']
@@ -267,8 +267,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 
 def varieties_view(request, yearname, fieldname, abtest=None):
 	
-	if request.method == 'POST':
-		varieties_form = variety_trials_forms.SelectVarietiesForm(request.POST)
+	if request.method == 'GET':
+		varieties_form = variety_trials_forms.SelectVarietiesForm(request.GET)
 		if varieties_form.is_valid():
 			
 			varieties = varieties_form.cleaned_data['varieties']
@@ -286,8 +286,8 @@ def add_trial_entry_csv_file(request):
 	errors = {} 
 	# a dictionary, keys are strings (source of error), values are strings (message)
 	
-	if request.method == 'POST': # If the form has been submitted...
-		form = variety_trials_forms.UploadCSVForm(request.POST, request.FILES)
+	if request.method == 'GET': # If the form has been submitted...
+		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
 		if form.is_valid():
 			success, errors = variety_trials_forms.handle_csv_file(request.FILES['csv_file'])
 			if success:
