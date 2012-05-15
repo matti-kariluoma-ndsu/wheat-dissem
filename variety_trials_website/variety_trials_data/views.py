@@ -18,6 +18,25 @@ def get_entries(locations, year_list):
 					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
 				)
 			)
+def variety_info(request, varietyName):
+	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
+	varieties_form = variety_trials_forms.SelectVarietiesForm()
+	variety_list = models.Variety.objects.all()
+	curyear = datetime.date.today().year - 1
+	year_released = models.Variety.objects
+	
+
+	return render_to_response(
+		'main_ndsu.html', 
+		{ 
+			'zipcode_radius_form': zipcode_radius_form,
+			'varieties_form': varieties_form,
+			'variety_list': variety_list,
+			'curyear': curyear
+		},
+		context_instance=RequestContext(request)
+	)
+        
 
 def index(request, abtest=None):
 	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
