@@ -180,9 +180,7 @@
 			{% for element in datalist %}
 				{% if datalist.0 == element %}
 				<td class='padded' style="text-align: left; width: 120px;">
-					<form>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
-					</form>
+					<a href="/view/info/{{element.0}}/">{{element.0}}</a>
 				</td>
 				{% else %}
 				<td class='padded'>
