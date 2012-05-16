@@ -11,6 +11,12 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 .location_name {
   margin-bottom:20px;
  }
+
+.container { 
+	height: 100%; 
+	padding: 5px; 
+	background: #FFF; 
+} 
  
 .row {
   border-top:1px dotted #666;
@@ -158,12 +164,27 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	width: 70px;
 }
 
+.Column { 
+	margin: 0 0 0 8px; 
+	width: 10%; 
+	float: left; 
+	text-align:center;
+}
+
+.ColumnToLeft { 
+	margin: 0 0 0 8px; 
+	width: 10%; 
+	float: left; 
+	text-align:left;
+}
+
 .spacer_row {
 	height: .5em;
 }
 
 .LSD_row {
 	background-color: #CFC;
+	
 }
 
 /* color scheme from http://www.ethanschoonover.com/solarized */
