@@ -13,17 +13,19 @@
 from math import sqrt, pi, cos, sin, exp
 from scipy.special import erfinv
 
-def LSD(response_to_treatments, probability):
-	"""
+function LSD(response_to_treatments, probability)
+{
+/*
 	A stripped-down reimplementation of LSD.test from the agricoloae
 	package. (http://cran.r-project.org/web/packages/agricolae/index.html)
 	
 	Calculates the Least Significant Difference of a multiple comparisons
 	trial, over a balanced dataset.
-	"""
+	*/
 		
-	def qnorm(probability):
-		"""
+	function qnorm(probability)
+	{
+		/*
 		A reimplementation of R's qnorm() function.
 		
 		This function calculates the quantile function of the normal
@@ -32,14 +34,15 @@ def LSD(response_to_treatments, probability):
 		
 		Required is the erfinv() function, the inverse error function.
 		(http://en.wikipedia.org/wiki/Error_function#Inverse_function)
-		"""
+		*/
 		if probability > 1 or probability <= 0:
 			raise BaseException # TODO: raise a standard/helpful error
 		else:
 			return sqrt(2) * erfinv(2*probability - 1)
-			
-	def qt(probability, degrees_of_freedom):
-		"""
+	}
+	function qt(probability, degrees_of_freedom)
+	{
+/*
 		A reimplementation of R's qt() function.
 		
 		This function calculates the quantile function of the student's t
@@ -53,7 +56,7 @@ def LSD(response_to_treatments, probability):
 		Currently unimplemented are the improvements to Algorithm 396 from
 		Hill, G. W. (1981) Remark on Algorithm 396, ACM Transactions on 
 		Mathematical Software, 7, 250-1.
-		"""
+		*/
 		n = degrees_of_freedom
 		P = probability
 		t = 0
@@ -94,7 +97,7 @@ def LSD(response_to_treatments, probability):
 			t = sqrt(float(n)*y)
 		
 		return t
-
+	}
 	trt = response_to_treatments
 	#model = aov(y~trt)
 	#df = df.residual(model)
@@ -139,10 +142,11 @@ def LSD(response_to_treatments, probability):
 	LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
 
 	return LSD
+	}
 
 	
 
-def main():
+
 	input1 = [
 		[64.5, 62.899999999999999, 48.600000000000001, 76.900000000000006],
 		[65.799999999999997, 60.200000000000003, 47.100000000000001, 75.900000000000006],
@@ -199,6 +203,3 @@ def main():
 	print result4
 	print "==="
 	
-	
-if __name__ == '__main__':
-	main()
