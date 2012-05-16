@@ -1,9 +1,14 @@
-
+<html>
+<head>
+<script type="text/javascript">
 //from math import sqrt, pi, cos, sin, exp
 //from scipy.special import erfinv
 
+
+
 function LSD(response_to_treatments, probability)
 {
+
 /*
 	A stripped-down reimplementation of LSD.test from the agricoloae
 	package. (http://cran.r-project.org/web/packages/agricolae/index.html)
@@ -24,10 +29,14 @@ function LSD(response_to_treatments, probability)
 		Required is the erfinv() function, the inverse error function.
 		(http://en.wikipedia.org/wiki/Error_function#Inverse_function)
 		*/
-		if probability > 1 or probability <= 0:
-			raise BaseException # TODO: raise a standard/helpful error
-		else:
+		if (probability > 1  || probability <= 0)
+		{
+			alert("There was a problem");
+			}
+		else
+		{
 			return sqrt(2) * erfinv(2*probability - 1)
+			}
 	}
 	function qt(probability, degrees_of_freedom)
 	{
@@ -49,41 +58,57 @@ function LSD(response_to_treatments, probability)
 		n = degrees_of_freedom
 		P = probability
 		t = 0
-		if (n < 1 or P > 1.0 or P <= 0.0 ):
-			raise BaseException #TODO: raise a standard/helpful error
-		elif (n == 2):
+		if (n < 1 || P > 1.0 || P <= 0.0 )
+			{
+			alert("There was an error");
+			}
+		else(n == 2)
+			{
 			t = sqrt(2.0/(P*(2.0-P)) - 2.0)
-		elif (n == 1):
+		    }
+		else(n == 1)
+		{
 			P = P * pi/2
 			t = cos(P)/sin(P)
-		else:
+			}
+		else
+			{
 			a = 1.0/(n-0.5)
 			b = 48.0/(a**2.0)
 			c = ((20700.0*a/b - 98.0)*a - 16.0)*a + 96.36
 			d = ((94.5/(b+c) - 3.0)/b + 1.0)*sqrt(a*pi/2.0)*float(n)
 			x = d*P
 			y = x**(2.0/float(n))
+			}
 		
-			if (y > 0.05 + a):
-				x = qnorm(P*0.5)
+			if (y > 0.05 + a)
+				{x = qnorm(P*0.5)
 				y = x**2.0
+				}
 				
-				if (n < 5):
+				if (n < 5)
+					{
 					c = c + 0.3*(float(n)-4.5)*(x+0.6)
 
 				c = (((0.05*d*x-5.0)*x-7.0)*x-2.0)*x+b+c
 				y = (((((0.4*y+6.3)*y+36.0)*y+94.5)/c-y-3.0)/b+1.0)*x
 				y = a*y**2.0
-				
-				if (y > 0.002):
+				}
+				if (y > 0.002)
+					{
 					y = exp(y) - 1.0
-				else:
+					}
+				else
+				{
 					y = 0.5*y**2.0 + y
+				}
 
-			else:
+			else
+				{
 				y = ((1.0/(((float(n)+6.0)/(float(n)*y)-0.089*d-0.822)*(float(n)+2.0)*3.0)+0.5/(float(n)+4.0))*y-1.0)*(float(n)+1.0)/(float(n)+2.0)+1.0/y
-			
+			    }
 			t = sqrt(float(n)*y)
+			
 		
 		return t
 	}
@@ -97,11 +122,19 @@ function LSD(response_to_treatments, probability)
 	degrees_freedom_of_error = (n-1)*(k-1)
 	
 	treatment_means = {}
-	for i in range(n): # n == len(trt)
-		total = 0.0
-		for j in range(k):
+	for (i=0; i<n; i++)
+	{
+	    total = 0.0
+		document.write("The total is: " + i);
+		}
+		
+		for(j=0; j<k; j++)
+			{
 			total += float(trt[i][j])
 		treatment_means[i] = total/k
+		document.write("The total is: " + i);
+		}
+		
 		
 	block_means = {}
 	for j in range(k):
@@ -133,9 +166,18 @@ function LSD(response_to_treatments, probability)
 	return LSD
 	}
 
+</script>
+<script type="text/javascript">
+function displaymessage()
+{
+alert("There was an erorr!");
+}
+</script>
+</head>
+
 	
-
-
+<body>
+<script type="text/javascript">
 	input1 = [
 		[64.5, 62.899999999999999, 48.600000000000001, 76.900000000000006],
 		[65.799999999999997, 60.200000000000003, 47.100000000000001, 75.900000000000006],
@@ -176,10 +218,11 @@ function LSD(response_to_treatments, probability)
 	result4 = 4.86117238
 
 
-	print LSD(input1, 0.05)
-	print result1
-	print "==="
-	
+	//document.write (LSD(input1, 0.05));
+	document.write( result1 );
+	document.write( "<p>===</p>" );
+	document.write(input1);
+	/*
 	print LSD(input2, 0.05)
 	print result2
 	print "==="
@@ -191,4 +234,16 @@ function LSD(response_to_treatments, probability)
 	print LSD(input4, 0.05)
 	print result4
 	print "==="
-	
+	*/
+</script>
+
+<form>
+<input type="button" value="Click here!" onclick="displaymessage()"/>
+</form>
+
+<p>By pressing the above button, an error message will be displayed.</p>
+
+</body>
+</html>
+
+
