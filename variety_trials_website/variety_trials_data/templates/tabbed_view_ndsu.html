@@ -56,7 +56,6 @@
 <div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-
 		<form name="{{yearname}}_variety_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
 			{% for field in locations_form %}
 			<div class="input row">
