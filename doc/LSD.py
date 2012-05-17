@@ -61,7 +61,7 @@ def LSD(response_to_treatments, probability):
 		t = 0
 		if (n < 1 or P > 1.0 or P <= 0.0 ):
 			raise BaseException #TODO: raise a standard/helpful error
-		elif (n == 2):
+		elif (n == 2)
 			t = sqrt(2.0/(P*(2.0-P)) - 2.0)
 		elif (n == 1):
 			P = P * pi/2
