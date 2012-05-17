@@ -247,10 +247,19 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		view = 'variety'
 	else: # the location view
 		view = 'location'
-	
+	location_get_string=''
+        variety_get_string=''
+	for v in varieties:
+                variety_get_string+='&varieties='+str(v.id)
+        for l in locations:
+                location_get_string+='&locations='+str(l.id)
+
+	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
 		'tabbed_view.html',
-		{ 
+		{
+                        'location_get_string': location_get_string,
+                        'variety_get_string': variety_get_string,
 			'locations_form': locations_form,
 			'field_list': field_list,
 			'location_list': locations,

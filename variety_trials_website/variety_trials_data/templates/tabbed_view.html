@@ -79,34 +79,32 @@
 </div>
 
 	<div class="top_spacer"></div>
-
-	<div >
+	<div>
 	{% for fieldname, blurb_list in blurbs.items %}
 		<p>	
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
+		
 		{% if fieldname == curfield %}
-			* {{blurb_list.0}}
+			* <a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
 		{% else %}
-			{{blurb_list.0}}
+			<a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
 		{% endif %}
-		</a>
+		
 		</p>
 	{% endfor %}
 	</div>
 	
 	<br style="clear: both;"/>
-	
 	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 		<!--TODO: auto-generate these year button images-->
 		<p>
-		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{yearname}}/{{curfield}}/">
+		
 		{% if yearname == curyear %}
-			* {{yearname}}
+			* <a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
 		{% else %}
-			{{yearname}}
+			<a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
 		{% endif %}
-		</a>
+		
 		</p>
 	{% endfor %}
 	</div>
@@ -182,7 +180,7 @@
 				{% if datalist.0 == element %}
 				<form>
 					<div class='ColumnToLeft'>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="<a href='/view/info/{{element.0}}/'>{{element.0}}</a>" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
+						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{element.1}}" onclick="unselect_variety({{element.1}})" /> <a href='/view/info/{{element.0}}/'>{{element.0}}</a>
 					</div>
 				</form>
 				{% else %}
