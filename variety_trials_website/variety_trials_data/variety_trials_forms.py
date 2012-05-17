@@ -28,7 +28,7 @@ class SelectFieldForm(forms.Form):
 							
 class SelectVarietiesForm(forms.Form):
 	varieties = forms.ModelMultipleChoiceField(
-								widget=forms.SelectMultiple(attrs={'size': 20}),
+								widget=forms.Select(),
 								queryset=models.Variety.objects.all()
 							)
 

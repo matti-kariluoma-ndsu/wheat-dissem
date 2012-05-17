@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://127.0.0.1:8000/ -->
+<html class=" js canvas canvastext geolocation crosswindowmessaging websqldatabase no-indexeddb hashchange historymanagement draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions  video audio localstorage sessionstorage webworkers applicationcache svg smil svgclippaths  fontface"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+
+  <!-- www.phpied.com/conditional-comments-block-downloads/ -->
+  <!--[if IE]><![endif]-->
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Wheat Dissemination 2012</title>
+  <meta name="description" content="Wheat variety trials online data directory.">
+  <meta name="author" content="M. Kariluoma, N. Kramer">
+	<!-- color scheme from http://www.ethanschoonover.com/solarized -->
+
+  <!--  Mobile Viewport Fix
+        j.mp/mobileviewport & davidbcalhoun.com/2010/viewport-metatag 
+  device-width : Occupy full width of the screen in its current orientation
+  initial-scale = 1.0 retains dimensions instead of zooming out if page height > device height
+  maximum-scale = 1.0 retains dimensions instead of zooming in if page width < device width
+  -->
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+
+  <!-- Place favicon.ico and apple-touch-icon.png in the root of your domain and delete these references -->
+  <link rel="shortcut icon" href="http://127.0.0.1:8000/static/img/favicon.ico">
+  <link rel="apple-touch-icon" href="http://127.0.0.1:8000/static/img/apple-touch-icon.png">
+
+  <!-- CSS : implied media="all" -->
+  <link rel="stylesheet" href="http://127.0.0.1:8000/static/css/style.css">
+
+  <!-- For the less-enabled mobile browsers like Opera Mini -->
+  <link rel="stylesheet" media="handheld" href="http://127.0.0.1:8000/static/css/handheld.css">
+  <link rel="stylesheet" media="print" href="http://127.0.0.1:8000/static/css/print.css">
+  <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
+  <script async="" src="./test3_files/ga.js"></script><script src="./test3_files/modernizr-1.5.min.js"></script>
+
+</head>
+<body>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+
+<!--[if lt IE 7 ]> <body class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <body class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <body class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <body class="ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->  <!--<![endif]-->
+
+<!-- begin html template -->
+<div id="content" style="margin: 2em;">
+
+<div>
+	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
+	<hr>
+	<h2>Welcome</h2><br>
+	<p>Presented here are the data collected during Hard Red Spring Wheat
+	(HRSW) variety trials conducted in North Dakota. Available data 
+	include yield, protein percent, test weight, kernel weight, 
+	plant height, etc.</p>
+	
+</div>
+<div class="location_form">
+	
+	<!--
+	TODO: Add noscript version of this field to point to the noscript
+	version of the view_location page.
+
+	TODO: fix input validation strings return an error.
+	-->
+	<form action="http://127.0.0.1:8000/view/2011/bushels_acre/" method="GET">
+		
+		
+		<div class="input row">
+			
+			<label for="id_zipcode">Zipcode</label>: <input id="id_zipcode" type="text" name="zipcode" maxlength="5">
+		</div>
+		
+		<div class="input row">
+			
+			<label for="id_search_radius_0">Search radius</label>: <ul>
+<li><label for="id_search_radius_0"><input checked="checked" type="radio" id="id_search_radius_0" value="50" name="search_radius"> 50 miles</label></li>
+<li><label for="id_search_radius_1"><input type="radio" id="id_search_radius_1" value="100" name="search_radius"> 100 miles</label></li>
+<li><label for="id_search_radius_2"><input type="radio" id="id_search_radius_2" value="200" name="search_radius"> 200 miles</label></li>
+<li><label for="id_search_radius_3"><input type="radio" id="id_search_radius_3" value="ND" name="search_radius"> All of ND</label></li>
+<li><label for="id_search_radius_4"><input type="radio" id="id_search_radius_4" value="MN" name="search_radius"> All of MN</label></li>
+<li><label for="id_search_radius_5"><input type="radio" id="id_search_radius_5" value="ALL" name="search_radius"> All Data</label></li>
+</ul>
+		</div>
+		
+		<input type="submit" value="Submit">
+	</form>
+</div>
+<div>
+	<hr>
+	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
+	<form action="http://127.0.0.1:8000/view/variety/2011/bushels_acre/" method="GET">
+		
+		
+		<div class="input row">
+			
+			<label for="id_varieties">Varieties</label>: <select name="varieties" id="id_varieties">
+<option value="81">Waikea</option>
+<option value="105">WB-Mayville</option>
+<option value="101">WB-Lyn</option>
+<option value="106">WB-Gunnison</option>
+<option value="19">WB-Digger</option>
+<option value="57">Vida</option>
+<option value="100">Velva</option>
+<option value="12">Vantage</option>
+<option value="70">Ulen</option>
+<option value="35">Traverse</option>
+<option value="46">Tom</option>
+<option value="5">Steele-ND</option>
+<option value="80">Snow Crest</option>
+<option value="38">Select</option>
+<option value="94">Saturn</option>
+<option value="13">Samson</option>
+<option value="45">Sabin</option>
+<option value="31">SY605 CL</option>
+<option value="104">SY Tyra</option>
+<option value="103">SY Soren</option>
+<option value="93">Rush</option>
+<option value="99">Rollag</option>
+<option value="108">Regina</option>
+<option value="2">Reeder</option>
+<option value="39">RB07</option>
+<option value="98">Prosper</option>
+<option value="102">Powerplay</option>
+<option value="51">Pivot</option>
+<option value="79">Pennewawa</option>
+<option value="69">Parshall</option>
+<option value="68">Outlook</option>
+<option value="67">Otis</option>
+<option value="97">Oklee</option>
+<option value="66">O'Neal</option>
+<option value="92">Norpro</option>
+<option value="10">ND 901CL Plus</option>
+<option value="48">ND 901CL</option>
+<option value="23">Muchmore</option>
+<option value="65">Mott/Steele-ND</option>
+<option value="40">Mott</option>
+<option value="64">McNeal</option>
+<option value="96">Marshall</option>
+<option value="63">Lolo</option>
+<option value="78">Lochsa</option>
+<option value="44">Kuntz</option>
+<option value="28">Knudson</option>
+<option value="30">Kelby</option>
+<option value="77">Kanata</option>
+<option value="32">Jenna</option>
+<option value="76">ID0377S</option>
+<option value="7">Howard</option>
+<option value="21">Hat Trick</option>
+<option value="91">Hanna</option>
+<option value="26">HY682</option>
+<option value="62">Granite</option>
+<option value="56">Granger</option>
+<option value="90">Grandin</option>
+<option value="75">Golden 86</option>
+<option value="6">Glenn</option>
+<option value="29">Freyr</option>
+<option value="89">Fireball</option>
+<option value="109">Fieldstar</option>
+<option value="9">Faller</option>
+<option value="52">FBC Dylan</option>
+<option value="88">Express</option>
+<option value="95">Explorer</option>
+<option value="16">Edge</option>
+<option value="107">Duclair</option>
+<option value="74">Diamond</option>
+<option value="4">Dapps</option>
+<option value="43">Cromwell</option>
+<option value="17">Corbin</option>
+<option value="20">Conan</option>
+<option value="61">Choteau/Steele</option>
+<option value="34">Choteau</option>
+<option value="24">Carberry</option>
+<option value="18">Brogan</option>
+<option value="36">Briggs</option>
+<option value="37">Brick</option>
+<option value="33">Brennan</option>
+<option value="14">Breaker</option>
+<option value="15">Blade</option>
+<option value="50">Big Red</option>
+<option value="11">Barlow</option>
+<option value="87">Banton</option>
+<option value="86">Bakker Gold</option>
+<option value="27">BW394</option>
+<option value="59">Amidon</option>
+<option value="3">Alsen</option>
+<option value="25">Alpine</option>
+<option value="22">Albany</option>
+<option value="53">Agawam</option>
+<option value="84">Ada</option>
+<option value="60">AP 604CL</option>
+<option value="85">AP 603CL</option>
+<option value="58">AC Vista</option>
+<option value="73">AC Snowstar</option>
+<option value="72">AC Snowbird</option>
+<option value="55">AC Lillian</option>
+<option value="71">AC Karma</option>
+<option value="83">AC Glenavon</option>
+<option value="82">AC Corine</option>
+</select>
+		</div>
+		
+		<input type="submit" value="Submit">
+	</form>
+	
+</div>
+
+</div>
+
+<script src="./test3_files/jquery.min.js"></script>
+<script>!window.jQuery && document.write('<script src="/static/js/jquery-1.4.2.min.js"><\/script>')</script>
+
+<!--[if lt IE 7 ]>
+ <script src="/static/img/dd_belatedpng.js"></script>
+<![endif]-->
+
+<!-- custom scripts -->
+
+<script>
+	
+	
+</script>
+
+<script>
+  $(function(){
+	
+	
+  });
+</script>
+  
+<!-- asynchronous google analytics: mathiasbynens.be/notes/async-analytics-snippet 
+change the UA-XXXXX-X to be your site's ID -->
+<script>
+ var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
+ (function(d, t) {
+  var g = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  g.async = true;
+  g.src = '//www.google-analytics.com/ga.js';
+  s.parentNode.insertBefore(g, s);
+ })(document, 'script');
+</script>
+
+
+
+</body></html>
