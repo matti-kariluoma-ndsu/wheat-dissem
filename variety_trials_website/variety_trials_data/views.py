@@ -245,14 +245,25 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	if one_subset: # the variety view
 		view = 'variety'
+	directHome=0
+	for l in sorted_list[1::]:
+                if l[1]==l[2]==l[3]==None:
+                        directHome=1
+                else:
+                        directHome=0
+                        break
+        if directHome==1:
+                return HttpResponseRedirect("/")
+                
+		#iterate through sorted list and send the user to the home page if it's all empty
 	else: # the location view
 		view = 'location'
 	location_get_string=''
         variety_get_string=''
 	for v in varieties:
-                variety_get_string+='&varieties='+str(v.id)
+                variety_get_string='&varieties='+str(v.id)
         for l in locations:
-                location_get_string+='&locations='+str(l.id)
+                location_get_string='&locations='+str(l.id)
 
 	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
