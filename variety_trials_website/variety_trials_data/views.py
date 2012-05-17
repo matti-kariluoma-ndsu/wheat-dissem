@@ -51,7 +51,7 @@ def index(request, abtest=None):
 	
 
 	return render_to_response(
-		'main_ndsu.html', 
+		'main.html', 
 		{ 
 			'zipcode_radius_form': zipcode_radius_form,
 			'varieties_form': varieties_form,
@@ -92,7 +92,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 						'radius': zipcode_radius_form.cleaned_data['search_radius']
 					})
 				return render_to_response(
-					'main_ndsu.html', 
+					'main.html', 
 					{ 
 						'zipcode_radius_form': zipcode_radius_form,
 						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
@@ -120,7 +120,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					'radius': zipcode_radius_form.cleaned_data['search_radius']
 				})
 			return render_to_response(
-					'main_ndsu.html', 
+					'main.html', 
 					{ 
 						'zipcode_radius_form': zipcode_radius_form,
 						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
@@ -249,7 +249,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		view = 'location'
 	
 	return render_to_response(
-		'tabbed_view_ndsu.html',
+		'tabbed_view.html',
 		{ 
 			'locations_form': locations_form,
 			'field_list': field_list,

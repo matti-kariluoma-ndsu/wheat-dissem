@@ -10,14 +10,6 @@
 	include yield, protein percent, test weight, kernel weight, 
 	plant height, etc.</p>
 	
-	<br/>
-	Other color schemes of this website:
-	<ul>
-		<li>Version 1 (current)</li>
-		<li><a href="/0/">Version 2</a></li>
-		<li><a href="/1/">Version 3</a></li>
-		<li><a href="/2/">Version 4</a></li>
-	</ul>
 </div>
 <div class="location_form" >
 	{% for error in error_list %}
@@ -28,10 +20,6 @@
 	version of the view_location page.
 
 	TODO: fix input validation strings return an error.
-
-	TODO: Do we need csrf_token?
-
-	TODO: use get, not push
 	-->
 	<form action="/view/{{curyear}}/bushels_acre/" method="GET">
 		
