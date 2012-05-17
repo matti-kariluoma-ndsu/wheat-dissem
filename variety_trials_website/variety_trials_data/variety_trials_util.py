@@ -5,7 +5,7 @@ from scipy.special import erfinv
 from itertools import chain
 from operator import attrgetter
 import copy
-
+	
 class LSD_Calculator:
 	"""
 	Utility class to return a list of lists for output,
@@ -174,6 +174,26 @@ class LSD_Calculator:
 		order by location, and place None when there is no data.
 		"""
 		
+		# serialize our inputs
+		"""
+		from django.core import serializers
+		prefix="58501_100_"
+		JSONSerializer = serializers.get_serializer("json")()
+		with open(prefix+"entries.json", "w") as out:
+			JSONSerializer.serialize(entries, stream=out)
+		with open(prefix+"locations.json", "w") as out:
+			JSONSerializer.serialize(locations, stream=out)
+		with open(prefix+"varieties.json", "w") as out:
+			JSONSerializer.serialize(varieties, stream=out)
+		
+		import json
+		with open(prefix+"years.json", "w") as out:
+			json.dump(years, out)
+		with open(prefix+"pref_year.json", "w") as out:
+			json.dump(pref_year, out)
+		with open(prefix+"field.json", "w") as out:
+			json.dump({"name":field.name}, out)
+		"""
 		# init to empty
 		self.location_indexes = {}
 		self.year_indexes = {}
@@ -682,7 +702,9 @@ class LSD_Calculator:
 			
 			return_list.extend(subset_list) # append the lists inside subset_list to return_list
 			return_list.append(next_header) # append another header row
-
+		
+		#print return_list[:len(return_list)-1:]
+		
 		return return_list[:len(return_list)-1:] # remove last row, a header row with nothing under it
 
 class Filter_by_Field:
