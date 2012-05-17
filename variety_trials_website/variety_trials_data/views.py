@@ -103,6 +103,8 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					context_instance=RequestContext(request)
 				) 
 			
+			#sort locations by distance
+			print radius
 			
 			#TODO: there must be a better way to populate the varieties list
 			varieties = []

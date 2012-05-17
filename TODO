@@ -74,11 +74,6 @@ use javascript to reload the page with new parameters. This won't work
 if javascript is disabled. Also, would an image hyperlink, or some other
 method, be more clear then a text hyperlink?
 
-The main page has a form that points to "view/column_name/year", but
-if that page is visited directly (or bookmarked) the data does not 
-display. We need to support a GET version of the page (or just use GET
-only) in addition to our already implemented POST version using the 
-aforementioned form.
 
 When viewing the query on "tabbed_view", the data is separated into
 many sub-tables. We need to show the amount of underlying data that went
@@ -86,10 +81,6 @@ into the reported 1-yr, 2-yr, and 3-yr means, as well as into the LSD
 calculation. (In the code, this is the three-tuple (x,y,z) key to the
 self.groups dictionary.)
 
-When viewing the data, we print the variety and locations names. Each
-variety should have a hyperlink (ideally a scroll-over box) to 
-information about that particular variety. This can be bogus text
-at this time, a student of Plant Sciences will write the actual text.
 
 LSD_Calculator.fetch() is really three functions, one where sub-tables 
 are generated, one where lsds for those sub-tables are calculated, and
@@ -110,7 +101,7 @@ browsers support
 
 * enter lsds for older data
 * add a link to home/start over
-* "back" button support? GET instead of POST?
+
 * mult-year avg still culling, other wierd behavior
   * 56716, 50mi
 * message if v-v union is empty, from "compare selected" button
@@ -161,4 +152,6 @@ Notes from 2012-Mar-20 Meeting
 		* "inivisibly" drop locations to calculate 3,2-yr lsds
 ** REGRESSION ** 58103 200 mi.. Barnes?
 ** REGRESSION ** Barlow, Brennan, Faller, Glenn in variety show two tables...
+
+
 

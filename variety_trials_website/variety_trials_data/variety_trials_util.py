@@ -194,7 +194,8 @@ class LSD_Calculator:
 		
 		
 		# order locations, varieties
-		self.locations = sorted(locations, key=attrgetter('name'))
+		#self.locations = sorted(locations, key=attrgetter('name'))
+		self.locations = locations
 		self.varieties = sorted(varieties, key=attrgetter('name'))
 		
 		#
@@ -538,6 +539,7 @@ class LSD_Calculator:
 					if l not in locations: # ensure all subgroups only show data for common locations
 						temp_row.append(None)
 					else:
+						
 						value = self.entries[v][cy_i][l]
 						
 						if value is not None:
@@ -1360,5 +1362,23 @@ class Locations_from_Zipcode_x_Radius:
 				)
 			#TODO: We just searched a square, now discard searches that are > x miles away.
 		
+		#sorting according to the closest city.	
+		sorted_list = []
 		
+		swapped = True
+		while (swapped):
+			swapped = False
+			for i in range(0,len(locations)-1):
+				if (locations[i].latitude > locations[i+1].latitude):
+					temp = locations[i]
+					locations[i] = locations[i+1]
+					locations[i+1] = temp
+					swapped = True		
+		
+		
+		#for l in locations:
+				#if l.zipcode.latitude<l
+				 #print "fuck"
+		
+			
 		return locations
