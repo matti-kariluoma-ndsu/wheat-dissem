@@ -186,7 +186,7 @@
 				{% if datalist.0 == element %}
 					<form>
 					<div class='ColumnToLeft'>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
+						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="<a href='/view/info/{{element.0}}/'>{{element.0}}</a>" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
 					</div>
 					</form>
 				{% else %}

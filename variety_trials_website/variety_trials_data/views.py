@@ -18,6 +18,30 @@ def get_entries(locations, year_list):
 					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
 				)
 			)
+def variety_info(request, variety_name):        
+        variety=models.Variety.objects.filter(name=variety_name)
+        """
+        year_released = variety.values('year_released')[0]['year_released']
+        index = variety.values('id')[0]['id']
+        name=variety.values('name')[0]['name']
+        description_url = variety.values('description_url')[0]['description_url']
+        """
+        for v in variety:
+                index=v.id
+                name=v.name
+                year_released=v.year_released
+                picture_url=v.picture_url
+                
+        
+	return render_to_response(
+		'variety_info.html', 
+		{ 
+                        'index': index,
+                        'variety_name': name
+		},
+		context_instance=RequestContext(request)
+	)
+        
 
 def index(request, abtest=None):
 	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
