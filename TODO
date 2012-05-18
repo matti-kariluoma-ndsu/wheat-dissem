@@ -162,3 +162,34 @@ Notes from 2012-Mar-20 Meeting
 ** REGRESSION ** 58103 200 mi.. Barnes?
 ** REGRESSION ** Barlow, Brennan, Faller, Glenn in variety show two tables...
 
+Notes from 2012-May-18 Meeting
+
+Talk of how we are going to truncate tables for pretty output.
+	1) when calculating subsets, only show those with greater than 6-10 varieties 
+		and 4-5 locations
+	2) From the zipcode, search for locations in a wideneing radius until the 
+		above criteria are met.
+	3) For the variety-variety view, repeat the above.
+	
+Perhaps we should remove the variety-variety form from the main page, and
+enforce entry into the database with a zipcode? If so we need their xip in big
+letters to remind people what data they are looking at.
+
+If we are going to have access the zipcode at all times, and ditching radius,
+maybe our get paramters can be locations deselected instead? and variety-variety
+views can just be up inthe get bar, since it'll be small? I'd like to have
+a list of numbers, or failing that reduce "varieties=" to "v=" (worse solution)
+
+Roll up an about/Bio page
+
+Think on database synchronization for UMN<=>NDSU. Email admin when something
+happens? if unresolved after 10 days, email users?
+
+Reminder to make the user-entry page robust (iterative), and undoable.
+
+If python is still losing references in early July, we'll need to investigate
+a new language. Before that we must try the new classes for variety_trials_util
+and maybe ask the community about a particualr version/implementation (JPython,
+CPython, IronPython, etc.) and see if that helps.
+
+
