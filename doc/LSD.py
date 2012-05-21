@@ -67,8 +67,8 @@ def LSD(response_to_treatments, probability):
 		else:
 			a = 1.0/(n-0.5)
 			b = 48.0/(a**2.0)
-			c = ((20700.0*a/b - 98.0)*a - 16.0)*a + 96.36
-			d = ((94.5/(b+c) - 3.0)/b + 1.0)*sqrt(a*pi/2.0)*float(n)
+			c = (((20700.0*a)/b - 98.0)*a - 16.0)*a + 96.36
+			d = ((94.5/(b+c) - 3.0)/b + 1.0)*sqrt((a*pi)/2.0)*float(n)
 			x = d*P
 			y = x**(2.0/float(n))
 		
@@ -79,17 +79,40 @@ def LSD(response_to_treatments, probability):
 				if (n < 5):
 					c = c + 0.3*(float(n)-4.5)*(x+0.6)
 
-				c = (((0.05*d*x-5.0)*x-7.0)*x-2.0)*x+b+c
-				y = (((((0.4*y+6.3)*y+36.0)*y+94.5)/c-y-3.0)/b+1.0)*x
-				y = a*y**2.0
+				#c = (((0.05*d*x-5.0)*x-7.0)*x-2.0)*x+b+c
+				c1 = (0.05*d*x) - 5.0
+				c2 = c1*x - 7.0
+				c3 = c2*x - 2.0
+				c4 = c3*x + b + c
+				c = c4
+				#y = (((((0.4*y+6.3)*y+36.0)*y+94.5)/c-y-3.0)/b+1.0)*x
+				y1 = (0.4*y+6.3)*y + 36.0
+				y2 = y1*y + 94.5
+				y3 = y2/c - y - 3.0
+				y4 = y3/b + 1.0
+				y5 = y4*x
+				y = y5
+				
+				y = a*(y**2.0)
 				
 				if (y > 0.002):
 					y = exp(y) - 1.0
 				else:
-					y = 0.5*y**2.0 + y
+					y = 0.5*(y**2.0) + y
 
 			else:
-				y = ((1.0/(((float(n)+6.0)/(float(n)*y)-0.089*d-0.822)*(float(n)+2.0)*3.0)+0.5/(float(n)+4.0))*y-1.0)*(float(n)+1.0)/(float(n)+2.0)+1.0/y
+				#y = ((1.0/(((float(n)+6.0)/(float(n)*y)-0.089*d-0.822)*(float(n)+2.0)*3.0)+0.5/(float(n)+4.0))*y-1.0)*(float(n)+1.0)/(float(n)+2.0)+1.0/y
+				y1 = float(n)+6.0
+				y2 = y1/(float(n)*y)
+				y3 = y2 - 0.089*d - 0.822
+				y4 = y3 * (float(n)+2.0) * 3.0
+				y5 = 1.0 / y4
+				y6 = y5 + 0.5/(float(n)+4.0)
+				y7 = y6*y - 1.0
+				y8 = y7 * (float(n)+1.0) 
+				y9 = y8 / (float(n)+2.0) 
+				y10 = y9 + 1.0/y
+				y= y10
 			
 			t = sqrt(float(n)*y)
 		
