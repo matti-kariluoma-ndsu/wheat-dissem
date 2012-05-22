@@ -289,6 +289,7 @@ class Table:
 		lsd_row = {} # Contains the LSDs calculated from an n year period, plus the LSD for each location.
 		year_columns = {} # Contains year(s) average values for the given varieties.
 		location_columns = {} # The variety value(s) for a location(s).
+		value_count = 0 # The sum of values used to calculate the mean average for a year.
 		
 		
 		def __init__(lsd = LSD._init_(self, entries, locations, varieties, years, pref_year, field)):
@@ -297,7 +298,6 @@ class Table:
 			
 		def collate_table():
 			collated_table = {}
-			
 			pass
 			return collated_table
 			
@@ -370,6 +370,14 @@ class Table:
 			"""
 			column = []
 			return column
+			
+		def set_value_count_for_column(get_year_column()): 
+			"""
+			Sets the sum of values used to calculate the mean averages in 
+			a year column.
+			"""
+			pass
+			return value_count
 							
 
 class Filter_by_Field:
