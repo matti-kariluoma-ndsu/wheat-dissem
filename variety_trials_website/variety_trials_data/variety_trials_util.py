@@ -196,6 +196,7 @@ class LSD_Calculator:
 		# order locations, varieties
 		#self.locations = sorted(locations, key=attrgetter('name'))
 		self.locations = locations
+		print self.locations
 		self.varieties = sorted(varieties, key=attrgetter('name'))
 		
 		#
@@ -492,7 +493,7 @@ class LSD_Calculator:
 					l_indexes_values.append(l_indexes[l])
 					head_row.append((l.name, l.id))
 			else:
-				for l in sorted(self.locations, key=attrgetter('name')):
+				for l in self.locations:
 					l_indexes_values.append(l_indexes[l])
 					head_row.append((l.name, l.id))
 		return_list.append(head_row) # append first row
@@ -1363,22 +1364,25 @@ class Locations_from_Zipcode_x_Radius:
 			#TODO: We just searched a square, now discard searches that are > x miles away.
 		
 		#sorting according to the closest city.	
-		sorted_list = []
+		sorted_list = list(locations)
 		
-		swapped = True
-		while (swapped):
-			swapped = False
-			for i in range(0,len(locations)-1):
-				if (locations[i].latitude > locations[i+1].latitude):
-					temp = locations[i]
-					locations[i] = locations[i+1]
-					locations[i+1] = temp
-					swapped = True		
+		'''
+		for l in locations:
+				print l.zipcode
+				print l.zipcode.latitude
+				print l.zipcode.longitude
+		'''
+		distance= [] 
+		i=0
+		for l in sorted_list:
+				distance[i] = lat1-sorted_list[0].latitude
+				i+1
 		
 		
-		#for l in locations:
-				#if l.zipcode.latitude<l
-				 #print "fuck"
 		
+		
+		
+		
+		print sorted_list[1]
 			
-		return locations
+		return sorted_list
