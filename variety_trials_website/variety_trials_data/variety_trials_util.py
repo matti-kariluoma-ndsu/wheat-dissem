@@ -292,13 +292,11 @@ class Table:
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
 		
 		
-		def __init__(lsd = LSD._init_(self, entries, locations, varieties, years, pref_year, field)):
-			pass 
+		def __init__(lsd = LSD._init_(self, entries, locations, varieties, years, pref_year, field)): 
 			return collate_table(lsd)
 			
 		def collate_table():
 			collated_table = {}
-			pass
 			return collated_table
 			
 		def header_row():
@@ -311,31 +309,30 @@ class Table:
 			
 			[Variety, 1-yr, 2-yr, 3-yr, Casselton, Prosper]
 			"""
+			
 			top_row = []
-			pass
 			return top_row
 			
-		def lsd_row():
+		def populate_lsd_row():
 			"""
 			Prefixes to bottom_row 'LSD', then calculates the LSD from the
 			location lists by year and appends by minimum year first. Next,
 			appends the LSDs from the database for each location.
 			
-			Spanning three years and including three locations, 
+			If the entry is spanning three years and includes three locations, 
 			the final output should look like this:
 			
 			[LSD, 2.5, 2.6, 2.7, 3, 2.1, 4.5]
 			"""
 			
-			bottom_row = []
-			return bottom_row
+			return lsd_row
 			
 		def populate_year_average_columns():
 			"""
 			Prefixes the year from lsd.year, which is the maximum year from
 			lsd object's list of years, creates subsequent elements in the
 			year_columns dictionary that are lists of the previous year(s)
-			values, with 'n-yr' prefixed.
+			values, with 'n-yr' prefixed on each list.
 			"""
 			
 			return year_columns
@@ -349,16 +346,17 @@ class Table:
 			The final output from l_column should look like this:
 			
 			[Casselton, 60.4, 60.3, 57.0, 2.5]
-			
 			"""
+			
 			l_column = []
 			return l_column
 			
 		def get_year_column(year):
 			"""
-			Returns the specified year's column from a table object's years_columns field
+			Returns the specified year's column from a Table object's years_columns field
 			as a list. This function also appends the LSD for the given year to the list.
 			"""
+			
 			column = []
 			return column
 			
@@ -368,15 +366,16 @@ class Table:
 			location_columns field as a list. This functions also appends
 			the LSD for the given location and year.
 			"""
+			
 			column = []
 			return column
 			
-		def set_value_count_for_column(get_year_column()): 
+		def set_value_count_for_column(year_columns, year): 
 			"""
 			Sets the sum of values used to calculate the mean averages in 
 			a year column.
 			"""
-			pass
+			
 			return value_count
 							
 
