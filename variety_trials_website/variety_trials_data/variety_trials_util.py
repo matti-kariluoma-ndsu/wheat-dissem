@@ -198,8 +198,8 @@ class LSD_Calculator:
 		self.location_indexes = {}
 		self.year_indexes = {}
 		self.entries = {}
-		#self.groups = {} # Probably won't need these
-		#self.groups_loc = {} # Probably won't need these
+		self.groups = {} 
+		self.groups_loc = {} 
 		self.lsds = {}
 		
 		self.year = pref_year
@@ -285,22 +285,22 @@ class Table:
 		...  ...  ...  ...  ...
 		"""
 		
+		top_row = {} # The top row for the table object: 'Varities', 1-yr, 2-yr, 3-yr, Loc1, Loc2, etc.
 		row_labels_column = [] # Contains the varieties' names.
-		lsd_row = {} # Contains the LSDs calculated from an n year period, plus the LSD for each location.
 		year_columns = {} # Contains year(s) average values for the given varieties.
 		location_columns = {} # The variety value(s) for a location(s).
+		lsd_row = {} # Contains the LSDs calculated from an n year period, plus the LSD for each location.
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
-		top_row = {} # The top row for the table object: 'Varities', 1-yr, 2-yr, 3-yr, Loc1, Loc2, etc.
 		
 		
 		def __init__(lsd = LSD._init_(self, entries, locations, varieties, years, pref_year, field)): 
 			return collate_table(lsd)
 			
-		def collate_table():
+		def collate_table(lsd): # Must pass a table object. If a field of an object is null, so be it.
 			collated_table = {}
 			return collated_table
 			
-		def header_row():
+		def header_row(): # def _init_() must be called first to instantiate a table object, otherwise, this will return nothing.
 			"""
 			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
 			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
@@ -312,7 +312,7 @@ class Table:
 			"""
 			return top_row
 			
-		def populate_lsd_row():
+		def populate_lsd_row(): # def _init_() must be called first to instantiate a table object, otherwise, this will return nothing.
 			"""
 			Prefixes to bottom_row 'LSD', then calculates the LSD from the
 			location lists by year and appends by minimum year first. Next,
@@ -326,7 +326,7 @@ class Table:
 			
 			return lsd_row
 			
-		def populate_year_average_columns():
+		def populate_year_average_columns(): # def _init_() must be called first to instantiate a table object, otherwise, this will return nothing.
 			"""
 			Prefixes the year from lsd.year, which is the maximum year from
 			lsd object's list of years, creates subsequent elements in the
@@ -340,7 +340,7 @@ class Table:
 			
 			return year_columns
 			
-		def populate_location_columns():
+		def populate_location_columns(): # def _init_() must be called first to instantiate a table object, otherwise, this will return nothing.
 			"""
 			Prefixes the location name to l_column, then appends the
 			location value for each variety. Finally, the last step appends
@@ -353,7 +353,7 @@ class Table:
 			
 			return location_columns
 			
-		def get_year_column(year):
+		def get_year_column(year): # def _init_() must be called first to instantiate a table object, otherwise, this will return nothing.
 			"""
 			Returns the specified year's column from a Table object's years_columns field
 			as a list. This function also appends the LSD for the given year to the list.
@@ -362,7 +362,7 @@ class Table:
 			column = []
 			return column
 			
-		def get_location_column(location):
+		def get_location_column(location): # def _init_() must be called first to instantiate a table object, otherwise, this will return nothing.
 			"""
 			Returns the specified location's column from a table object's 
 			location_columns field as a list. This functions also appends
