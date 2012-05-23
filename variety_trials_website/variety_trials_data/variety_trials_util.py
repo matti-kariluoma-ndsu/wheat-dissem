@@ -275,7 +275,7 @@ class LSD_Calculator:
 class Table:
 		"""
 		Creates an object with lists for fields that are suitable for a
-		tabular layout. The header list contains the year(s)'- and 
+		tabular layout. The header dictionary contains the year(s)'- and 
 		location(s)' column headers.  The last list is a list of all the 
 		LSD calculations for the given entry.
 		
@@ -290,6 +290,7 @@ class Table:
 		year_columns = {} # Contains year(s) average values for the given varieties.
 		location_columns = {} # The variety value(s) for a location(s).
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
+		top_row = {} # The top row for the table object: 'Varities', 1-yr, 2-yr, 3-yr, Loc1, Loc2, etc.
 		
 		
 		def __init__(lsd = LSD._init_(self, entries, locations, varieties, years, pref_year, field)): 
@@ -307,10 +308,8 @@ class Table:
 			
 			The final output should look like this:
 			
-			[Variety, 1-yr, 2-yr, 3-yr, Casselton, Prosper]
+			[(Variety), (1-yr), (2-yr), (3-yr), (Casselton), (Prosper)]
 			"""
-			
-			top_row = []
 			return top_row
 			
 		def populate_lsd_row():
@@ -322,7 +321,7 @@ class Table:
 			If the entry is spanning three years and includes three locations, 
 			the final output should look like this:
 			
-			[LSD, 2.5, 2.6, 2.7, 3, 2.1, 4.5]
+			[(LSD), (1-yr, 2.5), (2-yr, 2.6), (3-yr, 2.7), (Casselton, 3), (Propser, 2.1), (Location 3, 4.5)]
 			"""
 			
 			return lsd_row
@@ -333,6 +332,8 @@ class Table:
 			lsd object's list of years, creates subsequent elements in the
 			year_columns dictionary that are lists of the previous year(s)
 			values, with 'n-yr' prefixed on each list.
+			
+			
 			"""
 			
 			return year_columns
