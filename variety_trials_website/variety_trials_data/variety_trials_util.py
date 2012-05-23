@@ -1390,6 +1390,6 @@ class Locations_from_Zipcode_x_Radius:
 				sorted_list[k]=temp
 		
 		
-		print len(sorted_list)
+		
 			
 		return sorted_list
