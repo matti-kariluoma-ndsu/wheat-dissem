@@ -63,13 +63,11 @@ def index(request, abtest=None):
 		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
-                print request.GET['locations']
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
 		if locations_form.is_valid():
 			
 			locations = locations_form.cleaned_data['locations']
 			varieties = locations_form.cleaned_data['varieties']
-			
 			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
 			
 		else:
@@ -175,9 +173,26 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 				#'/static/img/button_seeding_rate.jpg', '/static/img/button_high_seeding_rate.jpg'],
 			#'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				#'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
-	}		
-	
-	this_year = datetime.date.today().year - 1
+	}
+        zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
+	if zipcode_radius_form.is_valid():
+		zipcode = zipcode_radius_form.cleaned_data['zipcode']
+		radius = zipcode_radius_form.cleaned_data['search_radius']
+	try:
+		pos_locations = Locations_from_Zipcode_x_Radius(
+			zipcode, radius
+		).fetch()
+	except models.Zipcode.DoesNotExist:
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+				'radius': zipcode_radius_form.cleaned_data['search_radius']
+				})
+	intersect = []
+        for item in some_dict.keys():
+                if another_dict.has_key(item):
+                        intersect.append(item)
+        print intersect
+        
+        this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 	year_list = [this_year, this_year-1, this_year-2]
 	
@@ -265,7 +280,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
                 variety_get_string='&varieties='+str(v.id)
         for l in locations:
                 location_get_string='&locations='+str(l.id)
-
+        print request.GET
 	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
 		'tabbed_view.html',
