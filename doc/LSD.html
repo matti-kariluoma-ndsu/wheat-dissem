@@ -4,20 +4,7 @@
 //from math import sqrt, pi, cos, sin, exp
 //from scipy.special import erfinv
 
-
-
-function LSD(response_to_treatments, probability)
-{
-
-/*
-	A stripped-down reimplementation of LSD.test from the agricoloae
-	package. (http://cran.r-project.org/web/packages/agricolae/index.html)
-	
-	Calculates the Least Significant Difference of a multiple comparisons
-	trial, over a balanced dataset.
-	*/
-		
-	function qnorm(probability)
+function qnorm(probability)
 	{
 		/*
 		A reimplementation of R's qnorm() function.
@@ -58,6 +45,8 @@ function LSD(response_to_treatments, probability)
 		n = degrees_of_freedom
 		P = probability
 		t = 0
+		pi = 3.14159
+		sqrt = 1
 		if (n < 1 || P > 1.0 || P <= 0.0 )
 			{
 			alert("There was an error");
@@ -69,22 +58,25 @@ function LSD(response_to_treatments, probability)
 		else if(n == 1)
 		{
 			P = P * pi/2
-			t = cos(P)/sin(P)
+			t = Math.cos(P)/Math.sin(P)
 			}
 		else
 			{
+			
 			a = 1.0/(n-0.5)
 			b = 48.0/(a^2.0)
 			c = ((20700.0*a/b - 98.0)*a - 16.0)*a + 96.36
-			d = ((94.5/(b+c) - 3.0)/b + 1.0)*sqrt(a*pi/2.0)*
-			(n)
-			x = d*P
-			y = x^(2.0/f
-			(n))
-			}
+			d = ((94.5/(b+c) - 3.0)/b + 1.0)
+			e = d*Math.sqrt(a*pi/2.0)*(n)
+			x = e*P
+			y = x^(2.0/(n))
+			
 		
 			if (y > 0.05 + a)
-				{x = qnorm(P*0.5)
+				{
+				x = qnorm(P*0.5)
+				document.write("x is : " +x + "<br/>")
+				
 				y = x^2.0
 				
 				
@@ -92,6 +84,7 @@ function LSD(response_to_treatments, probability)
 					{
 					c = c + 0.3*((n)-4.5)*(x+0.6)
 					}
+					
 				//c = (((0.05*d*x-5.0)*x-7.0)*x-2.0)*x+b+c
 				c1 = (0.05*d*x) - 5.0
 				c2 = c1*x - 7.0
@@ -134,12 +127,22 @@ function LSD(response_to_treatments, probability)
 				y= y10
 			    }
 			
-			t = sqrt(n)*(y)
+			t = Math.sqrt((n)*(y))
 			
-		
+		}
 		return t
 	}
-	trt = response_to_treatments
+
+function LSD(trt, probability)
+{
+
+/*
+	A stripped-down reimplementation of LSD.test from the agricoloae
+	package. (http://cran.r-project.org/web/packages/agricolae/index.html)
+	
+	Calculates the Least Significant Difference of a multiple comparisons
+	trial, over a balanced dataset.
+	*/
 	//model = aov(y~trt)
 	//df = df.residual(model)
 	//df is the residual Degrees of Freedom
@@ -163,7 +166,7 @@ function LSD(response_to_treatments, probability)
 	//var trt1 = new Array();
 	//trt[0] = new Array ();
 	
-	document.write("<p>Inspecting cells</p>");
+	/*document.write("<p>Inspecting cells</p>");
 	for (i=0; i<n; i++)
 	{
 		for (j=0; j<k; j++)
@@ -172,6 +175,7 @@ function LSD(response_to_treatments, probability)
 		document.write("<br>");
 		}
 	}
+	*/
 	
 	for (i=0; i<n; i++)
 	{
@@ -200,6 +204,7 @@ function LSD(response_to_treatments, probability)
 		
 		for(i=0; i<n; i++)
 			{
+			
 			total +=trt[i][j]
 			document.write(" The calculated total is:  " +total+"<br />")
 			}
@@ -229,38 +234,56 @@ function LSD(response_to_treatments, probability)
 		for(j=0;j<k;j++)
 		{
 			SSE += (trt[i][j] - treatment_means[i] - block_means[j] + grand_mean)^2.0;
+			
+			document.write("The treatment value for i and j is: "+ trt[i][j]+"<br/>")
+			document.write("The treatment mean is: "+ trt[i][j]+"<br/>")
+			document.write("The treatment mean is: "+ trt[i][j]+"<br/>")
+			document.write("The treatment mean is: "+ trt[i][j]+"<br/>")
+			
 			document.write(" The value is:  "+SSE + "<br/>")
 			}
 			}
 			
 	
 	//print "SSE: %f\n" % (SSE)
+	document.write("SSE : "+SSE+"<br/>")
 	
 	mean_squares_of_error = SSE / degrees_freedom_of_error
 	
 	//print "MSE: %f\n" % (mean_squares_of_error)
+	document.write("MSE : "+mean_squares_of_error+"<br/>")
 	
 	Tprob = qt(probability, degrees_freedom_of_error)
-	
+	document.write("Probability is : " +probability+"<br/>")
+	document.write("Degrees of freedom is : " +degrees_freedom_of_error+"<br/>")
+	document.write("T distribution probability : " +Tprob+"<br/>")
 	//print "t-value: %f\n" % (Tprob)
 	
-	LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
+	LSD = Tprob * Math.sqrt(2.0 * mean_squares_of_error / k)
 
 	return LSD
+
+
 	}
 
+
 </script>
+
 <script type="text/javascript">
 function displaymessage()
 {
-alert("There was an erorr!");
+alert("There was an erorr!")
 }
+
+
 </script>
+
 </head>
 
 	
 <body>
 <script type="text/javascript">
+	{
 	input1 = [
 		[64.5, 62.899999999999999, 48.600000000000001, 76.900000000000006],
 		[65.799999999999997, 60.200000000000003, 47.100000000000001, 75.900000000000006],
@@ -301,10 +324,44 @@ alert("There was an erorr!");
 	result4 = 4.86117238
 
 
-	document.write (LSD(input1, 0.05));
-	document.write( result1 );
+	//document.write ("calculated lsd is "+LSD(input1, 0.05));
+	document.write ("calculated lsd is "+LSD(input2, 0.05));
+	//document.write ("calculated lsd is "+LSD(input3, 0.05));
+	//document.write ("calculated lsd is "+LSD(input4, 0.05));
+	
+	document.write( "<br>It should be "+result1 );
+	document.write( "<br>It should be "+result2 );
+	document.write( "<br>It should be "+result3 );
+	document.write( "<br>It should be "+result4 );
+	
+	
 	document.write( "<p>===</p>" );
+	document.write( "<p>The inputs were :  </p>");
+	
 	document.write(input1);
+	document.write(input2);
+	document.write(input3); 
+	document.write(input4);
+	}
+   
+	
+	
+	/*document.write ("calculated lsd is "+LSD(input2, 0.05));
+	document.write( "<br>it should be "+result2 );
+	document.write( "<p>===</p>" );
+	document.write(input2);
+	
+	document.write ("calculated lsd is "+LSD(input3, 0.05));
+	document.write( "<br>it should be "+result3 );
+	document.write( "<p>===</p>" );
+	document.write(input3);
+	
+	document.write ("calculated lsd is "+LSD(input4, 0.05));
+	document.write( "<br>it should be "+result4 );
+	document.write( "<p>===</p>" );
+	document.write(input4);
+	*/
+	
 	/*
 	print LSD(input2, 0.05)
 	print result2

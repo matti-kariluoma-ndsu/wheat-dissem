@@ -59,7 +59,7 @@ def LSD(response_to_treatments, probability):
 		t = 0
 		if (n < 1 or P > 1.0 or P <= 0.0 ):
 			raise BaseException #TODO: raise a standard/helpful error
-		elif (n == 2)
+		elif (n == 2):
 			t = sqrt(2.0/(P*(2.0-P)) - 2.0)
 		elif (n == 1):
 			P = P * pi/2
@@ -149,14 +149,16 @@ def LSD(response_to_treatments, probability):
 		for j in range(k):
 			SSE += (float(trt[i][j]) - treatment_means[i] - block_means[j] + grand_mean)**2.0
 	
-	#print "SSE: %f\n" % (SSE)
+	print "SSE: %f\n" % (SSE)
 	
 	mean_squares_of_error = SSE / degrees_freedom_of_error
 	
-	#print "MSE: %f\n" % (mean_squares_of_error)
+	print "MSE: %f\n" % (mean_squares_of_error)
 	
 	Tprob = qt(probability, degrees_freedom_of_error)
-	
+	print probability
+	print degrees_freedom_of_error
+	print Tprob
 	#print "t-value: %f\n" % (Tprob)
 	
 	LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
