@@ -21,12 +21,13 @@
 
 	TODO: fix input validation strings return an error.
 
-	TODO: Do we need csrf_token?
+	
 
 	TODO: use get, not post
 	-->
 
 	<form action="/view/{{curyear}}/bushels_acre/" method="GET">
+
 		{% for field in zipcode_radius_form %}
 		<div class="input row">
 			{{ field.errors }}
