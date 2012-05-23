@@ -1372,17 +1372,24 @@ class Locations_from_Zipcode_x_Radius:
 				print l.zipcode.latitude
 				print l.zipcode.longitude
 		'''
-		distance= [] 
-		i=0
-		for l in sorted_list:
-				distance[i] = lat1-sorted_list[0].latitude
-				i+1
 		
 		
+		lat=[]
+		longi=[]
+		
+		for i in range(len(sorted_list)): 
+			x= lon1 - float(sorted_list[i].zipcode.longitude)
+			lat.append(x)
+			y= lat1 - float(sorted_list[i].zipcode.latitude)
+			longi.append(y)
+		
+		for k in range(len(sorted_list)-1):
+			if lat[k]>lat[k+1] or longi[k]>longi[k+1]:
+				temp = sorted_list[k+1]
+				sorted_list[k+1]=sorted_list[k]
+				sorted_list[k]=temp
 		
 		
-		
-		
-		print sorted_list[1]
+		print len(sorted_list)
 			
 		return sorted_list
