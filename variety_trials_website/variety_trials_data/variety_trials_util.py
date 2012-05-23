@@ -308,7 +308,7 @@ class Table:
 			
 			The final output should look like this:
 			
-			[(Variety), (1-yr), (2-yr), (3-yr), (Casselton), (Prosper)]
+			[(column1, Variety), (year, 1-yr), (year, 2-yr), (year, 3-yr), (location, Casselton), (location, Prosper), (location, SomePlace)]
 			"""
 			return top_row
 			
@@ -321,7 +321,7 @@ class Table:
 			If the entry is spanning three years and includes three locations, 
 			the final output should look like this:
 			
-			[(LSD), (1-yr, 2.5), (2-yr, 2.6), (3-yr, 2.7), (Casselton, 3), (Propser, 2.1), (Location 3, 4.5)]
+			[(column1, LSD), (year, 2.5), (year, 2.6), (year, 2.7), (location, 3), (location, 2.1), (Location, 4.5)]
 			"""
 			
 			return lsd_row
@@ -331,9 +331,11 @@ class Table:
 			Prefixes the year from lsd.year, which is the maximum year from
 			lsd object's list of years, creates subsequent elements in the
 			year_columns dictionary that are lists of the previous year(s)
-			values, with 'n-yr' prefixed on each list.
+			values, with 'n-yr' prefixed on each list. This function prefixes
+			the maxium year to this dictionary first, but years are appended 
+			to this dictionary from smallest to greatest.
 			
-			
+			[(Name, theMaxYear), (year, theMinYear),...,(year, theMaxYear)]
 			"""
 			
 			return year_columns
@@ -349,8 +351,7 @@ class Table:
 			[Casselton, 60.4, 60.3, 57.0, 2.5]
 			"""
 			
-			l_column = []
-			return l_column
+			return location_columns
 			
 		def get_year_column(year):
 			"""
