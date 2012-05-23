@@ -133,6 +133,7 @@ def letter(number):
 	return column_letter
 
 def handle_csv_file(uploaded_file):
+	print "hellow"
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
 	# No good, the uploaded_file is an object, not a file or stream...
 	"""
@@ -177,22 +178,22 @@ def handle_csv_file(uploaded_file):
 				for i in range(len(headers)):
 					headers[i] = headers[i].replace('"','') # remove all double quotes
 					headers[i] = headers[i].replace("'",'') # remove all single quotes
-				#print headers
+				print headers
 				skip = False
 		else:
 			column_number = 0
-			#print line
+			print line
 			#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
 			for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
 				if column == ',': # a special case caused by '^,|,$'
 					column = ''
 				column = column.replace('"','')
 				column = column.replace("'",'')
-				#print "column: %s" % (column)
+				print "column: %s" % (column)
 				if column.strip() != '':
 					try:
 						name = headers[column_number].strip()
-						#print "field: %s" % (name)
+						print "field: %s" % (name)
 						if name in insertion_dict.keys() and name not in reference_dict.keys():
 							insertion_dict[name] = column.strip()
 						else:
@@ -209,8 +210,9 @@ def handle_csv_file(uploaded_file):
 			model_instance = models.Trial_Entry()
 			for name in insertion_dict.keys():
 				setattr(model_instance, name, insertion_dict[name])
-				#print "Writing %s as %s" % (name, insertion_dict[name])
+				print "Writing %s as %s" % (name, insertion_dict[name])
 				insertion_dict[name] = None
-			#model_instance.save() # ARE YOU BRAVE ENOUGH?
+			model_instance.save() # ARE YOU BRAVE ENOUGH? answer - yes!
+			
 			
 	return (False, errors)
