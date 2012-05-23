@@ -331,9 +331,8 @@ class Table:
 			Prefixes the year from lsd.year, which is the maximum year from
 			lsd object's list of years, creates subsequent elements in the
 			year_columns dictionary that are lists of the previous year(s)
-			values, with 'n-yr' prefixed on each list. This function prefixes
-			the maxium year to this dictionary first, but years are appended 
-			to this dictionary from smallest to greatest.
+			values. This function prefixes the maxium year to this dictionary first, 
+			but years are appended to this dictionary from smallest to greatest.
 			
 			[(Name, theMaxYear), (year, theMinYear),...,(year, theMaxYear)]
 			"""
@@ -348,7 +347,7 @@ class Table:
 			
 			The final output from l_column should look like this:
 			
-			[Casselton, 60.4, 60.3, 57.0, 2.5]
+			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0), (lsd, 2.5)]
 			"""
 			
 			return location_columns
