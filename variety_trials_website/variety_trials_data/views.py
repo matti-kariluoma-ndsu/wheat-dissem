@@ -63,6 +63,7 @@ def index(request, abtest=None):
 		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
+                print request.GET['locations']
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
 		if locations_form.is_valid():
 			
@@ -93,7 +94,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					})
 				return render_to_response(
 					'main.html', 
-					{ 
+					{
 						'zipcode_radius_form': zipcode_radius_form,
 						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
 						'variety_list': models.Variety.objects.all(),
@@ -112,7 +113,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 			
 			varieties = list(set(varieties)) # remove duplicates
 			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode)
 			
 		else:
 			zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
@@ -121,7 +122,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 				})
 			return render_to_response(
 					'main.html', 
-					{ 
+					{
 						'zipcode_radius_form': zipcode_radius_form,
 						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
 						'variety_list': models.Variety.objects.all(),
@@ -134,7 +135,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 		# seems an error occured...
 		return HttpResponseRedirect("/") # send to homepage
 
-def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None):
+def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None, zipcode=None):
 	# TODO: does this belong in the DB?
 	unit_blurbs = {
 			'bushels_acre': ['Yield', 'Bushels per Acre', 
@@ -269,6 +270,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	return render_to_response(
 		'tabbed_view.html',
 		{
+                        'zipcode': zipcode,
                         'location_get_string': location_get_string,
                         'variety_get_string': variety_get_string,
 			'locations_form': locations_form,
