@@ -139,7 +139,9 @@ def LSD(response_to_treatments, probability):
 		total = 0.0
 		for i in range(n):
 			total += float(trt[i][j])
+			print "The total is : " +str(total)
 		block_means[j] = total/n
+		print "The block mean is : " + str(block_means[j])
 	
 	grand_mean = sum(treatment_means.values()) / float(n)
 	
@@ -206,8 +208,12 @@ def main():
 		[8.0999999999999996, 2.5]
 	]
 	result4 = 4.86117238
+	
+	print LSD(input2, 0.05)
+	print result2
+	print "==="
 
-
+	"""
 	print LSD(input1, 0.05)
 	print result1
 	print "==="
@@ -223,7 +229,7 @@ def main():
 	print LSD(input4, 0.05)
 	print result4
 	print "==="
-	
+	"""
 	
 if __name__ == '__main__':
 	main()
