@@ -36,6 +36,8 @@ def LSD(response_to_treatments, probability):
 		if probability > 1 or probability <= 0:
 			raise BaseException # TODO: raise a standard/helpful error
 		else:
+			print (2*probability - 1)
+			print erfinv(2*probability - 1)
 			return sqrt(2) * erfinv(2*probability - 1)
 			
 	def qt(probability, degrees_of_freedom):
