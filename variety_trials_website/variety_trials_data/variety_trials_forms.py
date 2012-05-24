@@ -24,9 +24,11 @@ class SelectFieldForm(forms.Form):
 	locations = forms.CharField(max_length=5)
 	year_list = forms.CharField(max_length=5)
 	field = forms.CharField(max_length=5)
-	radius = forms.CharField(max_length=5)
+	search_radius = forms.CharField(max_length=5)
 							
 class SelectVarietiesForm(forms.Form):
+        zipcode = forms.CharField(max_length=5, required=False)
+	search_radius = forms.CharField(max_length=5, required=False)
 	varieties = forms.ModelMultipleChoiceField(
 								widget=forms.SelectMultiple(attrs={'size': 20}),
 								queryset=models.Variety.objects.all()

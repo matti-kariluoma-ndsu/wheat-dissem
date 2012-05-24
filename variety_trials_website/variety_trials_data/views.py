@@ -63,12 +63,15 @@ def index(request, abtest=None):
 		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
+                zipcode=request.GET.__getitem__("zipcode")
+                search_radius=request.GET.__getitem__("search_radius")
+                
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
 		if locations_form.is_valid():
 			
 			locations = locations_form.cleaned_data['locations']
 			varieties = locations_form.cleaned_data['varieties']
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode, search_radius)
 			
 		else:
 			return HttpResponseRedirect("/") # send to homepage
@@ -111,7 +114,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 			
 			varieties = list(set(varieties)) # remove duplicates
 			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode, radius)
 			
 		else:
 			zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
@@ -133,7 +136,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 		# seems an error occured...
 		return HttpResponseRedirect("/") # send to homepage
 
-def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None, zipcode=None):
+def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None, zipcode=None, search_radius=0):
 	# TODO: does this belong in the DB?
 	unit_blurbs = {
 			'bushels_acre': ['Yield', 'Bushels per Acre', 
@@ -174,23 +177,40 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			#'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				#'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
 	}
+	"""
         zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 	if zipcode_radius_form.is_valid():
 		zipcode = zipcode_radius_form.cleaned_data['zipcode']
 		radius = zipcode_radius_form.cleaned_data['search_radius']
+                try:
+                	pos_locations = Locations_from_Zipcode_x_Radius(
+                		zipcode, radius
+                	).fetch()
+                	
+                except models.Zipcode.DoesNotExist:
+                	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+                			'radius': zipcode_radius_form.cleaned_data['search_radius']
+                			})
+        """
 	try:
-		pos_locations = Locations_from_Zipcode_x_Radius(
-			zipcode, radius
-		).fetch()
-	except models.Zipcode.DoesNotExist:
-		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
-				'radius': zipcode_radius_form.cleaned_data['search_radius']
-				})
-	intersect = []
-        for item in some_dict.keys():
-                if another_dict.has_key(item):
-                        intersect.append(item)
-        print intersect
+               	pos_locations = Locations_from_Zipcode_x_Radius(
+               		zipcode, search_radius
+               	).fetch()
+               	
+        except models.Zipcode.DoesNotExist:
+                None
+                """
+               	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+               			'radius': zipcode_radius_form.cleaned_data['search_radius']
+               			})
+               			"""
+        
+        neg_locations=[]
+        locations=list(locations)
+	for e in pos_locations:
+                if locations.count(e)==0:
+                        neg_locations.append(e)
+        print neg_locations
         
         this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
@@ -239,7 +259,9 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
-			'varieties': varieties
+			'varieties': varieties,
+                        'zipcode': zipcode,
+                        'search_radius': search_radius
 		})
 	
 	try:
@@ -280,12 +302,12 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
                 variety_get_string='&varieties='+str(v.id)
         for l in locations:
                 location_get_string='&locations='+str(l.id)
-        print request.GET
 	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
 		'tabbed_view.html',
 		{
                         'zipcode': zipcode,
+                        'search_radius': search_radius,
                         'location_get_string': location_get_string,
                         'variety_get_string': variety_get_string,
 			'locations_form': locations_form,
