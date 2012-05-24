@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from variety_trials_data import models
 from difflib import SequenceMatcher
 import re
+import time
+from datetime import date
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
@@ -133,6 +135,8 @@ def letter(number):
 	return column_letter
 
 def handle_csv_file(uploaded_file):
+	
+	#l = models.Location(name="some name",zipcode = models.Zipcode(zipcode = "1256",city="some state",state,latitude,longitude,timezone,daylight_savings)
 	print "hellow"
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
 	# No good, the uploaded_file is an object, not a file or stream...
@@ -190,10 +194,21 @@ def handle_csv_file(uploaded_file):
 				column = column.replace('"','')
 				column = column.replace("'",'')
 				print "column: %s" % (column)
+				
 				if column.strip() != '':
 					try:
 						name = headers[column_number].strip()
 						print "field: %s" % (name)
+						#Making objects to add to database.
+						
+						if name == "harvest_date_id":
+							possible_characters = ('/', ' ', '-', '.')
+							datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
+							datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+							if not datelist: 
+								d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+								d.save()
+						
 						if name in insertion_dict.keys() and name not in reference_dict.keys():
 							insertion_dict[name] = column.strip()
 						else:
@@ -212,7 +227,7 @@ def handle_csv_file(uploaded_file):
 				setattr(model_instance, name, insertion_dict[name])
 				print "Writing %s as %s" % (name, insertion_dict[name])
 				insertion_dict[name] = None
-			model_instance.save() # ARE YOU BRAVE ENOUGH? answer - yes!
+			model_instance.save() # ARE YOU BRAVE ENOUGH? 
 			
 			
 	return (False, errors)
