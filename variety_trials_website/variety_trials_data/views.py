@@ -221,6 +221,44 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		# TODO: we can do more for the user than redirect to /
 		return HttpResponseRedirect("/")
 	
+	# New idea, return a list of tables instead of a list of rows
+	tables = []
+	
+	header_rows = [sorted_list[0]]
+	lsd_rows = []
+	rows = []
+	i = 0;
+			
+	for row in sorted_list[1::]:
+		if len(row) > 0:
+			if row[0][0] == 'Variety':
+				tables.append(rows)
+				rows = []
+				header_rows.append(row)
+			elif row[0] == 'LSD':
+				lsd_rows.append(row)
+			else:
+				rows.append(row)
+				
+	tables.append(rows)
+
+	dict_tables = []
+	for h in header_rows:
+		dict_tables.append(dict(header=h))
+	for l, i in zip(lsd_rows, range(len(lsd_rows))):
+		dict_tables[i]['lsd'] = l
+	for r, i in zip(tables, range(len(tables))):
+		dict_tables[i]['rows'] = r
+	
+	"""
+	for table in dict_tables:
+		print table['header']
+		for row in table['rows']:
+			print row
+		print table['lsd']
+		print ''
+	"""
+	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
 			'varieties': varieties
