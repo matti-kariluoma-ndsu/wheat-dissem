@@ -233,7 +233,7 @@ class LSD_Calculator:
 		for v in varieties:
 			self.entries[v] = [[None for l in self.locations] for y in self.years]
 		for l in locations:
-			self.lsds[l] = [None for y in self.years]
+			self.lsds[l_i[l]] = [None for y in self.years]
 		
 		# grab data pertaining to our field
 		fieldname = self.field.name
@@ -269,7 +269,7 @@ class LSD_Calculator:
 								else:
 									value = None
 						
-						self.lsds[location][y] = value
+						self.lsds[l][y] = value
 		
 	def fetch(self, reduce_to_one_subset=False):
 		"""
@@ -507,9 +507,17 @@ class LSD_Calculator:
 				for key in self.groups_loc:
 					years_locations.extend(self.groups_loc[key][cy_i])
 				years_locations = list(set(years_locations))
+				used_locations = []
+				#
+				## TODO: this is where the additional alphabetical sort is
+				#
 				for l in sorted(years_locations, key=attrgetter('name')):
+					used_locations.append(l)
 					l_indexes_values.append(l_indexes[l])
 					head_row.append((l.name, l.id))
+				for l in set(self.locations).difference(used_locations):
+					del self.location_indexes[l]
+				self.locations = used_locations
 			else:
 				for l in sorted(self.locations, key=attrgetter('name')):
 					l_indexes_values.append(l_indexes[l])
@@ -687,15 +695,16 @@ class LSD_Calculator:
 						temp_row.append(None)
 					
 			else:
-				for l in self.location_indexes:
+				for l in self.locations:
 					if self.location_indexes[l] in locations:
-						value = self.lsds[l][cy_i] #TODO: smarter logic needed
+						value = self.lsds[self.location_indexes[l]][cy_i] #TODO: smarter logic needed
 						if value is not None:
 							temp_row.append(value)
 						else:
 							temp_row.append(None)
 					else:
 						temp_row.append(None)
+					
 					
 			subset_list.append(temp_row)
 			
