@@ -305,7 +305,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 
 	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
-		'tabbed_view.html',
+		'tabbed_view_table_ndsu.html',
 		{
                         'location_get_string': location_get_string,
                         'variety_get_string': variety_get_string,
