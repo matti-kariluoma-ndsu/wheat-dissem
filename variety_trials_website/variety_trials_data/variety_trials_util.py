@@ -445,6 +445,17 @@ class LSD_Calculator:
 			self.groups[((order,order,order),0)] = list(self.varieties)
 			self.groups_loc[((order,order,order),0)] = [list(common_locations), list(common_locations), list(common_locations)]# TODO: heavily assumes 3-yrs
 		else: # if we are the locations view
+			delete_groups = []
+			for key in self.groups:
+				# cull tables with len(locations) < 6
+				if key[0][0] < 6:
+					delete_groups.append(key)
+				# cull tables with len(varieties) < 4
+				elif len(self.groups[key]) < 4:
+					delete_groups.append(key)
+					
+			for key in delete_groups:
+				del self.groups[key]
 			# Add all varieties from larger subsets to smaller subsets
 			add_all_varieties_from_larger_subsets = False
 			if add_all_varieties_from_larger_subsets:
@@ -712,7 +723,9 @@ class LSD_Calculator:
 			return_list.extend(subset_list) # append the lists inside subset_list to return_list
 			return_list.append(next_header) # append another header row
 		
-		#print return_list[:len(return_list)-1:]
+		
+		if len(return_list[:len(return_list)-1:]) == 0:
+			return_list.append(next_header)
 		
 		return return_list[:len(return_list)-1:] # remove last row, a header row with nothing under it
 

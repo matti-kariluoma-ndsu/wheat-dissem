@@ -51,7 +51,7 @@ def index(request, abtest=None):
 	
 
 	return render_to_response(
-		'main.html', 
+		'main_ndsu.html', 
 		{ 
 			'zipcode_radius_form': zipcode_radius_form,
 			'varieties_form': varieties_form,

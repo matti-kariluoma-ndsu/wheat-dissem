@@ -151,7 +151,7 @@
 		</tr>
 		<tr class="Variety padded">
 			{% for heading in datalist %}
-			<td class="padded"><h3>{{ heading.0 }}</h3>
+			<td class="padded"><h4>{{ heading.0 }}</h4>
 				{% if heading.1 != -1 %}
 				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
 				{% endif %}
