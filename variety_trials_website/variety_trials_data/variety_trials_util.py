@@ -214,8 +214,10 @@ class LSD_Calculator:
 		
 		
 		# order locations, varieties
-		self.locations = sorted(locations, key=attrgetter('name'))
+		#self.locations = sorted(locations, key=attrgetter('name'))
 		self.varieties = sorted(varieties, key=attrgetter('name'))
+		
+		self.locations = locations
 		
 		#
 		# initialize self.entries, self.lsds
@@ -447,15 +449,19 @@ class LSD_Calculator:
 		else: # if we are the locations view
 			delete_groups = []
 			for key in self.groups:
-				# cull tables with len(locations) < 6
+				# cull tables with len(locations) != 6-10
 				if key[0][0] < 6:
 					delete_groups.append(key)
-				# cull tables with len(varieties) < 4
 				elif len(self.groups[key]) < 4:
 					delete_groups.append(key)
+				if key[0][0] > 10:
+					self.locations = self.locations[0:9]
+				# cull tables with len(varieties) < 4
+				
 					
 			for key in delete_groups:
 				del self.groups[key]
+				
 			# Add all varieties from larger subsets to smaller subsets
 			add_all_varieties_from_larger_subsets = False
 			if add_all_varieties_from_larger_subsets:
@@ -522,10 +528,12 @@ class LSD_Calculator:
 				#
 				## TODO: this is where the additional alphabetical sort is
 				#
-				for l in sorted(years_locations, key=attrgetter('name')):
-					used_locations.append(l)
-					l_indexes_values.append(l_indexes[l])
-					head_row.append((l.name, l.id))
+				#for l in sorted(years_locations, key=attrgetter('name')):
+				for l in self.locations:
+					if l in years_locations:
+						used_locations.append(l)
+						l_indexes_values.append(l_indexes[l])
+						head_row.append((l.name, l.id))
 				for l in set(self.locations).difference(used_locations):
 					del self.location_indexes[l]
 				self.locations = used_locations
@@ -1369,20 +1377,22 @@ class Locations_from_Zipcode_x_Radius:
 				self.radius = 50.0
 				skip_lookup = False
 		
-		if not skip_lookup:
-			lat2_list = []
-			lon2_list = []
-			
-			try:
-				zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
-				zipcode_object = zipcode_query.get() # should only be one result
-			except (ValueError, models.Zipcode.DoesNotExist) as instance:
-				raise models.Zipcode.DoesNotExist(instance)
+		
+		lat2_list = []
+		lon2_list = []
+		
+		try:
+			zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
+			zipcode_object = zipcode_query.get() # should only be one result
+		except (ValueError, models.Zipcode.DoesNotExist) as instance:
+			raise models.Zipcode.DoesNotExist(instance)
 
-			lat1 = float(zipcode_object.latitude) 
-			lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
-			lat1 = radians(lat1)
-			lon1 = radians(lon1)
+		lat1 = float(zipcode_object.latitude) 
+		lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
+		lat1 = radians(lat1)
+		lon1 = radians(lon1)
+		
+		if not skip_lookup:
 			R = 6378137.0 # Earth's median self.radius, in meters
 			d = self.radius * 1609.344	 # in meters 
 			# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
@@ -1404,5 +1414,30 @@ class Locations_from_Zipcode_x_Radius:
 				)
 			#TODO: We just searched a square, now discard searches that are > x miles away.
 		
+		#sort by distance from input zipcode
+		sorted_list = list(locations)
 		
-		return locations
+		'''
+		for l in locations:
+				print l.zipcode
+				print l.zipcode.latitude
+				print l.zipcode.longitude
+		'''
+		
+		
+		lat=[]
+		longi=[]
+		
+		for i in range(len(sorted_list)): 
+			x= lon1 - float(sorted_list[i].zipcode.longitude)
+			lat.append(x)
+			y= lat1 - float(sorted_list[i].zipcode.latitude)
+			longi.append(y)
+		
+		for k in range(len(sorted_list)-1):
+			if lat[k]>lat[k+1] or longi[k]>longi[k+1]:
+				temp = sorted_list[k+1]
+				sorted_list[k+1]=sorted_list[k]
+				sorted_list[k]=temp
+		
+		return sorted_list
