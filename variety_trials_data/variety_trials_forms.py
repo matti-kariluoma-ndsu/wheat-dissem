@@ -205,7 +205,7 @@ def handle_csv_file(uploaded_file):
 							possible_characters = ('/', ' ', '-', '.')
 							datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
 							datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-							if not datelist: 
+							if not datelist:
 								d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
 								d.save()
 						
@@ -231,3 +231,78 @@ def handle_csv_file(uploaded_file):
 			
 			
 	return (False, errors)
+	
+def checking_for_data(uploaded_file):
+		
+		insertion_dict = {}
+		reference_dict = {}
+
+		skip = True
+		skip_lines = 1
+		skip_count = 0
+
+		# Inspect our model, to grab the fields from it
+
+		for field in models.Trial_Entry._meta.fields:
+			if (field.get_internal_type() == 'ForeignKey' 
+					or field.get_internal_type() == 'ManyToManyField' ):
+				reference_dict["%s_id" % (field.name)] = field.rel.to.objects.all()
+			else:
+				insertion_dict[field.name] = None
+	
+		skip = True
+		skip_lines = 2
+		line_number = 0
+		headers = []
+		errors = {}
+		csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
+		
+		for line in uploaded_file:
+			line_number += 1
+			if (skip):
+				if (line_number + 1 > skip_lines):
+					headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
+					for i in range(len(headers)):
+						headers[i] = headers[i].replace('"','') # remove all double quotes
+						headers[i] = headers[i].replace("'",'') # remove all single quotes
+					skip = False
+			else:
+				column_number = 0
+				print line
+				#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
+				for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
+					if column == ',': # a special case caused by '^,|,$'
+						column = ''
+					column = column.replace('"','')
+					column = column.replace("'",'')
+					#print "column: %s" % (column)
+					
+					if column.strip() != '':
+						try:
+							name = headers[column_number].strip()
+							#print "field: %s" % (name)
+							#Making objects to add to database.
+							
+							if name == "harvest_date_id":
+								possible_characters = ('/', ' ', '-', '.')
+								datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
+								datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+								if not datelist:
+									print "got this far"
+									return (False,{"There was a problem at :":column})	
+								else:
+									print "got this far else"							
+							if name in insertion_dict.keys() and name not in reference_dict.keys():
+								insertion_dict[name] = column.strip()
+							else:
+								if name in reference_dict.keys():
+									try:
+										insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
+									except ValidationError:
+										errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
+								else:
+									errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
+						except IndexError:
+							errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
+					column_number += 1
+		return (False, errors)
