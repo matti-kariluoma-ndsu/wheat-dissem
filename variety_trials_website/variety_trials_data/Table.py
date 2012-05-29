@@ -260,7 +260,7 @@ class Table:
 			collated_table = {}
 			return collated_table
 			
-		def header_row(): 
+		def header_row(self): 
 			"""
 			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
 			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
@@ -302,20 +302,24 @@ class Table:
 			
 			return year_columns
 			
-		def populate_location_columns(self, locations): 
+		def populate_location_columns(self, locations, varieties): 
 			"""
 			Prefixes the location name to l_column, then appends the
-			location value for each variety. Finally, the last step appends
-			the LSD for the given varieties at that location.
+			location value for each variety.
 			
 			The final output from l_column should look like this:
 			
-			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0), (lsd, 2.5)]
+			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0)]
 			"""
+			self.locations = sorted(locations, key=attrgetter('name'))
+			l_i = dict(zip(self.locations, len(self.locations)))
+			# grab the years for the location, append them to the list at each location
 			
+			
+			location_columns = {}
 			return location_columns
 			
-		def get_year_column(self, year): 
+		def get_year_column(self, year):
 			"""
 			Returns the specified year's column from a Table object's years_columns field
 			as a list. This function also appends the LSD for the given year to the list.
