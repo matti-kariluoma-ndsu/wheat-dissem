@@ -453,9 +453,11 @@ class LSD_Calculator:
 				if key[0][0] < 6:
 					delete_groups.append(key)
 				elif len(self.groups[key]) < 4:
-					delete_groups.append(key)
+					pass
+					#delete_groups.append(key)
 				if key[0][0] > 10:
-					self.locations = self.locations[0:9]
+					pass
+					#self.locations = self.locations[0:9]
 				# cull tables with len(varieties) < 4
 				
 					
@@ -1352,8 +1354,8 @@ class Locations_from_Zipcode_x_Radius:
 		else: # get the numeric value
 			try:
 				self.radius = float(radius)
-			except ValueError:
-				self.radius = 100.0
+			except:
+				self.radius = 'ALL'
 	
 	def fetch(self):
 		"""
@@ -1389,11 +1391,12 @@ class Locations_from_Zipcode_x_Radius:
 
 		lat1 = float(zipcode_object.latitude) 
 		lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
-		lat1 = radians(lat1)
-		lon1 = radians(lon1)
+		
 		
 		if not skip_lookup:
-			R = 6378137.0 # Earth's median self.radius, in meters
+			lat1 = radians(lat1)
+			lon1 = radians(lon1)
+			R = 6378137.0 # Earth's median radius, in meters
 			d = self.radius * 1609.344	 # in meters 
 			# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
 			# TODO: have the Location objects grab default lat/long, not user entered
@@ -1414,30 +1417,35 @@ class Locations_from_Zipcode_x_Radius:
 				)
 			#TODO: We just searched a square, now discard searches that are > x miles away.
 		
-		#sort by distance from input zipcode
-		sorted_list = list(locations)
+		"""
+		From http://www.movable-type.co.uk/scripts/latlong.html
+		Haversine formula:
+		"""
+		distances = {}
+		R = 6378137.0 # Earth's median radius, in meters
+		for location in locations: 
+			lon2 = float(location.zipcode.longitude)
+			lat2 = float(location.zipcode.latitude)
+			delta_lon = radians(lon2 - lon1)
+			delta_lat = radians(lat2 - lat1)
+			lon1r = radians(lon1)
+			lat1r = radians(lat1)
+			lon2r = radians(lon2)
+			lat2r = radians(lat2)
+			a = sin(delta_lat / 2.0)**2.0 + cos(lat1r)*cos(lat2r)*sin(delta_lon / 2.0)**2.0
+			c = 2*atan2(sqrt(a), sqrt(1.0-a))
+			d = R * c
+			distances[location] = d
 		
-		'''
-		for l in locations:
-				print l.zipcode
-				print l.zipcode.latitude
-				print l.zipcode.longitude
-		'''
-		
-		
-		lat=[]
-		longi=[]
-		
-		for i in range(len(sorted_list)): 
-			x= lon1 - float(sorted_list[i].zipcode.longitude)
-			lat.append(x)
-			y= lat1 - float(sorted_list[i].zipcode.latitude)
-			longi.append(y)
-		
-		for k in range(len(sorted_list)-1):
-			if lat[k]>lat[k+1] or longi[k]>longi[k+1]:
-				temp = sorted_list[k+1]
-				sorted_list[k+1]=sorted_list[k]
-				sorted_list[k]=temp
-		
+		# sort by distance from input zipcode
+		sorted_list = []
+		for d in sorted(distances.values()):
+			for location in locations:
+				if d == distances[location]:
+					sorted_list.append(location)
+					break
+		"""
+		for l in sorted_list:
+			print "%f\t%s" %(distances[l], l.name)
+		"""
 		return sorted_list
