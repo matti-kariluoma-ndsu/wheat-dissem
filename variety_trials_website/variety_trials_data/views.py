@@ -83,7 +83,8 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if zipcode_radius_form.is_valid():
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
-			radius = zipcode_radius_form.cleaned_data['search_radius']
+			#radius = zipcode_radius_form.cleaned_data['search_radius']
+			radius = None
 			
 			try:
 				locations = Locations_from_Zipcode_x_Radius(
