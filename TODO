@@ -218,3 +218,15 @@ Upgrade to Django 1.4
 
 Is it worthwhile to use some other project/library to render our html/
 route pages/handle forms?
+
+For the iterative upload:
+	1) user uploads file
+	2) preprocess, no db lookup, publish the parsed file to a webpage
+	3) user hits next
+	4) server goes cell by cell, returning the first error to the user
+	  in the same formatted page as step 2, asks the user what to do
+	  i.e. accept guess, create new, etc.
+	5) repeat 4 until no errors
+	6) show the user the actual entered data (page as step 2, except all
+	  values pulled from the databse)
+	7) a page showing recent changes with the ability to undo recent changes
