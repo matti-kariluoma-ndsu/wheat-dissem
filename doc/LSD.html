@@ -4,12 +4,15 @@
 //from math import sqrt, pi, cos, sin, exp
 //from scipy.special import erfinv
 
-function erfinv(z)
-{
-return 0
-}
+
 function qnorm(probability)
 	{
+	function erfinv(y)
+	{
+		e = 1
+		document.write("The value of the inverse of the error function is : " + e)
+		return e
+	}
 		/*
 		A reimplementation of R's qnorm() function.
 		
@@ -49,7 +52,7 @@ function qnorm(probability)
 		n = degrees_of_freedom
 		P = probability
 		t = 0
-		pi = 3.14159
+		pi = 3.14159265359
 		sqrt = 1
 		if (n < 1 || P > 1.0 || P <= 0.0 )
 			{
@@ -184,7 +187,7 @@ function LSD(trt, probability)
 	for (i=0; i<n; i++)
 	{
 	    total = 0.0
-		document.write("The total is:  " + i + "<br />" );
+		//document.write("The total is:  " + i + "<br />" );
 		
 		
 		for(j=0; j<k; j++)
@@ -194,28 +197,33 @@ function LSD(trt, probability)
 		treatment_means[i] = total/k
 		document.write(" The total is:  " +total +"<br />");
 		
+		document.write(" The trt mean is:  " +treatment_means[i] +"<br />");
+		
 		
 	}
 	
 	document.write("<p>Calculating the Block Mean</p>");
 	block_means = new Array()
 	
-	for (j=0;j<k;j++);
-		{
+	for (j=0;j<k;j++)
+	{
+	//document.write(trt[i]);
+	//document.write("<br>");
+
 		total = 0.0
-		
+		document.write(" The calculated total is:  " +total+"<br />")
 		for(i=0; i<n; i++)
 			{
 			
 			total = total + trt[i][j]
+			document.write(" Trying to add :  " +i +","+ j +"<br />")
 			document.write(" The calculated total is:  " +total+"<br />")
 			}
 			
 		block_means[j] = total/n
 		document.write("The block mean is: " +block_means+"<br />")
-		
-			}
-		
+	}	
+	
 		document.write("<p>Calculating the grand_mean</p>");
 		total = 0.0;
 		for (i=0; i<treatment_means.length; i++)
