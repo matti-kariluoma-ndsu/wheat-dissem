@@ -252,7 +252,7 @@ class Table:
 		
 		def __init__(self, entries):
 			self.entries = entries
-			return collate_table(self)
+			
 			
 		def collate_table(table): 
 			
@@ -312,12 +312,21 @@ class Table:
 			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0)]
 			"""
 			self.locations = sorted(locations, key=attrgetter('name'))
-			l_i = dict(zip(self.locations, len(self.locations)))
-			# grab the years for the location, append them to the list at each location
+			l_i = dict(zip(self.locations, len(self.locations))) # Creates the amount of location columns required.
 			
+			self.varieties = sorted(varieties, key=attrgetter('name'))
+			v_i = dict(zip(self.varieties, key=attrgetter('name'))) # Creates the amount of rows required in the columns.
 			
-			location_columns = {}
-			return location_columns
+			for l, n in l_i: # I know this is n^3, but I don't care. The tables are not deep.
+					for v in v_i:
+						for entry in entries:
+							if l_i[l] in entries[entry.location] and v_i[v] in entries[entry.variety]:
+								try:
+									l_i[n] = v_i[v] # I just realized I only have the indexes of the varieties, but no values.You must fix this.
+								except AttributeError:
+									print 'Goodbye'
+									
+			return l_i
 			
 		def get_year_column(self, year):
 			"""
