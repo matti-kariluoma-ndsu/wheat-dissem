@@ -67,14 +67,14 @@ def locations_view(request, yearname, fieldname, abtest=None):
                 search_radius=request.GET.__getitem__("search_radius")
                 
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if locations_form.is_valid():
 			
 			locations = locations_form.cleaned_data['locations']
 			varieties = locations_form.cleaned_data['varieties']
 			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode, search_radius)
-			
 		else:
-			return HttpResponseRedirect("/") # send to homepage
+			return zipcode_view(request, yearname, fieldname, abtest)
 	else:
 		return HttpResponseRedirect("/") # send to homepage
 
@@ -260,7 +260,6 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	# New idea, return a list of tables instead of a list of rows
 	tables = []
-	
 	header_rows = [sorted_list[0]]
 	lsd_rows = []
 	rows = []
@@ -287,14 +286,32 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	for r, i in zip(tables, range(len(tables))):
 		dict_tables[i]['rows'] = r
 	
-	"""
+	for table in dict_tables:
+		order = table['header'][0][1][0]
+		#print order
+		table['order'] = tuple((order[0], order[0]+order[1], order[0]+order[1]+order[2]))
+		table['header'][0] = ('Variety', -1)
+	
+	remove_incomplete_tables = True
+	# remove tables that are incomplete
+	if remove_incomplete_tables:
+		keep_me = []
+		for table in dict_tables:
+			full = True
+			for row in table['rows']:
+				if None in row:
+					full = False
+			if full:
+				keep_me.append(table)
+		dict_tables = keep_me
+	'''
 	for table in dict_tables:
 		print table['header']
 		for row in table['rows']:
 			print row
 		print table['lsd']
 		print ''
-	"""
+	'''
 	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
@@ -315,7 +332,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	#TODO: this is very bad for the database...
 	try:
-		curyear = sorted_list[0][0] # we sent a preference for curyear, but what was returned may be different
+		pass
+		#curyear = sorted_list[0][0] # we sent a preference for curyear, but what was returned may be different
 	except IndexError: # will happen if all locations have been deselected...
 		sorted_list = [[curyear]]
 		return HttpResponseRedirect("/")
@@ -355,6 +373,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			'curyear': curyear,
 			'heading_list': sorted_list[0][1::],
 			'sorted_list': sorted_list[1::],
+			'tables': dict_tables,
 			'years': year_list,
 			'blurbs' : unit_blurbs,
 			'curfield' : fieldname,

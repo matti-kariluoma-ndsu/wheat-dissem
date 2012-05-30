@@ -129,20 +129,7 @@
 		<tr>
 			<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
 		</tr>
-		<tr >
-			<td class="Variety padded"><h4> Variety</h4></td>
-			{% for heading in heading_list %}
-			<td class="padded"><h4>{{ heading.0 }}</h4>
-			{% if heading.1 != -1 %}
-			<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
-			{% endif %}
-			</td>
-			{% endfor %}
-		</tr>
-		<tr class="row subheadings thin">
-		</tr>
-	{% for datalist in sorted_list %}
-		{% if datalist.0.0 == "Variety" %}
+	{% for table in tables %}
 		<tr class="spacer_row">
 			<td></td>
 		</tr>
@@ -150,35 +137,30 @@
 			<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
 		</tr>
 		<tr class="Variety padded">
-			{% for heading in datalist %}
+			{% for heading in table.header %}
 			<td class="padded"><h4>{{ heading.0 }}</h4>
 				{% if heading.1 != -1 %}
 				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+				{% else %}
+				<p style="font-size: 0.8em;">
+					{% if heading.0 == '1-yr' %}
+					{{ table.order.0 }} site-years
+					{% endif %}
+					{% if heading.0 == '2-yr' %}
+					{{ table.order.1 }} site-years
+					{% endif %}
+					{% if heading.0 == '3-yr' %}
+					{{ table.order.2 }} site-years
+					{% endif %}
+				</p>
 				{% endif %}
 			</td>
 			{% endfor %}
 		</tr>
-		{% else %}
-		{% if datalist.0 == "LSD" %}
-		<tr>
-			<td>
-			<form>
-				<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
-			</form>
-			</td>
-		</tr>
-		<tr class="spacer_row">
-			<td></td>
-		</tr>
-		<tr class="LSD_row">
-			{% for element in datalist %}
-			<td class='padded'>{{ element|default_if_none:"--" }}</td>
-			{% endfor %}
-		</tr>
-		{% else %}
+		{% for row in table.rows %}
 		<tr class="group {% cycle 'master_odd' 'master_even' %}">
-			{% for element in datalist %}
-				{% if datalist.0 == element %}
+			{% for element in row %}
+				{% if row.0 == element %}
 				<td class='padded' style="text-align: left; width: 120px;">
 					<form>
 						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
@@ -191,8 +173,22 @@
 				{% endif %}
 			{% endfor %}
 		</tr>
-		{% endif %}
-		{% endif %}
+		{% endfor %}
+		<tr>
+			<td>
+			<form>
+				<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
+			</form>
+			</td>
+		</tr>
+		<tr class="spacer_row">
+			<td></td>
+		</tr>
+		<tr class="LSD_row">
+			{% for element in table.lsd %}
+			<td class='padded'>{{ element|default_if_none:"--" }}</td>
+			{% endfor %}
+		</tr>
 	{% endfor %}
 		<tr class="bottom_spacer"></tr>
   </table>
