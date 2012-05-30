@@ -3,8 +3,39 @@
 <script type="text/javascript">
 //from math import sqrt, pi, cos, sin, exp
 //from scipy.special import erfinv
+var pi = 3.14159265359
 
 //http://stackoverflow.com/questions/5971830/need-code-for-inverse-error-function
+function erfc(x)
+{
+	z = Math.abs(x)
+	t = 1.0 / (0.5 * z + 1.0)
+	a1 = t * 0.17087277 + -0.82215223
+	a2 = t * a1 + 1.48851587
+	a3 = t * a2 + -1.13520398
+	a4 = t * a3 + 0.27886807
+	a5 = t * a4 + -0.18628806
+	a6 = t * a5 + 0.09678418
+	a7 = t * a6 + 0.37409196
+	a8 = t * a7 + 1.00002368
+	a9 = t * a8
+	a10 = -z * z - 1.26551223 + a9
+	a = t * Math.exp(a10)
+	
+	if (x < 0.0)
+	{
+		a = 2.0 - a
+	}
+	
+	return a
+
+}
+
+function erf(x)
+{
+	return 1.0 - erfc(x)
+}
+
 function erfinv(y)
 {
 	if (y < -1.0 ||y > 1.0)
@@ -12,6 +43,7 @@ function erfinv(y)
 		alert("input out of range!")
 		return 0
 	}
+	
 	if (y == -1.0)
 	{
 		x = Number.POSITIVE_INFINITY
@@ -22,17 +54,51 @@ function erfinv(y)
 	}
 	else if (y < -0.7)
 	{
-		
+		z1 = (1.0 + y) / 2.0
+		z2 = Math.Ln(z1)
+		z3 = Math.sqrt(-z2)
+		z = z3
+		x1 = 1.641345311 * z + 3.429567803
+		x2 = x1 * z + -1.624906493
+		x3 = x2 * z + -1.970840454
+		x4 = 1.637067800 * z +  3.543889200
+		x5 = x4 * z + 1.0
+		x6 = -x3 / x5 // note: negative
+		x = x6
 	}
 	else if (y < 0.7)
 	{
-		
+		z = y * y
+		x1 = -0.140543331 * z + 0.914624893
+		x2 = x1 * z + -1.645349621
+		x3 = x2 * z + 0.886226899
+		x4 = 0.012229801 * z + -0.329097515
+		x5 = x4 * z + -0.329097515
+		x6 = x5 * z + 1.442710462
+		x7 = x6 * z + -2.118377725
+		x8 = x7 * z + 1.0
+		x9 = y * x3 / x8
+		x = x9
 	}
 	else
 	{
-		
+		z1 = (1.0 + y) / 2.0
+		z2 = Math.Ln(z1)
+		z3 = Math.sqrt(-z2)
+		z = z3
+		x1 = 1.641345311 * z + 3.429567803
+		x2 = x1 * z + -1.624906493
+		x3 = x2 * z + -1.970840454
+		x4 = 1.637067800 * z +  3.543889200
+		x5 = x4 * z + 1.0
+		x6 = x3 / x5 // note: positive
+		x = x6
 	}
-	 
+	
+	x = x - (erf(x) - y) / (2.0/Math.sqrt(pi) * Math.exp(-x*x));
+	x = x - (erf(x) - y) / (2.0/math.sqrt(pi) * Math.exp(-x*x));
+	
+	return x
 }
 
 function LSD(response_to_treatments, probability)
