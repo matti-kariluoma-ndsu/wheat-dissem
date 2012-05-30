@@ -555,19 +555,21 @@ class LSD_Calculator:
 				for l in sorted(self.locations, key=attrgetter('name')):
 					l_indexes_values.append(l_indexes[l])
 					head_row.append((l.name, l.id))
-		return_list.append(head_row) # append first row
+		#return_list.append(head_row) # append first row
 		
 		# the header between each group
 		next_header = [('Variety', -1)]
 		next_header.extend(head_row[1::])
-		
 		#
 		# construct the rest of the rows
 		#
 		
 		for key in sorted(self.groups.keys(), reverse=True): # for each subset
 			subset_list = []
+			next_head = list(next_header)
+			next_head[0] = ('Variety', key)
 			
+			return_list.append(next_head)
 			# define the locations that need to be printed for this subset
 			if key in self.groups_loc:
 				#locations = [l_indexes[l] for l in self.groups_loc[key][cy_i]] # TODO: do we need to consider the other years here?
@@ -743,7 +745,7 @@ class LSD_Calculator:
 			
 			
 			return_list.extend(subset_list) # append the lists inside subset_list to return_list
-			return_list.append(next_header) # append another header row
+			 # append another header row
 		
 		
 		if len(return_list[:len(return_list)-1:]) == 0:
