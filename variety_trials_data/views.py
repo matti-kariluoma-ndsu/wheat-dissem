@@ -413,4 +413,24 @@ def add_form_confirmation(request):
 		{'form': form, 'format_errors': errors},
 		context_instance=RequestContext(request)
 	)
-
+def add_information(request):
+	
+	errors = {} 
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
+		if form.is_valid():
+			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
+			if success:
+				return HttpResponseRedirect('/success/')
+			else:
+				form = variety_trials_forms.UploadCSVForm()
+	else:	
+		form = variety_trials_forms.UploadCSVForm()
+	print errors
+	return render_to_response(
+		'add_form_confirmation.html', 
+		{'form': form, 'format_errors': errors},
+		context_instance=RequestContext(request)
+	)

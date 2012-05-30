@@ -30,6 +30,7 @@ class SelectFieldForm(forms.Form):
 class UploadCSVForm(forms.Form):
 	csv_file  = forms.FileField()
 
+
 class fuzzy_spellchecker():
 	""" Uses an internal dictionary to check whether a word has a close 
 	match or not.	"""
@@ -280,18 +281,27 @@ def checking_for_data(uploaded_file):
 					if column.strip() != '':
 						try:
 							name = headers[column_number].strip()
-							#print "field: %s" % (name)
-							#Making objects to add to database.
+							
+							#Checking for objects on database.
 							
 							if name == "harvest_date_id":
 								possible_characters = ('/', ' ', '-', '.')
 								datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
 								datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
 								if not datelist:
-									print "got this far"
-									return (False,{"There was a problem at :":column})	
-								else:
-									print "got this far else"							
+									errors['Problem with harvest ID'] = "  Are you sure about the given details? %s"%(column)
+									
+							if name == "location_id":
+								locationlist = models.Location.objects.all().filter (name=str(column))
+								if not locationlist:
+									errors['Problem with location ID'] = "  Are you sure about the given details? %s"%(column)
+							
+							if name == "variety_id":
+								varietylist = models.Location.objects.all().filter (name=str(column))
+								if not varietylist:
+									errors['Problem with variety ID'] = "  Are you sure about the given details? %s"%(column)								
+								
+																		
 							if name in insertion_dict.keys() and name not in reference_dict.keys():
 								insertion_dict[name] = column.strip()
 							else:
