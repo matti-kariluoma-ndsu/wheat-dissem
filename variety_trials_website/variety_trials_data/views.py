@@ -64,6 +64,7 @@ def index(request, abtest=None):
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':               
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if locations_form.is_valid():
 			zipcode = locations_form.cleaned_data['zipcode']
 			locations = locations_form.cleaned_data['locations']
@@ -346,7 +347,6 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		'tabbed_view_table_ndsu.html',
 		{
 			'zipcode': zipcode,
-			'search_radius': search_radius,
 			'location_get_string': location_get_string,
 			'variety_get_string': variety_get_string,
 			'locations_form': locations_form,

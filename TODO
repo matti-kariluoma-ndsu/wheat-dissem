@@ -230,3 +230,8 @@ For the iterative upload:
 	6) show the user the actual entered data (page as step 2, except all
 	  values pulled from the databse)
 	7) a page showing recent changes with the ability to undo recent changes
+
+BUG
+1) choose zipcode from home
+2) remove a location
+3) click one of the 'yield,protein,...' or '2012,2011,...' breaks it
