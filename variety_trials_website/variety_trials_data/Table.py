@@ -49,7 +49,7 @@ class LSD_Row(Row):
 		lsd_3yr = self._LSD(data_3yr, probability)
 		
 		lsds = []
-		for column in self.table.columns:
+		for column in self.table.columns: # I might need to change this.
 			lsds.append(column.lsd) 
 		
 		return ['LSD', lsd_1yr, lsd_2yr, lsd_3yr].extend(lsds)
@@ -311,22 +311,22 @@ class Table:
 			
 			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0)]
 			"""
-			self.locations = sorted(locations, key=attrgetter('name'))
-			l_i = dict(zip(self.locations, len(self.locations))) # Creates the amount of location columns required.
+			columns = {} # The dictionary of columns that will return. {Location, {Variety=name, value}}
 			
-			self.varieties = sorted(varieties, key=attrgetter('name'))
-			v_i = dict(zip(self.varieties, key=attrgetter('name'))) # Creates the amount of rows required in the columns.
+			l_temp = sorted(locations, key=attrgetter('name'))
 			
-			for l, n in l_i: # I know this is n^3, but I don't care. The tables are not deep.
-					for v in v_i:
-						for entry in entries:
-							if l_i[l] in entries[entry.location] and v_i[v] in entries[entry.variety]:
-								try:
-									l_i[n] = v_i[v] # I just realized I only have the indexes of the varieties, but no values.You must fix this.
-								except AttributeError:
-									print 'Goodbye'
-									
-			return l_i
+			v_temp = sorted(varieties, key=attrgetter('name'))
+			
+			for entry in self.entries: # Yay for n^3
+				for l in l_temp:
+					for v in v_temp:
+						if l in entry.location.name and v in entry.variety.name:
+							try:
+								columns = [l, {v, entry.test_weight}]
+							except AttributeError:
+								columns = [l, {v, none}]
+													
+			return columns
 			
 		def get_year_column(self, year):
 			"""
