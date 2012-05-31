@@ -285,19 +285,20 @@ class Table:
 			"""
 			
 			year_columns = {}
-			y_temp = sorted(years, reverse=true)
+			max_year = max(years)
+			y_temp = sorted(years, reverse=true) # I should trim this to only three years.
 			v_temp = sorted(varieties, key=attrgetter('name'))
 			
 			for entry in self.entries: # Yay for n^3.
 				for y in y_temp:
 					for  v in v_temp:
-						if y in entry.harvest_date.year and v in entry.variety.name:
+						if y == entry.harvest_date.year and v == entry.variety.name:
 							try:
 								year_columns = {y, {v, entry.test_weight}}
 							except AttributeError:
-								year_columns = {y, {v, none}
+								year_columns = {y, {v, none}}
 							
-			return year_columns
+			return year_columns.insert(0, [Name, max_year])
 			
 		def populate_location_columns(self, locations, varieties): 
 			"""
@@ -317,7 +318,7 @@ class Table:
 			for entry in self.entries: # Yay for n^3
 				for l in l_temp:
 					for v in v_temp:
-						if l in entry.location.name and v in entry.variety.name:
+						if l == entry.location.name and v == entry.variety.name:
 							try:
 								columns = [l, {v, entry.test_weight}]
 							except AttributeError:
