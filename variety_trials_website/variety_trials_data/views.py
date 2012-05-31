@@ -195,7 +195,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	for e in pos_locations:
                 if locations.count(e)==0:
                         neg_locations.append(e)
-        print neg_locations
+        #print neg_locations
         
         this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
