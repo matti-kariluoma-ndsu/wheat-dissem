@@ -177,21 +177,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			#'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				#'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
 	}
-	"""
-        zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
-	if zipcode_radius_form.is_valid():
-		zipcode = zipcode_radius_form.cleaned_data['zipcode']
-		radius = zipcode_radius_form.cleaned_data['search_radius']
-                try:
-                	pos_locations = Locations_from_Zipcode_x_Radius(
-                		zipcode, radius
-                	).fetch()
-                	
-                except models.Zipcode.DoesNotExist:
-                	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
-                			'radius': zipcode_radius_form.cleaned_data['search_radius']
-                			})
-        """
+	#retrieves the list of locations and finds the locations that have been excluded by the user, storing them in neg_locations
 	try:
                	pos_locations = Locations_from_Zipcode_x_Radius(
                		zipcode, search_radius
@@ -199,19 +185,12 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
                	
         except models.Zipcode.DoesNotExist:
                 None
-                """
-               	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
-               			'radius': zipcode_radius_form.cleaned_data['search_radius']
-               			})
-               			"""
-        
+                
         neg_locations=[]
         locations=list(locations)
 	for e in pos_locations:
                 if locations.count(e)==0:
                         neg_locations.append(e)
-        print neg_locations
-        
         this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 	year_list = [this_year, this_year-1, this_year-2]
@@ -256,14 +235,15 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	except TypeError:
 		# TODO: we can do more for the user than redirect to /
 		return HttpResponseRedirect("/")
-	
+	print request.GET
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
 			'varieties': varieties,
                         'zipcode': zipcode,
                         'search_radius': search_radius
 		})
-	
+	print locations_form
+	print locations
 	try:
 		ab = int(abtest)
 	except ValueError:
