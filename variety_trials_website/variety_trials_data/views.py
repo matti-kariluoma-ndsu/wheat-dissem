@@ -199,7 +199,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		curyear = int(yearname)
 	except ValueError:
 		curyear = max(year_list)
-		
+
+	
 	field_list = []
 	for field in models.Trial_Entry._meta.fields:
 		if (field.get_internal_type() == 'DecimalField' 
@@ -276,6 +277,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		#iterate through sorted list and send the user to the home page if it's all empty
 	else: # the location view
 		view = 'location'
+	print request.GET
 	location_get_string=''
         variety_get_string=''
 	for v in varieties:
