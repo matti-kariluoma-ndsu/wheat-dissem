@@ -62,17 +62,13 @@ def index(request, abtest=None):
 	)
 		
 def locations_view(request, yearname, fieldname, abtest=None):
-	if request.method == 'GET':
-                zipcode=request.GET.__getitem__("zipcode")
-                search_radius=request.GET.__getitem__("search_radius")
-                
+	if request.method == 'GET':               
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
-		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if locations_form.is_valid():
-			
+			zipcode = locations_form.cleaned_data['zipcode']
 			locations = locations_form.cleaned_data['locations']
 			varieties = locations_form.cleaned_data['varieties']
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode, search_radius)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode)
 		else:
 			return zipcode_view(request, yearname, fieldname, abtest)
 	else:
@@ -118,21 +114,8 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode, radius)
 			
 		else:
-			zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
-					'zipcode': zipcode_radius_form.cleaned_data['zipcode'],
-					'radius': zipcode_radius_form.cleaned_data['search_radius']
-				})
-			return render_to_response(
-					'main.html', 
-					{
-						'zipcode_radius_form': zipcode_radius_form,
-						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
-						'variety_list': models.Variety.objects.all(),
-						'curyear': datetime.date.today().year,
-						'error_list': ['Sorry, the zipcode: "' + zipcode_radius_form.cleaned_data['zipcode'] + '" didn\'t return any results.']
-					},
-					context_instance=RequestContext(request)
-				)
+			return HttpResponseRedirect("/") # send to homepage
+
 	else:
 		# seems an error occured...
 		return HttpResponseRedirect("/") # send to homepage
@@ -316,8 +299,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
 			'varieties': varieties,
-                        'zipcode': zipcode,
-                        'search_radius': search_radius
+			'zipcode': zipcode
 		})
 	
 	try:
@@ -363,10 +345,10 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	return render_to_response(
 		'tabbed_view_table_ndsu.html',
 		{
-                        'zipcode': zipcode,
-                        'search_radius': search_radius,
-                        'location_get_string': location_get_string,
-                        'variety_get_string': variety_get_string,
+			'zipcode': zipcode,
+			'search_radius': search_radius,
+			'location_get_string': location_get_string,
+			'variety_get_string': variety_get_string,
 			'locations_form': locations_form,
 			'field_list': field_list,
 			'location_list': locations,
