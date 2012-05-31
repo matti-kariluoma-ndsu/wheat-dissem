@@ -156,7 +156,7 @@ function LSD(trt, probability)
 	//n are factors, k is responses per factor (treatments)
 	n = trt.length
 	k = (trt[0].length) // == len(trt[1]) == ... == len(trt[n]) iff we have a balanced design
-	degrees_freedom_of_error = (n-1)*(k-1)
+	degrees_of_freedom_of_error = (n-1)*(k-1)
 	
 	treatment_means = new Array ()
 	
@@ -173,7 +173,10 @@ function LSD(trt, probability)
 	//var trt1 = new Array();
 	//trt[0] = new Array ();
 	
-	/*document.write("<p>Inspecting cells</p>");
+	
+	
+	
+	document.write("<p>Inspecting cells</p>");
 	for (i=0; i<n; i++)
 	{
 		for (j=0; j<k; j++)
@@ -182,7 +185,7 @@ function LSD(trt, probability)
 		document.write("<br>");
 		}
 	}
-	*/
+	
 	
 	for (i=0; i<n; i++)
 	{
@@ -221,7 +224,7 @@ function LSD(trt, probability)
 			}
 			
 		block_means[j] = total/n
-		document.write("The block mean is: " +block_means+"<br />")
+		document.write("The block mean is: " +block_means[j]+"<br />")
 	}	
 	
 		document.write("<p>Calculating the grand_mean</p>");
@@ -257,6 +260,7 @@ function LSD(trt, probability)
 	//print "SSE: %f\n" % (SSE)
 	document.write("SSE : "+SSE+"<br/>")
 	
+	degrees_freedom_of_error = 1
 	mean_squares_of_error = SSE / degrees_freedom_of_error
 	
 	//print "MSE: %f\n" % (mean_squares_of_error)
@@ -384,6 +388,7 @@ alert("There was an erorr!")
 	print result4
 	print "==="
 	*/
+	
 </script>
 
 <form>
@@ -394,5 +399,6 @@ alert("There was an erorr!")
 
 </body>
 </html>
+
 
 
