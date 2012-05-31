@@ -271,35 +271,32 @@ class Table:
 			[(column1, Variety), (year, 1-yr), (year, 2-yr), (year, 3-yr), (location, Casselton), (location, Prosper), (location, SomePlace)]
 			"""
 			
-			
 			return top_row
 			
+		def populate_year_average_columns(self, years, varieties): 
 			"""
-		def populate_lsd_row(): # I might omit this function, not sure yet.
-			
-			#Prefixes to bottom_row 'LSD', then calculates the LSD from the
-			#location lists by year and appends by minimum year first. Next,
-			#appends the LSDs from the database for each location.
-			
-			#If the entry is spanning three years and includes three locations, 
-			#the final output should look like this:
-			
-			#[(column1, LSD), (year, 2.5), (year, 2.6), (year, 2.7), (location, 3), (location, 2.1), (Location, 4.5)]
-			
-			return lsd_row
-			"""
-			
-		def populate_year_average_columns(self, years): 
-			"""
-			Prefixes the year from lsd.year, which is the maximum year from
-			lsd object's list of years, creates subsequent elements in the
-			year_columns dictionary that are lists of the previous year(s)
-			values. This function prefixes the maxium year to this dictionary first, 
-			but years are appended to this dictionary from smallest to greatest.
+			Prefixes the maximum year from list of years, creates 
+			subsequent elements in the year_columns dictionary that are 
+			lists of the previous year(s) values. This function prefixes 
+			the maxium year to this dictionary first, but years are 
+			appended to this dictionary from smallest to greatest.
 			
 			[(Name, theMaxYear), (year, theMinYear),...,(year, theMaxYear)]
 			"""
 			
+			year_columns = {}
+			y_temp = sorted(years, reverse=true)
+			v_temp = sorted(varieties, key=attrgetter('name'))
+			
+			for entry in self.entries: # Yay for n^3.
+				for y in y_temp:
+					for  v in v_temp:
+						if y in entry.harvest_date.year and v in entry.variety.name:
+							try:
+								year_columns = {y, {v, entry.test_weight}}
+							except AttributeError:
+								year_columns = {y, {v, none}
+							
 			return year_columns
 			
 		def populate_location_columns(self, locations, varieties): 
