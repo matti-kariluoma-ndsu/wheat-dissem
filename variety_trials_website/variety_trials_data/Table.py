@@ -260,7 +260,7 @@ class Table:
 			collated_table = {}
 			return collated_table
 			
-		def header_row(self): 
+		def header_row(self, y_columns, l_columns): # This method requires populated year- and location columns.
 			"""
 			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
 			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
@@ -270,6 +270,13 @@ class Table:
 			
 			[(column1, Variety), (year, 1-yr), (year, 2-yr), (year, 3-yr), (location, Casselton), (location, Prosper), (location, SomePlace)]
 			"""
+			top_row = []
+			
+			for y, d in y_columns.iteritems():
+				top_row = y_columns[y]
+			
+			for l, d in l_columns.iteritems():
+				top_row = l_columns[l]
 			
 			return top_row
 			
@@ -294,9 +301,11 @@ class Table:
 					for  v in v_temp:
 						if y == entry.harvest_date.year and v == entry.variety.name:
 							try:
-								year_columns = {y, {v, entry.test_weight}}
+								year_columns = {y, {v, entry.test_weight}} # I'm not sure if this test weight is already the mean value.
 							except AttributeError:
-								year_columns = {y, {v, none}}
+								year_columns = {y, {v, 'none'}}
+						else:
+							{y, {'none', 'none'}}
 							
 			return year_columns.insert(0, [Name, max_year])
 			
@@ -322,7 +331,9 @@ class Table:
 							try:
 								columns = [l, {v, entry.test_weight}]
 							except AttributeError:
-								columns = [l, {v, none}]
+								columns = [l, {v, 'none'}]
+						else:
+							columns = [l, {'none', 'none'}]
 													
 			return columns
 			
