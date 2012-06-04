@@ -10,8 +10,8 @@ class Row:
 	"""
 	Contains references to each Cell in this row.
 	"""
-	def __init__(self):
-		self.members = list()
+	def __init__(self, aRowList):
+		self.members = aRow
 		self.index = 0
 	
 	def __iter__(self):
@@ -188,8 +188,8 @@ class Column:
 	"""
 	Contains references to each Cell in this column.
 	"""
-	def __init__(self):
-		self.members = list()
+	def __init__(self, aColumnList):
+		self.members = aColumn
 		self.index = 0
 	
 	def __iter__(self):
@@ -242,13 +242,9 @@ class Table:
 		row_labels_column = [] # Contains the varieties' names.
 		year_columns = {} # Contains year(s) average values for the given varieties.
 		location_columns = {} # The variety value(s) for a location(s).
+		columns = {} # Contains both year and location columns.
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
 		collated_table = {} 
-		
-		header = Row()._iter_()
-		varieties = Column()._iter_()
-		year = Column()._iter_() 
-		location = Column()._iter_()
 		
 		
 		def __init__(self, entries):
@@ -256,11 +252,15 @@ class Table:
 			
 			
 		def collate_table(self, top_row, row_labels_column, year_columns, location_columns): 
-			collated_table = {top_row, row_labels_column, year_columns, location_columns} # If only it were this simple. I have to balance the data, and make sure the columns align nicely.
+			"""
+			Write description here.
+			"""
+			
+			collated_table = {top_row, row_labels_column} 
 			
 			return collated_table
 			
-		def header_row(self, y_columns, l_columns): # This method requires populated year- and location columns.
+		def header_row(self, year_columns, location_columns): # This method requires populated year- and location columns.
 			"""
 			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
 			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
@@ -272,13 +272,14 @@ class Table:
 			"""
 			top_row = ['Varieties']
 			
-			for y, j in y_columns.iteritems():
+			for y, j in year_columns.iteritems():
 				top_row = y
 			
-			for l, j in l_columns.iteritems():
+			for l, j in location_columns.iteritems():
 				top_row = l
 			
 			return top_row
+			
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
@@ -287,12 +288,11 @@ class Table:
 			[(minYear, value ),...,(maxYear, value)] The 'year' key will be numeric. 
 			"""
 			
-			year_columns = {}
 			max_year = max(years)
 			y_temp = sorted(years, reverse=true) 
 			
 			if len(y_temp) > 3:
-				t = y_temp[:2] # Reduce the number of year lists to 3.
+				t = y_temp[:2] # Reduce the number of years to 3.
 				y_temp = t
 			
 			v_temp = sorted(varieties, key=attrgetter('name'))
@@ -302,15 +302,15 @@ class Table:
 					for  v in v_temp:
 						if y == entry.harvest_date.year and v == entry.variety.name:
 							try:
-								year_columns = {y, [v, entry.test_weight]} # I'm not sure if this test weight is already the mean value.
+								year_columns = {y, dict([(v, entry.test_weight)])} # I'm not sure if this test weight is already the mean value.
 							except AttributeError:
-								year_columns = {y, [v, 'none']}
+								year_columns = {y, dict([(v, None)])}
 						else:
-							year_columns = {y, [v, 'none']}
+							year_columns = {y, dict([(v, None)])}
 							
 			return year_columns
 			
-		def populate_location_columns(self, locations, varieties): 
+		def populate_location_columns(self, locations, year_columns): # This is called after year_columns is populated.
 			"""
 			Prefixes the location name to l_column, then appends the
 			location value for each variety.
@@ -319,35 +319,34 @@ class Table:
 			
 			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0)]
 			"""
-			columns = {} # The dictionary of columns that will return. {Location, {Variety=name, value}}
 			
 			l_temp = sorted(locations, key=attrgetter('name'))
 			
-			v_temp = sorted(varieties, key=attrgetter('name'))
+			for y, v in year_columns: # Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
+				v_temp = v[0]
 			
 			for entry in self.entries.iteritems(): # Yay for n^3
 				for l in l_temp:
 					for v in v_temp:
 						if l == entry.location.name and v == entry.variety.name:
 							try:
-								location_columns = {l, [v, entry.test_weight]}
+								location_columns = {l, dict([(v, entry.test_weight)])}
 							except AttributeError:
-								location_columns = {l, [v, 'none']}
+								location_columns = {l, dict([(v, None)])}
 						else:
-							location_columns = {l, ['none', 'none']}
+							location_columns = {l, dict([(v, None)])}
 													
 			return location_columns
 			
-		def populate_row_labels_column(self, varieties):
+		def populate_row_labels_column(self, year_columns):
 			"""
 			Returns a list containing the labels for each row in the Table object.
 			
 			['Agawam', 'Albany',...'WB-Mayville']
 			"""
 			
-			v_temp = sorted(varieties, key=attrgetter('name'))
-			
-			row_labels_column = set(v_temp) # Removes duplicate variety row labels.
+			for y, v in year_columns.iteritems():
+				row_labels_column = [k for k,d in v] # Grabs the variety name from year_columns.
 			
 			return row_labels_column 
 			
