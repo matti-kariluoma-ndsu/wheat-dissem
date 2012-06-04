@@ -238,7 +238,7 @@ class Table:
 		...  ...  ...  ...  ...
 		"""
 		
-		top_row = {} # The top row for the table object: 'Varities', 1-yr, 2-yr, 3-yr, Loc1, Loc2, etc.
+		top_row = [] # The top row for the table object: 'Varities', 1-yr, 2-yr, 3-yr, Loc1, Loc2, etc.
 		row_labels_column = [] # Contains the varieties' names.
 		year_columns = {} # Contains year(s) average values for the given varieties.
 		location_columns = {} # The variety value(s) for a location(s).
@@ -273,10 +273,10 @@ class Table:
 			top_row = []
 			
 			for y, d in y_columns.iteritems():
-				top_row = y_columns[y]
+				top_row = y
 			
 			for l, d in l_columns.iteritems():
-				top_row = l_columns[l]
+				top_row = l
 			
 			return top_row
 			
@@ -296,7 +296,7 @@ class Table:
 			y_temp = sorted(years, reverse=true) # I should trim this to only three years.
 			v_temp = sorted(varieties, key=attrgetter('name'))
 			
-			for entry in self.entries: # Yay for n^3.
+			for entry in self.entries.iteritems(): # Yay for n^3.
 				for y in y_temp:
 					for  v in v_temp:
 						if y == entry.harvest_date.year and v == entry.variety.name:
@@ -324,7 +324,7 @@ class Table:
 			
 			v_temp = sorted(varieties, key=attrgetter('name'))
 			
-			for entry in self.entries: # Yay for n^3
+			for entry in self.entries.iteritems(): # Yay for n^3
 				for l in l_temp:
 					for v in v_temp:
 						if l == entry.location.name and v == entry.variety.name:
@@ -336,6 +336,23 @@ class Table:
 							columns = [l, {'none', 'none'}]
 													
 			return columns
+			
+		def populate_row_labels_column(self, year_columns, location_columns):
+			"""
+			Returns a list containing the labels for each row in the Table object.
+			
+			['Varieties', 'Agawam', 'Albany',...'WB-Mayville']
+			"""
+			
+			for y, d in year_columns.iteritems():
+				r_temp = [v for v in d.iteritems()]
+				
+			for l, d in location_columns.iteritems():
+				r_temp = [l for l in d.iteritems()]
+			
+			row_labels_column = set(r_temp) # Removes duplicate variety row labels.
+			
+			return row_labels_column 
 			
 		def get_year_column(self, year):
 			"""
