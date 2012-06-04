@@ -244,10 +244,12 @@ class Table:
 		location_columns = {} # The variety value(s) for a location(s).
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
 		
+		"""
 		header = Row()._iter_()
-		varieties = Column()._iter_() # The object used to created the row_labels_column
+		varieties = Column()._iter_()
 		year = Column()._iter_() 
 		location = Column()._iter_()
+		"""
 		
 		
 		def __init__(self, entries):
@@ -268,32 +270,33 @@ class Table:
 			
 			The final output should look like this:
 			
-			[(column1, Variety), (year, 1-yr), (year, 2-yr), (year, 3-yr), (location, Casselton), (location, Prosper), (location, SomePlace)]
+			['Varieties', 'someYear', 'someYear', 'someYear, 'Casselton', 'Prosper', 'SomePlace']
 			"""
 			top_row = ['Varieties']
 			
-			for y, d in y_columns.iteritems():
+			for y, j in y_columns.iteritems():
 				top_row = y
 			
-			for l, d in l_columns.iteritems():
+			for l, j in l_columns.iteritems():
 				top_row = l
 			
 			return top_row
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
-			Prefixes the maximum year from list of years, creates 
-			subsequent elements in the year_columns dictionary that are 
-			lists of the previous year(s) values. This function prefixes 
-			the maxium year to this dictionary first, but years are 
-			appended to this dictionary from smallest to greatest.
+			Appends the variety values for the given years.
 			
-			[(year, theMinYear),...,(year, theMaxYear)] The 'year' key will be the numeric year referenced. 
+			[(minYear, value ),...,(maxYear, value)] The 'year' key will be numeric. 
 			"""
 			
 			year_columns = {}
 			max_year = max(years)
-			y_temp = sorted(years, reverse=true) # I should trim this to only three years.
+			y_temp = sorted(years, reverse=true) 
+			
+			if len(y_temp) > 3:
+				t = y_temp[:2] # Reduce the number of year lists to 3.
+				y_temp = t
+			
 			v_temp = sorted(varieties, key=attrgetter('name'))
 			
 			for entry in self.entries.iteritems(): # Yay for n^3.
@@ -301,13 +304,13 @@ class Table:
 					for  v in v_temp:
 						if y == entry.harvest_date.year and v == entry.variety.name:
 							try:
-								year_columns = {y, {v, entry.test_weight}} # I'm not sure if this test weight is already the mean value.
+								year_columns = {y, [v, entry.test_weight]} # I'm not sure if this test weight is already the mean value.
 							except AttributeError:
-								year_columns = {y, {v, 'none'}}
+								year_columns = {y, [v, 'none']}
 						else:
-							{y, {'none', 'none'}}
+							{y, [v, 'none']}
 							
-			return year_columns.insert(0, [Name, max_year])
+			return year_columns
 			
 		def populate_location_columns(self, locations, varieties): 
 			"""
@@ -329,28 +332,24 @@ class Table:
 					for v in v_temp:
 						if l == entry.location.name and v == entry.variety.name:
 							try:
-								columns = [l, {v, entry.test_weight}]
+								columns = {l, [v, entry.test_weight]}
 							except AttributeError:
-								columns = [l, {v, 'none'}]
+								columns = {l, [v, 'none']}
 						else:
-							columns = [l, {'none', 'none'}]
+							columns = {l, ['none', 'none']}
 													
 			return columns
 			
-		def populate_row_labels_column(self, year_columns, location_columns):
+		def populate_row_labels_column(self, varieties):
 			"""
 			Returns a list containing the labels for each row in the Table object.
 			
-			['Varieties', 'Agawam', 'Albany',...'WB-Mayville']
+			['Agawam', 'Albany',...'WB-Mayville']
 			"""
 			
-			for y, d in year_columns.iteritems():
-				r_temp = [v for v in d.iteritems()]
-				
-			for l, d in location_columns.iteritems():
-				r_temp = [l for l in d.iteritems()]
+			v_temp = sorted(varieties, key=attrgetter('name'))
 			
-			row_labels_column = set(r_temp) # Removes duplicate variety row labels.
+			row_labels_column = set(v_temp) # Removes duplicate variety row labels.
 			
 			return row_labels_column 
 			
