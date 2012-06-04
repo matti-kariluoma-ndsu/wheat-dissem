@@ -242,43 +242,13 @@ class Table:
 		row_labels_column = [] # Contains the varieties' names.
 		year_columns = {} # Contains year(s) average values for the given varieties.
 		location_columns = {} # The variety value(s) for a location(s).
-		columns = {} # Contains both year and location columns.
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
-		collated_table = {} 
+		collated_table = {}
+		max_year = 0 
 		
 		
 		def __init__(self, entries):
 			self.entries = entries
-			
-			
-		def collate_table(self, top_row, row_labels_column, year_columns, location_columns): 
-			"""
-			Write description here.
-			"""
-			
-			collated_table = {top_row, row_labels_column} 
-			
-			return collated_table
-			
-		def header_row(self, year_columns, location_columns): # This method requires populated year- and location columns.
-			"""
-			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
-			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
-			appends the sorted location names, and then returns top_row.
-			
-			The final output should look like this:
-			
-			['Varieties', 'someYear', 'someYear', 'someYear, 'Casselton', 'Prosper', 'SomePlace']
-			"""
-			top_row = ['Varieties']
-			
-			for y, j in year_columns.iteritems():
-				top_row = y
-			
-			for l, j in location_columns.iteritems():
-				top_row = l
-			
-			return top_row
 			
 			
 		def populate_year_average_columns(self, years, varieties): 
@@ -288,7 +258,6 @@ class Table:
 			[(minYear, value ),...,(maxYear, value)] The 'year' key will be numeric. 
 			"""
 			
-			max_year = max(years)
 			y_temp = sorted(years, reverse=true) 
 			
 			if len(y_temp) > 3:
@@ -297,16 +266,16 @@ class Table:
 			
 			v_temp = sorted(varieties, key=attrgetter('name'))
 			
-			for entry in self.entries.iteritems(): # Yay for n^3.
+			for entry in self.entries: # Yay for n^3.
 				for y in y_temp:
 					for  v in v_temp:
 						if y == entry.harvest_date.year and v == entry.variety.name:
 							try:
-								year_columns = {y, dict([(v, entry.test_weight)])} # I'm not sure if this test weight is already the mean value.
+								year_columns = [y, [v, entry.test_weight]] # I'm not sure if this test weight is already the mean value.
 							except AttributeError:
-								year_columns = {y, dict([(v, None)])}
+								year_columns = [y, [v, None]] # I might change the nested lists to tuples.
 						else:
-							year_columns = {y, dict([(v, None)])}
+							year_columns = [y, [v, None]]
 							
 			return year_columns
 			
@@ -325,16 +294,16 @@ class Table:
 			for y, v in year_columns: # Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
 				v_temp = v[0]
 			
-			for entry in self.entries.iteritems(): # Yay for n^3
+			for entry in self.entries: # Yay for n^3
 				for l in l_temp:
 					for v in v_temp:
 						if l == entry.location.name and v == entry.variety.name:
 							try:
-								location_columns = {l, dict([(v, entry.test_weight)])}
+								location_columns = [l, [v, entry.test_weight]] 
 							except AttributeError:
-								location_columns = {l, dict([(v, None)])}
+								location_columns = [l, [v, None]]
 						else:
-							location_columns = {l, dict([(v, None)])}
+							location_columns = [l, [v, None]]
 													
 			return location_columns
 			
@@ -345,21 +314,66 @@ class Table:
 			['Agawam', 'Albany',...'WB-Mayville']
 			"""
 			
-			for y, v in year_columns.iteritems():
-				row_labels_column = [k for k,d in v] # Grabs the variety name from year_columns.
+			for y, v in year_columns:
+				row_labels_column = v[0] # Grabs the variety name from year_columns.
 			
 			return row_labels_column 
 			
-		def get_year_column(self, year, collated_table):
+			
+		def collate_table(self, top_row, row_labels_column, year_columns, location_columns): 
+			"""
+			This function might be a waste of time. I think I should focus on the get functions.
+			The returned lists may be placed where required.
+			"""	
+				
+			collated_table = [top_row, row_labels_column, year_columns, location_columns] # This is a mess when printed, maybe.
+			
+			return collated_table
+			
+		def header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
+			"""
+			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
+			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
+			appends the sorted location names, and then returns top_row.
+			
+			The final output should look like this:
+			
+			['Varieties', 'someYear', 'someYear', 'someYear, 'Casselton', 'Prosper', 'SomePlace']
+			"""
+			top_row = ['Varieties']
+			
+			for y, v in year_columns:
+				top_row = y
+			
+			for l, v in location_columns:
+				top_row = l
+			
+			return top_row
+			
+		def get_year_column(self, year, year_columns):
 			"""
 			Returns the specified year's column from a Table object's years_columns field
 			as a list. This function also appends the LSD for the given year to the list.
 			"""
 			
-			column = []
+			year2 = year - 1
+			year3 = year - 2
+			
+			for y in year_columns: 
+				if year == y:
+					year_columns.remove(y)
+				if year2 == y:
+					year_columns[y:]
+				if year3 == y:
+					year_columns[y:]
+					
+				year_columns[:0] = year
+				
+				column = year_columns
+			
 			return column
 			
-		def get_location_column(self, location, collated_table): 
+		def get_location_column(self, location, location_columns): 
 			"""
 			Returns the specified location's column from a table object's 
 			location_columns field as a list. This functions also appends
@@ -376,3 +390,6 @@ class Table:
 			"""
 			
 			return value_count
+			
+		def set_table_year(self, year):
+			return max_year
