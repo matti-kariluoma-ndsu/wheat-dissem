@@ -243,23 +243,21 @@ class Table:
 		year_columns = {} # Contains year(s) average values for the given varieties.
 		location_columns = {} # The variety value(s) for a location(s).
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
+		collated_table = {} 
 		
-		"""
 		header = Row()._iter_()
 		varieties = Column()._iter_()
 		year = Column()._iter_() 
 		location = Column()._iter_()
-		"""
 		
 		
 		def __init__(self, entries):
 			self.entries = entries
 			
 			
-		def collate_table(self): 
+		def collate_table(self, top_row, row_labels_column, year_columns, location_columns): 
+			collated_table = {top_row, row_labels_column, year_columns, location_columns} # If only it were this simple. I have to balance the data, and make sure the columns align nicely.
 			
-			lsd = LSD_Row(table)
-			collated_table = {}
 			return collated_table
 			
 		def header_row(self, y_columns, l_columns): # This method requires populated year- and location columns.
@@ -308,7 +306,7 @@ class Table:
 							except AttributeError:
 								year_columns = {y, [v, 'none']}
 						else:
-							{y, [v, 'none']}
+							year_columns = {y, [v, 'none']}
 							
 			return year_columns
 			
@@ -332,13 +330,13 @@ class Table:
 					for v in v_temp:
 						if l == entry.location.name and v == entry.variety.name:
 							try:
-								columns = {l, [v, entry.test_weight]}
+								location_columns = {l, [v, entry.test_weight]}
 							except AttributeError:
-								columns = {l, [v, 'none']}
+								location_columns = {l, [v, 'none']}
 						else:
-							columns = {l, ['none', 'none']}
+							location_columns = {l, ['none', 'none']}
 													
-			return columns
+			return location_columns
 			
 		def populate_row_labels_column(self, varieties):
 			"""
@@ -353,7 +351,7 @@ class Table:
 			
 			return row_labels_column 
 			
-		def get_year_column(self, year):
+		def get_year_column(self, year, collated_table):
 			"""
 			Returns the specified year's column from a Table object's years_columns field
 			as a list. This function also appends the LSD for the given year to the list.
@@ -362,7 +360,7 @@ class Table:
 			column = []
 			return column
 			
-		def get_location_column(self, location): 
+		def get_location_column(self, location, collated_table): 
 			"""
 			Returns the specified location's column from a table object's 
 			location_columns field as a list. This functions also appends
