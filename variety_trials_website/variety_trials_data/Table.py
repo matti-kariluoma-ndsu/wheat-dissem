@@ -254,7 +254,7 @@ class Table:
 			self.entries = entries
 			
 			
-		def collate_table(table): 
+		def collate_table(self): 
 			
 			lsd = LSD_Row(table)
 			collated_table = {}
@@ -270,7 +270,7 @@ class Table:
 			
 			[(column1, Variety), (year, 1-yr), (year, 2-yr), (year, 3-yr), (location, Casselton), (location, Prosper), (location, SomePlace)]
 			"""
-			top_row = []
+			top_row = ['Varieties']
 			
 			for y, d in y_columns.iteritems():
 				top_row = y
@@ -288,7 +288,7 @@ class Table:
 			the maxium year to this dictionary first, but years are 
 			appended to this dictionary from smallest to greatest.
 			
-			[(Name, theMaxYear), (year, theMinYear),...,(year, theMaxYear)]
+			[(year, theMinYear),...,(year, theMaxYear)] The 'year' key will be the numeric year referenced. 
 			"""
 			
 			year_columns = {}
