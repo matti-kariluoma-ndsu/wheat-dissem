@@ -346,7 +346,7 @@ class Table:
 			for k in temp.keys():
 				t = k # This grabs the variety name, but not the value associated with it.
 				
-			row_labels_column = set(t) # Remove possible duplicates.
+			row_labels_column = set(sorted(t)) # Remove possible duplicates.
 					
 			return row_labels_column 
 			
@@ -388,8 +388,12 @@ class Table:
 			as a list. This function also appends the LSD for the given year to the list.
 			"""
 			
-			
-			
+			try:
+				temp = year_columns[0]
+			except (IndexError, SyntaxError, KeyError):
+				pass
+				
+			column = temp[year]
 			return column
 			
 		def get_location_column(self, location, location_columns): 
@@ -399,7 +403,12 @@ class Table:
 			the LSD for the given location and year.
 			"""
 			
-			column = []
+			try:
+				temp = location_columns[0]
+			except (IndexError, SyntaxError, KeyError):
+				pass
+			
+			column = temp[location]
 			return column
 			
 		def set_value_count_for_column(self, column, year): 
