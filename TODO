@@ -63,8 +63,7 @@
 ./variety_trials_data/variety_trials_util.py:			# TODO: have the Location objects grab default lat/long, not user entered
 ./variety_trials_data/variety_trials_util.py:			#TODO: We just searched a square, now discard searches that are > x miles away.
 
-"tabbed_view" is set up using a hierarchy of tables. It would be nicer 
-if instead "tabbed_view" used <div> tags with a good class structure
+<div> tags with a good class structure
 to keep the data aligned. Furthermore, it may be possible to represent
 the cells as objects and reduce the need for the server to explicitly
 make the table structure.
@@ -74,22 +73,8 @@ use javascript to reload the page with new parameters. This won't work
 if javascript is disabled. Also, would an image hyperlink, or some other
 method, be more clear then a text hyperlink?
 
-The main page has a form that points to "view/column_name/year", but
-if that page is visited directly (or bookmarked) the data does not 
-display. We need to support a GET version of the page (or just use GET
-only) in addition to our already implemented POST version using the 
-aforementioned form.
-
-When viewing the query on "tabbed_view", the data is separated into
-many sub-tables. We need to show the amount of underlying data that went
-into the reported 1-yr, 2-yr, and 3-yr means, as well as into the LSD
-calculation. (In the code, this is the three-tuple (x,y,z) key to the
-self.groups dictionary.)
-
-When viewing the data, we print the variety and locations names. Each
-variety should have a hyperlink (ideally a scroll-over box) to 
-information about that particular variety. This can be bogus text
-at this time, a student of Plant Sciences will write the actual text.
+Each variety should have a hyperlink (ideally a scroll-over box) to 
+information about that particular variety.
 
 LSD_Calculator.fetch() is really three functions, one where sub-tables 
 are generated, one where lsds for those sub-tables are calculated, and
@@ -116,8 +101,7 @@ aggregate data availbale, for the foreseeable future. We need to dredge
 up the old data we had and enter the LSD value, back to 2010.
 
 Each page should have a link to the homepage (to start the query over).
-
-
+This should be in base.html.
 
 When the user clicks the checkboxes next to the variety names, then
 selects "Compare Selected" they can sometimes be brought to the 
@@ -125,9 +109,6 @@ variety-variety view, but no data is on the page. It would be best if
 their was some sort of message to be shown to the user; problem is
 if we use a ResponseRedirect, we can't (?) do a render_to_response()
 to show that message.
-
-If the user gives us their zipcode, we should be able to sort the 
-columns (locations) by distance from that zipcode.
 
 * "compare selected" should do nothing if 0 or 1 varieties are selected
   * show a message telling them why they can't compare 0 or 1?
@@ -193,8 +174,7 @@ Talk of how we are going to truncate tables for pretty output.
 		above criteria are met.
 	3) For the variety-variety view, repeat the above.
 	
-Perhaps we should remove the variety-variety form from the main page, and
-enforce entry into the database with a zipcode? If so we need their xip in big
+We need the current zipcode in big
 letters to remind people what data they are looking at.
 
 If we are going to have access the zipcode at all times, and ditching radius,
