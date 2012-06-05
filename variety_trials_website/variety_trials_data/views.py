@@ -191,6 +191,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	for e in pos_locations:
 		if locations.count(e)==0:
 			neg_locations.append(e)
+			
 	this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 	year_list = [this_year, this_year-1, this_year-2]
@@ -236,15 +237,13 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	except TypeError:
 		# TODO: we can do more for the user than redirect to /
 		return HttpResponseRedirect("/")
-	print request.GET
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
 			'varieties': varieties,
 			'zipcode': zipcode,
 			'search_radius': search_radius
 		})
-	print locations_form
-	print locations
+	
 	try:
 		ab = int(abtest)
 	except ValueError:
@@ -277,7 +276,6 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		#iterate through sorted list and send the user to the home page if it's all empty
 	else: # the location view
 		view = 'location'
-	print request.GET
 	location_get_string=''
 	variety_get_string=''
 	for v in varieties:
