@@ -240,8 +240,8 @@ class Table:
 		
 		top_row = [] # The top row for the table object: 'Varities', 1-yr, 2-yr, 3-yr, Loc1, Loc2, etc.
 		row_labels_column = [] # Contains the varieties' names.
-		year_columns = {} # Contains year(s) average values for the given varieties.
-		location_columns = {} # The variety value(s) for a location(s).
+		year_columns = [] # Contains year(s) average values for the given varieties. Three lists in this list, 
+		location_columns = [] # The variety value(s) for a location(s).
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
 		collated_table = {}
 		max_year = 0 
@@ -258,24 +258,34 @@ class Table:
 			[(minYear, value ),...,(maxYear, value)] The 'year' key will be numeric. 
 			"""
 			
+			y1 = {} # y1 and y2 are appended to the year_columns, so both may be referenced.
+			y2 = [] # This contains just the variety values, so when collated, it doesn't have all the annoying keys. 
+			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
+			v_temp = sorted(varieties, key=attrgetter('name'))
 			y_temp = sorted(years, reverse=true) 
 			
 			if len(y_temp) > 3:
 				t = y_temp[:2] # Reduce the number of years to 3.
 				y_temp = t
 			
-			v_temp = sorted(varieties, key=attrgetter('name'))
-			
 			for entry in self.entries: # Yay for n^3.
 				for y in y_temp:
 					for  v in v_temp:
 						if y == entry.harvest_date.year and v == entry.variety.name:
 							try:
-								year_columns = [y, [v, entry.test_weight]] # I'm not sure if this test weight is already the mean value.
+								y1 = {y: {v: entry.test_weight}} # I'm not sure if this test weight is already the mean value.
+								y2 = entry.test_weight
+								y3 = y
 							except AttributeError:
-								year_columns = [y, [v, None]] # I might change the nested lists to tuples.
+								y1 = {y: {v: None}} # I might change the nested lists to tuples.
+								y2 = None
+								y3 = y
 						else:
-							year_columns = [y, [v, None]]
+							y1 = {y: {v: None}}
+							y2 = None
+							y3 = y
+							
+			year_columns = [y1][y2][y3]
 							
 			return year_columns
 			
@@ -290,6 +300,9 @@ class Table:
 			"""
 			
 			l_temp = sorted(locations, key=attrgetter('name'))
+			l1 = {}
+			l2 = [] # The same protocol is followed here as in the year_average_columns function.
+			l3 = [] 
 			
 			for y, v in year_columns: # Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
 				v_temp = v[0]
@@ -299,11 +312,19 @@ class Table:
 					for v in v_temp:
 						if l == entry.location.name and v == entry.variety.name:
 							try:
-								location_columns = [l, [v, entry.test_weight]] 
+								l1 = {l: {v: entry.test_weight}}
+								l2 = entry.test_weight
+								l3 = l
 							except AttributeError:
-								location_columns = [l, [v, None]]
+								l1 = {l: {v: None}}
+								l2 = None
+								l3 = l
 						else:
-							location_columns = [l, [v, None]]
+							l1 = {l: {v: None}}
+							l2 = None
+							l3 = l
+			
+			location_columns = [l1][l2][l3]
 													
 			return location_columns
 			
@@ -314,23 +335,22 @@ class Table:
 			['Agawam', 'Albany',...'WB-Mayville']
 			"""
 			
-			for y, v in year_columns:
-				row_labels_column = v[0] # Grabs the variety name from year_columns.
+			temp = []
+			t = []
 			
+			try:
+				temp = year_columns[0]
+			except (IndexError, SyntaxError, KeyError):
+				pass
+				
+			for k in temp.keys():
+				t = k # This grabs the variety name, but not the value associated with it.
+				
+			row_labels_column = set(t) # Remove possible duplicates.
+					
 			return row_labels_column 
 			
-			
-		def collate_table(self, top_row, row_labels_column, year_columns, location_columns): 
-			"""
-			This function might be a waste of time. I think I should focus on the get functions.
-			The returned lists may be placed where required.
-			"""	
-				
-			collated_table = [top_row, row_labels_column, year_columns, location_columns] # This is a mess when printed, maybe.
-			
-			return collated_table
-			
-		def header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
+		def populate_header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
 			"""
 			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
 			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
@@ -342,13 +362,25 @@ class Table:
 			"""
 			top_row = ['Varieties']
 			
-			for y, v in year_columns:
-				top_row = y
+			try:
+				top_row = year_columns[2] # There had better be something at these indexes.
+				top_row = location_columns[2]
+			except (IndexError, SyntaxError, KeyError): 
+				pass 
 			
-			for l, v in location_columns:
-				top_row = l
+			return top_row	
 			
-			return top_row
+			
+		def collate_table(self, top_row, row_labels_column, year_columns, location_columns): 
+			"""
+			This function might be a waste of time. I think I should focus on the get functions.
+			The returned lists may be placed where required.
+			"""	
+				
+			collated_table = [top_row, row_labels_column, year_columns, location_columns] # Change this.
+			
+			return collated_table
+			
 			
 		def get_year_column(self, year, year_columns):
 			"""
@@ -356,20 +388,7 @@ class Table:
 			as a list. This function also appends the LSD for the given year to the list.
 			"""
 			
-			year2 = year - 1
-			year3 = year - 2
 			
-			for y in year_columns: 
-				if year == y:
-					year_columns.remove(y)
-				if year2 == y:
-					year_columns[y:]
-				if year3 == y:
-					year_columns[y:]
-					
-				year_columns[:0] = year
-				
-				column = year_columns
 			
 			return column
 			
