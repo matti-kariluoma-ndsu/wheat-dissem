@@ -153,13 +153,13 @@ def LSD(response_to_treatments, probability):
 		for j in range(k):
 			SSE += (float(trt[i][j]) - treatment_means[i] - block_means[j] + grand_mean)**2.0
 	
-	print "Navneet trial"
-	print "treatment value for rows and columns is : " + str(trt[i][j])
-	print "The treatment mean is: " + str(treatment_means[i])
-	print "The block mean is : " + str(block_means[j])
-	print "The grand mean is : " + str(grand_mean)
-	print "The value of SSE is : " + str(SSE)
-	
+			print "Navneet trial"
+			print "treatment value for rows and columns is : " + str(trt[i][j])
+			print "The treatment mean is: " + str(treatment_means[i])
+			print "The block mean is : " + str(block_means[j])
+			print "The grand mean is : " + str(grand_mean)
+			print "The value of SSE is : " + str(SSE)
+			
 	#print "SSE: %f\n" % (SSE)
 	
 	mean_squares_of_error = SSE / degrees_freedom_of_error

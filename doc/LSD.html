@@ -172,7 +172,7 @@ function erfinv(y)
 			{
 			
 			a = 1.0/(n-0.5)
-			b = 48.0/(a^2.0)
+			b = 48.0/Math.pow(a,2.0)
 			c = (((20700.0*a)/b - 98.0)*a - 16.0)*a + 96.36
 			d = ((94.5/(b+c) - 3.0)/b + 1.0)
 			e = d*Math.sqrt(a*pi/2.0)*(n)
@@ -206,7 +206,7 @@ function erfinv(y)
 				y5 = y4*x
 				y = y5
 				
-				y = a*(y^2.0)
+				y = a*Math.pow(y,2.0)
 				
 				if (y > 0.002)
 					{
@@ -214,7 +214,7 @@ function erfinv(y)
 					}
 				else
 				{
-					y = 0.5*(y^2.0) + y
+					y = 0.5*Math.pow(y,2.0) + y
 				}
 			}
 			else
@@ -355,7 +355,7 @@ function LSD(trt, probability)
 	{
 		for(j=0;j<k;j++)
 		{
-			SSE += (trt[i][j] - treatment_means[i] - block_means[j] + grand_mean)^2.0;
+			SSE += Math.pow(trt[i][j] - treatment_means[i] - block_means[j] +grand_mean,2.0)
 			
 	document.write("The treatment value for the rows and columns is: "+ trt[i][j]+"<br/>")
 	document.write("The treatment mean is: "+ treatment_means[i]+"<br/>")
@@ -384,11 +384,7 @@ function LSD(trt, probability)
 	LSD = Tprob * Math.sqrt(2.0 * mean_squares_of_error / k)
 
 	return LSD
-
-
-	
-
-function main ()
+}
 
 	input1 = [
 		[64.5, 62.899999999999999, 48.600000000000001, 76.900000000000006],
@@ -482,7 +478,7 @@ function main ()
 	print "==="
 	*/
 	
-}</script>
+</script>
 
 <form>
 <input type="button" value="Click here!" onclick="displaymessage()"/>
