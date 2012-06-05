@@ -18,30 +18,30 @@ def get_entries(locations, year_list):
 					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
 				)
 			)
-def variety_info(request, variety_name):        
-        variety=models.Variety.objects.filter(name=variety_name)
-        """
-        year_released = variety.values('year_released')[0]['year_released']
-        index = variety.values('id')[0]['id']
-        name=variety.values('name')[0]['name']
-        description_url = variety.values('description_url')[0]['description_url']
-        """
-        for v in variety:
-                index=v.id
-                name=v.name
-                year_released=v.year_released
-                picture_url=v.picture_url
-                
-        
+def variety_info(request, variety_name):	
+	variety=models.Variety.objects.filter(name=variety_name)
+	"""
+	year_released = variety.values('year_released')[0]['year_released']
+	index = variety.values('id')[0]['id']
+	name=variety.values('name')[0]['name']
+	description_url = variety.values('description_url')[0]['description_url']
+	"""
+	for v in variety:
+		index=v.id
+		name=v.name
+		year_released=v.year_released
+		picture_url=v.picture_url
+		
+	
 	return render_to_response(
 		'variety_info.html', 
 		{ 
-                        'index': index,
-                        'variety_name': name
+			'index': index,
+			'variety_name': name
 		},
 		context_instance=RequestContext(request)
 	)
-        
+	
 
 def index(request, abtest=None):
 	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
@@ -63,9 +63,9 @@ def index(request, abtest=None):
 		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
-                zipcode=request.GET.__getitem__("zipcode")
-                search_radius=request.GET.__getitem__("search_radius")
-                
+		zipcode=request.GET.__getitem__("zipcode")
+		search_radius=request.GET.__getitem__("search_radius")
+		
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
 		if locations_form.is_valid():
 			
@@ -179,19 +179,19 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	}
 	#retrieves the list of locations and finds the locations that have been excluded by the user, storing them in neg_locations
 	try:
-               	pos_locations = Locations_from_Zipcode_x_Radius(
-               		zipcode, search_radius
-               	).fetch()
-               	
-        except models.Zipcode.DoesNotExist:
-                None
-                
-        neg_locations=[]
-        locations=list(locations)
+		pos_locations = Locations_from_Zipcode_x_Radius(
+				zipcode, search_radius
+			).fetch()
+	
+	except models.Zipcode.DoesNotExist:
+		None
+		
+	neg_locations=[]
+	locations=list(locations)
 	for e in pos_locations:
-                if locations.count(e)==0:
-                        neg_locations.append(e)
-        this_year = datetime.date.today().year - 1
+		if locations.count(e)==0:
+			neg_locations.append(e)
+	this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 	year_list = [this_year, this_year-1, this_year-2]
 	
@@ -240,8 +240,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
 			'varieties': varieties,
-                        'zipcode': zipcode,
-                        'search_radius': search_radius
+			'zipcode': zipcode,
+			'search_radius': search_radius
 		})
 	print locations_form
 	print locations
@@ -266,32 +266,32 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		view = 'variety'
 	directHome=0
 	for l in sorted_list[1::]:
-                if l[1]==l[2]==l[3]==None:
-                        directHome=1
-                else:
-                        directHome=0
-                        break
-        if directHome==1:
-                return HttpResponseRedirect("/")
-                
+		if l[1]==l[2]==l[3]==None:
+			directHome=1
+		else:
+			directHome=0
+			break
+	if directHome==1:
+		return HttpResponseRedirect("/")
+		
 		#iterate through sorted list and send the user to the home page if it's all empty
 	else: # the location view
 		view = 'location'
 	print request.GET
 	location_get_string=''
-        variety_get_string=''
+	variety_get_string=''
 	for v in varieties:
-                variety_get_string='&varieties='+str(v.id)
-        for l in locations:
-                location_get_string='&locations='+str(l.id)
+		variety_get_string='&varieties='+str(v.id)
+	for l in locations:
+		location_get_string='&locations='+str(l.id)
 	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
 		'tabbed_view.html',
 		{
-                        'zipcode': zipcode,
-                        'search_radius': search_radius,
-                        'location_get_string': location_get_string,
-                        'variety_get_string': variety_get_string,
+			'zipcode': zipcode,
+			'search_radius': search_radius,
+			'location_get_string': location_get_string,
+			'variety_get_string': variety_get_string,
 			'locations_form': locations_form,
 			'field_list': field_list,
 			'location_list': locations,

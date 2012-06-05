@@ -7,17 +7,17 @@ import re
 class SelectLocationByZipcodeRadiusForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=False)  
 	search_radius = forms.ChoiceField(
-										widget=forms.RadioSelect(), 
-                    choices=(
-                      (50, '50 miles'), 
-                      (100,'100 miles'), 
-                      (200,'200 miles'), 
-                      ('ND','All of ND'), 
-                      ('MN','All of MN'), 
-                      ('ALL','All Data')
-                      ),
-                    initial='50'
-                  )
+			widget=forms.RadioSelect(), 
+			choices=(
+				(50, '50 miles'), 
+				(100,'100 miles'), 
+				(200,'200 miles'), 
+				('ND','All of ND'), 
+				('MN','All of MN'), 
+				('ALL','All Data')
+			),
+			initial='50'
+		)
 	#search_radius = forms.CharField(max_length=5)
 
 class SelectFieldForm(forms.Form):
@@ -27,7 +27,7 @@ class SelectFieldForm(forms.Form):
 	search_radius = forms.CharField(max_length=5)
 							
 class SelectVarietiesForm(forms.Form):
-        zipcode = forms.CharField(max_length=5, required=False)
+	zipcode = forms.CharField(max_length=5, required=False)
 	search_radius = forms.CharField(max_length=5, required=False)
 	varieties = forms.ModelMultipleChoiceField(
 								widget=forms.SelectMultiple(attrs={'size': 20}),
