@@ -134,7 +134,7 @@ def LSD(response_to_treatments, probability):
 			total += float(trt[i][j])
 		treatment_means[i] = total/k
 		
-		
+	print "Calculating the Block Mean"	
 	block_means = {}
 	for j in range(k):
 		total = 0.0
@@ -147,6 +147,7 @@ def LSD(response_to_treatments, probability):
 	grand_mean = sum(treatment_means.values()) / float(n)
 	
 	# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+	print "The difference between type I and type III SS"
 	SSE = 0.0
 	for i in range(n): # n == len(trt)
 		for j in range(k):
@@ -166,9 +167,9 @@ def LSD(response_to_treatments, probability):
 	print "MSE: %f\n" % (mean_squares_of_error)
 	
 	Tprob = qt(probability, degrees_freedom_of_error)
-	print probability
-	print degrees_freedom_of_error
-	print Tprob
+	print "The probability is: " + str(probability)
+	print "Degrees of freedom: " + str(degrees_freedom_of_error)
+	print "T-distribution is: " + str(Tprob)
 	#print "t-value: %f\n" % (Tprob)
 	
 	LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
@@ -217,7 +218,7 @@ def main():
 	]
 	result4 = 4.86117238
 	
-	print LSD(input2, 0.05)
+	print "Calculated LSD value is: " + str(LSD(input2, 0.05))
 	print result2
 	print "==="
 

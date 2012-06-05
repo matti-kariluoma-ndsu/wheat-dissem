@@ -5,14 +5,112 @@
 //from scipy.special import erfinv
 
 
-function qnorm(probability)
-	{
-	function erfinv(y)
-	{
-		e = 1
+
+	
+	var pi = 3.14159265359
+
+//http://stackoverflow.com/questions/5971830/need-code-for-inverse-error-function
+function erfc(x)
+{
+        z = Math.abs(x)
+        t = 1.0 / (0.5 * z + 1.0)
+        a1 = t * 0.17087277 + -0.82215223
+        a2 = t * a1 + 1.48851587
+        a3 = t * a2 + -1.13520398
+        a4 = t * a3 + 0.27886807
+        a5 = t * a4 + -0.18628806
+        a6 = t * a5 + 0.09678418
+        a7 = t * a6 + 0.37409196
+        a8 = t * a7 + 1.00002368
+        a9 = t * a8
+        a10 = -z * z - 1.26551223 + a9
+        a = t * Math.exp(a10)
+       
+        if (x < 0.0)
+        {
+                a = 2.0 - a
+        }
+       
+        return a
+
+}
+
+function erf(x)
+{
+        return 1.0 - erfc(x)
+}
+
+function erfinv(y)
+{
+        if (y < -1.0 ||y > 1.0)
+        {
+                alert("input out of range!")
+                return 0
+        }
+       
+        if (y == -1.0)
+        {
+                x = Number.POSITIVE_INFINITY
+        }
+        else if (y == 1.0)
+        {
+                x = Number.NEGATIVE_INFINITY
+        }
+        else if (y < -0.7)
+        {
+                z1 = (1.0 + y) / 2.0
+                z2 = Math.Ln(z1)
+                z3 = Math.sqrt(-z2)
+                z = z3
+                x1 = 1.641345311 * z + 3.429567803
+                x2 = x1 * z + -1.624906493
+                x3 = x2 * z + -1.970840454
+                x4 = 1.637067800 * z +  3.543889200
+                x5 = x4 * z + 1.0
+                x6 = -x3 / x5 // note: negative
+                x = x6
+        }
+        else if (y < 0.7)
+        {
+                z = y * y
+                x1 = -0.140543331 * z + 0.914624893
+                x2 = x1 * z + -1.645349621
+                x3 = x2 * z + 0.886226899
+                x4 = 0.012229801 * z + -0.329097515
+                x5 = x4 * z + -0.329097515
+                x6 = x5 * z + 1.442710462
+                x7 = x6 * z + -2.118377725
+                x8 = x7 * z + 1.0
+                x9 = y * x3 / x8
+                x = x9
+        }
+        else
+        {
+                z1 = (1.0 + y) / 2.0
+                z2 = Math.Ln(z1)
+                z3 = Math.sqrt(-z2)
+                z = z3
+                x1 = 1.641345311 * z + 3.429567803
+                x2 = x1 * z + -1.624906493
+                x3 = x2 * z + -1.970840454
+                x4 = 1.637067800 * z +  3.543889200
+                x5 = x4 * z + 1.0
+                x6 = x3 / x5 // note: positive
+                x = x6
+        }
+       
+        x = x - (erf(x) - y) / (2.0/Math.sqrt(pi) * Math.exp(-x*x));
+        x = x - (erf(x) - y) / (2.0/math.sqrt(pi) * Math.exp(-x*x));
+       
+        return x
+}
+	
+		/* e = 1
 		document.write("The value of the inverse of the error function is : " + e)
 		return e
-	}
+		*/
+	function qnorm(probability)
+	{
 		/*
 		A reimplementation of R's qnorm() function.
 		
@@ -56,14 +154,17 @@ function qnorm(probability)
 		sqrt = 1
 		if (n < 1 || P > 1.0 || P <= 0.0 )
 			{
+			/*{
 			document.write("There was an error");
+			}
+			*/
 			}
 		else if(n == 2)
 			{
 			t = sqrt(2.0/(P*(2.0-P)) - 2.0)
 		    }
 		else if(n == 1)
-		{
+			{
 			P = P * pi/2
 			t = Math.cos(P)/Math.sin(P)
 			}
@@ -72,7 +173,7 @@ function qnorm(probability)
 			
 			a = 1.0/(n-0.5)
 			b = 48.0/(a^2.0)
-			c = ((20700.0*a/b - 98.0)*a - 16.0)*a + 96.36
+			c = (((20700.0*a)/b - 98.0)*a - 16.0)*a + 96.36
 			d = ((94.5/(b+c) - 3.0)/b + 1.0)
 			e = d*Math.sqrt(a*pi/2.0)*(n)
 			x = e*P
@@ -82,8 +183,6 @@ function qnorm(probability)
 			if (y > 0.05 + a)
 				{
 				x = qnorm(P*0.5)
-				document.write("x is : " +x + "<br/>")
-				
 				y = x^2.0
 				
 				
@@ -107,7 +206,7 @@ function qnorm(probability)
 				y5 = y4*x
 				y = y5
 				
-				y = a*y^2.0
+				y = a*(y^2.0)
 				
 				if (y > 0.002)
 					{
@@ -115,21 +214,21 @@ function qnorm(probability)
 					}
 				else
 				{
-					y = 0.5*y^2.0 + y
+					y = 0.5*(y^2.0) + y
 				}
-				}
+			}
 			else
 				{
 				//y = ((1.0/(((float(n)+6.0)/(float(n)*y)-0.089*d-0.822)*(float(n)+2.0)*3.0)+0.5/(float(n)+4.0))*y-1.0)*(float(n)+1.0)/(float(n)+2.0)+1.0/y
 				y1 =(n)+6.0
-				y2 = y1/((n)*y)
+				y2 = y1/(n*y)
 				y3 = y2 - 0.089*d - 0.822
-				y4 = y3 * ((n)+2.0) * 3.0
+				y4 = y3 * (n+2.0) * 3.0
 				y5 = 1.0 / y4
-				y6 = y5 + 0.5/((n)+4.0)
+				y6 = y5 + 0.5/(n+4.0)
 				y7 = y6*y - 1.0
-				y8 = y7 * ((n)+1.0) 
-				y9 = y8 / ((n)+2.0) 
+				y8 = y7 * (n+1.0) 
+				y9 = y8 / (n+2.0) 
 				y10 = y9 + 1.0/y
 				y= y10
 			    }
@@ -138,8 +237,10 @@ function qnorm(probability)
 			
 		}
 		return t
-	}
-
+		}
+		
+	
+	
 function LSD(trt, probability)
 {
 
@@ -166,9 +267,15 @@ function LSD(trt, probability)
 	document.write("<p>Inspecting rows</p>");
 	for (i=0; i<n; i++)
 	{
+	
+		total = 0.0
+	
+	/*
+	{
 	document.write(trt[i]);
 	document.write("<br>");
 	}
+	*/
 	
 	//var trt1 = new Array();
 	//trt[0] = new Array ();
@@ -177,17 +284,19 @@ function LSD(trt, probability)
 	
 	
 	document.write("<p>Inspecting cells</p>");
-	for (i=0; i<n; i++)
-	{
+	//for (i=0; i<n; i++)
+	
 		for (j=0; j<k; j++)
 		{
-		document.write(trt[i][j]);
-		document.write("<br>");
+			total += (trt[i][j])
+			//document.write(trt[i][j]);
+			//document.write("<br>");
+		treatment_means[i] = total/k
 		}
-	}
 	
 	
-	for (i=0; i<n; i++)
+	
+	/*for (i=0; i<n; i++)
 	{
 	    total = 0.0
 		//document.write("The total is:  " + i + "<br />" );
@@ -201,7 +310,7 @@ function LSD(trt, probability)
 		document.write(" The total is:  " +total +"<br />");
 		
 		document.write(" The trt mean is:  " +treatment_means[i] +"<br />");
-		
+	*/	
 		
 	}
 	
@@ -218,9 +327,10 @@ function LSD(trt, probability)
 		for(i=0; i<n; i++)
 			{
 			
-			total = total + trt[i][j]
-			document.write(" Trying to add :  " +i +","+ j +"<br />")
-			document.write(" The calculated total is:  " +total+"<br />")
+			total = total + (trt[i][j])
+			document.write("The total is : " +total);
+			//document.write(" Trying to add :  " +i +","+ j +"<br />")
+			//document.write(" The calculated total is:  " +total+"<br />")
 			}
 			
 		block_means[j] = total/n
@@ -247,12 +357,11 @@ function LSD(trt, probability)
 		{
 			SSE += (trt[i][j] - treatment_means[i] - block_means[j] + grand_mean)^2.0;
 			
-			document.write("The treatment value for the rows and columns is: "+ trt[i][j]+"<br/>")
-			document.write("The treatment mean is: "+ treatment_means[i]+"<br/>")
-			document.write("The block mean is: "+ block_means[j]+"<br/>")
-			document.write("The grand mean is: "+ grand_mean +"<br/>")
-			
-			document.write(" The value of SSE :  "+SSE + "<br/>")
+	document.write("The treatment value for the rows and columns is: "+ trt[i][j]+"<br/>")
+	document.write("The treatment mean is: "+ treatment_means[i]+"<br/>")
+	document.write("The block mean is: "+ block_means[j]+"<br/>")
+	document.write("The grand mean is: "+ grand_mean +"<br/>")
+	document.write(" The value of SSE :  "+SSE + "<br/>")
 			}
 			}
 			
@@ -277,26 +386,10 @@ function LSD(trt, probability)
 	return LSD
 
 
-	}
-
-
-</script>
-
-<script type="text/javascript">
-function displaymessage()
-{
-alert("There was an erorr!")
-}
-
-
-</script>
-
-</head>
-
 	
-<body>
-<script type="text/javascript">
-	{
+
+function main ()
+
 	input1 = [
 		[64.5, 62.899999999999999, 48.600000000000001, 76.900000000000006],
 		[65.799999999999997, 60.200000000000003, 47.100000000000001, 75.900000000000006],
@@ -355,7 +448,7 @@ alert("There was an erorr!")
 	document.write(input2);
 	document.write(input3);
 	document.write(input4);
-	}
+
    
 	
 	
@@ -389,7 +482,7 @@ alert("There was an erorr!")
 	print "==="
 	*/
 	
-</script>
+}</script>
 
 <form>
 <input type="button" value="Click here!" onclick="displaymessage()"/>
