@@ -552,7 +552,7 @@ class LSD_Calculator:
 					del self.location_indexes[l]
 				self.locations = used_locations
 			else:
-				for l in sorted(self.locations, key=attrgetter('name')):
+				for l in self.locations:
 					l_indexes_values.append(l_indexes[l])
 					head_row.append((l.name, l.id))
 		#return_list.append(head_row) # append first row
@@ -601,6 +601,7 @@ class LSD_Calculator:
 					if l not in locations: # ensure all subgroups only show data for common locations
 						temp_row.append(None)
 					else:
+						
 						value = self.entries[v][cy_i][l]
 						
 						if value is not None:
@@ -1462,4 +1463,5 @@ class Locations_from_Zipcode_x_Radius:
 		for l in sorted_list:
 			print "%f\t%s" %(distances[l], l.name)
 		"""
+
 		return sorted_list

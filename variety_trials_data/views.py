@@ -105,6 +105,8 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					context_instance=RequestContext(request)
 				) 
 			
+			#sort locations by distance
+			print radius
 			
 			#TODO: there must be a better way to populate the varieties list
 			varieties = []
@@ -370,7 +372,7 @@ def add_trial_entry_csv_file(request):
 	errors = {} 
 	# a dictionary, keys are strings (source of error), values are strings (message)
 	
-	if request.method == 'GET': # If the form has been submitted...
+	if request.method == 'POST': # If the form has been submitted...
 		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
 		if form.is_valid():
 			success, errors = variety_trials_forms.handle_csv_file(request.FILES['csv_file'])

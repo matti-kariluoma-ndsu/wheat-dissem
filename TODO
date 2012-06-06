@@ -76,6 +76,7 @@ method, be more clear then a text hyperlink?
 Each variety should have a hyperlink (ideally a scroll-over box) to 
 information about that particular variety.
 
+
 LSD_Calculator.fetch() is really three functions, one where sub-tables 
 are generated, one where lsds for those sub-tables are calculated, and
 another where everything is collated into an output table. The latter
@@ -89,6 +90,7 @@ The intent of this website is to replace the printed booklets that
 the Plant Sciences dept currently prints and distributes. They already
 have pdf versions of their booklets available on the website, and our
 project would like to deliver in a form familiar to that. Modern
+
 browsers support <link media="print" rel="stylesheet" src="file.css">
 
 Farmers have expressed interest in seeing information about providers of
@@ -126,7 +128,6 @@ We should try to make them all the same width.
 Implement listing the locations in the url in terms of what has been removed, 
 rather than what is being displayed. In views.py in tabbed_view the locations 
 that have been removed are stored in the lost neg_locations
-
 
 * 50 mi 58501, 2010, Kidder County has an index of -1, why?
 
@@ -226,3 +227,4 @@ BUG
  2) n select
  3) select > text field
  4) checkboxes
+
