@@ -4,7 +4,7 @@
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_location_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
+		<form name="{{fieldname}}_location_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">	
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -19,8 +19,7 @@
 <div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-		<form name="{{yearname}}_location_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
-
+		<form name="{{yearname}}_location_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">	
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -180,7 +179,7 @@
 				{% if datalist.0 == element %}
 				<form>
 					<div class='ColumnToLeft'>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="<a href='/view/info/{{element.0}}/'>{{element.0}}</a>" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
+						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> <a href='/view/info/{{element.0}}/'>{{element.0}}</a>
 					</div>
 				</form>
 				{% else %}

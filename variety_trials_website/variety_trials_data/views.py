@@ -51,7 +51,7 @@ def index(request, abtest=None):
 	
 
 	return render_to_response(
-		'main.html', 
+		'main_ndsu.html', 
 		{ 
 			'zipcode_radius_form': zipcode_radius_form,
 			'varieties_form': varieties_form,
@@ -62,17 +62,16 @@ def index(request, abtest=None):
 	)
 		
 def locations_view(request, yearname, fieldname, abtest=None):
-	if request.method == 'GET':
+	if request.method == 'GET':               
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if locations_form.is_valid():
-			
+			zipcode = locations_form.cleaned_data['zipcode']
 			locations = locations_form.cleaned_data['locations']
 			varieties = locations_form.cleaned_data['varieties']
-			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
-			
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode)
 		else:
-			return HttpResponseRedirect("/") # send to homepage
+			return zipcode_view(request, yearname, fieldname, abtest)
 	else:
 		return HttpResponseRedirect("/") # send to homepage
 
@@ -81,7 +80,8 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if zipcode_radius_form.is_valid():
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
-			radius = zipcode_radius_form.cleaned_data['search_radius']
+			#radius = zipcode_radius_form.cleaned_data['search_radius']
+			radius = None
 			
 			try:
 				locations = Locations_from_Zipcode_x_Radius(
@@ -93,7 +93,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					})
 				return render_to_response(
 					'main.html', 
-					{ 
+					{
 						'zipcode_radius_form': zipcode_radius_form,
 						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
 						'variety_list': models.Variety.objects.all(),
@@ -112,29 +112,16 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 			
 			varieties = list(set(varieties)) # remove duplicates
 			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest)
+			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode, radius)
 			
 		else:
-			zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(intital={
-					'zipcode': zipcode_radius_form.cleaned_data['zipcode'],
-					'radius': zipcode_radius_form.cleaned_data['search_radius']
-				})
-			return render_to_response(
-					'main.html', 
-					{ 
-						'zipcode_radius_form': zipcode_radius_form,
-						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
-						'variety_list': models.Variety.objects.all(),
-						'curyear': datetime.date.today().year,
-						'error_list': ['Sorry, the zipcode: "' + zipcode_radius_form.cleaned_data['zipcode'] + '" didn\'t return any results.']
-					},
-					context_instance=RequestContext(request)
-				)
+			return HttpResponseRedirect("/") # send to homepage
+
 	else:
 		# seems an error occured...
 		return HttpResponseRedirect("/") # send to homepage
 
-def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None):
+def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None, zipcode=None, search_radius=0):
 	# TODO: does this belong in the DB?
 	unit_blurbs = {
 			'bushels_acre': ['Yield', 'Bushels per Acre', 
@@ -174,9 +161,43 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 				#'/static/img/button_seeding_rate.jpg', '/static/img/button_high_seeding_rate.jpg'],
 			#'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				#'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
-	}		
-	
-	this_year = datetime.date.today().year - 1
+	}
+	"""
+        zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
+	if zipcode_radius_form.is_valid():
+		zipcode = zipcode_radius_form.cleaned_data['zipcode']
+		radius = zipcode_radius_form.cleaned_data['search_radius']
+                try:
+                	pos_locations = Locations_from_Zipcode_x_Radius(
+                		zipcode, radius
+                	).fetch()
+                	
+                except models.Zipcode.DoesNotExist:
+                	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+                			'radius': zipcode_radius_form.cleaned_data['search_radius']
+                			})
+        """
+	try:
+               	pos_locations = Locations_from_Zipcode_x_Radius(
+               		zipcode, search_radius
+               	).fetch()
+               	
+        except models.Zipcode.DoesNotExist:
+                None
+                """
+               	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+               			'radius': zipcode_radius_form.cleaned_data['search_radius']
+               			})
+               			"""
+        
+        neg_locations=[]
+        locations=list(locations)
+	for e in pos_locations:
+                if locations.count(e)==0:
+                        neg_locations.append(e)
+        #print neg_locations
+        
+        this_year = datetime.date.today().year - 1
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
 	year_list = [this_year, this_year-1, this_year-2]
 	
@@ -221,9 +242,65 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		# TODO: we can do more for the user than redirect to /
 		return HttpResponseRedirect("/")
 	
+	# New idea, return a list of tables instead of a list of rows
+	tables = []
+	header_rows = [sorted_list[0]]
+	lsd_rows = []
+	rows = []
+	i = 0;
+			
+	for row in sorted_list[1::]:
+		if len(row) > 0:
+			if row[0][0] == 'Variety':
+				tables.append(rows)
+				rows = []
+				header_rows.append(row)
+			elif row[0] == 'LSD':
+				lsd_rows.append(row)
+			else:
+				rows.append(row)
+				
+	tables.append(rows)
+
+	dict_tables = []
+	for h in header_rows:
+		dict_tables.append(dict(header=h))
+	for l, i in zip(lsd_rows, range(len(lsd_rows))):
+		dict_tables[i]['lsd'] = l
+	for r, i in zip(tables, range(len(tables))):
+		dict_tables[i]['rows'] = r
+	
+	for table in dict_tables:
+		order = table['header'][0][1][0]
+		#print order
+		table['order'] = tuple((order[0], order[0]+order[1], order[0]+order[1]+order[2]))
+		table['header'][0] = ('Variety', -1)
+	
+	remove_incomplete_tables = True
+	# remove tables that are incomplete
+	if remove_incomplete_tables:
+		keep_me = []
+		for table in dict_tables:
+			full = True
+			for row in table['rows']:
+				if None in row:
+					full = False
+			if full:
+				keep_me.append(table)
+		dict_tables = keep_me
+	'''
+	for table in dict_tables:
+		print table['header']
+		for row in table['rows']:
+			print row
+		print table['lsd']
+		print ''
+	'''
+	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
-			'varieties': varieties
+			'varieties': varieties,
+			'zipcode': zipcode
 		})
 	
 	try:
@@ -238,25 +315,47 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	#TODO: this is very bad for the database...
 	try:
-		curyear = sorted_list[0][0] # we sent a preference for curyear, but what was returned may be different
+		pass
+		#curyear = sorted_list[0][0] # we sent a preference for curyear, but what was returned may be different
 	except IndexError: # will happen if all locations have been deselected...
 		sorted_list = [[curyear]]
 		return HttpResponseRedirect("/")
 	
 	if one_subset: # the variety view
 		view = 'variety'
+	directHome=0
+	for l in sorted_list[1::]:
+                if l[1]==l[2]==l[3]==None:
+                        directHome=1
+                else:
+                        directHome=0
+                        break
+        if directHome==1:
+                return HttpResponseRedirect("/")
+                
+		#iterate through sorted list and send the user to the home page if it's all empty
 	else: # the location view
 		view = 'location'
-	
+	location_get_string=''
+        variety_get_string=''
+	for v in varieties:
+                variety_get_string='&varieties='+str(v.id)
+        for l in locations:
+                location_get_string='&locations='+str(l.id)
+	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
-		'tabbed_view.html',
-		{ 
+		'tabbed_view_table_ndsu.html',
+		{
+			'zipcode': zipcode,
+			'location_get_string': location_get_string,
+			'variety_get_string': variety_get_string,
 			'locations_form': locations_form,
 			'field_list': field_list,
 			'location_list': locations,
 			'curyear': curyear,
 			'heading_list': sorted_list[0][1::],
 			'sorted_list': sorted_list[1::],
+			'tables': dict_tables,
 			'years': year_list,
 			'blurbs' : unit_blurbs,
 			'curfield' : fieldname,

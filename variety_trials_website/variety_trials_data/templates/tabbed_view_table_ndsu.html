@@ -1,12 +1,10 @@
-{% extends "base.html" %}
+{% extends "base_ag_ndsu.html" %}
 {% load django_math %}
-{% block content %}
-<input type="button" value="Home" onClick="location.href='/';">
+{% block navigation %}
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_location_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
-			
+		<form name="{{fieldname}}_location_form" action="/view/location/{{curyear}}/{{fieldname}}/" method="get">
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -21,8 +19,7 @@
 <div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-		<form name="{{yearname}}_location_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
-			
+		<form name="{{yearname}}_location_form" action="/view/location/{{yearname}}/{{curfield}}/" method="get">
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -43,8 +40,7 @@
 <div class="variety_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_variety_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
-			
+		<form name="{{fieldname}}_variety_form" action="/view/variety/{{curyear}}/{{fieldname}}/" method="get">
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -59,8 +55,8 @@
 <div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-		<form name="{{yearname}}_variety_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
-			
+		<form name="{{yearname}}_variety_form" action="/view/variety/{{yearname}}/{{curfield}}/" method="get">
+			{% csrf_token %}
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -79,130 +75,123 @@
 	{% endfor %}
 </div>
 
-	<div class="top_spacer"></div>
-	<div>
+<ul class="navTree navTreeLevel0">
 	{% for fieldname, blurb_list in blurbs.items %}
-		<p>	
-		
+	<li class="navTreeItem navTreeTopNode">
 		{% if fieldname == curfield %}
-			* <a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
+			* {{blurb_list.0}}
+		</a>
 		{% else %}
-			<a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
+			{{blurb_list.0}}
+		</a>
 		{% endif %}
-		
-		</p>
+	</li>
 	{% endfor %}
-	</div>
-	
-	<br style="clear: both;"/>
-	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+</ul>
+<hr>
+<ul class="navTree navTreeLevel0">
 	{% for yearname in years %}
-		<!--TODO: auto-generate these year button images-->
-		<p>
-		
+	<li class="navTreeItem navTreeTopNode">
+		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
-			* <a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
+			* {{yearname}}
 		{% else %}
-			<a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
+			{{yearname}}
 		{% endif %}
-		
-		</p>
+		</a>
+	</li>
 	{% endfor %}
-	</div>
+</ul>
 
-	<div id="django_trial_results_content">
-		<div>
-			<div colspan="{{ heading_list|length|add:1 }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="top_spacer"></div>
+
+<div id="django_trial_results_content">
+	<table border='1'>
+		<tr>
+			<td colspan="{{ heading_list|length|add:1 }}">
 				{% for fieldname, blurb_list in blurbs.items %}
 				{% if fieldname == curfield %}
 						<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
 						<p>{{blurb_list.2}}</p>
 				{% endif %}
 				{% endfor %}
-			</div>
-		</div>
-		<div>
-			<div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
-		</div>
-		<div class = "container">
-			<div class="Column"><h4> Variety</h4></div>
-			{% for heading in heading_list %}
-			<div class="Column"><h4>{{ heading.0 }}</h4>
-			{% if heading.1 != -1 %}
-			<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
-			{% endif %}
-			</div>
-			{% endfor %}
-		</div>
-		<br style="clear: both;"/>
-		<div class="row subheadings thin">
-		</div>
-	{% for datalist in sorted_list %}
-		{% if datalist.0.0 == "Variety" %}
-		<div class="container">
-			<div></div>
-		</div>
-		<div>
-			<div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
-		</div>
-		<div class="container">
-			{% for heading in datalist %}
-			<div class="Column"><h3>{{ heading.0 }}</h3>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+		</tr>
+	{% for table in tables %}
+		<tr class="spacer_row">
+			<td></td>
+		</tr>
+		<tr>
+			<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+		</tr>
+		<tr class="Variety padded">
+			{% for heading in table.header %}
+			<td class="padded"><h4>{{ heading.0 }}</h4>
 				{% if heading.1 != -1 %}
 				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+				{% else %}
+				<p style="font-size: 0.8em;">
+					{% if heading.0 == '1-yr' %}
+					{{ table.order.0 }} site-years
+					{% endif %}
+					{% if heading.0 == '2-yr' %}
+					{{ table.order.1 }} site-years
+					{% endif %}
+					{% if heading.0 == '3-yr' %}
+					{{ table.order.2 }} site-years
+					{% endif %}
+				</p>
 				{% endif %}
-			</div>
+			</td>
 			{% endfor %}
-		</div>
-		<br style="clear: both;"/>
-		
-		{% else %}
-		{% if datalist.0 == "LSD" %}
-		<div>
-			<div class ='ColumnToLeft'>
+		</tr>
+		{% for row in table.rows %}
+		<tr class="group {% cycle 'master_odd' 'master_even' %}">
+			{% for element in row %}
+				{% if row.0 == element %}
+				<td class='padded' style="text-align: left; width: 120px;">
+					<form>
+						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
+					</form>
+				</td>
+				{% else %}
+				<td class='padded'>
+					{{ element|default_if_none:"--" }}
+				</td>
+				{% endif %}
+			{% endfor %}
+		</tr>
+		{% endfor %}
+		<tr>
+			<td>
 			<form>
 				<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
 			</form>
-			</div>
-			<br style="clear: both;"/>
-		</div>
-		<div class="spacer_row">
-			<div></div>
-		</div>
-		<div class="LSD_row">
-			{% for element in datalist %}
-			<div class='Column'>{{ element|default_if_none:"--" }}</div>
+			</td>
+		</tr>
+		<tr class="spacer_row">
+			<td></td>
+		</tr>
+		<tr class="LSD_row">
+			{% for element in table.lsd %}
+			<td class='padded'>{{ element|default_if_none:"--" }}</td>
 			{% endfor %}
-			<br style="clear: both;"/>
-		</div>
-		{% else %}
-		<div class="group {% cycle 'master_odd' 'master_even' %}">
-			{% for element in datalist %}
-				{% if datalist.0 == element %}
-				<form>
-					<div class='ColumnToLeft'>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{element.1}}" onclick="unselect_variety({{element.1}})" /> <a href='/view/info/{{element.0}}/'>{{element.0}}</a>
-					</div>
-				</form>
-				{% else %}
-				<div class='Column'>
-					{{ element|default_if_none:"--" }}
-				</div>
-				{% endif %}
-				
-			{% endfor %}
-			<br style="clear: both;"/>
-		</div>
-		{% endif %}
-		{% endif %}
+		</tr>
 	{% endfor %}
-		<div class="bottom_spacer"></div>
-	</div>
-	<div class="clear">&#160;</div>
+		<tr class="bottom_spacer"></tr>
+  </table>
+</div>
+<div class="clear">&#160;</div>
 
-	<!--
-	<div id='dynamic_content'></div>
-	-->
 {% endblock %}
 
 {% load jsonify %}

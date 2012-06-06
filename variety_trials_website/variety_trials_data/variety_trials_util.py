@@ -214,8 +214,11 @@ class LSD_Calculator:
 		
 		
 		# order locations, varieties
-		self.locations = sorted(locations, key=attrgetter('name'))
+		#self.locations = sorted(locations, key=attrgetter('name'))
 		self.varieties = sorted(varieties, key=attrgetter('name'))
+		
+		self.locations = locations
+		self.all_locations = list(locations)
 		
 		#
 		# initialize self.entries, self.lsds
@@ -233,7 +236,7 @@ class LSD_Calculator:
 		for v in varieties:
 			self.entries[v] = [[None for l in self.locations] for y in self.years]
 		for l in locations:
-			self.lsds[l] = [None for y in self.years]
+			self.lsds[l_i[l]] = [None for y in self.years]
 		
 		# grab data pertaining to our field
 		fieldname = self.field.name
@@ -269,7 +272,7 @@ class LSD_Calculator:
 								else:
 									value = None
 						
-						self.lsds[location][y] = value
+						self.lsds[l][y] = value
 		
 	def fetch(self, reduce_to_one_subset=False):
 		"""
@@ -316,32 +319,6 @@ class LSD_Calculator:
 		# Sort by common locations
 		# Note: this is the subset problem(?), which is NP-complete
 		#
-		
-		
-		# populate groups with a list of all varieties having n locations
-		cy_i = self.year_indexes[self.year] #current_year_index
-		
-		l_indexes = self.location_indexes
-		
-		for entry in self.entries.items():
-			count = [0,0,0] # TODO: _Heavily_ assumes we are only using the last three years
-			for y in self.year_indexes.values():
-				count[y] = len_not_none(entry[1][y])
-			if count[0] or count[1] or count[2]:
-				key = (tuple(count), 0)
-				if key in self.groups:
-					self.groups[key].append(entry[0]) # .append(entry.key)
-				else:
-					self.groups[key] = [entry[0]]
-				
-		# populate an initial guess on the locations in each group
-		for key in self.groups:
-			v = self.groups[key][0]
-			self.groups_loc[key] = [None, None, None] # _heavily_ assumes we are only dealing with 3 years
-			for y in self.year_indexes.values():
-				self.groups_loc[key][y] = [l for l in self.locations if self.entries[v][y][l_indexes[l]] is not None]
-		
-		
 		def break_into_subsets():
 			# Go through each subset and break into more subsets.
 			new_subsets = {}
@@ -391,83 +368,137 @@ class LSD_Calculator:
 				self.groups_loc[new_key] = [None, None, None] # _heavily_ assumes we are only dealing with 3 years
 				for y in self.year_indexes.values():
 					self.groups_loc[new_key][y] = [l for l in self.locations if self.entries[v][y][l_indexes[l]] is not None]
-		
-		# make more subgroups, and update the locations for each new subgroup
-		for num_times in range(3): # TODO: hard-coded numeric value
-			break_into_subsets()
-		
-		#TODO: mayhap this check should be done before break_into_subsets()?
-		if reduce_to_one_subset: # if we are the varieties view
-			# find the biggest group(s) representing the chosen varieties, then delete the rest
-			most_varieties = []
-			max_len = max(map(len, self.groups.values()))
-			for key in sorted(self.groups.keys(), reverse=True):
-				if len(self.groups[key]) >= max_len:
-					most_varieties.append(key)
+					
+		min_locations = 6
+		min_varieties = 4
+		largest_table_varieties = 0
+		self.locations = list(self.all_locations[0:min_locations-2])
+		all_locations_position = min_locations-2
+		attempts = 0
+		max_attempts = 3
+		while largest_table_varieties < min_varieties and attempts < max_attempts:
+			del self.groups
+			self.groups = {}
+			self.groups_loc = {}
 			
+			attempts += 1	
+			all_locations_position += 1
+			if all_locations_position < len(self.all_locations):
+				self.locations.append(self.all_locations[all_locations_position])
+			# populate groups with a list of all varieties having n locations
+			#print self.locations
+			cy_i = self.year_indexes[self.year] #current_year_index
 			
-			"""
-			# for the groups that remain, delete the non-common locations until one subset remains
-			init_locale = self.groups_loc[most_varieties[0]]
-			common_locations = []
-			for locations in init_locale:
-				common_locations.extend(locations)
-			common_locations = dict(zip(common_locations, common_locations)) # make a copy as a dictionary
+			l_indexes = self.location_indexes
 			
-			for key in most_varieties[1::]: # skip first
-				for locations in self.groups_loc[key]:
+			for entry in self.entries.items():
+				count = [0,0,0] # TODO: _Heavily_ assumes we are only using the last three years
+				for y in self.year_indexes.values():
+					for l in self.locations:
+						if entry[1][y][l_indexes[l]] is not None:
+							count[y] +=1 
+				if count[0] or count[1] or count[2]:
+					key = (tuple(count), 0)
+					if key in self.groups:
+						self.groups[key].append(entry[0]) # .append(entry.key)
+					else:
+						self.groups[key] = [entry[0]]
+					
+			# populate an initial guess on the locations in each group
+			for key in self.groups:
+				v = self.groups[key][0]
+				self.groups_loc[key] = [None, None, None] # _heavily_ assumes we are only dealing with 3 years
+				for y in self.year_indexes.values():
+					self.groups_loc[key][y] = [l for l in self.locations if self.entries[v][y][l_indexes[l]] is not None]
+			
+			# make more subgroups, and update the locations for each new subgroup
+			for num_times in range(3): # TODO: hard-coded numeric value
+				break_into_subsets()
+			
+			#TODO: mayhap this check should be done before break_into_subsets()?
+			if reduce_to_one_subset: # if we are the varieties view
+				# find the biggest group(s) representing the chosen varieties, then delete the rest
+				most_varieties = []
+				max_len = max(map(len, self.groups.values()))
+				for key in sorted(self.groups.keys(), reverse=True):
+					if len(self.groups[key]) >= max_len:
+						most_varieties.append(key)
+				
+				
+				"""
+				# for the groups that remain, delete the non-common locations until one subset remains
+				init_locale = self.groups_loc[most_varieties[0]]
+				common_locations = []
+				for locations in init_locale:
+					common_locations.extend(locations)
+				common_locations = dict(zip(common_locations, common_locations)) # make a copy as a dictionary
+				
+				for key in most_varieties[1::]: # skip first
+					for locations in self.groups_loc[key]:
+						to_delete = []
+						for location in common_locations:
+							if location not in locations:
+								to_delete.append(location)
+						for location in to_delete:
+							del common_locations[location]
+				"""
+				# commented out since we don't have that many 3-yr complete data
+				
+				# delete non-common locations with respect to the selected year
+				init_locale = self.groups_loc[most_varieties[0]]
+				common_locations = init_locale[cy_i]
+				common_locations = dict(zip(common_locations, common_locations)) # make a copy as a dictionary
+				
+				for key in most_varieties[1::]: # skip first
 					to_delete = []
 					for location in common_locations:
-						if location not in locations:
+						if location not in self.groups_loc[key][cy_i]:
 							to_delete.append(location)
 					for location in to_delete:
 						del common_locations[location]
-			"""
-			# commented out since we don't have that many 3-yr complete data
+				
+				# put all into one group
+				del self.groups
+				del self.groups_loc
+				order = len(common_locations)
+				self.groups[((order,order,order),0)] = list(self.varieties)
+				self.groups_loc[((order,order,order),0)] = [list(common_locations), list(common_locations), list(common_locations)]# TODO: heavily assumes 3-yrs
+			else: # if we are the locations view
+				# Add all varieties from larger subsets to smaller subsets
+				add_all_varieties_from_larger_subsets = False
+				if add_all_varieties_from_larger_subsets:
+					"""
+					common_varieties = []
+					common_buffer = []
+					common_key = len(self.locations)
+					for key in sorted(self.groups.keys(), reverse=True):
+						if key[0] < common_key: # if we are less than the major order of the previous subset
+							common_varieties.extend(common_buffer)
+							common_buffer = []
+						common_key = key[0] # the major order
+						self.groups[key].extend(common_varieties)
+						common_buffer.extend(self.groups[key])
+					"""
+					for key in sorted(self.groups.keys(), reverse=True):
+						for lkey in [lesser_key for lesser_key in self.groups.keys() if lesser_key[0] <= key[0]]: # python does compares on tuples well
+							if lkey is not key: # ignore the case where we are the same key
+								self.groups[lkey].extend(self.groups[key])
+								self.groups[lkey] = list(set(self.groups[lkey])) # remove duplicates
 			
-			# delete non-common locations with respect to the selected year
-			init_locale = self.groups_loc[most_varieties[0]]
-			common_locations = init_locale[cy_i]
-			common_locations = dict(zip(common_locations, common_locations)) # make a copy as a dictionary
-			
-			for key in most_varieties[1::]: # skip first
-				to_delete = []
-				for location in common_locations:
-					if location not in self.groups_loc[key][cy_i]:
-						to_delete.append(location)
-				for location in to_delete:
-					del common_locations[location]
-			
-			# put all into one group
-			del self.groups
-			del self.groups_loc
-			order = len(common_locations)
-			self.groups[((order,order,order),0)] = list(self.varieties)
-			self.groups_loc[((order,order,order),0)] = [list(common_locations), list(common_locations), list(common_locations)]# TODO: heavily assumes 3-yrs
-		else: # if we are the locations view
-			# Add all varieties from larger subsets to smaller subsets
-			add_all_varieties_from_larger_subsets = False
-			if add_all_varieties_from_larger_subsets:
-				"""
-				common_varieties = []
-				common_buffer = []
-				common_key = len(self.locations)
-				for key in sorted(self.groups.keys(), reverse=True):
-					if key[0] < common_key: # if we are less than the major order of the previous subset
-						common_varieties.extend(common_buffer)
-						common_buffer = []
-					common_key = key[0] # the major order
-					self.groups[key].extend(common_varieties)
-					common_buffer.extend(self.groups[key])
-				"""
-				for key in sorted(self.groups.keys(), reverse=True):
-					for lkey in [lesser_key for lesser_key in self.groups.keys() if lesser_key[0] <= key[0]]: # python does compares on tuples well
-						if lkey is not key: # ignore the case where we are the same key
-							self.groups[lkey].extend(self.groups[key])
-							self.groups[lkey] = list(set(self.groups[lkey])) # remove duplicates
+			largest_table_varieties = len(sorted(self.groups.keys(), reverse=True)[0])
 		
-			
-		#print self.groups
+		delete_groups = []
+		for key in self.groups:
+			if len(self.groups[key]) < min_varieties:
+				delete_groups.append(key)
+		for key in delete_groups:
+			del self.groups[key]
+		"""
+		for key in sorted(self.groups, reverse=True):
+			print key
+			for variety in self.groups[key]:
+				print "\t%s" % str(variety)
+		"""
 		#
 		# make a list of years to average over
 		#
@@ -507,26 +538,38 @@ class LSD_Calculator:
 				for key in self.groups_loc:
 					years_locations.extend(self.groups_loc[key][cy_i])
 				years_locations = list(set(years_locations))
-				for l in sorted(years_locations, key=attrgetter('name')):
-					l_indexes_values.append(l_indexes[l])
-					head_row.append((l.name, l.id))
+				used_locations = []
+				#
+				## TODO: this is where the additional alphabetical sort is
+				#
+				#for l in sorted(years_locations, key=attrgetter('name')):
+				for l in self.locations:
+					if l in years_locations:
+						used_locations.append(l)
+						l_indexes_values.append(l_indexes[l])
+						head_row.append((l.name, l.id))
+				for l in set(self.locations).difference(used_locations):
+					del self.location_indexes[l]
+				self.locations = used_locations
 			else:
 				for l in sorted(self.locations, key=attrgetter('name')):
 					l_indexes_values.append(l_indexes[l])
 					head_row.append((l.name, l.id))
-		return_list.append(head_row) # append first row
+		#return_list.append(head_row) # append first row
 		
 		# the header between each group
 		next_header = [('Variety', -1)]
 		next_header.extend(head_row[1::])
-		
 		#
 		# construct the rest of the rows
 		#
 		
 		for key in sorted(self.groups.keys(), reverse=True): # for each subset
 			subset_list = []
+			next_head = list(next_header)
+			next_head[0] = ('Variety', key)
 			
+			return_list.append(next_head)
 			# define the locations that need to be printed for this subset
 			if key in self.groups_loc:
 				#locations = [l_indexes[l] for l in self.groups_loc[key][cy_i]] # TODO: do we need to consider the other years here?
@@ -687,9 +730,9 @@ class LSD_Calculator:
 						temp_row.append(None)
 					
 			else:
-				for l in self.location_indexes:
+				for l in self.locations:
 					if self.location_indexes[l] in locations:
-						value = self.lsds[l][cy_i] #TODO: smarter logic needed
+						value = self.lsds[self.location_indexes[l]][cy_i] #TODO: smarter logic needed
 						if value is not None:
 							temp_row.append(value)
 						else:
@@ -697,13 +740,16 @@ class LSD_Calculator:
 					else:
 						temp_row.append(None)
 					
+					
 			subset_list.append(temp_row)
 			
 			
 			return_list.extend(subset_list) # append the lists inside subset_list to return_list
-			return_list.append(next_header) # append another header row
+			 # append another header row
 		
-		#print return_list[:len(return_list)-1:]
+		
+		if len(return_list[:len(return_list)-1:]) == 0:
+			return_list.append(next_header)
 		
 		return return_list[:len(return_list)-1:] # remove last row, a header row with nothing under it
 
@@ -1322,8 +1368,8 @@ class Locations_from_Zipcode_x_Radius:
 		else: # get the numeric value
 			try:
 				self.radius = float(radius)
-			except ValueError:
-				self.radius = 100.0
+			except:
+				self.radius = 'ALL'
 	
 	def fetch(self):
 		"""
@@ -1347,21 +1393,24 @@ class Locations_from_Zipcode_x_Radius:
 				self.radius = 50.0
 				skip_lookup = False
 		
-		if not skip_lookup:
-			lat2_list = []
-			lon2_list = []
-			
-			try:
-				zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
-				zipcode_object = zipcode_query.get() # should only be one result
-			except (ValueError, models.Zipcode.DoesNotExist) as instance:
-				raise models.Zipcode.DoesNotExist(instance)
+		
+		lat2_list = []
+		lon2_list = []
+		
+		try:
+			zipcode_query = models.Zipcode.objects.filter(zipcode=self.zipcode)
+			zipcode_object = zipcode_query.get() # should only be one result
+		except (ValueError, models.Zipcode.DoesNotExist) as instance:
+			raise models.Zipcode.DoesNotExist(instance)
 
-			lat1 = float(zipcode_object.latitude) 
-			lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
+		lat1 = float(zipcode_object.latitude) 
+		lon1 = float(zipcode_object.longitude) # alternatively, we can call zipcode[0].longitude, but this might throw an IndexError
+		
+		
+		if not skip_lookup:
 			lat1 = radians(lat1)
 			lon1 = radians(lon1)
-			R = 6378137.0 # Earth's median self.radius, in meters
+			R = 6378137.0 # Earth's median radius, in meters
 			d = self.radius * 1609.344	 # in meters 
 			# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
 			# TODO: have the Location objects grab default lat/long, not user entered
@@ -1382,5 +1431,35 @@ class Locations_from_Zipcode_x_Radius:
 				)
 			#TODO: We just searched a square, now discard searches that are > x miles away.
 		
+		"""
+		From http://www.movable-type.co.uk/scripts/latlong.html
+		Haversine formula:
+		"""
+		distances = {}
+		R = 6378137.0 # Earth's median radius, in meters
+		for location in locations: 
+			lon2 = float(location.zipcode.longitude)
+			lat2 = float(location.zipcode.latitude)
+			delta_lon = radians(lon2 - lon1)
+			delta_lat = radians(lat2 - lat1)
+			lon1r = radians(lon1)
+			lat1r = radians(lat1)
+			lon2r = radians(lon2)
+			lat2r = radians(lat2)
+			a = sin(delta_lat / 2.0)**2.0 + cos(lat1r)*cos(lat2r)*sin(delta_lon / 2.0)**2.0
+			c = 2*atan2(sqrt(a), sqrt(1.0-a))
+			d = R * c
+			distances[location] = d
 		
-		return locations
+		# sort by distance from input zipcode
+		sorted_list = []
+		for d in sorted(distances.values()):
+			for location in locations:
+				if d == distances[location]:
+					sorted_list.append(location)
+					break
+		"""
+		for l in sorted_list:
+			print "%f\t%s" %(distances[l], l.name)
+		"""
+		return sorted_list

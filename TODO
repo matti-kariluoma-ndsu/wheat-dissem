@@ -104,26 +104,48 @@ The intent of this website is to replace the printed booklets that
 the Plant Sciences dept currently prints and distributes. They already
 have pdf versions of their booklets available on the website, and our
 project would like to deliver in a form familiar to that. Modern
-browsers support 
-  <link media="print" rel="stylesheet">
-* look at seeing seed sellers
+browsers support <link media="print" rel="stylesheet" src="file.css">
 
-* enter lsds for older data
-* add a link to home/start over
-* "back" button support? GET instead of POST?
-* mult-year avg still culling, other wierd behavior
-  * 56716, 50mi
-* message if v-v union is empty, from "compare selected" button
-* dropdown/add -> submit for v-v on main page
-  * message if v-v union empty
-* look at distance-sort instead of lexigraphical for location names
+Farmers have expressed interest in seeing information about providers of
+seed, phone numbers/websites and prices if possible. This would info
+would be available from a hyperlink on the variety name.
+
+When the project first began, we entertained the idea of calculating the
+LSD of varieties at some location from raw data. Turns out we only have
+aggregate data availbale, for the foreseeable future. We need to dredge
+up the old data we had and enter the LSD value, back to 2010.
+
+Each page should have a link to the homepage (to start the query over).
+
+
+
+When the user clicks the checkboxes next to the variety names, then
+selects "Compare Selected" they can sometimes be brought to the 
+variety-variety view, but no data is on the page. It would be best if
+their was some sort of message to be shown to the user; problem is
+if we use a ResponseRedirect, we can't (?) do a render_to_response()
+to show that message.
+
+If the user gives us their zipcode, we should be able to sort the 
+columns (locations) by distance from that zipcode.
+
 * "compare selected" should do nothing if 0 or 1 varieties are selected
-  * message?
-* add "All" button at top
- * only show n-yr avgs of each field
-* cols not same sized on v-v view?
+  * show a message telling them why they can't compare 0 or 1?
+  * maybe they just want to see all the location data for that variety?
+		* it may confusing to have them click the variety name-as-linkt o 
+		generate that view
+
+In addition to the "Yield" "Protein Percent" "Test Weight" buttons at
+the top of the page, we also need a button "All" that shows all of
+those fields. This view would only show the n-yr averages to save space.
+
+It seems the html/css does not keep all of the columns the same size.
+We should try to make them all the same width.
 
 * 50 mi 58501, 2010, Kidder County has an index of -1, why?
+
+* wierd behavior
+  * 56716, 50mi
 
 Notes from Jan 5 meeting:
 zipcode to means only, distance on h
@@ -192,4 +214,24 @@ a new language. Before that we must try the new classes for variety_trials_util
 and maybe ask the community about a particualr version/implementation (JPython,
 CPython, IronPython, etc.) and see if that helps.
 
+Upgrade to Django 1.4
 
+Is it worthwhile to use some other project/library to render our html/
+route pages/handle forms?
+
+For the iterative upload:
+	1) user uploads file
+	2) preprocess, no db lookup, publish the parsed file to a webpage
+	3) user hits next
+	4) server goes cell by cell, returning the first error to the user
+	  in the same formatted page as step 2, asks the user what to do
+	  i.e. accept guess, create new, etc.
+	5) repeat 4 until no errors
+	6) show the user the actual entered data (page as step 2, except all
+	  values pulled from the databse)
+	7) a page showing recent changes with the ability to undo recent changes
+
+BUG
+1) choose zipcode from home
+2) remove a location
+3) click one of the 'yield,protein,...' or '2012,2011,...' breaks it
