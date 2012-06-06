@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>Interchange/Swap List Items</title>
+
+<script type="text/javascript">
+
+function movePosition(side){
+	var positionLeft=document.getElementById('selectLeft');
+	var positionRight=document.getElementById('selectRight');
+
+if(side==1){
+	if(positionLeft.options.length==0){
+		alert('Nothing to move');
+		return false;
+	}
+	else
+	{
+		var toCompare=positionLeft.options.selectedIndex;
+
+		move(positionRight,positionLeft.options[toCompare].value,positionLeft.options[toCompare].text);
+		positionLeft.remove(toCompare);
+
+	if(positionLeft.options.length>0){
+		positionLeft.options[0].selected=true;
+		}
+	}
+
+}else if(side==2){
+
+	if(positionRight.options.length==0){
+		alert('Nothing to move');
+		return false;
+	}else{
+		var toCompare=positionRight.options.selectedIndex;
+
+		move(positionLeft,positionRight.options[toCompare].value,positionRight.options[toCompare].text);
+		positionRight.remove(toCompare);
+
+	if(positionRight.options.length>0){
+		positionRight.options[0].selected=true;
+			}
+		}
+	}
+}
+
+function move(listBoxTo,optionValue,optionDisplayText){
+	var newOption = document.createElement("option"); 
+	newOption.value = optionValue; 
+	newOption.text = optionDisplayText; 
+	listBoxTo.add(newOption, null); 
+	return true; 
+}
+</script>
+</head>
+
+<body>
+<div>
+<table border="0">
+<tr>
+<p>Make Your selections:<p>
+</tr>
+<tr>
+<td rowspan="3" align="left">
+<select name="selectLeft" size="10" id="selectLeft"> 
+	<option value="AS" selected="selected">Waikea</option>
+	<option value="AD">Sabin</option>
+	<option value="AO">Samson</option>
+	<option value="AI">AAAA</option>
+	<option value="AQ">Blah</option>
+</select>
+</label></td>
+
+<td align="left">&nbsp;</td>
+<td align="left">&nbsp;</td>
+
+
+<td rowspan="3" align="left"><select name="selectRight" size="10" id="selectRight">
+
+</select></td>
+</tr>
+
+<tr>
+<td align="left">&nbsp;</td>
+<td align="left"><label>
+<input name="btnRight" type="button" id="btnRight" value="&gt;&gt;" onClick="javascript:movePosition(1);">
+</label></td>
+</tr>
+
+<tr>
+<td align="left">&nbsp;</td>
+<td align="left"><label>
+<input name="btnLeft" type="button" id="btnLeft" value="&lt;&lt;" onClick="javascript:movePosition(2);">
+</label></td>
+</tr>
+
+</table>
+
+</body>
+</html>
