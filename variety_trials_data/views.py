@@ -352,21 +352,24 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	)
 
 def varieties_view(request, yearname, fieldname, abtest=None):
-	
+
 	if request.method == 'GET':
 		varieties_form = variety_trials_forms.SelectVarietiesForm(request.GET)
 		if varieties_form.is_valid():
 			
 			varieties = varieties_form.cleaned_data['varieties']
+			print '1'
 			locations = models.Location.objects.all()
 			
 			return tabbed_view(request, yearname, fieldname, locations, varieties, True, abtest)
 			
 		else:
+                        for field in varieties_form:
+                                print field.errors
+                                print field.label_tag
 			return HttpResponseRedirect("/") # send to homepage
 	else:
 		return HttpResponseRedirect("/") # send to homepage
-
 def add_trial_entry_csv_file(request):
 	
 	errors = {} 

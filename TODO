@@ -93,6 +93,13 @@ project would like to deliver in a form familiar to that. Modern
 
 browsers support <link media="print" rel="stylesheet" src="file.css">
 
+It seems the html/css does not keep all of the columns the same size.
+We should try to make them all the same width.
+
+If we use divs instead of tables, we can't (?) control line breaks.
+Looked at Display:Inline, white-space:nowrap but did not help! Maybe we 
+need to have our design allow for a newline in our table? color, shading?
+
 Farmers have expressed interest in seeing information about providers of
 seed, phone numbers/websites and prices if possible. This would info
 would be available from a hyperlink on the variety name.
@@ -122,8 +129,6 @@ In addition to the "Yield" "Protein Percent" "Test Weight" buttons at
 the top of the page, we also need a button "All" that shows all of
 those fields. This view would only show the n-yr averages to save space.
 
-It seems the html/css does not keep all of the columns the same size.
-We should try to make them all the same width.
 
 Implement listing the locations in the url in terms of what has been removed, 
 rather than what is being displayed. In views.py in tabbed_view the locations 
@@ -170,6 +175,7 @@ Notes from 2012-Mar-20 Meeting
 		* "inivisibly" drop locations to calculate 3,2-yr lsds
 ** REGRESSION ** 58103 200 mi.. Barnes?
 ** REGRESSION ** Barlow, Brennan, Faller, Glenn in variety show two tables...
+
 
 Notes from 2012-May-18 Meeting
 
@@ -227,4 +233,6 @@ BUG
  2) n select
  3) select > text field
  4) checkboxes
+
+
 
