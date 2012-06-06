@@ -227,8 +227,8 @@ def main():
 	print result1
 	print "==="
 	
-	print LSD(input2, 0.05)
-	print result2
+	print LSD(input1, 0.05)
+	print result1
 	print "==="
 	
 	print LSD(input3, 0.05)

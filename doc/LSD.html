@@ -175,9 +175,9 @@ function erfinv(y)
 			b = 48.0/Math.pow(a,2.0)
 			c = (((20700.0*a)/b - 98.0)*a - 16.0)*a + 96.36
 			d = ((94.5/(b+c) - 3.0)/b + 1.0)
-			e = d*Math.sqrt(a*pi/2.0)*(n)
+			e = d*Math.sqrt(a*pi/2.0)* var(n)
 			x = e*P
-			y = x^(2.0/(n))
+			y = x^(2.0/(var n))
 			
 		
 			if (y > 0.05 + a)
@@ -188,7 +188,7 @@ function erfinv(y)
 				
 				if (n < 5)
 					{
-					c = c + 0.3*((n)-4.5)*(x+0.6)
+					c = c + 0.3*(var(n)-4.5)*(x+0.6)
 					}
 					
 				//c = (((0.05*d*x-5.0)*x-7.0)*x-2.0)*x+b+c
@@ -220,20 +220,20 @@ function erfinv(y)
 			else
 				{
 				//y = ((1.0/(((float(n)+6.0)/(float(n)*y)-0.089*d-0.822)*(float(n)+2.0)*3.0)+0.5/(float(n)+4.0))*y-1.0)*(float(n)+1.0)/(float(n)+2.0)+1.0/y
-				y1 =(n)+6.0
-				y2 = y1/(n*y)
+				y1 = var(n)+6.0
+				y2 = y1/(var(n)*y)
 				y3 = y2 - 0.089*d - 0.822
-				y4 = y3 * (n+2.0) * 3.0
+				y4 = y3 * (var(n)+2.0) * 3.0
 				y5 = 1.0 / y4
-				y6 = y5 + 0.5/(n+4.0)
+				y6 = y5 + 0.5/(var(n)+4.0)
 				y7 = y6*y - 1.0
-				y8 = y7 * (n+1.0) 
-				y9 = y8 / (n+2.0) 
+				y8 = y7 * (var(n)+1.0) 
+				y9 = y8 / (var (n)+2.0) 
 				y10 = y9 + 1.0/y
 				y= y10
 			    }
 			
-			t = Math.sqrt((n)*(y))
+			t = Math.sqrt(var(n)*(y))
 			
 		}
 		return t
@@ -288,7 +288,7 @@ function LSD(trt, probability)
 	
 		for (j=0; j<k; j++)
 		{
-			total += (trt[i][j])
+			total += var(trt[i][j])
 			//document.write(trt[i][j]);
 			//document.write("<br>");
 		treatment_means[i] = total/k
@@ -327,8 +327,8 @@ function LSD(trt, probability)
 		for(i=0; i<n; i++)
 			{
 			
-			total = total + (trt[i][j])
-			document.write("The total is : " +total);
+			total = total + var(trt[i][j])
+			document.write("The total is : " +total+"<br />");
 			//document.write(" Trying to add :  " +i +","+ j +"<br />")
 			//document.write(" The calculated total is:  " +total+"<br />")
 			}
@@ -344,7 +344,7 @@ function LSD(trt, probability)
 		total = total + treatment_means[i];
 		}
 		
-	grand_mean = total/(n);
+	grand_mean = total/var(n);
 	document.write("The grand mean is : " +grand_mean+"<br />")
 	
 	// TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
@@ -355,7 +355,7 @@ function LSD(trt, probability)
 	{
 		for(j=0;j<k;j++)
 		{
-			SSE += Math.pow(trt[i][j] - treatment_means[i] - block_means[j] +grand_mean,2.0)
+			SSE += Math.pow(var(trt[i][j]) - treatment_means[i] - block_means[j] +grand_mean,2.0)
 			
 	document.write("The treatment value for the rows and columns is: "+ trt[i][j]+"<br/>")
 	document.write("The treatment mean is: "+ treatment_means[i]+"<br/>")
@@ -426,8 +426,8 @@ function LSD(trt, probability)
 	result4 = 4.86117238
 
 
-	//document.write ("Calculated LSD is "+LSD(input1, 0.05));
-	document.write ("Calculated LSD value : "+LSD(input2, 0.05));
+	document.write ("Calculated LSD is "+LSD(input1, 0.05));
+	//document.write ("Calculated LSD value : "+LSD(input2, 0.05));
 	//document.write ("Calculated LSD is "+LSD(input3, 0.05));
 	//document.write ("Calculated LSD is "+LSD(input4, 0.05));
 	
@@ -486,8 +486,10 @@ function LSD(trt, probability)
 
 <p>Click to view the Error Message</p>
 
-</body>
+</head>
+
 </html>
+
 
 
 
