@@ -41,12 +41,31 @@ class LSD_Row(Row):
 		self.table = table
 	
 	def populate(self, probability):
-		data_1yr = self.table.fetch(years=[0])
-		data_2yr = self.table.fetch(years=[0,1])
-		data_3yr = self.table.fetch(years=[0,1,2])
-		lsd_1yr = self._LSD(data_1yr, probability)
-		lsd_2yr = self._LSD(data_2yr, probability)
-		lsd_3yr = self._LSD(data_3yr, probability)
+		
+		columns = self.table.year_columns
+		years_i = []
+		
+		for k in columns.keys():
+			years_i = k
+		
+		if len(years_i) == 3:
+			data_1yr = years_i[0]
+			data_2yr = years_i[1]
+			data_3yr = years_i[2]
+		elif len(years_i) == 2:
+			data_1yr = years_i[0]
+			data_2yr = years_i[1]
+		elif len(years_i) == 1:
+			data_1yr = years_i[0]
+		else:
+			pass
+		
+		if data_1yr != None:	
+			lsd_1yr = self._LSD(data_1yr, probability)
+		if data_2yr != None:
+			lsd_2yr = self._LSD(data_2yr, probability)
+		if data_3yr != None:
+			lsd_3yr = self._LSD(data_3yr, probability)
 		
 		lsds = []
 		for column in self.table.columns: # You need to change this.
@@ -258,7 +277,7 @@ class Table:
 			[(minYear, value ),...,(maxYear, value)] The 'year' key will be numeric. 
 			"""
 			
-			y1 = {} # y1 and y2 are appended to the year_columns, so both may be referenced.
+			y1 = {} # The big dictionary with all the information you could possible want, e.g. {Year: {Variety: Value}}.
 			y2 = [] # This contains just the variety values, so when collated, it doesn't have all the annoying keys. 
 			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
 			v_temp = sorted(varieties, key=attrgetter('name'))
@@ -300,7 +319,7 @@ class Table:
 			"""
 			
 			l_temp = sorted(locations, key=attrgetter('name'))
-			l1 = {}
+			l1 = {} # {Location: {Variety: Value}}
 			l2 = [] # The same protocol is followed here as in the year_average_columns function.
 			l3 = [] 
 			
@@ -393,7 +412,7 @@ class Table:
 			"""
 			
 			try:
-				temp = year_columns[0]
+				temp = year_columns[0] # Grabs the dictionary.
 			except (IndexError, SyntaxError, KeyError):
 				pass
 				
@@ -408,7 +427,7 @@ class Table:
 			"""
 			
 			try:
-				temp = location_columns[0]
+				temp = location_columns[0] # Grabs the dictionary.
 			except (IndexError, SyntaxError, KeyError):
 				pass
 			
