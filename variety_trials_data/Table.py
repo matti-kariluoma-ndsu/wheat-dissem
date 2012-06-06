@@ -281,11 +281,11 @@ class Table:
 			"""
 			Appends the variety values for the given years.
 			
-			[(minYear, value ),...,(maxYear, value)] The 'year' key will be numeric. 
+			[(maxYear, value ),...,(minYear, value)] The 'year' key will be numeric. 
 			"""
 			
 			y1 = {} # The big dictionary with all the information you could possible want, e.g. {Year: {Variety: Value}}.
-			y2 = [] # This contains just the variety values, so when collated, it doesn't have all the annoying keys. 
+			y2 = [] # This contains just the variety values, it doesn't have all the annoying keys. 
 			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
 			v_temp = sorted(varieties, key=attrgetter('name'))
 			y_temp = sorted(years, reverse=true) 
@@ -325,9 +325,9 @@ class Table:
 			"""
 			
 			l_temp = sorted(locations, key=attrgetter('name'))
-			l1 = {} # {Location: {Variety: Value}}
-			l2 = [] # The same protocol is followed here as in the year_average_columns function.
-			l3 = [] 
+			l1 = {} # The big dictionary with all the information you could possible want, e.g. {Location: {Variety: Value}}
+			l2 = [] # This contains just the variety values, it doesn't have all the annoying keys..
+			l3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
 			
 			for y, v in year_columns: # Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
 				v_temp = v[0]
