@@ -198,8 +198,8 @@ class LSD_Calculator:
 		self.location_indexes = {}
 		self.year_indexes = {}
 		self.entries = {}
-		self.groups = {}
-		self.groups_loc = {}
+		self.groups = {} 
+		self.groups_loc = {} 
 		self.lsds = {}
 		
 		self.year = pref_year
@@ -271,7 +271,6 @@ class LSD_Calculator:
 									pass
 								else:
 									value = None
-						
 						self.lsds[l][y] = value
 		
 	def fetch(self, reduce_to_one_subset=False):
@@ -1465,3 +1464,4 @@ class Locations_from_Zipcode_x_Radius:
 		"""
 
 		return sorted_list
+
