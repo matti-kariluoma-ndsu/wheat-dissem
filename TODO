@@ -215,3 +215,9 @@ BUG
 1) choose zipcode from home
 2) remove a location
 3) click one of the 'yield,protein,...' or '2012,2011,...' breaks it
+
+4 ways to get to v-v from home:
+ 1) mutliple select
+ 2) n select
+ 3) select > text field
+ 4) checkboxes
