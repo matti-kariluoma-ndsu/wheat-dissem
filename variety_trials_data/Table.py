@@ -68,8 +68,10 @@ class LSD_Row(Row):
 			lsd_3yr = self._LSD(data_3yr, probability)
 		
 		lsds = []
-		for column in self.table.columns: # You need to change this.
+		"""
+		for column in self.table.year_columns.keys(): 
 			lsds.append(column.lsd) 
+		"""
 		
 		return ['LSD', lsd_1yr, lsd_2yr, lsd_3yr].extend(lsds)
 	
@@ -266,9 +268,13 @@ class Table:
 		max_year = 0 
 		
 		
-		def __init__(self, entries):
+		def __init__(self, entries, probability): # Probability is required for creating the LSD row in the collate_table function.
 			self.entries = entries
-			
+			self.populate_year_average_columns(self, years, varieties)
+			self.populate_location_columns(self, locations, year_columns)
+			self.populate_header_row(self, year_columns, location_columns)
+			self.populate_row_labels_column(self, year_columns)
+			self.collate_table(self, top_row, row_labels_column, year_columns, location_columns)
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
@@ -400,7 +406,10 @@ class Table:
 			except (IndexError, SyntaxError, KeyError):
 				pass
 				
-			# I need to calculate and populate the LSD row.
+			lsdCalc = LSD_Row().init(self)
+			lsd_row = lsdCalc.populate(self, someProbability) # Figure out how this probability will pass to here.
+			
+			collated_table = {'lsds':lsd_row}
 			
 			return collated_table
 			
