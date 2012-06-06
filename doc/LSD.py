@@ -61,7 +61,7 @@ def LSD(response_to_treatments, probability):
 		t = 0
 		if (n < 1 or P > 1.0 or P <= 0.0 ):
 			raise BaseException #TODO: raise a standard/helpful error
-		elif (n == 2):
+		elif (n == 2)
 			t = sqrt(2.0/(P*(2.0-P)) - 2.0)
 		elif (n == 1):
 			P = P * pi/2
@@ -136,29 +136,42 @@ def LSD(response_to_treatments, probability):
 			total += float(trt[i][j])
 		treatment_means[i] = total/k
 		
+	print "Calculating the Block Mean"	
 	block_means = {}
 	for j in range(k):
 		total = 0.0
 		for i in range(n):
 			total += float(trt[i][j])
+			print "The total is : " +str(total)
 		block_means[j] = total/n
+		print "The block mean is : " + str(block_means[j])
 	
 	grand_mean = sum(treatment_means.values()) / float(n)
 	
 	# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+	print "The difference between type I and type III SS"
 	SSE = 0.0
 	for i in range(n): # n == len(trt)
 		for j in range(k):
 			SSE += (float(trt[i][j]) - treatment_means[i] - block_means[j] + grand_mean)**2.0
 	
+			print "Navneet trial"
+			print "treatment value for rows and columns is : " + str(trt[i][j])
+			print "The treatment mean is: " + str(treatment_means[i])
+			print "The block mean is : " + str(block_means[j])
+			print "The grand mean is : " + str(grand_mean)
+			print "The value of SSE is : " + str(SSE)
+			
 	#print "SSE: %f\n" % (SSE)
 	
 	mean_squares_of_error = SSE / degrees_freedom_of_error
 	
-	#print "MSE: %f\n" % (mean_squares_of_error)
+	print "MSE: %f\n" % (mean_squares_of_error)
 	
 	Tprob = qt(probability, degrees_freedom_of_error)
-	
+	print "The probability is: " + str(probability)
+	print "Degrees of freedom: " + str(degrees_freedom_of_error)
+	print "T-distribution is: " + str(Tprob)
 	#print "t-value: %f\n" % (Tprob)
 	
 	LSD = Tprob * sqrt(2.0 * mean_squares_of_error / k)
@@ -206,14 +219,18 @@ def main():
 		[8.0999999999999996, 2.5]
 	]
 	result4 = 4.86117238
+	
+	print "Calculated LSD value is: " + str(LSD(input2, 0.05))
+	print result2
+	print "==="
 
-
+	"""
 	print LSD(input1, 0.05)
 	print result1
 	print "==="
 	
-	print LSD(input2, 0.05)
-	print result2
+	print LSD(input1, 0.05)
+	print result1
 	print "==="
 	
 	print LSD(input3, 0.05)
@@ -223,7 +240,7 @@ def main():
 	print LSD(input4, 0.05)
 	print result4
 	print "==="
-	
+	"""
 	
 if __name__ == '__main__':
 	main()
