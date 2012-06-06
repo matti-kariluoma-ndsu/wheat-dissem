@@ -51,7 +51,7 @@ def index(request, abtest=None):
 	
 
 	return render_to_response(
-		'main_ndsu.html', 
+		'main.html', 
 		{ 
 			'zipcode_radius_form': zipcode_radius_form,
 			'varieties_form': varieties_form,
@@ -64,7 +64,6 @@ def index(request, abtest=None):
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
 		zipcode=request.GET.__getitem__("zipcode")
-		search_radius=request.GET.__getitem__("search_radius")
 		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if locations_form.is_valid():
@@ -91,7 +90,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 				).fetch()
 			except models.Zipcode.DoesNotExist:
 				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
-						'radius': zipcode_radius_form.cleaned_data['search_radius']
+						#'radius': zipcode_radius_form.cleaned_data['search_radius']
 					})
 				return render_to_response(
 					'main.html', 
@@ -125,7 +124,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 		# seems an error occured...
 		return HttpResponseRedirect("/") # send to homepage
 
-def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None, zipcode=None, search_radius=0):
+def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None, zipcode=None, search_radius=None):
 	# TODO: does this belong in the DB?
 	unit_blurbs = {
 			'bushels_acre': ['Yield', 'Bushels per Acre', 
@@ -330,7 +329,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 		location_get_string='&locations='+str(l.id)
 	variety_get_string = '?'+variety_get_string[1::]
 	return render_to_response(
-		'tabbed_view_table_ndsu.html',
+		'tabbed_view.html',
 		{
 			'zipcode': zipcode,
 			'search_radius': search_radius,
