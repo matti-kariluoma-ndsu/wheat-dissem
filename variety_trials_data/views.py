@@ -48,8 +48,6 @@ def index(request, abtest=None):
 	varieties_form = variety_trials_forms.SelectVarietiesForm()
 	variety_list = models.Variety.objects.all()
 	curyear = datetime.date.today().year - 1
-	
-
 	return render_to_response(
 		'main_ndsu.html', 
 		{ 
@@ -391,3 +389,21 @@ def add_trial_entry_csv_file(request):
 		{'form': form, 'format_errors': errors},
 		context_instance=RequestContext(request)
 	)
+def inspect(request):
+	
+	#masterDict=dict()
+	#masterDict["2011"]=dict()
+	#masterDict["2011"]["header"]=list
+	#for l in locations:
+	#	masterDict["2011"]["header"].append(l.name)
+	masterDict={"header":['L1','L2','L3','L4'],
+		"rows":{"V1":["X","X","X",None],
+		"V2":["X",None,"X",None],
+		"V3":[None,"X","X","X"]
+	}}
+	return render_to_response(
+		'inspect.html',
+		{'masterDict':masterDict}
+	)
+	
+
