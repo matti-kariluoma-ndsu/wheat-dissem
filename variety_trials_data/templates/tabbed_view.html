@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load django_math %}
 {% block content %}
-<input type="button" value="Home" onClick="location.href='/';">
+<a href="/">Home</a>
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
