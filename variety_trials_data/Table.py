@@ -265,9 +265,11 @@ class Table:
 		location_columns = [] # The variety value(s) for a location(s).
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
 		collated_table = {}
+		lsd_row = []
+		
 		max_year = 0 
 		
-		
+			
 		def __init__(self, entries, probability): # Probability is required for creating the LSD row in the collate_table function.
 			self.entries = entries
 			self.populate_year_average_columns(self, years, varieties)
@@ -302,7 +304,7 @@ class Table:
 								y2 = entry.test_weight
 								y3 = y
 							except AttributeError:
-								y1 = {y: {v: None}} # I might change the nested lists to tuples.
+								y1 = {y: {v: None}} 
 								y2 = None
 								y3 = y
 						else:
@@ -310,14 +312,13 @@ class Table:
 							y2 = None
 							y3 = y
 							
-			year_columns = [y1][y2][y3]
+			year_columns = [y1, y2, y3]
 							
 			return year_columns
 			
-		def populate_location_columns(self, locations, year_columns): # This is called after year_columns is populated.
+		def populate_location_columns(self, locations, year_columns): 
 			"""
-			Prefixes the location name to l_column, then appends the
-			location value for each variety.
+			Creates a dictionary of locations columns.
 			
 			The final output from l_column should look like this:
 			
@@ -349,7 +350,7 @@ class Table:
 							l2 = None
 							l3 = l
 			
-			location_columns = [l1][l2][l3]
+			location_columns = [l1, l2, l3]
 													
 			return location_columns
 			
@@ -378,7 +379,7 @@ class Table:
 		def populate_header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
 			"""
 			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
-			the appropriate amount of year headers, i.e. 1-yr, 2-yr, etc.,
+			the appropriate amount of year headers, i.e. 1yr, 2yr, etc.,
 			appends the sorted location names, and then returns top_row.
 			
 			The final output should look like this:
@@ -396,10 +397,10 @@ class Table:
 			return top_row	
 			
 			
-		def collate_table(self, top_row, row_labels_column, year_columns, location_columns): 
+		def collate_table(self, top_row, row_labels_column, year_columns, location_columns, probability): 
 			"""
-			This function might be a waste of time. I think I should focus on the get functions.
-			The returned lists may be placed where required.
+			This function creates one big dictionary with keys that label each part of a table.
+			Header, Rows, Year_Columns, Location_Columns, LSD_Row.
 			"""	
 			try:
 				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns[0], 'locations':location_columns[0]} # Hrmm.
@@ -407,7 +408,7 @@ class Table:
 				pass
 				
 			lsdCalc = LSD_Row().init(self)
-			lsd_row = lsdCalc.populate(self, someProbability) # Figure out how this probability will pass to here.
+			lsd_row = lsdCalc.populate(self, probability) # Figure out how this probability will pass to here.
 			
 			collated_table = {'lsds':lsd_row}
 			
@@ -417,11 +418,11 @@ class Table:
 		def get_year_column(self, year, year_columns):
 			"""
 			Returns the specified year's column from a Table object's years_columns field
-			as a list. This function also appends the LSD for the given year to the list.
+			as a list.
 			"""
 			
 			try:
-				temp = year_columns[0] # Grabs the dictionary.
+				temp = year_columns[0] # Grabs the dictionary of year columns.
 			except (IndexError, SyntaxError, KeyError):
 				pass
 				
@@ -431,23 +432,33 @@ class Table:
 		def get_location_column(self, location, location_columns): 
 			"""
 			Returns the specified location's column from a table object's 
-			location_columns field as a list. This functions also appends
-			the LSD for the given location and year.
+			location_columns field as a list.
 			"""
 			
 			try:
-				temp = location_columns[0] # Grabs the dictionary.
+				temp = location_columns[0] # Grabs the dictionary of location columns.
 			except (IndexError, SyntaxError, KeyError):
 				pass
 			
 			column = temp[location]
 			return column
 			
-		def set_value_count_for_column(self, column, year): 
+		def set_value_count_for_column(self, year_columns, year): 
 			"""
 			Sets the count of values used to calculate the mean averages in 
 			a year column.
 			"""
+			
+			temp = []
+			value_count = 0
+			
+			if year_columns[year]:
+				temp = year_columns[year]
+			
+			if len(temp) > 0:
+				for t in temp.keys():
+					for v in temp.keys[t].keys():
+						value_count  += 1 
 			
 			return value_count
 			
