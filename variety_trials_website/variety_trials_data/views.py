@@ -333,11 +333,16 @@ def add_information(request):
 	# a dictionary, keys are strings (source of error), values are strings (message)
 	
 	if request.method == 'POST': # If the form has been submitted...
-		values = request.POST.getlist("kalith")
-		print values
-	
-	return render_to_response(
-		'add_information.html', 
-		{'form': values, 'format_errors': errors},
-		context_instance=RequestContext(request)
-	)
+		errors = request.POST.getlist("chkError")
+			
+		for error in errors:
+			if error =='Problem with variety ID' or error =='Problem with location ID':
+				return render_to_response(
+					'add_information.html', 
+					{'format_errors': errors},
+					context_instance=RequestContext(request)
+				)
+			
+		
+			
+
