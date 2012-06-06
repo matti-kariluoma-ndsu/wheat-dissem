@@ -49,7 +49,7 @@ class LSD_Row(Row):
 		lsd_3yr = self._LSD(data_3yr, probability)
 		
 		lsds = []
-		for column in self.table.columns: # I might need to change this.
+		for column in self.table.columns: # You need to change this.
 			lsds.append(column.lsd) 
 		
 		return ['LSD', lsd_1yr, lsd_2yr, lsd_3yr].extend(lsds)
@@ -376,8 +376,12 @@ class Table:
 			This function might be a waste of time. I think I should focus on the get functions.
 			The returned lists may be placed where required.
 			"""	
+			try:
+				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns[0], 'locations':location_columns[0]} # Hrmm.
+			except (IndexError, SyntaxError, KeyError):
+				pass
 				
-			collated_table = [top_row, row_labels_column, year_columns, location_columns] # Change this.
+			# I need to calculate and populate the LSD row.
 			
 			return collated_table
 			
@@ -413,7 +417,7 @@ class Table:
 			
 		def set_value_count_for_column(self, column, year): 
 			"""
-			Sets the sum of values used to calculate the mean averages in 
+			Sets the count of values used to calculate the mean averages in 
 			a year column.
 			"""
 			
