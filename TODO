@@ -123,6 +123,11 @@ those fields. This view would only show the n-yr averages to save space.
 It seems the html/css does not keep all of the columns the same size.
 We should try to make them all the same width.
 
+Implement listing the locations in the url in terms of what has been removed, 
+rather than what is being displayed. In views.py in tabbed_view the locations 
+that have been removed are stored in the lost neg_locations
+
+
 * 50 mi 58501, 2010, Kidder County has an index of -1, why?
 
 * wierd behavior
