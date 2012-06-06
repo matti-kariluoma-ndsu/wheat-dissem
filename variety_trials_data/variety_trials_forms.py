@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from variety_trials_data import models
 from difflib import SequenceMatcher
 import re
+import time
+from datetime import date
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
@@ -27,6 +29,7 @@ class SelectFieldForm(forms.Form):
 
 class UploadCSVForm(forms.Form):
 	csv_file  = forms.FileField()
+
 
 class fuzzy_spellchecker():
 	""" Uses an internal dictionary to check whether a word has a close 
@@ -133,6 +136,9 @@ def letter(number):
 	return column_letter
 
 def handle_csv_file(uploaded_file):
+	
+	#l = models.Location(name="some name",zipcode = models.Zipcode(zipcode = "1256",city="some state",state,latitude,longitude,timezone,daylight_savings)
+	print "hellow"
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
 	# No good, the uploaded_file is an object, not a file or stream...
 	"""
@@ -177,22 +183,33 @@ def handle_csv_file(uploaded_file):
 				for i in range(len(headers)):
 					headers[i] = headers[i].replace('"','') # remove all double quotes
 					headers[i] = headers[i].replace("'",'') # remove all single quotes
-				#print headers
+				print headers
 				skip = False
 		else:
 			column_number = 0
-			#print line
+			print line
 			#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
 			for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
 				if column == ',': # a special case caused by '^,|,$'
 					column = ''
 				column = column.replace('"','')
 				column = column.replace("'",'')
-				#print "column: %s" % (column)
+				print "column: %s" % (column)
+				
 				if column.strip() != '':
 					try:
 						name = headers[column_number].strip()
-						#print "field: %s" % (name)
+						print "field: %s" % (name)
+						#Making objects to add to database.
+						
+						if name == "harvest_date_id":
+							possible_characters = ('/', ' ', '-', '.')
+							datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
+							datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+							if not datelist:
+								d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+								d.save()
+						
 						if name in insertion_dict.keys() and name not in reference_dict.keys():
 							insertion_dict[name] = column.strip()
 						else:
@@ -209,8 +226,93 @@ def handle_csv_file(uploaded_file):
 			model_instance = models.Trial_Entry()
 			for name in insertion_dict.keys():
 				setattr(model_instance, name, insertion_dict[name])
-				#print "Writing %s as %s" % (name, insertion_dict[name])
+				print "Writing %s as %s" % (name, insertion_dict[name])
 				insertion_dict[name] = None
-			#model_instance.save() # ARE YOU BRAVE ENOUGH?
+			model_instance.save() # ARE YOU BRAVE ENOUGH? 
+			
 			
 	return (False, errors)
+	
+def checking_for_data(uploaded_file):
+		
+		insertion_dict = {}
+		reference_dict = {}
+
+		skip = True
+		skip_lines = 1
+		skip_count = 0
+
+		# Inspect our model, to grab the fields from it
+
+		for field in models.Trial_Entry._meta.fields:
+			if (field.get_internal_type() == 'ForeignKey' 
+					or field.get_internal_type() == 'ManyToManyField' ):
+				reference_dict["%s_id" % (field.name)] = field.rel.to.objects.all()
+			else:
+				insertion_dict[field.name] = None
+	
+		skip = True
+		skip_lines = 2
+		line_number = 0
+		headers = []
+		errors = {}
+		csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
+		
+		for line in uploaded_file:
+			line_number += 1
+			if (skip):
+				if (line_number + 1 > skip_lines):
+					headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
+					for i in range(len(headers)):
+						headers[i] = headers[i].replace('"','') # remove all double quotes
+						headers[i] = headers[i].replace("'",'') # remove all single quotes
+					skip = False
+			else:
+				column_number = 0
+				print line
+				#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
+				for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
+					if column == ',': # a special case caused by '^,|,$'
+						column = ''
+					column = column.replace('"','')
+					column = column.replace("'",'')
+					#print "column: %s" % (column)
+					
+					if column.strip() != '':
+						try:
+							name = headers[column_number].strip()
+							
+							#Checking for objects on database.
+							
+							if name == "harvest_date_id":
+								possible_characters = ('/', ' ', '-', '.')
+								datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
+								datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+								if not datelist:
+									errors['Problem with harvest ID'] = "  Are you sure about the given details? %s"%(column)
+									
+							if name == "location_id":
+								locationlist = models.Location.objects.all().filter (name=str(column))
+								if not locationlist:
+									errors['Problem with location ID'] = "  Are you sure about the given details? %s"%(column)
+							
+							if name == "variety_id":
+								varietylist = models.Location.objects.all().filter (name=str(column))
+								if not varietylist:
+									errors['Problem with variety ID'] = "  Are you sure about the given details? %s"%(column)								
+								
+																		
+							if name in insertion_dict.keys() and name not in reference_dict.keys():
+								insertion_dict[name] = column.strip()
+							else:
+								if name in reference_dict.keys():
+									try:
+										insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
+									except ValidationError:
+										errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
+								else:
+									errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
+						except IndexError:
+							errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
+					column_number += 1
+		return (False, errors)
