@@ -266,7 +266,6 @@ class Table:
 		value_count = 0 # The sum of values used to calculate the mean average for a year.
 		collated_table = {}
 		lsd_row = []
-		
 		max_year = 0 
 		
 			
@@ -400,7 +399,7 @@ class Table:
 		def collate_table(self, top_row, row_labels_column, year_columns, location_columns, probability): 
 			"""
 			This function creates one big dictionary with keys that label each part of a table.
-			Header, Rows, Year_Columns, Location_Columns, LSD_Row.
+			keys: header; rows; years; locations; lsds.
 			"""	
 			try:
 				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns[0], 'locations':location_columns[0]} # Hrmm.
@@ -409,7 +408,6 @@ class Table:
 				
 			lsdCalc = LSD_Row().init(self)
 			lsd_row = lsdCalc.populate(self, probability) # Figure out how this probability will pass to here.
-			
 			collated_table = {'lsds':lsd_row}
 			
 			return collated_table
@@ -463,4 +461,5 @@ class Table:
 			return value_count
 			
 		def set_table_year(self, year):
+			max_year = year
 			return max_year
