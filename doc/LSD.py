@@ -36,8 +36,8 @@ def LSD(response_to_treatments, probability):
 		if probability > 1 or probability <= 0:
 			raise BaseException # TODO: raise a standard/helpful error
 		else:
-			print (2*probability - 1)
-			print erfinv(2*probability - 1)
+			print "..?? : " +str(2*probability - 1)
+			print "...?? 2 : " +str(erfinv(2*probability - 1))
 			return sqrt(2) * erfinv(2*probability - 1)
 			
 	def qt(probability, degrees_of_freedom):
@@ -61,20 +61,26 @@ def LSD(response_to_treatments, probability):
 		t = 0
 		if (n < 1 or P > 1.0 or P <= 0.0 ):
 			raise BaseException #TODO: raise a standard/helpful error
-		elif (n == 2)
+		elif (n == 2):
 			t = sqrt(2.0/(P*(2.0-P)) - 2.0)
 		elif (n == 1):
 			P = P * pi/2
 			t = cos(P)/sin(P)
 		else:
 			a = 1.0/(n-0.5)
+			print "a is : " +str(a)
 			b = 48.0/(a**2.0)
+			print "b is :" +str(b)
 			c = (((20700.0*a)/b - 98.0)*a - 16.0)*a + 96.36
+			print "c is : " +str(c)
 			d = ((94.5/(b+c) - 3.0)/b + 1.0)*sqrt((a*pi)/2.0)*float(n)
+			print "d is : " +str(d)
 			x = d*P
+			print "x is : " +str(x)
 			y = x**(2.0/float(n))
+			print "y is : " + str(y)
 		
-			if (y > 0.05 + a):
+			if (y > (0.05 + a)):
 				x = qnorm(P*0.5)
 				y = x**2.0
 				
@@ -220,8 +226,8 @@ def main():
 	]
 	result4 = 4.86117238
 	
-	print "Calculated LSD value is: " + str(LSD(input2, 0.05))
-	print result2
+	print "Calculated LSD is: " + str(LSD(input4,0.05))
+	print result4
 	print "==="
 
 	"""
