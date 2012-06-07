@@ -395,6 +395,7 @@ def add_trial_entry_csv_file(request):
 def add_form_confirmation(request):
 	
 	errors = {} 
+	givenvalues = {}
 	# a dictionary, keys are strings (source of error), values are strings (message)
 	
 	if request.method == 'POST': # If the form has been submitted...
@@ -410,10 +411,28 @@ def add_form_confirmation(request):
 	#print errors
 	return render_to_response(
 		'add_form_confirmation.html', 
-		{'form': form, 'format_errors': errors},
+		{'form': form, 'format_errors': errors,},
 		context_instance=RequestContext(request)
 	)
 def add_information(request):
+	
+	errors = {}
+	givendetail = []
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+		errors = request.POST.getlist("chkError")
+		#givendetail = variety_trials_forms.checking_for_data.givenval
+		
+		for error in errors:
+			if error =='Problem with variety ID' or error =='Problem with location ID':
+				return render_to_response(
+					'add_information.html', 
+					{'format_errors': errors},
+					context_instance=RequestContext(request)
+				)
+			
+def adding_to_database(request):
 	
 	errors = {}
 	# a dictionary, keys are strings (source of error), values are strings (message)
@@ -429,6 +448,6 @@ def add_information(request):
 					context_instance=RequestContext(request)
 				)
 			
-		
-			
+				
+		    
 

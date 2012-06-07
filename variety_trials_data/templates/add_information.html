@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div>
+	<h1><u>Please Enter Following data</u></h1>
+	<br>
+	<br>
+	<h4>Enter Following information to complete the task</h4>
+	<!--TODO: auto generate this file from the model-->
+	<br />
+	<br />
+	<br />
+</div>
+
+
+
+<div class="error">
+
+<form enctype="multipart/form-data" action="#" method="post">
+{% for error in format_errors%}
+  {% csrf_token %}
+  
+ 
+{%if error = 'Problem with variety ID'%}
+	  <h5>For the Variety(* fields are necessary )</h5>
+  <br>
+
+  			<table>
+<tr>
+<td>*Enter the Variety Name:</td>
+<td><input type="text" name="location" /><br /> </td>
+</tr>
+
+<tr>
+<td>Enter the description url :</td>
+<td><input type="text" name="description_url" /></td>
+</tr>
+
+<tr>
+<td>Enter the picture url :</td>
+<td><input type="text" name="picture_url" /></td>
+</tr>
+
+<tr>
+<td>Enter the agent origin :</td>
+<td><input type="text" name="agent_origin" /></td>
+</tr>
+
+<tr>
+<td>Enter the year released :</td>
+<td><input type="text" name="year_released" /></td>
+</tr>
+
+<tr>
+<td>Enter the straw length :</td>
+<td><input type="text" name="straw_length" /></td>
+</tr>
+
+<tr>
+<td>Enter the maturity :</td>
+<td><input type="text" name="maturity" /></td>
+</tr>
+
+<tr>
+<td>Enter the grain color :</td>
+<td><input type="text" name="grain_color" /></td>
+</tr>
+
+<tr>
+<td>Enter the seed color :</td>
+<td><input type="text" name="seed_color" /></td>
+</tr>
+
+<tr>
+<td>Enter the beard :</td>
+<td><input type="text" name="beard" /></td>
+</tr>
+
+<tr>
+<td>Enter the wiltr :</td>
+<td><input type="text" name="wilt" /></td>
+</tr>
+
+<tr>
+<td>Are there any diseases  :</td>
+<td>*disease name:<input type="text" name="diseases" /></td>
+<td>*susceptibility:<input type="text" name="diseases" /></td>
+</tr>
+
+
+</table>
+	  
+	        
+    {%elif error = 'Problem with location ID'%}
+    <h6>For the Location(* fields are necessary )</h6>
+    <br>
+	   <table>  
+		<tr>
+		<td>*Enter the Location Name:</td>
+		<td><input type="text" name="location" /><br /> </td>
+		</tr>
+
+		<tr>
+		<td>Enter the Zip Code :</td>
+		<td><input type="text" name="zipcode" /></td>
+		</tr>
+		</table>
+		<br>
+	{%endif%}
+		
+{% endfor %}
+<br>
+<br>
+<input type="submit" value="Submit" />
+</form>
+</div
+{% endblock %}

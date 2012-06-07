@@ -4,6 +4,7 @@ from variety_trials_data import models
 from difflib import SequenceMatcher
 import re
 import time
+import json
 from datetime import date
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
@@ -256,6 +257,7 @@ def checking_for_data(uploaded_file):
 		line_number = 0
 		headers = []
 		errors = {}
+		givenval = {}
 		csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
 		
 		for line in uploaded_file:
@@ -281,8 +283,9 @@ def checking_for_data(uploaded_file):
 					if column.strip() != '':
 						try:
 							name = headers[column_number].strip()
-							
+							column = column.strip()
 							#Checking for objects on database.
+							givenval[name] = (str(column))
 							
 							if name == "harvest_date_id":
 								possible_characters = ('/', ' ', '-', '.')
@@ -297,7 +300,7 @@ def checking_for_data(uploaded_file):
 									errors['Problem with location ID'] = "  Are you sure about the given details? %s"%(column)
 							
 							if name == "variety_id":
-								varietylist = models.Location.objects.all().filter (name=str(column))
+								varietylist = models.Variety.objects.all().filter (name=str(column))
 								if not varietylist:
 									errors['Problem with variety ID'] = "  Are you sure about the given details? %s"%(column)								
 								
@@ -315,4 +318,17 @@ def checking_for_data(uploaded_file):
 						except IndexError:
 							errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
 					column_number += 1
+					
+				if not errors:
+					model_instance = models.Trial_Entry()
+					for name in insertion_dict.keys():
+						setattr(model_instance, name, insertion_dict[name])
+						print "Writing %s as %s" % (name, insertion_dict[name])
+						insertion_dict[name] = None
+					model_instance.save() # ARE YOU BRAVE ENOUGH? 
+					return HttpResponseRedirect("/variety_trials_data/templates/success.html/")
+				else:
+					json.dump(givenval,open("filename.txt",'w'))
+					print givenval
+					
 		return (False, errors)
