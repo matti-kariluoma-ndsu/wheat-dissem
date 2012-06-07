@@ -81,8 +81,11 @@ def LSD(response_to_treatments, probability):
 			print "y is : " + str(y)
 		
 			if (y > (0.05 + a)):
+				print str(a)
 				x = qnorm(P*0.5)
+				print str(a)
 				y = x**2.0
+				print "The value of y after the Math.pow function" + str(y)
 				
 				if (n < 5):
 					c = c + 0.3*(float(n)-4.5)*(x+0.6)
@@ -93,6 +96,7 @@ def LSD(response_to_treatments, probability):
 				c3 = c2*x - 2.0
 				c4 = c3*x + b + c
 				c = c4
+				print "The value of c is: " + str(c)
 				#y = (((((0.4*y+6.3)*y+36.0)*y+94.5)/c-y-3.0)/b+1.0)*x
 				y1 = (0.4*y+6.3)*y + 36.0
 				y2 = y1*y + 94.5
@@ -100,8 +104,10 @@ def LSD(response_to_treatments, probability):
 				y4 = y3/b + 1.0
 				y5 = y4*x
 				y = y5
+				print "y is :  "+str(y)
 				
 				y = a*(y**2.0)
+				print "The value of y after another Math.pow function is: " +str(y)
 				
 				if (y > 0.002):
 					y = exp(y) - 1.0

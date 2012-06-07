@@ -118,10 +118,15 @@ function erfinv(y)
 		{
 			document.write("There was a problem");
 		}
+		
 		else
 		{
+			x = ((2*probability) - 1)
+			document.write("...???: " + x +"<br/>" )
+			y = (erfinv(2*probability - 1))
+			document.write("...??2 : " + y +"<br/>")
 			return Math.sqrt(2) * erfinv(2*probability - 1)
-			}
+		}
 	}
 	function qt(probability, degrees_of_freedom)
 	{
@@ -163,32 +168,36 @@ function erfinv(y)
 		else
 			{
 			a = 1.0/(n-0.5)
-			document.write("a is: " +a)
+			document.write("a is: " +a+ "<br/>")
 			b = 48.0/Math.pow(a,2.0)
-			document.write("b is: " +b)
+			document.write("b is: " +b +"<br/>")
+			
 			c = (((20700.0*a)/b - 98.0)*a - 16.0)*a + 96.36
-			document.write("c is: " +c)
+			document.write("c is: " +c +"<br/>")
 			d = ((94.5/(b+c) - 3.0)/b + 1.0)*Math.sqrt((a*pi)/2.0)*((n))
-			document.write("d is: " +d)
+			document.write("d is: " +d + "<br/>")
 			//e = d*Math.sqrt(a*pi/2.0)*((n))
 			x = d*P
-			document.write("x is: " +x)
+			document.write("x is: " +x +"<br/>")
 			y = Math.pow(x,(2.0/(n)))
-			document.write("y is: " +y)
+			document.write("y is: " +y +"<br/>")
 			
 		
 			if (y > (0.05 + a))
 			{
-				x = qnorm(P*0.5)
-
+				document.write("the value of a:" +a + "<br/>")
+				var gfjgjhg = a
+				x = qnorm(P*0.5) //value of a is changing after this statement
+				a = gfjgjhg
+				document.write("the value of a:" +a + "<br/>")
 				y = Math.pow(x,2.0)
-				
+			
 				
 				if (n < 5)
-					{
+				{
 
 					c = c + 0.3*((n)-4.5)*(x+0.6)
-					}
+				}
 					
 				//c = (((0.05*d*x-5.0)*x-7.0)*x-2.0)*x+b+c
 				c1 = (0.05*d*x) - 5.0
@@ -197,6 +206,8 @@ function erfinv(y)
 				c4 = c3*x + b + c
 				c = c4
 				
+				document.write("The value of c is : " +c+"<br/>")
+				
 				//y = (((((0.4*y+6.3)*y+36.0)*y+94.5)/c-y-3.0)/b+1.0)*x
 				y1 = (0.4*y+6.3)*y + 36.0
 				y2 = y1*y + 94.5
@@ -204,9 +215,9 @@ function erfinv(y)
 				y4 = y3/b + 1.0
 				y5 = y4*x
 				y = y5
-				
-				y = a*Math.pow(y,2.0)
-				
+				document.write(" y is :  "+ y+"<br/>")
+				y = a * (Math.pow(y,2.0))
+				document.write("The value of y after another Math.pow function is : " +y+"<br/>")
 
 				if (y > 0.002)
 					{
