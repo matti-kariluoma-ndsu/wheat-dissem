@@ -1,15 +1,11 @@
 (grep for TODOs)
 ./urls.py:    ## TODO: There are 3 views of our data, reduce to 2 if not 1.
 
-./settings.py:## TODO: Disable the sessions, auth, admin, etc. apps we don't need
-
 ./variety_trials_data/variety_trials_forms.py:	## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
 ./variety_trials_data/variety_trials_forms.py:	# TODO: Consider not save() -ing each line, maybe do batches of ~100?
 
 ./variety_trials_data/templates/main.html:	TODO: Add noscript version of this field to point to the noscript
 ./variety_trials_data/templates/main.html:	TODO: fix input validation strings return an error.
-./variety_trials_data/templates/main.html:	TODO: Do we need csrf_token?
-./variety_trials_data/templates/main.html:	TODO: use get, not post
 
 ./variety_trials_data/templates/tabbed_view.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 ./variety_trials_data/templates/tabbed_view.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
@@ -186,15 +182,11 @@ Talk of how we are going to truncate tables for pretty output.
 		above criteria are met.
 	3) For the variety-variety view, repeat the above.
 	
-We need the current zipcode in big
-letters to remind people what data they are looking at.
 
 If we are going to have access the zipcode at all times, and ditching radius,
 maybe our get paramters can be locations deselected instead? and variety-variety
 views can just be up inthe get bar, since it'll be small? I'd like to have
 a list of numbers, or failing that reduce "varieties=" to "v=" (worse solution)
-
-Roll up an about/Bio page
 
 Think on database synchronization for UMN<=>NDSU. Email admin when something
 happens? if unresolved after 10 days, email users?
@@ -205,8 +197,6 @@ If python is still losing references in early July, we'll need to investigate
 a new language. Before that we must try the new classes for variety_trials_util
 and maybe ask the community about a particualr version/implementation (JPython,
 CPython, IronPython, etc.) and see if that helps.
-
-Upgrade to Django 1.4
 
 Is it worthwhile to use some other project/library to render our html/
 route pages/handle forms?
