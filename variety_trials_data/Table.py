@@ -69,7 +69,7 @@ class LSD_Row(Row):
 		
 		lsds = []
 		"""
-		for column in self.table.year_columns.keys(): 
+		for column in self.table.year_columns.keys(): # We might just leave this out.
 			lsds.append(column.lsd) 
 		"""
 		
@@ -271,7 +271,7 @@ class Table:
 			
 		def __init__(self, entries, probability): # Probability is required for creating the LSD row in the collate_table function.
 			self.entries = entries
-			self.populate_year_average_columns(self, years, varieties)
+			self.populate_year_average_columns(self, years, varieties) # This order of function calls is important.
 			self.populate_location_columns(self, locations, year_columns)
 			self.populate_header_row(self, year_columns, location_columns)
 			self.populate_row_labels_column(self, year_columns)
@@ -407,7 +407,7 @@ class Table:
 				pass
 				
 			lsdCalc = LSD_Row().init(self)
-			lsd_row = lsdCalc.populate(self, probability) # Figure out how this probability will pass to here.
+			lsd_row = lsdCalc.populate(self, probability)
 			collated_table = {'lsds':lsd_row}
 			
 			return collated_table
@@ -443,7 +443,7 @@ class Table:
 			
 		def set_value_count_for_column(self, year_columns, year): 
 			"""
-			Sets the count of values used to calculate the mean averages in 
+			Sets the count of values used to calculate the mean average for the LSD calculator in 
 			a year column.
 			"""
 			
