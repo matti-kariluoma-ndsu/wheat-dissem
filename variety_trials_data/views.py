@@ -220,6 +220,18 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			del unit_blurbs[name]
 	"""
 	
+	from variety_trials_data.Table import SubTable
+	t = SubTable(get_entries(locations, year_list), 0.05)
+	
+	lsd_row = t.get(year_list, varieties, locations)
+	
+	print t.top_row
+	print t.year_columns
+	print t.location_columns
+	for row in t.row_labels_column:
+		print row
+	print lsd_row
+		
 	# TODO: respect/update the cur_year value.
 	try:
 		sorted_list = LSD_Calculator(get_entries(locations, year_list), locations, varieties, year_list, curyear, field).fetch(reduce_to_one_subset=one_subset)
