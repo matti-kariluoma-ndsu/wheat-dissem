@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+	{% for element in history %}
+				<p> {{element.username}} </p>
+				<p> {{element.created_date}} </p>
+				<p> {{element.trial_entry}} </p>
+				{% endfor %}
+</div>
+{% endblock %}

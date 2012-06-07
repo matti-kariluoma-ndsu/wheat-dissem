@@ -72,7 +72,9 @@ class Date(models.Model):
 	
 	def __unicode__(self):
 		return str(self.date)
-	
+		
+
+		
 class Trial_Entry(models.Model):
 	bushels_acre				 = models.DecimalField(decimal_places=5, max_digits=10)
 	protein_percent			 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
@@ -103,6 +105,13 @@ class Trial_Entry(models.Model):
 
 	def __unicode__(self):
 		return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.date.year)
+		
+class Trial_Entry_History(models.Model):
+	username = models.CharField(max_length=200)
+	created_date				 = models.ForeignKey(Date, related_name='created_date')
+	trial_entry							 = models.ForeignKey(Trial_Entry)
+	def __unicode__(self):
+		return str(self.trial_entry)+" by "+str(self.username)+" at "+str(self.created_date.date.year)
 
 # Now add custom forms to populate these data:
 class VarietyForm(ModelForm):

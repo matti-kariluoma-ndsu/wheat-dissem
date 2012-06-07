@@ -42,6 +42,17 @@ def variety_info(request, variety_name):
 		context_instance=RequestContext(request)
 	)
 	
+def history(request):	
+	history=models.Trial_Entry_History.objects.all()	
+	
+	return render_to_response(
+		'history.html', 
+		{ 
+			'history': history,
+		},
+		context_instance=RequestContext(request)
+	)
+	
 
 def index(request, abtest=None):
 	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
