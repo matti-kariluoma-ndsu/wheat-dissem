@@ -11,7 +11,7 @@ class Row:
 	Contains references to each Cell in this row.
 	"""
 	def __init__(self, aRowList):
-		self.members = aRow
+		self.members = aRowList
 		self.index = 0
 	
 	def __iter__(self):
@@ -37,8 +37,9 @@ class LSD_Row(Row):
 	A row that keeps track of which Table it belongs to.
 	"""
 	def __init__(self, table):
-		super(LSD_Row, self).__init__() # call Row.__init__()
+		#super(LSD_Row, self).__init__(list()) # call Row.__init__()
 		self.table = table
+		Row.__init__(self, [])
 	
 	def populate(self, probability):
 		
@@ -47,8 +48,7 @@ class LSD_Row(Row):
 		l_columns = self.table.location_columns
 		location_lsds = []
 		
-		for k in y_columns.keys():
-			years_i = k
+		years_i = list(y_columns[0].keys())
 		
 		if len(years_i) == 3:
 			data_1yr = years_i[0]
@@ -62,27 +62,31 @@ class LSD_Row(Row):
 		else:
 			pass
 		
+		"""
 		if data_1yr != None:	
 			lsd_1yr = self._LSD(data_1yr, probability)
 		if data_2yr != None:
 			lsd_2yr = self._LSD(data_2yr, probability)
 		if data_3yr != None:
 			lsd_3yr = self._LSD(data_3yr, probability)
-			
+		"""	
+		lsd_1yr = 0.1
+		lsd_2yr = 0.2
+		lsd_3yr = 0.3
 		"""
 		Grab the LSDs for the location columns in the Table object. 
 		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
 		"""	
 		for entry in self.table.entries:
-			for l in l_columns.keys():
-				if entry.hsd_10 != None and l == entry.location.name:
-					location_lsds = entry.hsd_10
-				elif entry.lsd_05 != None and l == entry.location.name:
-					location_lsds = entry.lsd_05
-				elif entry.lsd_10 != None and l == entry.location.name:
-					location_lsds = entry.lsd_10
+			for l in l_columns[0].keys():
+				if entry.hsd_10 is not None and l.name == entry.location.name:
+					location_lsds.append(entry.hsd_10)
+				elif entry.lsd_05 is not None and l.name == entry.location.name:
+					location_lsds.append(entry.lsd_05)
+				elif entry.lsd_10 is not None and l.name == entry.location.name:
+					location_lsds.append(entry.lsd_10)
 				else:
-					location_lsds = None	
+					location_lsds.append(None)	
 				
 		lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
 		
@@ -278,14 +282,18 @@ class Table:
 			
 		def __init__(self, entries, probability): # Probability is required for creating the LSD row in the collate_table function.
 			self.entries = entries
-			
+			self.probability = probability
 			
 		def get(self, years, varieties, locations):
 			year_columns = self.populate_year_average_columns( years, varieties) # This order of function calls is important.
 			location_columns = self.populate_location_columns( locations, year_columns)
 			top_row = self.populate_header_row( year_columns, location_columns)
 			row_labels_column = self.populate_row_labels_column( year_columns)
-			return self.collate_table(s top_row, row_labels_column, year_columns, location_columns)
+			self.year_columns = year_columns
+			self.location_columns = location_columns
+			self.top_row = top_row
+			self.row_labels_column = row_labels_column
+			return self.collate_table( top_row, row_labels_column, year_columns, location_columns, self.probability)
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
@@ -298,7 +306,7 @@ class Table:
 			y2 = [] # This contains just the variety values, it doesn't have all the annoying keys. 
 			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
 			v_temp = sorted(varieties, key=attrgetter('name'))
-			y_temp = sorted(years, reverse=true) 
+			y_temp = sorted(years, reverse=True) 
 			
 			if len(y_temp) > 3:
 				t = y_temp[:2] # Reduce the number of years to 3.
@@ -307,7 +315,7 @@ class Table:
 			for entry in self.entries: # Yay for n^3.
 				for y in y_temp:
 					for  v in v_temp:
-						if y == entry.harvest_date.year and v == entry.variety.name:
+						if y == entry.harvest_date.date.year and v == entry.variety.name:
 							try:
 								y1 = {y: {v: entry.test_weight}} # I'm not sure if this test weight is already the mean value.
 								y2 = entry.test_weight
@@ -339,8 +347,11 @@ class Table:
 			l2 = [] # This contains just the variety values, it doesn't have all the annoying keys..
 			l3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
 			
-			for y, v in year_columns: # Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
-				v_temp = v[0]
+			# Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
+			for y, v_dict in year_columns[0].items():
+				v_temp = v_dict.keys() # TODO: logic error, maybe this is meant to be in the calling function?
+				if v_temp is not None and len(v_temp) > 0:
+					break;
 			
 			for entry in self.entries: # Yay for n^3
 				for l in l_temp:
@@ -379,7 +390,7 @@ class Table:
 				pass
 				
 			for k in temp.keys():
-				t = k # This grabs the variety name, but not the value associated with it.
+				t.append(k) # This grabs the variety name, but not the value associated with it.
 				
 			row_labels_column = set(sorted(t)) # Remove possible duplicates.
 					
@@ -416,8 +427,8 @@ class Table:
 			except (IndexError, SyntaxError, KeyError):
 				pass
 				
-			lsdCalc = LSD_Row().init(self)
-			lsd_row = lsdCalc.populate(self, probability)
+			lsdCalc = LSD_Row(self)
+			lsd_row = lsdCalc.populate(probability)
 			collated_table = {'lsds':lsd_row}
 			
 			return collated_table
