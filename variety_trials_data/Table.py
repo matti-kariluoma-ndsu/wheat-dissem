@@ -42,10 +42,12 @@ class LSD_Row(Row):
 	
 	def populate(self, probability):
 		
-		columns = self.table.year_columns
+		y_columns = self.table.year_columns
 		years_i = []
+		l_columns = self.table.location_columns
+		location_lsds = []
 		
-		for k in columns.keys():
+		for k in y_columns.keys():
 			years_i = k
 		
 		if len(years_i) == 3:
@@ -66,14 +68,28 @@ class LSD_Row(Row):
 			lsd_2yr = self._LSD(data_2yr, probability)
 		if data_3yr != None:
 			lsd_3yr = self._LSD(data_3yr, probability)
-		
-		lsds = []
+			
 		"""
-		for column in self.table.year_columns.keys(): # We might just leave this out.
-			lsds.append(column.lsd) 
-		"""
+		Grab the LSDs for the location columns in the Table object. 
+		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
+		"""	
+		for entry in self.table.entries:
+			for l in l_columns.keys():
+				if entry.hsd_10 != None and l == entry.location.name:
+					location_lsds = entry.hsd_10
+				elif entry.lsd_05 != None and l == entry.location.name:
+					location_lsds = entry.lsd_05
+				elif entry.lsd_10 != None and l == entry.location.name:
+					location_lsds = entry.lsd_10
+				else:
+					location_lsds = None	
+				
+		lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
 		
-		return ['LSD', lsd_1yr, lsd_2yr, lsd_3yr].extend(lsds)
+		for l in location_lsds:
+			lsds = l
+		
+		return lsds
 	
 	def _qnorm(self, probability):
 		"""
