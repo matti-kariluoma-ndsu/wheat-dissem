@@ -259,23 +259,17 @@ class Table:
 		...  ...  ...  ...  ...
 		"""
 		
-		top_row = [] # The top row for the table object: 'Varities', 1-yr, 2-yr, 3-yr, Loc1, Loc2, etc.
-		row_labels_column = [] # Contains the varieties' names.
-		year_columns = [] # Contains year(s) average values for the given varieties. Three lists in this list, 
-		location_columns = [] # The variety value(s) for a location(s).
-		value_count = 0 # The sum of values used to calculate the mean average for a year.
-		collated_table = {}
-		lsd_row = []
-		max_year = 0 
-		
 			
 		def __init__(self, entries, probability): # Probability is required for creating the LSD row in the collate_table function.
 			self.entries = entries
-			self.populate_year_average_columns(self, years, varieties) # This order of function calls is important.
-			self.populate_location_columns(self, locations, year_columns)
-			self.populate_header_row(self, year_columns, location_columns)
-			self.populate_row_labels_column(self, year_columns)
-			self.collate_table(self, top_row, row_labels_column, year_columns, location_columns)
+			
+			
+		def get(self, years, varieties, locations):
+			year_columns = self.populate_year_average_columns( years, varieties) # This order of function calls is important.
+			location_columns = self.populate_location_columns( locations, year_columns)
+			top_row = self.populate_header_row( year_columns, location_columns)
+			row_labels_column = self.populate_row_labels_column( year_columns)
+			return self.collate_table(s top_row, row_labels_column, year_columns, location_columns)
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
