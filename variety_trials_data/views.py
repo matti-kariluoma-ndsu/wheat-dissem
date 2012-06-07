@@ -220,8 +220,8 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			del unit_blurbs[name]
 	"""
 	
-	from variety_trials_data.Table import Table
-	t = Table(get_entries(locations, year_list), 0.05)
+	from variety_trials_data.Table import SubTable
+	t = SubTable(get_entries(locations, year_list), 0.05)
 	
 	lsd_row = t.get(year_list, varieties, locations)
 	

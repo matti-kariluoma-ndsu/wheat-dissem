@@ -267,6 +267,10 @@ class Cell:
 		self.field = field
 
 class Table:
+	def __init__():
+		pass
+
+class SubTable:
 		"""
 		Creates an object with lists for fields that are suitable for a
 		tabular layout. The header dictionary contains the year(s)'- and 
@@ -286,14 +290,14 @@ class Table:
 			
 		def get(self, years, varieties, locations):
 			year_columns = self.populate_year_average_columns( years, varieties) # This order of function calls is important.
-			location_columns = self.populate_location_columns( locations, year_columns)
-			top_row = self.populate_header_row( year_columns, location_columns)
-			row_labels_column = self.populate_row_labels_column( year_columns)
-			self.year_columns = year_columns
-			self.location_columns = location_columns
+			location_columns = self.populate_location_columns( locations, year_columns[0])
+			top_row = self.populate_header_row( year_columns[0], location_columns[0])
+			row_labels_column = self.populate_row_labels_column( year_columns[0])
+			self.year_columns = year_columns[0]
+			self.location_columns = location_columns[0]
 			self.top_row = top_row
 			self.row_labels_column = row_labels_column
-			return self.collate_table( top_row, row_labels_column, year_columns, location_columns, self.probability)
+			return self.collate_table( top_row, row_labels_column, year_columns[0], location_columns[0], self.probability)
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
@@ -307,6 +311,7 @@ class Table:
 			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
 			v_temp = sorted(varieties, key=attrgetter('name'))
 			y_temp = sorted(years, reverse=True) 
+			year_columns = []
 			
 			if len(y_temp) > 3:
 				t = y_temp[:2] # Reduce the number of years to 3.
@@ -328,8 +333,7 @@ class Table:
 							y1 = {y: {v: None}}
 							y2 = None
 							y3 = y
-							
-			year_columns = [y1, y2, y3]
+						year_columns.append([y1, y2, y3])
 							
 			return year_columns
 			
@@ -346,7 +350,7 @@ class Table:
 			l1 = {} # The big dictionary with all the information you could possible want, e.g. {Location: {Variety: Value}}
 			l2 = [] # This contains just the variety values, it doesn't have all the annoying keys..
 			l3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
-			
+			location_columns = []
 			# Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
 			for y, v_dict in year_columns[0].items():
 				v_temp = v_dict.keys() # TODO: logic error, maybe this is meant to be in the calling function?
@@ -369,9 +373,8 @@ class Table:
 							l1 = {l: {v: None}}
 							l2 = None
 							l3 = l
-			
-			location_columns = [l1, l2, l3]
-													
+						location_columns.append([l1, l2, l3])
+				
 			return location_columns
 			
 		def populate_row_labels_column(self, year_columns):
