@@ -402,18 +402,19 @@ def add_form_confirmation(request):
 		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
 		if form.is_valid():
 			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
-			if success:
-				return HttpResponseRedirect('/success/')
+			if not errors:
+				return HttpResponseRedirect("/sucess/")
 			else:
 				form = variety_trials_forms.UploadCSVForm()
+				return render_to_response(
+					'add_form_confirmation.html', 
+					{'form': form, 'format_errors': errors,},
+					context_instance=RequestContext(request)
+				)
 	else:	
 		form = variety_trials_forms.UploadCSVForm()
-	#print errors
-	return render_to_response(
-		'add_form_confirmation.html', 
-		{'form': form, 'format_errors': errors,},
-		context_instance=RequestContext(request)
-	)
+	
+	
 def add_information(request):
 	
 	errors = {}
@@ -432,22 +433,27 @@ def add_information(request):
 					context_instance=RequestContext(request)
 				)
 			
-def adding_to_database(request):
+			
+def adding_to_database_confirm(request):
 	
-	errors = {}
+	entered_variety_data = []
+	entered_location_data = {}
+	
 	# a dictionary, keys are strings (source of error), values are strings (message)
 	
 	if request.method == 'POST': # If the form has been submitted...
-		errors = request.POST.getlist("chkError")
-			
-		for error in errors:
-			if error =='Problem with variety ID' or error =='Problem with location ID':
-				return render_to_response(
-					'add_information.html', 
-					{'format_errors': errors},
-					context_instance=RequestContext(request)
-				)
-			
-				
+		entered_variety_data.append(request.POST.getlist("varietyname"))
+		print entered_variety_data
+		
+		
+		return HttpResponseRedirect("/sucess/")
+		
+
+							
+def redirect_sucess(request):
+
+	return render_to_response(
+		'success.html'
+	)
 		    
 

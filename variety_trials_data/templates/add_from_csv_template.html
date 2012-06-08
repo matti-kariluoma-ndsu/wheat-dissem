@@ -19,7 +19,7 @@
 </div>
 {% endfor %}
 
-<form enctype="multipart/form-data" action="/add_trials_confirm/" method="post">
+<form enctype="multipart/form-data" action="" method="post">
   {% csrf_token %}
   {% for field in form %}
     <div class="input_row">

@@ -301,9 +301,11 @@ def checking_for_data(uploaded_file):
 							
 							if name == "variety_id":
 								varietylist = models.Variety.objects.all().filter (name=str(column))
-								if not varietylist:
-									errors['Problem with variety ID'] = "  Are you sure about the given details? %s"%(column)								
 								
+								if not varietylist:
+									
+									errors[i+1] = "  Are you sure about the given details? %s"%(column)								
+									
 																		
 							if name in insertion_dict.keys() and name not in reference_dict.keys():
 								insertion_dict[name] = column.strip()
@@ -326,9 +328,9 @@ def checking_for_data(uploaded_file):
 						print "Writing %s as %s" % (name, insertion_dict[name])
 						insertion_dict[name] = None
 					model_instance.save() # ARE YOU BRAVE ENOUGH? 
-					return HttpResponseRedirect("/variety_trials_data/templates/success.html/")
+
 				else:
 					json.dump(givenval,open("filename.txt",'w'))
 					print givenval
-					
+				
 		return (False, errors)
