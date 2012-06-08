@@ -287,7 +287,26 @@ class SubTable:
 		def __init__(self, entries, probability): # Probability is required for creating the LSD row in the collate_table function.
 			self.entries = entries
 			self.probability = probability
-			
+			(self.years, self.locations, self.varieties) = self._inspect_entries()
+			self.header_row = Row(self.populate_header_row())
+		
+		def _inspect_entries(self):
+			"""
+			We could just ask the user to send the list of years, locations,
+			varieities down with entries, but this is safer as the years/
+			varieties are guranteed to be in entries.
+			"""
+			years = set()
+			locations = set()
+			varieties = set()
+			# TODO keep track of what locations/varieties are at each year
+			for entry in self.entries:
+				years.add(entry.harvest_date)
+				locations.add(entry.location)
+				varieties.add(entry.variety)
+				
+			return (years, locations, varieties)
+		
 		def get(self, years, varieties, locations):
 			year_columns = self.populate_year_average_columns( years, varieties) # This order of function calls is important.
 			location_columns = self.populate_location_columns( locations, year_columns[0])
