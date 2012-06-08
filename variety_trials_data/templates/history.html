@@ -1,10 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
+
+<style type="text/css">
+
+table
+    {
+	width:50%;
+	border: 2px solid black;
+    }
+th
+   {
+	height:30px;
+	border: 2px solid black;
+   }
+td
+{
+	height: 30px;
+	text-align:Left
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border: 1px solid black;
+}
+</style>
+
 <div>
+<table>
 	{% for element in history %}
-				<p> {{element.username}} </p>
-				<p> {{element.created_date}} </p>
-				<p> {{element}} </p>
+	<tr>
+				<td><a href = "/view/delete/{{element.id}}">X</a></td>
+				<td> {{element.username}} </td>
+				<td> {{element.created_date}} </td>
+				<td> {{element}} </td>
+	</tr>
 				{% endfor %}
+</table>
 </div>
 {% endblock %}

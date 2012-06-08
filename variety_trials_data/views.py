@@ -43,7 +43,27 @@ def variety_info(request, variety_name):
 	)
 	
 def history(request):	
-	history=models.Trial_Entry_History.objects.all()	
+	history=models.Trial_Entry_History.objects.all()
+	newlist = []
+	
+	for element in history:
+		newlist.append(element)
+		element.created_date
+		element.username
+	return render_to_response(
+		'history.html', 
+		{ 
+			'history': history,
+			'list' : newlist,
+		},
+		context_instance=RequestContext(request)
+	)
+def history_delete(request, delete):	
+	history=models.Trial_Entry_History.objects.filter(id = delete)
+	for element in history:
+		trial_Entry=models.Trial_Entry.objects.filter(id = element.trial_entry.id)
+		trial_Entry.delete()
+		
 	
 	return render_to_response(
 		'history.html', 

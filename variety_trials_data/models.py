@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import ModelForm
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your models here.
 class Disease(models.Model):
@@ -109,9 +110,13 @@ class Trial_Entry(models.Model):
 class Trial_Entry_History(models.Model):
 	username = models.CharField(max_length=200)
 	created_date				 = models.ForeignKey(Date, related_name='created_date')
-	trial_entry							 = models.ForeignKey(Trial_Entry)
+	trial_entry							 = models.ForeignKey(Trial_Entry, on_delete=models.DO_NOTHING)
 	def __unicode__(self):
-		return str(self.trial_entry)+" by "+str(self.username)+" at "+str(self.created_date.date.year)
+		try:
+			trial = str(self.trial_entry)
+		except ObjectDoesNotExist:
+			trial = str("none")
+		return trial +" by "+str(self.username)+" at "+str(self.created_date.date.year)
 
 # Now add custom forms to populate these data:
 class VarietyForm(ModelForm):

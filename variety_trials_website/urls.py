@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     (r'^add_trials/', views.add_trial_entry_csv_file), # page to upload a spreadsheet to
     (r'^view/info/(?P<variety_name>[a-zA-Z_]+)', views.variety_info), # defaults to location-based view
 	(r'^view/history/', views.history), # defaults to location-based view
+	(r'^view/delete/(?P<delete>[1234567890]+)', views.history_delete), # defaults to location-based view
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}) # serves static/img static/css static/js etc.
                        
 )
