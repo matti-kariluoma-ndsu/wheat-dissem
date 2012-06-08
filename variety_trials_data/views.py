@@ -392,12 +392,13 @@ def inspect(request):
 
 	curyear = datetime.date.today().year - 1
 	yearList=[curyear,curyear-1,curyear-2]
+	#TODO: use a raw query instead?
 	entries= models.Trial_Entry.objects.select_related(depth=3).filter(
 				harvest_date__in=models.Date.objects.filter(
 					date__range=(datetime.date(min(yearList),1,1), datetime.date(max(yearList),12,31))
 				)
-			)
-			#TODO: use a raw query instead?
+			).order_by("location")
+			
 	locations=models.Trial_Entry.objects.raw(
 							"SELECT id,name FROM variety_trials_data_location"
 						)
@@ -410,27 +411,33 @@ def inspect(request):
 	for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
 				varieties.append(entry.variety)
 	varieties = list(set(varieties)) # remove duplicates
-	for entry in entries:
-		print entry.harvest_date.date.year
-		
-		
-		
+	
+	
 	for year in yearList:
 		masterDict[year]=dict()
 		masterDict[year]["header"]=list()
 		for l in locations:
-			masterDict[year]["header"].append(l.name)
+			masterDict[year]["header"].insert(l.id,l.name)
 		masterDict[year]["rows"]={}
 		for v in varieties:
 			masterDict[year]["rows"][v.name]=[]
-	# masterDict={curyear:{"header":['L1','L2','L3','L4'],
-		# "rows":{"V1":["X","X","X",None],
-		# "V2":["X",None,"X",None],
-		# "V3":[None,"X","X","X"]
-	# }}}
+			for l in locations:
+				masterDict[year]["rows"][v.name].insert(l.id," ")
+	
+	
+	# for year in yearList:
+		# for l in locations:
+			# for v in varieties:
+				# masterDict[year]["rows"][v.name].insert(l.id," ")
+	
+	for entry in entries:
+		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name].insert(entry.location.id,"X")
+		
 	return render_to_response(
 		'inspect.html',
-		{'masterDict':masterDict}
+		{
+		'masterDict':masterDict
+		}
 	)
 	
 
