@@ -63,11 +63,11 @@ class LSD_Row(Row):
 			pass
 		
 		"""
-		if data_1yr != None:	
+		if data_1yr is not None:	
 			lsd_1yr = self._LSD(data_1yr, probability)
-		if data_2yr != None:
+		if data_2yr is not None:
 			lsd_2yr = self._LSD(data_2yr, probability)
-		if data_3yr != None:
+		if data_3yr is not None:
 			lsd_3yr = self._LSD(data_3yr, probability)
 		"""	
 		lsd_1yr = 0.1
