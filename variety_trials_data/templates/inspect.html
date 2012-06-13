@@ -1,24 +1,21 @@
-	{% for year in masterDict.items %}
+{% for year in masterDict.items %}
 	
 	<h4>{{year.0}}</h4>
 	<table border="1">
 	<tr>
 	<td> </td>
-	{% for column in year.1.header %}
-		<td>{{column}}</td>
+	{% for location in year.1.header %}
+		<td>{{location}}</td>
 	{% endfor %}
 	</tr>
-	{% for row in year.1.rows.items %}
+	{% for variety in year.1.rows.items %}
 		<tr>
-		<td>{{row.0}}</td>
-		{% for col in row.1 %}
-			{% if col = None %}
-				<td>No</td>
-			{%else%}
-				<td>{{col}}</td>
-			{%endif%}
+		<td>{{variety.0}}</td>
+		
+		{% for entry in variety.1.items %}
+			<td>{{entry.1}}</td>
 		{% endfor %}
 		</tr>
 	{% endfor %}
 	</table>
-	{% endfor %}
+{% endfor %}

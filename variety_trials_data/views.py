@@ -420,9 +420,9 @@ def inspect(request):
 			masterDict[year]["header"].insert(l.id,l.name)
 		masterDict[year]["rows"]={}
 		for v in varieties:
-			masterDict[year]["rows"][v.name]=[]
+			masterDict[year]["rows"][v.name]={}
 			for l in locations:
-				masterDict[year]["rows"][v.name].insert(l.id," ")
+				masterDict[year]["rows"][v.name][l.id]=" "
 	
 	
 	# for year in yearList:
@@ -431,7 +431,7 @@ def inspect(request):
 				# masterDict[year]["rows"][v.name].insert(l.id," ")
 	
 	for entry in entries:
-		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name].insert(entry.location.id,"X")
+		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
 		
 	return render_to_response(
 		'inspect.html',
