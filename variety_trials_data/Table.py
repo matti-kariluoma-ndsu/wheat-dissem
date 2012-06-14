@@ -318,7 +318,13 @@ class SubTable:
 			if len(y_temp) > 3:
 				t = y_temp[:2] # Reduce the number of years to 3.
 				y_temp = t
+				
+				
+			for y in y_temp:
+				for v in v_temp:
+					Trial_Entry.objects.filter(harvest_date.date.year=y, variety.name=v) # Apparently I can't do this.
 			
+			"""
 			for entry in self.entries: # Yay for n^3.
 				for y in y_temp: # This for loop is crap. I'm going to generate a QuerySet and evaluate that instead.
 					for  v in v_temp:
@@ -336,6 +342,8 @@ class SubTable:
 							y2 = None
 							y3 = y
 						year_columns.append([y1, y2, y3])
+						
+			"""
 							
 			return year_columns
 			
