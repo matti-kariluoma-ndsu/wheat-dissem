@@ -48,7 +48,7 @@ class LSD_Row(Row):
 		l_columns = self.table.location_columns
 		location_lsds = []
 		
-		years_i = list(y_columns[0].keys())
+		years_i = list(y_columns[0]) # Grabs the y key, e.g., {y:{v:value}}.
 		
 		if len(years_i) == 3:
 			data_1yr = years_i[0]
@@ -62,17 +62,19 @@ class LSD_Row(Row):
 		else:
 			pass
 		
-		"""
 		if data_1yr is not None:	
 			lsd_1yr = self._LSD(data_1yr, probability)
 		if data_2yr is not None:
 			lsd_2yr = self._LSD(data_2yr, probability)
 		if data_3yr is not None:
 			lsd_3yr = self._LSD(data_3yr, probability)
-		"""	
+			
+		"""
 		lsd_1yr = 0.1
-		lsd_2yr = 0.2
+		lsd_2yr = 0.2  # Matti's test values.
 		lsd_3yr = 0.3
+		"""
+		
 		"""
 		Grab the LSDs for the location columns in the Table object. 
 		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
@@ -90,7 +92,7 @@ class LSD_Row(Row):
 				
 		lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
 		
-		for l in location_lsds:
+		for l in location_lsds: 
 			lsds = l
 		
 		return lsds
@@ -284,12 +286,12 @@ class SubTable:
 		"""
 		
 			
-		def __init__(self, entries, probability): # Probability is required for creating the LSD row in the collate_table function.
+		def __init__(self, entries, probability):
 			self.entries = entries
 			self.probability = probability
 			
-		def get(self, years, varieties, locations):
-			year_columns = self.populate_year_average_columns( years, varieties) # This order of function calls is important.
+		def get(self, years, varieties, locations): # 'Years', 'varieties' and 'locations' are string values passed by the user to parse the database.
+			year_columns = self.populate_year_average_columns( years, varieties) 
 			location_columns = self.populate_location_columns( locations, year_columns[0])
 			top_row = self.populate_header_row( year_columns[0], location_columns[0])
 			row_labels_column = self.populate_row_labels_column( year_columns[0])
@@ -309,8 +311,8 @@ class SubTable:
 			y1 = {} # The big dictionary with all the information you could possible want, e.g. {Year: {Variety: Value}}.
 			y2 = [] # This contains just the variety values, it doesn't have all the annoying keys. 
 			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
-			v_temp = sorted(varieties, key=attrgetter('name'))
-			y_temp = sorted(years, reverse=True) 
+			v_temp = list.sort(varieties)
+			y_temp = list.reverse(list.sort(years)) 
 			year_columns = []
 			
 			if len(y_temp) > 3:
@@ -318,11 +320,11 @@ class SubTable:
 				y_temp = t
 			
 			for entry in self.entries: # Yay for n^3.
-				for y in y_temp:
+				for y in y_temp: # This for loop is crap. I'm going to generate a QuerySet and evaluate that instead.
 					for  v in v_temp:
-						if y == entry.harvest_date.date.year and v == entry.variety.name:
+						if y == entry.harvest_date.date.year and v == entry.variety.name: 
 							try:
-								y1 = {y: {v: entry.test_weight}} # I'm not sure if this test weight is already the mean value.
+								y1 = {y: {v: entry.test_weight}} 
 								y2 = entry.test_weight
 								y3 = y
 							except AttributeError:
@@ -358,7 +360,7 @@ class SubTable:
 					break;
 			
 			for entry in self.entries: # Yay for n^3
-				for l in l_temp:
+				for l in l_temp: # This for loop is crap. I'm going to generate a QuerySet and evaluate that instead.
 					for v in v_temp:
 						if l == entry.location.name and v == entry.variety.name:
 							try:
@@ -426,7 +428,7 @@ class SubTable:
 			keys: header; rows; years; locations; lsds.
 			"""	
 			try:
-				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns[0], 'locations':location_columns[0]} # Hrmm.
+				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns[0], 'locations':location_columns[0]}
 			except (IndexError, SyntaxError, KeyError):
 				pass
 				
