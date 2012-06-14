@@ -23,7 +23,7 @@
   {% csrf_token %}
   
  
-{%if error = 'Problem with variety ID'%}
+{%if error = 'Problem with variety'%}
 	  <h5>For the Variety(* fields are necessary )</h5>
   <br>
 
@@ -91,9 +91,11 @@
 
 
 </table>
+<br>
+<br>
 	  
 	        
-    {%elif error = 'Problem with location ID'%}
+    {%elif error = 'Problem with location'%}
     <h6>For the Location(* fields are necessary )</h6>
     <br>
 	   <table>  

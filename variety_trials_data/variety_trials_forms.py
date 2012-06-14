@@ -238,7 +238,8 @@ def checking_for_data(uploaded_file):
 		
 		insertion_dict = {}
 		reference_dict = {}
-
+		error_counter = 1
+		file_counter = 1
 		skip = True
 		skip_lines = 1
 		skip_count = 0
@@ -292,20 +293,20 @@ def checking_for_data(uploaded_file):
 								datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
 								datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
 								if not datelist:
-									errors['Problem with harvest ID'] = "  Are you sure about the given details? %s"%(column)
+									errors["Problem with harvest %s"%error_counter] = "  Are you sure about the given details? %s"%(column)
+									error_counter=error_counter+1
 									
 							if name == "location_id":
 								locationlist = models.Location.objects.all().filter (name=str(column))
 								if not locationlist:
-									errors['Problem with location ID'] = "  Are you sure about the given details? %s"%(column)
-							
+									errors["Problem with location %s"%error_counter] = "  Are you sure about the given details? %s"%(column)
+									error_counter=error_counter+1
 							if name == "variety_id":
 								varietylist = models.Variety.objects.all().filter (name=str(column))
 								
 								if not varietylist:
-									
-									errors[i+1] = "  Are you sure about the given details? %s"%(column)								
-									
+									errors["Problem with variety %s"%error_counter] = "  Are you sure about the given details? %s"%(column)								
+									error_counter=error_counter+1
 																		
 							if name in insertion_dict.keys() and name not in reference_dict.keys():
 								insertion_dict[name] = column.strip()
@@ -330,7 +331,8 @@ def checking_for_data(uploaded_file):
 					model_instance.save() # ARE YOU BRAVE ENOUGH? 
 
 				else:
-					json.dump(givenval,open("filename.txt",'w'))
+					json.dump(givenval,open(str(file_counter)+".txt",'w'))
+					file_counter=file_counter+1
 					print givenval
 				
 		return (False, errors)

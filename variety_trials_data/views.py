@@ -419,17 +419,24 @@ def add_information(request):
 	
 	errors = {}
 	givendetail = []
+	details = [] 
 	# a dictionary, keys are strings (source of error), values are strings (message)
 	
 	if request.method == 'POST': # If the form has been submitted...
 		errors = request.POST.getlist("chkError")
 		#givendetail = variety_trials_forms.checking_for_data.givenval
-		
-		for error in errors:
-			if error =='Problem with variety ID' or error =='Problem with location ID':
+		for l in errors:
+			split_l = l.split(' ')
+			if len(split_l) > 1:
+				details.append(split_l[0]+" "+split_l[1]+" "+split_l[2])
+				
+				
+		#print details					
+		for detail in details:
+			if detail =='Problem with variety' or detail =='Problem with location':
 				return render_to_response(
 					'add_information.html', 
-					{'format_errors': errors},
+					{'format_errors': details ,'error_num':errors},
 					context_instance=RequestContext(request)
 				)
 			
