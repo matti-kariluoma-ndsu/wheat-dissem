@@ -9,15 +9,9 @@ class SelectLocationByZipcodeRadiusForm(forms.Form):
 							
 class SelectVarietiesForm(SelectLocationByZipcodeRadiusForm):
 	varieties = forms.ModelMultipleChoiceField(
-			widget=forms.SelectMultiple(attrs={'size': 20}),
+			widget=forms.Select(attrs={'size': 20}),
 			queryset=models.Variety.objects.all()
-		)
-
-class SelectLocationsForm(SelectVarietiesForm):
-	locations = forms.ModelMultipleChoiceField(
-			widget=forms.SelectMultiple(attrs={'size': 20}),
-			queryset=models.Location.objects.all()
-		)
+                        )
 
 class SelectFieldForm(forms.Form):
 	locations = forms.CharField(max_length=5)

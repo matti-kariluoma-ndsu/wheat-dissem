@@ -72,6 +72,12 @@ def history_delete(request, delete):
 		},
 		context_instance=RequestContext(request)
 	)
+
+def history_commit(request, id):  
+        entries = models.Trial_Entry_History.objects.filter(id = id)
+        for entry in entries:
+                entry.deletable = False;
+                entry.save()
 	
 
 def index(request, abtest=None):

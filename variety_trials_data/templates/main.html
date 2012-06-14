@@ -1,6 +1,57 @@
 {% extends "base.html" %}
 {% load django_math %}
 {% block content %}
+
+<script type="text/javascript">
+
+function movePosition(side){
+	var positionLeft=document.getElementById('selectLeft');
+	var positionRight=document.getElementById('selectRight');
+
+if(side==1){
+	if(positionLeft.options.length==0){
+		alert('Nothing to move');
+		return false;
+	}
+	else
+	{
+		var toCompare=positionLeft.options.selectedIndex;
+
+		move(positionRight,positionLeft.options[toCompare].value,positionLeft.options[toCompare].text);
+		positionLeft.remove(toCompare);
+
+	if(positionLeft.options.length>0){
+		positionLeft.options[0].selected=true;
+		}
+	}
+
+}else if(side==2){
+
+	if(positionRight.options.length==0){
+		alert('Nothing to move');
+		return false;
+	}else{
+		var toCompare=positionRight.options.selectedIndex;
+
+		move(positionLeft,positionRight.options[toCompare].value,positionRight.options[toCompare].text);
+		positionRight.remove(toCompare);
+
+	if(positionRight.options.length>0){
+		positionRight.options[0].selected=true;
+			}
+		}
+	}
+}
+
+function move(listBoxTo,optionValue,optionDisplayText){
+	var newOption = document.createElement("option"); 
+	newOption.value = optionValue; 
+	newOption.text = optionDisplayText; 
+	listBoxTo.add(newOption, null); 
+	return true; 
+}
+</script>
+
 <div>
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
 	<hr>
@@ -22,7 +73,6 @@
 	TODO: fix input validation strings return an error.
 	-->
 	<form action="/view/{{curyear}}/bushels_acre/" method="GET">
-		
 		{% for field in zipcode_radius_form %}
 		<div class="input row">
 			{{ field.errors }}
@@ -32,19 +82,44 @@
 		<input type="submit" value="Submit" />
 	</form>
 </div>
+
 <div>
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
 	<form action="/view/variety/{{curyear}}/bushels_acre/" method="GET">
-		
+	<table border="0">
+	<tr>
+	<p>Make Your selections:<p>
+	</tr>
+	<tr>
+	<td rowspan="3" align="left">
+	<select name="selectLeft" size="10" id="selectLeft"> 
 		{% for field in varieties_form %}
 		<div class="input row">
 			{{ field.errors }}
 			{{ field.label_tag }}: {{ field }}
 		</div>
 		{% endfor %}
+		</select>
 		<input type="submit" value="Submit" />
 	</form>
-	
+	<td rowspan="3" align="left"><select name="selectRight" size="10" id="selectRight">
+
+</select></td>
+<tr>
+<td align="left">&nbsp;</td>
+<td align="left"><label>
+<input name="btnRight" type="button" id="btnRight" value="&gt;&gt;" onClick="javascript:movePosition(1);">
+</label></td>
+</tr>
+
+<tr>
+<td align="left">&nbsp;</td>
+<td align="left"><label>
+<input name="btnLeft" type="button" id="btnLeft" value="&lt;&lt;" onClick="javascript:movePosition(2);">
+</label></td>
+</tr>
+
+</table>
 </div>
 {% endblock %}
