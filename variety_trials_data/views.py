@@ -389,7 +389,8 @@ def add_trial_entry_csv_file(request):
 		context_instance=RequestContext(request)
 	)
 def inspect(request):
-
+	
+	
 	curyear = datetime.date.today().year - 1
 	yearList=[curyear,curyear-1,curyear-2]
 	#TODO: use a raw query instead?
@@ -399,45 +400,50 @@ def inspect(request):
 				)
 			).order_by("location")
 			
-	locations=models.Trial_Entry.objects.raw(
-							"SELECT id,name FROM variety_trials_data_location"
-						)
+	# locations=models.Trial_Entry.objects.raw(
+							# "SELECT id,name FROM variety_trials_data_location"
+						# )
 	# varieties=models.Trial_Entry.objects.raw(
 							# "SELECT name,id FROM variety_trials_data_variety"
 						# )
-	masterDict=dict()
+	locations= models.Location.objects.order_by("name")
+	varieties= models.Variety.objects.order_by("name")
 	#TODO: there must be a better way to populate the varieties list
-	varieties=[]
-	for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
-				varieties.append(entry.variety)
-	varieties = list(set(varieties)) # remove duplicates
-	
-	
+	# varieties=[]
+	# for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
+				# varieties.append(entry.variety)
+	# varieties = list(set(varieties)) # remove duplicates
+
+	masterDict=dict()
 	for year in yearList:
 		masterDict[year]=dict()
 		masterDict[year]["header"]=list()
 		for l in locations:
-			masterDict[year]["header"].insert(l.id,l.name)
-		masterDict[year]["rows"]={}
+			masterDict[year]["header"].append(l.name)
+		masterDict[year]["rows"]=dict()
 		for v in varieties:
-			masterDict[year]["rows"][v.name]={}
+			masterDict[year]["rows"][v.name]=dict()
 			for l in locations:
-				masterDict[year]["rows"][v.name][l.id]=" "
+				masterDict[year]["rows"][v.name][l.name]=" "
 	
 	
-	# for year in yearList:
-		# for l in locations:
-			# for v in varieties:
-				# masterDict[year]["rows"][v.name].insert(l.id," ")
 	
 	for entry in entries:
-		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
-		
+		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.name]="X"
+	
+	masterList=dict()
+	for year in yearList:
+		masterList[year]=dict()
+		masterList[year]["header"]=masterDict[year]["header"]
+		masterList[year]["rows"]=list()
+		for v in varieties:
+			masterList[year]["rows"].append(list())
+			for l in locations:
+				masterList[year]["rows"][v.name].append(masterDict[year]["rows"][v.name][l.name])
+	
 	return render_to_response(
 		'inspect.html',
 		{
-		'masterDict':masterDict
+		'masterDict':masterList
 		}
 	)
-	
-
