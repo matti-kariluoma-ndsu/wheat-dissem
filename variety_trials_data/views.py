@@ -408,11 +408,6 @@ def inspect(request):
 						# )
 	locations= models.Location.objects.order_by("name")
 	varieties= models.Variety.objects.order_by("name")
-	#TODO: there must be a better way to populate the varieties list
-	# varieties=[]
-	# for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
-				# varieties.append(entry.variety)
-	# varieties = list(set(varieties)) # remove duplicates
 
 	masterDict=dict()
 	for year in yearList:
@@ -436,11 +431,15 @@ def inspect(request):
 		masterList[year]=dict()
 		masterList[year]["header"]=masterDict[year]["header"]
 		masterList[year]["rows"]=list()
+		x=0
 		for v in varieties:
-			masterList[year]["rows"].append(list())
+			dummy_list=list()
+			dummy_list.append(v.name)
+			masterList[year]["rows"].append(dummy_list)
+			
 			for l in locations:
-				masterList[year]["rows"][v.name].append(masterDict[year]["rows"][v.name][l.name])
-	
+				masterList[year]["rows"][x].append(masterDict[year]["rows"][v.name][l.name])
+			x+=1
 	return render_to_response(
 		'inspect.html',
 		{

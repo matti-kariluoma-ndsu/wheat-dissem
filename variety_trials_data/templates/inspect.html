@@ -8,11 +8,9 @@
 		<td>{{location}}</td>
 	{% endfor %}
 	</tr>
-	{% for variety in year.1.rows.items %}
+	{% for variety in year.1.rows %}
 		<tr>
-		<td>{{variety.0}}</td>
-		
-		{% for entry in variety.1 %}
+		{% for entry in variety %}
 			<td>{{entry}}</td>
 		{% endfor %}
 		</tr>
