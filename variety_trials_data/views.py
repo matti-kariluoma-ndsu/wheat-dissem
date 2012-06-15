@@ -392,23 +392,23 @@ def inspect(request):
 	
 	
 	curyear = datetime.date.today().year - 1
-	yearList=[curyear,curyear-1,curyear-2]
-	#TODO: use a raw query instead?
-	entries= models.Trial_Entry.objects.select_related(depth=3).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min(yearList),1,1), datetime.date(max(yearList),12,31))
-				)
-			).order_by("location")
-			
-	# locations=models.Trial_Entry.objects.raw(
-							# "SELECT id,name FROM variety_trials_data_location"
-						# )
-	# varieties=models.Trial_Entry.objects.raw(
-							# "SELECT name,id FROM variety_trials_data_variety"
-						# )
-	locations= models.Location.objects.order_by("name")
-	varieties= models.Variety.objects.order_by("name")
-
+	yearList=list()
+	year = datetime.date.today().year - 1
+	date_count=1
+	x=0
+	#this loop runs forever
+	while date_count>0:
+		date_count=models.Date.objects.filter(date__range=(datetime.date(curyear-1,1,1), datetime.date(curyear,12,31))).count()
+		#min_year = models.Date.objects.raw("SELECT id,date  FROM variety_trials_data_date where date < "+str(year)+" LIMIT 1")
+		year-=1
+		print x
+		x+=1
+	year+=1
+	for year in range(year,curyear):
+		yearList.append(year)
+	varieties = models.Variety.objects.all().order_by("name")
+	locations = models.Location.objects.all().order_by("name")
+	
 	masterDict=dict()
 	for year in yearList:
 		masterDict[year]=dict()
@@ -419,13 +419,16 @@ def inspect(request):
 		for v in varieties:
 			masterDict[year]["rows"][v.name]=dict()
 			for l in locations:
-				masterDict[year]["rows"][v.name][l.name]=" "
+				masterDict[year]["rows"][v.name][l.id]=" "
 	
+	for entry in models.Trial_Entry.objects.select_related(depth=3).filter(
+			harvest_date__in=models.Date.objects.filter(
+				date__range=(datetime.date(min(yearList),1,1), datetime.date(max(yearList),12,31))
+			)
+		):
+		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
 	
-	
-	for entry in entries:
-		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.name]="X"
-	
+
 	masterList=dict()
 	for year in yearList:
 		masterList[year]=dict()
@@ -438,11 +441,11 @@ def inspect(request):
 			masterList[year]["rows"].append(dummy_list)
 			
 			for l in locations:
-				masterList[year]["rows"][x].append(masterDict[year]["rows"][v.name][l.name])
+				masterList[year]["rows"][x].append(masterDict[year]["rows"][v.name][l.id])
 			x+=1
 	return render_to_response(
 		'inspect.html',
 		{
-		'masterDict':masterList
+		'masterList':masterList
 		}
 	)
