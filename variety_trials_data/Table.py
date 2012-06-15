@@ -315,14 +315,22 @@ class SubTable:
 			y_temp = list.reverse(list.sort(years)) 
 			year_columns = []
 			
+			teo = Trial_Entry.objects
+			
 			if len(y_temp) > 3:
 				t = y_temp[:2] # Reduce the number of years to 3.
 				y_temp = t
-				
-				
+			
+			"""
+			I'm going to change this query. Right now, the current state of 
+			this Class assumes that strings/keywords, years, locations, varieties, are passed to 
+			this function, the Table Class, and the populate_location_columns function parses those strings and uses them in 
+			a query. I'll decide soon if we should keep that, or expect that objects themselves are passed to this Class.
+			"""
 			for y in y_temp:
 				for v in v_temp:
-					Trial_Entry.objects.filter(harvest_date.date.year=y, variety.name=v) # Apparently I can't do this.
+					Trial_Entry.objects.filter(harvest_date__year=y, variety__name=v.name) 
+					
 			
 			"""
 			for entry in self.entries: # Yay for n^3.
