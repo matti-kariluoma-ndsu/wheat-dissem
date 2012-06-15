@@ -442,17 +442,47 @@ def add_information(request):
 			
 			
 def adding_to_database_confirm(request):
-	
+	#List for Varieties
 	entered_variety_data = []
-	entered_location_data = {}
-	
+	description_url = []
+	picture_url = []
+	agent_origin = []
+	year_released = []
+	straw_length = []
+	maturity = []
+	grain_color = [] 
+	seed_color = []
+	beard = []
+	wilt = []
+	diseases = []
+	susceptibility = []
+	#Lists for Location data 
+	entered_location_data = []
+	extracted_zip = [] 
+	errorcheck = []
 	# a dictionary, keys are strings (source of error), values are strings (message)
 	
 	if request.method == 'POST': # If the form has been submitted...
+	
 		entered_variety_data.append(request.POST.getlist("varietyname"))
+		description_url.append(request.POST.getlist("description_url"))
+		picture_url.append(request.POST.getlist("picture_url"))
+		agent_origin.append(request.POST.getlist("agent_origin"))
+		year_released.append(request.POST.getlist("year_released"))
+		straw_length.append(request.POST.getlist("straw_length"))
+		maturity.append(request.POST.getlist("maturity"))
+		grain_color.append(request.POST.getlist("grain_color"))
+		seed_color.append(request.POST.getlist("seed_color"))
+		beard.append(request.POST.getlist("beard"))
+		wilt.append(request.POST.getlist("wilt"))
+		diseases.append(request.POST.getlist("diseases"))
+		susceptibility.append(request.POST.getlist("susceptibility"))
+		entered_location_data.append(request.POST.getlist("entered_location_data"))
+		extracted_zip.append(request.POST.getlist("zipcode"))
+		
 		print entered_variety_data
-		
-		
+		errorcheck= variety_trials_forms.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
+		print errorcheck
 		return HttpResponseRedirect("/sucess/")
 		
 

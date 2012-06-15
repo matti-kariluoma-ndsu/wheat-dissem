@@ -325,6 +325,7 @@ def checking_for_data(uploaded_file):
 				if not errors:
 					model_instance = models.Trial_Entry()
 					for name in insertion_dict.keys():
+						
 						setattr(model_instance, name, insertion_dict[name])
 						print "Writing %s as %s" % (name, insertion_dict[name])
 						insertion_dict[name] = None
@@ -336,3 +337,26 @@ def checking_for_data(uploaded_file):
 					print givenval
 				
 		return (False, errors)
+
+def adding_to_database(varietyname, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip):
+	split_l=[]
+	data = {}
+	
+
+	f = open("1.txt", 'r')
+	data = json.load(f)
+	'''
+	model_instance = models.Trial_Entry()
+	for name in data.keys():
+		setattr(model_instance, name, data[name])
+		print "Writing %s as %s" % (name, data[name])
+		data[name] = None
+	model_instance.save() # ARE YOU BRAVE ENOUGH? 
+	'''
+	f.close()
+
+	
+	
+	
+	
+	return(False,data)
