@@ -104,6 +104,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 
 {% block javascript %}
 
+//selects everything in the selectRight box
 function select_all() {
 $("#selectRight").each(
 			function() {
@@ -111,4 +112,11 @@ $("#selectRight").each(
 			}
 		);
 	}
+	
+//clears the selecrRight box on page load
+$("#selectRight").each(
+			function() {
+				$("#selectRight option").remove();
+			}
+		);
 {% endblock %}

@@ -394,7 +394,7 @@ def varieties_view(request, yearname, fieldname, abtest=None):
 		print request.GET
 		if varieties_form.is_valid():
 			
-			varieties = varieties_form.cleaned_data['varieties']
+			varieties = varieties_form.cleaned_data['varieties_selected']
 			print '1'
 			locations = models.Location.objects.all()
 			
