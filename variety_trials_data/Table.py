@@ -180,8 +180,8 @@ class LSD_Row(Row):
 		"""
 		
 		trt = response_to_treatments
-		#model = aov(y~trt)
-		#df = df.residual(model)
+		# model = aov(y~trt)
+		# df = df.residual(model)
 		# df is the residual Degrees of Freedom
 		# n are factors, k is responses per factor
 		n = len(trt)
@@ -303,95 +303,38 @@ class SubTable:
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
-			Appends the variety values for the given years.
-			
-			[(maxYear, value ),...,(minYear, value)] The 'year' key will be numeric. 
+			This function returns a dictionary like so: {year:{variety:test_weight}} 
 			"""
 			
-			y1 = {} # The big dictionary with all the information you could possible want, e.g. {Year: {Variety: Value}}.
-			y2 = [] # This contains just the variety values, it doesn't have all the annoying keys. 
-			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
-			v_temp = list.sort(varieties)
-			y_temp = list.reverse(list.sort(years)) 
-			year_columns = []
-			
-			teo = Trial_Entry.objects
+			query_results = []
+			year_columns = {} # The big dictionary with all the information you could possible want, e.g. {year: {variety: test_weight}}.
 			
 			if len(y_temp) > 3:
-				t = y_temp[:2] # Reduce the number of years to 3.
+				t = years[:2] # Reduce the number of years to 3, and hope that the years are sorted.
 				y_temp = t
 			
-			"""
-			I'm going to change this query. Right now, the current state of 
-			this Class assumes that strings/keywords, years, locations, varieties, are passed to 
-			this function, the Table Class, and the populate_location_columns function parses those strings and uses them in 
-			a query. I'll decide soon if we should keep that, or expect that objects themselves are passed to this Class.
-			"""
 			for y in y_temp:
-				for v in v_temp:
-					Trial_Entry.objects.filter(harvest_date__year=y, variety__name=v.name) 
-					
-			
-			"""
-			for entry in self.entries: # Yay for n^3.
-				for y in y_temp: # This for loop is crap. I'm going to generate a QuerySet and evaluate that instead.
-					for  v in v_temp:
-						if y == entry.harvest_date.date.year and v == entry.variety.name: 
-							try:
-								y1 = {y: {v: entry.test_weight}} 
-								y2 = entry.test_weight
-								y3 = y
-							except AttributeError:
-								y1 = {y: {v: None}} 
-								y2 = None
-								y3 = y
-						else:
-							y1 = {y: {v: None}}
-							y2 = None
-							y3 = y
-						year_columns.append([y1, y2, y3])
-						
-			"""
+				for v in varieties:
+					query_results.append(Trial_Entry.objects.filter(harvest_date__year=y, variety__name=v.name))
+							
+			if len(query_results) is not 0:
+				for q in query_results:
+					year_columns = {query_results.harvest_date.date.year: None} # Create the year keys. 
+				
+				if len(year_columns) is not 0: # None will become another dictionary with the variety names as the keys.
+					for y in year_columns:	
+						year_columns[y] = {query_results.variety.name: query_results.variety.test_weight}
 							
 			return year_columns
 			
-		def populate_location_columns(self, locations, year_columns): 
+		def populate_location_columns(self, locations, year_columns): # Assumes the same locations are sent to the populate_year_average_columns
 			"""
-			Creates a dictionary of locations columns.
-			
-			The final output from l_column should look like this:
-			
-			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0)]
+			Creates a dictionary of location columns:
+			{location: {variety:test_weight}}
 			"""
 			
-			l_temp = sorted(locations, key=attrgetter('name'))
-			l1 = {} # The big dictionary with all the information you could possible want, e.g. {Location: {Variety: Value}}
-			l2 = [] # This contains just the variety values, it doesn't have all the annoying keys..
-			l3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
-			location_columns = []
-			# Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
-			for y, v_dict in year_columns[0].items():
-				v_temp = v_dict.keys() # TODO: logic error, maybe this is meant to be in the calling function?
-				if v_temp is not None and len(v_temp) > 0:
-					break;
+			query_results = []
 			
-			for entry in self.entries: # Yay for n^3
-				for l in l_temp: # This for loop is crap. I'm going to generate a QuerySet and evaluate that instead.
-					for v in v_temp:
-						if l == entry.location.name and v == entry.variety.name:
-							try:
-								l1 = {l: {v: entry.test_weight}}
-								l2 = entry.test_weight
-								l3 = l
-							except AttributeError:
-								l1 = {l: {v: None}}
-								l2 = None
-								l3 = l
-						else:
-							l1 = {l: {v: None}}
-							l2 = None
-							l3 = l
-						location_columns.append([l1, l2, l3])
 				
 			return location_columns
 			
