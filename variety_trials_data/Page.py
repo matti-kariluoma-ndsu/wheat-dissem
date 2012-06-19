@@ -11,27 +11,41 @@ class Cell:
 	Helper class; Cells for our Table class.
 	"""
 	
-	def __init__(self, row, column, value):
+	def __init__(self, row, column):
 		row.append(self)
 		column.append(self)
-		
 		self.row = row
 		self.column = column
-		self.value = value
+		self.members = []
+		self.index = 0
+		
+	def __iter__(self):
+		self.index = 0
+		return self
 	
+	def next(self):
+		if self.index == len(self.members):
+			raise StopIteration
+		value = self.members[self.index]
+		self.index = self.index + 1
+		return value 
+	
+	def append(self, value):
+		self.members.append(value)
+		
 	def delete_row(self):
 		self.row = None
 	
 	def delete_column(self):
 		self.column = None
 		
-	def delete_value(self):
-		self.value = None
+	def delete_values(self):
+		self.members = []
 		
 	def clear(self):
 		self.delete_row()
 		self.delete_column()
-		self.delete_value()
+		self.delete_values()
 
 class Row:
 	"""
@@ -293,14 +307,14 @@ class Table:
 			self.lsd_probability = lsd_probability
 			self.rows = {}
 			self.columns = {}
+			self.cells = {}
 			
 		def get_row(self, variety):
 			try:
 				row = self.rows[variety]
 			except KeyError:
 				row = self.rows[variety] = Row(variety)
-			return row
-							
+			return row	
 		
 		def get_column(self, location):
 			try:
@@ -308,6 +322,16 @@ class Table:
 			except KeyError:
 				col = self.columns[location] = Column(location)
 			return col
+		
+		def get_cell(self, entry):
+			try:
+				cell = self.cells[(entry.variety, entry.location)]
+			except KeyError:
+				# create a new cell object, which adds itself to the given row & column
+				cell = self.cells[(entry.variety, entry.location)] = Cell(self.get_row(entry.variety), self.get_column(entry.location))
+			return cell
+			
+			
 
 class Page:
 	def __init__(self, entries, lsd_probability):
@@ -316,6 +340,7 @@ class Page:
 		table = Table(lsd_probability)
 		self.tables.append(table)
 		for entry in entries:
-			# create a new cell object, which adds itself to the given row & column
-			Cell(table.get_row(entry.variety), table.get_column(entry.location), entry)
+			# store like entries for multiple observations and multiple years
+			table.get_cell(entry).append(entry)
+			
 
