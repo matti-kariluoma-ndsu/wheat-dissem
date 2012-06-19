@@ -92,14 +92,23 @@ function move(listBoxTo,optionValue,optionDisplayText){
 			{{ field.errors }}
 			{{ field.label_tag }}: {{ field }}
 		</div>
+		
 		{% endfor %}
-		</form>
-		<form action="/view/variety/{{curyear}}/bushels_acre/" method="GET">
-			<input name="btnRight" type="button" id="btnRight" value="&gt;&gt;" onClick="javascript:movePosition(1);">
-			<select name="selectRight" size="10" id="selectRight">
-			<input name="btnLeft" type="button" id="btnLeft" value="&lt;&lt;" onClick="javascript:movePosition(2);">
-			<input type="submit" value="Submit" />
+		<input name="btnRight" type="button" id="btnRight" value="&gt;&gt;" onClick="javascript:movePosition(1);">
+		<input name="btnLeft" type="button" id="btnLeft" value="&lt;&lt;" onClick="javascript:movePosition(2);">
+		<input type="submit" value="Submit"; onClick = "javascript:select_all();">
 		</form>
 	
 </div>
+{% endblock %}
+
+{% block javascript %}
+
+function select_all() {
+$("#selectRight").each(
+			function() {
+				$("#selectRight option").attr("selected","selected");
+			}
+		);
+	}
 {% endblock %}
