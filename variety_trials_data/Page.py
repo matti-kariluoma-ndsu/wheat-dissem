@@ -37,19 +37,21 @@ class Row:
 	"""
 	Contains references to each Cell in this row.
 	"""
-	def __init__(self):
+	def __init__(self, variety):
+		self.variety = variety
 		self.members = []
 		self.index = 0
 	
 	def __iter__(self):
-		self.index = -1
+		self.index = 0
 		return self
 	
 	def next(self):
 		if self.index == len(self.members):
 			raise StopIteration
+		cell = self.members[self.index]
 		self.index = self.index + 1
-		return self.members[self.index] 
+		return cell 
 	
 	def append(self, value):
 		self.members.append(value)
@@ -64,8 +66,8 @@ class LSD_Row(Row):
 	"""
 	A row that keeps track of which Table it belongs to.
 	"""
-	def __init__(self, table):
-		Row.__init__(self)
+	def __init__(self, variety, table):
+		Row.__init__(self, variety)
 		self.table = table
 		
 	
@@ -249,19 +251,21 @@ class Column:
 	"""
 	Contains references to each Cell in this column.
 	"""
-	def __init__(self):
+	def __init__(self, location):
+		self.location = location
 		self.members = []
 		self.index = 0
 	
 	def __iter__(self):
-		self.index = -1
+		self.index = 0
 		return self
 	
 	def next(self):
 		if self.index == len(self.members):
 			raise StopIteration
+		cell = self.members[self.index]
 		self.index = self.index + 1
-		return self.members[self.index]
+		return cell
 	
 	def append(self, value):
 		self.members.append(value)
@@ -286,7 +290,7 @@ class Table:
 		"""
 			
 		def __init__(self, lsd_probability): # Probability is required for creating the LSD row
-			self.lsd_probaility = lsd_probaility
+			self.lsd_probability = lsd_probability
 			self.rows = {}
 			self.columns = {}
 			
@@ -294,7 +298,7 @@ class Table:
 			try:
 				row = self.rows[variety]
 			except KeyError:
-				row = self.rows[variety] = Row()
+				row = self.rows[variety] = Row(variety)
 			return row
 							
 		
@@ -302,7 +306,7 @@ class Table:
 			try:
 				col = self.columns[location]	
 			except KeyError:
-				col = self.columns[location] = Column()
+				col = self.columns[location] = Column(location)
 			return col
 
 class Page:

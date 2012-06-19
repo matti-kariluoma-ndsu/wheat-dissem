@@ -4,6 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
+from variety_trials_data.Page import Page
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
 
@@ -165,6 +166,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			#'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				#'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
 	}
+	
 	#retrieves the list of locations and finds the locations that have been excluded by the user, storing them in neg_locations
 	try:
 		pos_locations = Locations_from_Zipcode_x_Radius(
@@ -179,7 +181,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	for e in pos_locations:
 		if locations.count(e)==0:
 			neg_locations.append(e)
-			
+	
 	this_year = datetime.date.today().year - 1
 
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
@@ -220,79 +222,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			del unit_blurbs[name]
 	"""
 	
-	from variety_trials_data.Table import SubTable
-	t = SubTable(get_entries(locations, year_list), 0.05)
-	
-	lsd_row = t.get(year_list, varieties, locations)
-	
-	print t.top_row
-	print t.year_columns
-	print t.location_columns
-	for row in t.row_labels_column:
-		print row
-	print lsd_row
-		
-	# TODO: respect/update the cur_year value.
-	try:
-		sorted_list = LSD_Calculator(get_entries(locations, year_list), locations, varieties, year_list, curyear, field).fetch(reduce_to_one_subset=one_subset)
-	except TypeError:
-		# TODO: we can do more for the user than redirect to /
-		return HttpResponseRedirect("/")
-	
-	# New idea, return a list of tables instead of a list of rows
-	tables = []
-	header_rows = [sorted_list[0]]
-	lsd_rows = []
-	rows = []
-	i = 0;
-			
-	for row in sorted_list[1::]:
-		if len(row) > 0:
-			if row[0][0] == 'Variety':
-				tables.append(rows)
-				rows = []
-				header_rows.append(row)
-			elif row[0] == 'LSD':
-				lsd_rows.append(row)
-			else:
-				rows.append(row)
-				
-	tables.append(rows)
-
-	dict_tables = []
-	for h in header_rows:
-		dict_tables.append(dict(header=h))
-	for l, i in zip(lsd_rows, range(len(lsd_rows))):
-		dict_tables[i]['lsd'] = l
-	for r, i in zip(tables, range(len(tables))):
-		dict_tables[i]['rows'] = r
-	
-	for table in dict_tables:
-		order = table['header'][0][1][0]
-		#print order
-		table['order'] = tuple((order[0], order[0]+order[1], order[0]+order[1]+order[2]))
-		table['header'][0] = ('Variety', -1)
-	
-	remove_incomplete_tables = True
-	# remove tables that are incomplete
-	if remove_incomplete_tables:
-		keep_me = []
-		for table in dict_tables:
-			full = True
-			for row in table['rows']:
-				if None in row:
-					full = False
-			if full:
-				keep_me.append(table)
-		dict_tables = keep_me
-	'''
-	for table in dict_tables:
-		print table['header']
-		for row in table['rows']:
-			print row
-		print table['lsd']
-		print ''
-	'''
+	page = Page(get_entries(locations[0:6], year_list), 0.05)
 	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
@@ -307,39 +237,20 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	except TypeError:
 		ab = None
 	
-	# turn the headers from a list of names to a tuple of (location_name, location_id)
-	heading_list = []
-	
-	#TODO: this is very bad for the database...
-	try:
-		pass
-		#curyear = sorted_list[0][0] # we sent a preference for curyear, but what was returned may be different
-	except IndexError: # will happen if all locations have been deselected...
-		sorted_list = [[curyear]]
-		return HttpResponseRedirect("/")
-	
 	if one_subset: # the variety view
 		view = 'variety'
-	directHome=0
-	for l in sorted_list[1::]:
-		if l[1]==l[2]==l[3]==None:
-			directHome=1
-		else:
-			directHome=0
-			break
-	if directHome==1:
-		return HttpResponseRedirect("/")
-		
-		#iterate through sorted list and send the user to the home page if it's all empty
 	else: # the location view
 		view = 'location'
+	
 	location_get_string=''
 	variety_get_string=''
+	"""
 	for v in varieties:
 		variety_get_string='&varieties='+str(v.id)
 	for l in locations:
 		location_get_string='&locations='+str(l.id)
 	variety_get_string = '?'+variety_get_string[1::]
+	"""
 	return render_to_response(
 		'tabbed_view.html',
 		{
@@ -351,9 +262,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			'field_list': field_list,
 			'location_list': locations,
 			'curyear': curyear,
-			'heading_list': sorted_list[0][1::],
-			'sorted_list': sorted_list[1::],
-			'tables': dict_tables,
+			'page': page,
 			'years': year_list,
 			'blurbs' : unit_blurbs,
 			'curfield' : fieldname,
