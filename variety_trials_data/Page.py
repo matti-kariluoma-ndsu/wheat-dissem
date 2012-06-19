@@ -1,21 +1,24 @@
-from variety_trials_data.models import Trial_Entry #, Date
+from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
 from scipy.special import erfinv
 from itertools import chain
 from operator import attrgetter
 import copy
+import datetime
 
 class Cell:
 	"""
 	Helper class; Cells for our Table class.
 	"""
 	
-	def __init__(self, row, column):
+	def __init__(self, row, column, year, fieldname):
 		row.append(self)
 		column.append(self)
 		self.row = row
 		self.column = column
+		self.year = year
+		self.fieldname = fieldname
 		self.members = []
 		self.index = 0
 		
@@ -46,6 +49,35 @@ class Cell:
 		self.delete_row()
 		self.delete_column()
 		self.delete_values()
+	
+	def get_from(self, year, fieldname):
+		this_year = []
+		for entry in self.members:
+			if entry.harvest_date.date.year == year:
+				this_year.append(entry)
+		
+		values = []
+		for entry in this_year:
+			try:
+				values.append(getattr(entry, fieldname))
+			except AttributeError:
+				pass
+		
+		mean = None
+		if len(values) > 0:
+			mean = float(sum(values)) / float(len(values))
+		
+		return mean
+	
+	def get(self):
+		return self.get_from(self.year, self.fieldname)
+		
+	def set_default_year(self, year):
+		self.year = year
+		
+	def set_default_fieldname(self, fieldname):
+		self.fieldname = fieldname
+	
 
 class Row:
 	"""
@@ -260,7 +292,7 @@ class LSD_Row(Row):
 			lsds = l
 		
 		return lsds
-				
+
 class Column:
 	"""
 	Contains references to each Cell in this column.
@@ -323,24 +355,69 @@ class Table:
 				col = self.columns[location] = Column(location)
 			return col
 		
-		def get_cell(self, entry):
+		def get_cell(self, entry, default_year, default_fieldname):
 			try:
 				cell = self.cells[(entry.variety, entry.location)]
 			except KeyError:
 				# create a new cell object, which adds itself to the given row & column
-				cell = self.cells[(entry.variety, entry.location)] = Cell(self.get_row(entry.variety), self.get_column(entry.location))
+				cell = self.cells[(entry.variety, entry.location)] = Cell(
+						self.get_row(entry.variety), 
+						self.get_column(entry.location), 
+						default_year, 
+						default_fieldname)
 			return cell
-			
-			
+	
+		def set_defaults(self, year, fieldname):
+			for rows in self.rows.values():
+				for cell in rows:
+					cell.set_default_year(year)
+					cell.set_default_field(fieldname)
+		
+		def set_default_year(self, year):
+			for rows in self.rows.values():
+				for cell in rows:
+					cell.set_default_year(year)
+		
+		def set_default_field(self, fieldname):
+			for rows in self.rows.values():
+				for cell in rows:
+					cell.set_default_field(fieldname)
 
 class Page:
-	def __init__(self, entries, lsd_probability):
-		self.entries = entries
+	def get_entries(self):
+		# We do a depth=2 so we can access entry.variety.name
+		# We do a depth=3 so we can access entry.harvest_date.date.year
+		#TODO: Somehow reduce this to depth=1
+		return models.Trial_Entry.objects.select_related(depth=3).filter(
+				location__in=self.locations
+			).filter(
+				harvest_date__in=models.Date.objects.filter(
+					date__range=(datetime.date(min(self.years),1,1), datetime.date(max(self.years),12,31))
+				)
+			)
+			
+	def __init__(self, locations, years, default_year, default_fieldname, lsd_probability):
+		self.locations = locations
+		self.years = years
 		self.tables = []
 		table = Table(lsd_probability)
 		self.tables.append(table)
-		for entry in entries:
+		for entry in self.get_entries():
 			# store like entries for multiple observations and multiple years
-			table.get_cell(entry).append(entry)
+			# entry is used as a lookup
+			# default_* are used when intializing a new cell
+			table.get_cell(entry, default_year, default_fieldname).append(entry)
+	
+	def set_defaults(self, year, fieldname):
+		for table in self.tables:
+			table.set_defaults(year, fieldname)
+			
+	def set_default_year(self, year):
+		for table in self.tables:
+			table.set_default_year(year)
+	
+	def set_default_field(self, fieldname):
+		for table in self.tables:
+			table.set_default_field(fieldname)
 			
 

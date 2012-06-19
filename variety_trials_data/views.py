@@ -8,17 +8,7 @@ from variety_trials_data.Page import Page
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
 
-def get_entries(locations, year_list):
-	# We do a depth=2 so we can access entry.variety.name
-	# We do a depth=3 so we can access entry.harvest_date.date.year
-	#TODO: Somehow reduce this to depth=1
-	return models.Trial_Entry.objects.select_related(depth=3).filter(
-				location__in=locations
-			).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
-				)
-			)
+
 def variety_info(request, variety_name):	
 	variety=models.Variety.objects.filter(name=variety_name)
 	"""
@@ -222,7 +212,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			del unit_blurbs[name]
 	"""
 	
-	page = Page(get_entries(locations[0:6], year_list), 0.05)
+	page = Page(locations[0:8], year_list, curyear, fieldname, 0.05)
 	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
@@ -252,7 +242,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	variety_get_string = '?'+variety_get_string[1::]
 	"""
 	return render_to_response(
-		'tabbed_view.html',
+		'tabbed_object_view.html',
 		{
 			'zipcode': zipcode,
 			'search_radius': search_radius,

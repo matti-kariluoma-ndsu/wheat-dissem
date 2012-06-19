@@ -152,7 +152,7 @@
 		</div>
 		<div class="LSD_row">
 			{% for cell in row %}
-			<div class='Column'>{{ cell.value.bushels_acre|default_if_none:"--" }}</div>
+			<div class='Column'>{{ cell.get|default_if_none:"--" }}</div>
 			{% endfor %}
 			<br style="clear: both;"/>
 		</div>
