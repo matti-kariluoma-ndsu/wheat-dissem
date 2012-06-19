@@ -5,7 +5,7 @@
 <script type="text/javascript">
 
 function movePosition(side){
-	var positionLeft=document.getElementById('selectLeft');
+	var positionLeft=document.getElementById('id_varieties');
 	var positionRight=document.getElementById('selectRight');
 
 if(side==1){
@@ -87,39 +87,19 @@ function move(listBoxTo,optionValue,optionDisplayText){
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
 	<form action="/view/variety/{{curyear}}/bushels_acre/" method="GET">
-	<table border="0">
-	<tr>
-	<p>Make Your selections:<p>
-	</tr>
-	<tr>
-	<td rowspan="3" align="left">
-	<select name="selectLeft" size="10" id="selectLeft"> 
 		{% for field in varieties_form %}
 		<div class="input row">
 			{{ field.errors }}
 			{{ field.label_tag }}: {{ field }}
 		</div>
 		{% endfor %}
-		</select>
-		<input type="submit" value="Submit" />
-	</form>
-	<td rowspan="3" align="left"><select name="selectRight" size="10" id="selectRight">
-
-</select></td>
-<tr>
-<td align="left">&nbsp;</td>
-<td align="left"><label>
-<input name="btnRight" type="button" id="btnRight" value="&gt;&gt;" onClick="javascript:movePosition(1);">
-</label></td>
-</tr>
-
-<tr>
-<td align="left">&nbsp;</td>
-<td align="left"><label>
-<input name="btnLeft" type="button" id="btnLeft" value="&lt;&lt;" onClick="javascript:movePosition(2);">
-</label></td>
-</tr>
-
-</table>
+		</form>
+		<form action="/view/variety/{{curyear}}/bushels_acre/" method="GET">
+			<input name="btnRight" type="button" id="btnRight" value="&gt;&gt;" onClick="javascript:movePosition(1);">
+			<select name="selectRight" size="10" id="selectRight">
+			<input name="btnLeft" type="button" id="btnLeft" value="&lt;&lt;" onClick="javascript:movePosition(2);">
+			<input type="submit" value="Submit" />
+		</form>
+	
 </div>
 {% endblock %}
