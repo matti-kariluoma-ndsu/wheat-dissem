@@ -391,26 +391,21 @@ def add_trial_entry_csv_file(request):
 def inspect(request):
 	
 	
-	curyear = datetime.date.today().year - 1
-	yearList=list()
-	year = datetime.date.today().year - 1
+	cur_year = datetime.date.today().year
+	year_list=list()
+	min_year = datetime.date.today().year
 	date_count=1
-	x=0
-	#this loop runs forever
 	while date_count>0:
-		date_count=models.Date.objects.filter(date__range=(datetime.date(curyear-1,1,1), datetime.date(curyear,12,31))).count()
-		#min_year = models.Date.objects.raw("SELECT id,date  FROM variety_trials_data_date where date < "+str(year)+" LIMIT 1")
-		year-=1
-		print x
-		x+=1
-	year+=1
-	for year in range(year,curyear):
-		yearList.append(year)
+		min_year-=1
+		date_count=models.Date.objects.filter(date__range=(datetime.date(min_year-1,1,1), datetime.date(min_year,12,31))).count()
+		print str(min_year)+" "+str(date_count)
+	for year in range(min_year+1,cur_year):
+		year_list.append(year)
 	varieties = models.Variety.objects.all().order_by("name")
 	locations = models.Location.objects.all().order_by("name")
 	
 	masterDict=dict()
-	for year in yearList:
+	for year in year_list:
 		masterDict[year]=dict()
 		masterDict[year]["header"]=list()
 		for l in locations:
@@ -423,14 +418,13 @@ def inspect(request):
 	
 	for entry in models.Trial_Entry.objects.select_related(depth=3).filter(
 			harvest_date__in=models.Date.objects.filter(
-				date__range=(datetime.date(min(yearList),1,1), datetime.date(max(yearList),12,31))
+				date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
 			)
 		):
 		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
-	
 
 	masterList=dict()
-	for year in yearList:
+	for year in year_list:
 		masterList[year]=dict()
 		masterList[year]["header"]=masterDict[year]["header"]
 		masterList[year]["rows"]=list()
