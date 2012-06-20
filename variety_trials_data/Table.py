@@ -306,7 +306,6 @@ class SubTable:
 			This function returns a dictionary like so: {year:{variety:test_weight}} 
 			"""
 			
-			query_results = []
 			year_columns = {} # The big dictionary with all the information you could possible want, e.g. {year: {variety: test_weight}}.
 			
 			if len(y_temp) > 3:
@@ -315,27 +314,32 @@ class SubTable:
 			
 			for y in y_temp:
 				for v in varieties:
-					query_results.append(Trial_Entry.objects.filter(harvest_date__year=y, variety__name=v.name))
+					query_set = Trial_Entry.objects.filter(harvest_date__year=y, variety__name=v.name)
 							
-			if len(query_results) is not 0:
-				for q in query_results:
-					year_columns = {query_results.harvest_date.date.year: None} # Create the year keys. 
-				
-				if len(year_columns) is not 0: # None will become another dictionary with the variety names as the keys.
-					for y in year_columns:	
-						year_columns[y] = {query_results.variety.name: query_results.variety.test_weight}
+				for q in query_set:
+					year_columns = {q.harvest_date.date.year: {q.variety.name: q.variety.test_weight}} # OMG! Maybe this will work!
 							
 			return year_columns
 			
-		def populate_location_columns(self, locations, year_columns): # Assumes the same locations are sent to the populate_year_average_columns
+		def populate_location_columns(self, years, locations):
 			"""
 			Creates a dictionary of location columns:
 			{location: {variety:test_weight}}
 			"""
 			
-			query_results = []
+			location_columns = {}
 			
+			if len(years) > 3:
+				t = years[:2] # Reduce the number of years to 3, and hope that the years are sorted.
+				y_temp = t
+			
+			for y in y_temp:
+				for l in locations:
+					query_set = Trial_Entry.objects.filter(harvest_date__year=y, location__name=l.name)
 				
+				for q in query_set:
+					location_columns = {q.harvest_date.date.year: {q.location.name: q.variety.test_weight}} # this is wrong
+							
 			return location_columns
 			
 		def populate_row_labels_column(self, year_columns):
@@ -395,8 +399,7 @@ class SubTable:
 			lsd_row = lsdCalc.populate(probability)
 			collated_table = {'lsds':lsd_row}
 			
-			return collated_table
-			
+			return collated_table	
 			
 		def get_year_column(self, year, year_columns):
 			"""
