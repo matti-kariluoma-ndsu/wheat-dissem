@@ -18,7 +18,8 @@ if(side==1){
 		var toCompare=positionLeft.options.selectedIndex;
 
 		move(positionRight,positionLeft.options[toCompare].value,positionLeft.options[toCompare].text);
-		positionLeft.remove(toCompare);
+		//positionLeft.remove(toCompare);
+		
 
 	if(positionLeft.options.length>0){
 		positionLeft.options[0].selected=true;
@@ -33,8 +34,9 @@ if(side==1){
 	}else{
 		var toCompare=positionRight.options.selectedIndex;
 
-		move(positionLeft,positionRight.options[toCompare].value,positionRight.options[toCompare].text);
+		//move(positionLeft,positionRight.options[toCompare].value,positionRight.options[toCompare].text);
 		positionRight.remove(toCompare);
+		
 
 	if(positionRight.options.length>0){
 		positionRight.options[0].selected=true;
@@ -94,9 +96,15 @@ function move(listBoxTo,optionValue,optionDisplayText){
 		</div>
 		
 		{% endfor %}
+		
+		<input type="submit" value="Submit"; onClick = "javascript:select_all();">
+		</form>
+		
+		<form>
+		<select name="selectRight" size="10" id="selectRight">
+		</select>
 		<input name="btnRight" type="button" id="btnRight" value="&gt;&gt;" onClick="javascript:movePosition(1);">
 		<input name="btnLeft" type="button" id="btnLeft" value="&lt;&lt;" onClick="javascript:movePosition(2);">
-		<input type="submit" value="Submit"; onClick = "javascript:select_all();">
 		</form>
 	
 </div>
@@ -104,19 +112,22 @@ function move(listBoxTo,optionValue,optionDisplayText){
 
 {% block javascript %}
 
+function select_variety(variety_value) {
+		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
+	}
+
 //selects everything in the selectRight box
 function select_all() {
-$("#selectRight").each(
+$("#id_varieties option").each(
 			function() {
-				$("#selectRight option").attr("selected","selected");
+				$(this).removeAttr("selected");
+			}
+		);
+	
+$("#selectRight option").each(
+			function() {
+				select_variety($(this).attr("value"));
 			}
 		);
 	}
-	
-//clears the selecrRight box on page load
-$("#selectRight").each(
-			function() {
-				$("#selectRight option").remove();
-			}
-		);
 {% endblock %}
