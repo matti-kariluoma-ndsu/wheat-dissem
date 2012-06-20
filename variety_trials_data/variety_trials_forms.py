@@ -339,20 +339,66 @@ def checking_for_data(uploaded_file):
 		return (False, errors)
 
 def adding_to_database(varietyname, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip):
-	split_l=[]
 	data = {}
-	
-
+	forgienfield=[]
+	possible_characters = ('/', ' ', '-', '.')
 	f = open("1.txt", 'r')
 	data = json.load(f)
-	'''
+	#saving verified inputs to the database
+	for l in range(len(varietyname)):
+		d = models.Variety(
+			name=varietyname[l][l],
+			description_url = description_url[l][l]
+			,agent_origin=agent_origin[l][l],
+			year_released=year_released[l][l],
+			straw_length=straw_length[l][l],
+			maturity=maturity[l][l],
+			grain_color=grain_color[l][l],
+			seed_color=seed_color[l][l], 
+			beard=beard[l][l],
+			 wilt=wilt[l][l]
+			  )
+		d.save()
+	'''	
+	for i in range(len(entered_location_data)):
+		s = models.Location( 
+			name = entered_location_data[i][i],
+			zipcode = extracted_zip[i][i],
+			)
+	'''		
+		
+		
+	#I guess we dont need this section of code.
+	'''	
+	for field in models.Trial_Entry._meta.fields:
+			if (field.get_internal_type() == 'ForeignKey' 
+					or field.get_internal_type() == 'ManyToManyField' ):
+						forgienfield.append("%s_id" % field.name)
+	'''						
 	model_instance = models.Trial_Entry()
 	for name in data.keys():
-		setattr(model_instance, name, data[name])
+		if name == 'plant_date_id':
+			setattr(model_instance, name, 1)
+		elif name == 'harvest_date_id':
+			datesplit=re.split("[%s]" % ("".join(possible_characters)), data[name])
+			datelist = models.Date.objects.filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+		
+			forgineid = 1
+			for element in datelist:
+				forgineid = element.id
+			setattr(model_instance, name,forgineid)
+		elif name == 'location_id':
+			
+			setattr(model_instance, name, 1)
+		elif name == 'variety_id':
+			setattr(model_instance, name, 1)	
+		else:
+			setattr(model_instance, name, data[name])
+		
 		print "Writing %s as %s" % (name, data[name])
 		data[name] = None
 	model_instance.save() # ARE YOU BRAVE ENOUGH? 
-	'''
+	
 	f.close()
 
 	
