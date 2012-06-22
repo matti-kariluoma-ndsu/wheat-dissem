@@ -464,25 +464,25 @@ def adding_to_database_confirm(request):
 	
 	if request.method == 'POST': # If the form has been submitted...
 	
-		entered_variety_data.append(request.POST.getlist("varietyname"))
-		description_url.append(request.POST.getlist("description_url"))
-		picture_url.append(request.POST.getlist("picture_url"))
-		agent_origin.append(request.POST.getlist("agent_origin"))
-		year_released.append(request.POST.getlist("year_released"))
-		straw_length.append(request.POST.getlist("straw_length"))
-		maturity.append(request.POST.getlist("maturity"))
-		grain_color.append(request.POST.getlist("grain_color"))
-		seed_color.append(request.POST.getlist("seed_color"))
-		beard.append(request.POST.getlist("beard"))
-		wilt.append(request.POST.getlist("wilt"))
-		diseases.append(request.POST.getlist("diseases"))
-		susceptibility.append(request.POST.getlist("susceptibility"))
-		entered_location_data.append(request.POST.getlist("entered_location_data"))
-		extracted_zip.append(request.POST.getlist("zipcode"))
+		entered_variety_data=request.POST.getlist("varietyname")
+		description_url= request.POST.getlist("description_url")
+		picture_url=request.POST.getlist("picture_url")
+		agent_origin=request.POST.getlist("agent_origin")
+		year_released=request.POST.getlist("year_released")
+		straw_length=request.POST.getlist("straw_length")
+		maturity=request.POST.getlist("maturity")
+		grain_color=request.POST.getlist("grain_color")
+		seed_color=request.POST.getlist("seed_color")
+		beard=request.POST.getlist("beard")
+		wilt=request.POST.getlist("wilt")
+		diseases=request.POST.getlist("diseases")
+		susceptibility=request.POST.getlist("susceptibility")
+		entered_location_data=request.POST.getlist("location")
+		extracted_zip=request.POST.getlist("zipcode")
 		
-		print entered_variety_data
+		
 		errorcheck= variety_trials_forms.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
-		print errorcheck
+		
 		return HttpResponseRedirect("/sucess/")
 		
 

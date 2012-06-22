@@ -6,6 +6,7 @@ import re
 import time
 import json
 from datetime import date
+import os, os.path
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
@@ -339,46 +340,54 @@ def checking_for_data(uploaded_file):
 		return (False, errors)
 
 def adding_to_database(varietyname, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip):
-	data = {}
-	forgienfield=[]
+  #left with calculating the number of files and deleting them in the end.
+	k=0
 	possible_characters = ('/', ' ', '-', '.')
 	f = open("1.txt", 'r')
 	data = json.load(f)
 	#saving verified inputs to the database
 	for l in range(len(varietyname)):
-		d = models.Variety(
-			name=varietyname[l][l],
-			description_url = description_url[l][l]
-			,agent_origin=agent_origin[l][l],
-			year_released=year_released[l][l],
-			straw_length=straw_length[l][l],
-			maturity=maturity[l][l],
-			grain_color=grain_color[l][l],
-			seed_color=seed_color[l][l], 
-			beard=beard[l][l],
-			 wilt=wilt[l][l]
-			  )
-		d.save()
-	'''	
+		#checking onece more!
+		varietylist = models.Variety.objects.all().filter (name=varietyname[l])
+		#saving the new variety
+		if not varietylist:
+			d = models.Variety(
+				name=varietyname[l],
+				description_url = description_url[l]
+				,agent_origin=agent_origin[l],
+				year_released=year_released[l],
+				straw_length=straw_length[l],
+				maturity=maturity[l][l],
+				grain_color=grain_color[l],
+				seed_color=seed_color[l], 
+				beard=beard[l],
+				wilt=wilt[l]
+				  )
+			d.save()
+	'''
 	for i in range(len(entered_location_data)):
 		s = models.Location( 
 			name = entered_location_data[i][i],
 			zipcode = extracted_zip[i][i],
 			)
-	'''		
-		
-		
-	#I guess we dont need this section of code.
-	'''	
-	for field in models.Trial_Entry._meta.fields:
-			if (field.get_internal_type() == 'ForeignKey' 
-					or field.get_internal_type() == 'ManyToManyField' ):
-						forgienfield.append("%s_id" % field.name)
-	'''						
+		s.save()
+	'''
+					
 	model_instance = models.Trial_Entry()
 	for name in data.keys():
 		if name == 'plant_date_id':
-			setattr(model_instance, name, 1)
+			datesplit=re.split("[%s]" % ("".join(possible_characters)), data[name])
+			datelist = models.Date.objects.filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+			if not datelist:
+				ins_d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+				ins_d.save()
+			
+			datelist = models.Date.objects.filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+					
+			dateid = 1
+			for element in datelist:
+				dateid = element.id
+			setattr(model_instance, name,dateid)
 		elif name == 'harvest_date_id':
 			datesplit=re.split("[%s]" % ("".join(possible_characters)), data[name])
 			datelist = models.Date.objects.filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
@@ -388,10 +397,22 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 				forgineid = element.id
 			setattr(model_instance, name,forgineid)
 		elif name == 'location_id':
+			print entered_location_data[k]
+			locationlist = models.Zipcode.objects.all().filter (city=str(entered_location_data[k]),zipcode = extracted_zip[k])
+			locationid = 1
+			for element in locationlist:
+				locationid = element.id
 			
-			setattr(model_instance, name, 1)
+			print locationid
+			setattr(model_instance, name, locationid)
+			k=k+1
 		elif name == 'variety_id':
-			setattr(model_instance, name, 1)	
+			print data[name]
+			varietylist = models.Variety.objects.all().filter (name=data[name])
+			varietyid = 1
+			for element in varietylist:
+				varietyid = element.id
+			setattr(model_instance, name,varietyid)	
 		else:
 			setattr(model_instance, name, data[name])
 		
@@ -401,8 +422,6 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 	
 	f.close()
 
-	
-	
-	
+		
 	
 	return(False,data)
