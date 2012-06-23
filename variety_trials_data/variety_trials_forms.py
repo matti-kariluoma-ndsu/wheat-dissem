@@ -6,7 +6,8 @@ import re
 import time
 import json
 from datetime import date
-import os, os.path
+import glob
+import os
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
@@ -340,7 +341,13 @@ def checking_for_data(uploaded_file):
 		return (False, errors)
 
 def adding_to_database(varietyname, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip):
+	numberoffiles=0
+	os.chdir("/home/kalith/summerjob/wheat-dissem")
+	for files in glob.glob("*.txt"):
+		numberoffiles=numberoffiles+1
+	print numberoffiles
   #left with calculating the number of files and deleting them in the end.
+  
 	k=0
 	possible_characters = ('/', ' ', '-', '.')
 	f = open("1.txt", 'r')
