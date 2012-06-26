@@ -344,6 +344,7 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 	numberoffiles=0
 	os.chdir("/home/kalith/summerjob/wheat-dissem")
 	for files in glob.glob("*.txt"):
+		print files
 		numberoffiles=numberoffiles+1
 	
   #left with calculating the number of files and deleting them in the end.
@@ -432,6 +433,8 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 		
 		f.close()
 
+	for filetitle in glob.glob("*.txt"):
+		 os.remove("/home/kalith/summerjob/wheat-dissem/"+str(filetitle))
 		
 	
 	return(False,data)
