@@ -3,6 +3,8 @@ Prerequisites:
   Download and Install Python, version 2.4 or greater. (http://www.python.org/download)
  Scipy:
   Download and install scipy, version 0.7 or greater. (http://www.scipy.org/download)
+ Jinja2:
+	Download and install Jinja2, version 2.6 or greater. (http://jinja.pocoo.org/docs/intro/#installation)
  Django:
   Ensure a previous version of Django is not installed; run 
    $ python -c  "import django; print django.get_version()"
