@@ -3,8 +3,11 @@ Prerequisites:
   Download and Install Python, version 2.4 or greater. (http://www.python.org/download)
  Scipy:
   Download and install scipy, version 0.7 or greater. (http://www.scipy.org/download)
- Jinja2:
-	Download and install Jinja2, version 2.6 or greater. (http://jinja.pocoo.org/docs/intro/#installation)
+ PyPy:
+	Download and install PyPy, a python "compiler" with performance gains over
+	the standard python interpretor (CPython). Download and install version 1.9 or
+	greater. (http://www.pypy.org/download.html)
+	
  Django:
   Ensure a previous version of Django is not installed; run 
    $ python -c  "import django; print django.get_version()"
@@ -22,7 +25,10 @@ Prerequisites:
 		$ tar xzf wadofstuff-django-serializers-1.1.0.tar.gz
 		$ cd wadofstuff-django-serializers-1.1.0
 		$ sudo python setup.py install
- 
+
+Use of PyPy instead of python: modify apache/apache_run.wsgi 
+(http://code.djangoproject.com/wiki/DjangoAndPyPy)
+
 Install to a fresh machine w/apache (Ubuntu/Debian syntax):
 NOTE: Ensure a previous version of Django is not installed; run 
  $ python -c  "import django; print django.get_version()"
