@@ -350,17 +350,36 @@ class SubTable:
 			
 			location_columns = {}
 			
-			if len(years) > 3:
+			if len(years) >= 3:
 				t = years[:2] # Reduce the number of years to 3, and hope that the years are sorted.
 				y_temp = t
-			
-			for y in y_temp:
-				for l in locations:
-					query_set = Trial_Entry.objects.filter(harvest_date__year=y, location__name=l.name)
 				
-				for q in query_set:
-					location_columns = {q.harvest_date.date.year: {q.location.name: q.variety.test_weight}} 
+				for l in locations:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year,location__name=l.name).values(l.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year,location__name=l.name).values(l.name)
+					query_set_year3 = Trial_Entry.objects.filter(harvest_date__year=y_temp[2].date.year,location__name=l.name).values(l.name)
+				
+				location_columns = {y_temp[0]:query_set_year1, y_temp[1]:query_set_year2, y_temp[2]:query_set_year3}
 							
+			elif len(years) == 2:
+				t = years[:1]
+				y_temp = t
+				
+				for l in locations:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year,location__name=l.name).values(l.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year,location__name=l.name).values(l.name)
+			
+				location_columns = {y_temp[0]:query_set_year1, y_temp[1]:query_set_year2}
+			
+			elif len(years) == 1:
+				t = years[0]
+				y_temp = t
+			
+				for l in locations:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year,location__name=l.name).values(l.name)
+			
+				location_columns = {y_temp[0]:query_set_year1}
+			
 			return location_columns
 			
 		def populate_row_labels_column(self, year_columns):
@@ -398,8 +417,9 @@ class SubTable:
 			top_row = ['Varieties']
 			
 			try:
-				top_row = year_columns[2] # There had better be something at these indexes.
-				top_row = location_columns[2]
+				for 
+				top_row = year_columns
+				top_row = location_columns
 			except (IndexError, SyntaxError, KeyError): 
 				pass 
 			
