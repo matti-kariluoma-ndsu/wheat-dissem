@@ -308,16 +308,37 @@ class SubTable:
 			
 			year_columns = {} # The big dictionary with all the information you could possible want, e.g. {year: {variety: test_weight}}.
 			
-			if len(y_temp) > 3:
-				t = years[:2] # Reduce the number of years to 3, and hope that the years are sorted.
+			if len(years) >= 3:
+				t = years[:2] # Reduce the count of years to 3, and hope that the years are sorted.
 				y_temp = t
-			
-			for y in y_temp:
+				# If the following query is confusing, refer to this link: https://docs.djangoproject.com/en/1.4/ref/models/querysets/#values
+				# When using the .values() function when creating a query set, it pairs values with the keys that are queried, thus creating dictionaries.
+				# The downside of this query is that it doesn't create nested dictionaries.
 				for v in varieties:
-					query_set = Trial_Entry.objects.filter(harvest_date__year=y, variety__name=v.name)
-							
-				for q in query_set:
-					year_columns = {q.harvest_date.date.year: {q.variety.name: q.variety.test_weight}} # OMG! Maybe this will work!
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year, variety__name=v.test_weight).values(v.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year, variety__name=v.test_weight).values(v.name)
+					query_set_year3 = Trial_Entry.objects.filter(harvest_date__year=y_temp[2].date.year, variety__name=v.test_weight).values(v.name)
+				
+				year_columns = {years[0]:query_set_year1, years[1]:query_set_year2, years[2]:query_set_year3}
+				
+			elif len(years) == 2:
+				t = years[:1]
+				y_temp = t
+				
+				for v in varieties:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year, variety__name=v.test_weight).values(v.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year, variety__name=v.test_weight).values(v.name)
+				
+				year_columns = {years[0]:query_set_year1, years[1]:query_set_year2}
+				
+			elif len(years) == 1:
+				t = years[0]
+				y_temp = t
+				
+				for v in varieties:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year, variety__name=v.test_weight).values(v.name)
+				
+				year_columns = {years[0]:query_set_year1}
 							
 			return year_columns
 			
@@ -338,7 +359,7 @@ class SubTable:
 					query_set = Trial_Entry.objects.filter(harvest_date__year=y, location__name=l.name)
 				
 				for q in query_set:
-					location_columns = {q.harvest_date.date.year: {q.location.name: q.variety.test_weight}} # this is wrong
+					location_columns = {q.harvest_date.date.year: {q.location.name: q.variety.test_weight}} 
 							
 			return location_columns
 			
