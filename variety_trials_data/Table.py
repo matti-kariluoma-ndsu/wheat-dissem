@@ -417,14 +417,16 @@ class SubTable:
 			top_row = ['Varieties']
 			
 			try:
-				for 
-				top_row = year_columns
-				top_row = location_columns
+				for y in year_columns.keys():
+					top_row.append(y)
+				
+				for l in location_columns.keys():
+					top_row.append(l)
+					
 			except (IndexError, SyntaxError, KeyError): 
 				pass 
 			
 			return top_row	
-			
 			
 		def collate_table(self, top_row, row_labels_column, year_columns, location_columns, probability): 
 			"""
