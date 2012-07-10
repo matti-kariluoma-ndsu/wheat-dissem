@@ -110,7 +110,7 @@ class Trial_Entry(models.Model):
 		
 class Trial_Entry_History(models.Model):
 	username     = models.CharField(max_length=200)
-	created_date = models.ForeignKey(Date, related_name='created_date')
+	created_date = models.DateField()
 	trial_entry  = models.ForeignKey(Trial_Entry, on_delete=models.DO_NOTHING)
 	def __unicode__(self):
 		try:
