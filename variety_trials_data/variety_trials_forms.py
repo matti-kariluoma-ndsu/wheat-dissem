@@ -11,7 +11,7 @@ import os
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
-							
+		
 class SelectVarietiesForm(SelectLocationByZipcodeRadiusForm):
 	varieties = forms.ModelMultipleChoiceField(
 			widget=forms.Select(),
@@ -29,7 +29,12 @@ class SelectVarietiesForm(SelectLocationByZipcodeRadiusForm):
 			widget=forms.Select(),
 			queryset=models.Variety.objects.all()
                         )
-
+class SelectLocationsForm(SelectVarietiesForm):
+	locations = forms.ModelMultipleChoiceField(
+		widget=forms.SelectMultiple(attrs={'size': 20}),
+		queryset=models.Location.objects.all()
+		)
+		
 class SelectFieldForm(forms.Form):
 	locations = forms.CharField(max_length=5)
 	year_list = forms.CharField(max_length=5)
