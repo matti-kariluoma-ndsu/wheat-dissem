@@ -288,16 +288,120 @@ def add_trial_entry_csv_file(request):
 	if request.method == 'POST': # If the form has been submitted...
 		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
 		if form.is_valid():
-			success, errors = variety_trials_forms.handle_csv_file(request.FILES['csv_file'])
+			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
 			if success:
 				return HttpResponseRedirect('/success/')
 			else:
 				form = variety_trials_forms.UploadCSVForm()
 	else:	
 		form = variety_trials_forms.UploadCSVForm()
-
+	#print errors
 	return render_to_response(
 		'add_from_csv_template.html', 
 		{'form': form, 'format_errors': errors},
 		context_instance=RequestContext(request)
 	)
+
+
+def add_form_confirmation(request):
+	
+	errors = {} 
+	givenvalues = {}
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
+		if form.is_valid():
+			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
+			if not errors:
+				return HttpResponseRedirect("/sucess/")
+			else:
+				form = variety_trials_forms.UploadCSVForm()
+				return render_to_response(
+					'add_form_confirmation.html', 
+					{'form': form, 'format_errors': errors,},
+					context_instance=RequestContext(request)
+				)
+	else:	
+		form = variety_trials_forms.UploadCSVForm()
+	
+	
+def add_information(request):
+	
+	errors = {}
+	givendetail = []
+	details = [] 
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+		errors = request.POST.getlist("chkError")
+		#givendetail = variety_trials_forms.checking_for_data.givenval
+		for l in errors:
+			split_l = l.split(' ')
+			if len(split_l) > 1:
+				details.append(split_l[0]+" "+split_l[1]+" "+split_l[2])
+				
+				
+		#print details					
+		for detail in details:
+			if detail =='Problem with variety' or detail =='Problem with location':
+				return render_to_response(
+					'add_information.html', 
+					{'format_errors': details ,'error_num':errors},
+					context_instance=RequestContext(request)
+				)
+			
+			
+def adding_to_database_confirm(request):
+	#List for Varieties
+	entered_variety_data = []
+	description_url = []
+	picture_url = []
+	agent_origin = []
+	year_released = []
+	straw_length = []
+	maturity = []
+	grain_color = [] 
+	seed_color = []
+	beard = []
+	wilt = []
+	diseases = []
+	susceptibility = []
+	#Lists for Location data 
+	entered_location_data = []
+	extracted_zip = [] 
+	errorcheck = []
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+	
+		entered_variety_data=request.POST.getlist("varietyname")
+		description_url= request.POST.getlist("description_url")
+		picture_url=request.POST.getlist("picture_url")
+		agent_origin=request.POST.getlist("agent_origin")
+		year_released=request.POST.getlist("year_released")
+		straw_length=request.POST.getlist("straw_length")
+		maturity=request.POST.getlist("maturity")
+		grain_color=request.POST.getlist("grain_color")
+		seed_color=request.POST.getlist("seed_color")
+		beard=request.POST.getlist("beard")
+		wilt=request.POST.getlist("wilt")
+		diseases=request.POST.getlist("diseases")
+		susceptibility=request.POST.getlist("susceptibility")
+		entered_location_data=request.POST.getlist("location")
+		extracted_zip=request.POST.getlist("zipcode")
+		
+		
+		errorcheck= variety_trials_forms.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
+		
+		return HttpResponseRedirect("/sucess/")
+		
+
+							
+def redirect_sucess(request):
+
+	return render_to_response(
+		'success.html'
+	)
+		    
+

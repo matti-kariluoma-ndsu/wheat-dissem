@@ -28,6 +28,10 @@ urlpatterns = patterns('',
     #(r'^view/location/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)', views.locations_view),
     #(r'^view/variety/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)', views.varieties_view),
     (r'^add_trials/', views.add_trial_entry_csv_file), # page to upload a spreadsheet to
+    (r'^add_trials_confirm/', views.add_form_confirmation), # Page to confirmations
+    (r'^sucess/', views.redirect_sucess), # Page to sucess
+    (r'^add_info/', views.add_information), # Page to confirmations
+    (r'^add_data_variety_or_location/', views.adding_to_database_confirm), # Page to adding to database
     (r'^view/info/(?P<variety_name>[a-zA-Z_]+)', views.variety_info), # defaults to location-based view
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}) # serves static/img static/css static/js etc.
                        

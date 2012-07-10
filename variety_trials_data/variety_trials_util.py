@@ -1462,6 +1462,5 @@ class Locations_from_Zipcode_x_Radius:
 		for l in sorted_list:
 			print "%f\t%s" %(distances[l], l.name)
 		"""
-
 		return sorted_list
 
