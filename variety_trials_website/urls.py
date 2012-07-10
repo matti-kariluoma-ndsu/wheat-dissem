@@ -37,6 +37,6 @@ urlpatterns = patterns('',
 		(r'^view/delete/(?P<delete>[1234567890]+)/', views.history_delete), # defaults to location-based view
 		(r'^json/', views.to_json),
 		(r'^(?P<zipcode>[1234567890]+)/json/', views.zipcode_to_json),
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}), # serves static/img static/css static/js etc.
+    #(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}), # serves static/img static/css static/js etc.
 )
 
