@@ -109,9 +109,9 @@ class Trial_Entry(models.Model):
 		return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.date.year)
 		
 class Trial_Entry_History(models.Model):
-	username = models.CharField(max_length=200)
-	created_date				 = models.ForeignKey(Date, related_name='created_date')
-	trial_entry							 = models.ForeignKey(Trial_Entry, on_delete=models.DO_NOTHING)
+	username     = models.CharField(max_length=200)
+	created_date = models.ForeignKey(Date, related_name='created_date')
+	trial_entry  = models.ForeignKey(Trial_Entry, on_delete=models.DO_NOTHING)
 	def __unicode__(self):
 		try:
 			trial = str(self.trial_entry)
