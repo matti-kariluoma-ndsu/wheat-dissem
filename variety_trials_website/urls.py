@@ -33,6 +33,8 @@ urlpatterns = patterns('',
     (r'^add_info/', views.add_information), # Page to confirmations
     (r'^add_data_variety_or_location/', views.adding_to_database_confirm), # Page to adding to database
     (r'^view/info/(?P<variety_name>[a-zA-Z_]+)', views.variety_info), # defaults to location-based view
+	(r'^view/history/', views.history), # defaults to location-based view
+	(r'^view/delete/(?P<delete>[1234567890]+)', views.history_delete), # defaults to location-based view
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}) # serves static/img static/css static/js etc.
                        
 )

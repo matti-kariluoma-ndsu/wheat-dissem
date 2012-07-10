@@ -33,6 +33,43 @@ def variety_info(request, variety_name):
 		context_instance=RequestContext(request)
 	)
 	
+def history(request):	
+	history=models.Trial_Entry_History.objects.all()
+	newlist = []
+	
+	for element in history:
+		newlist.append(element)
+		element.created_date
+		element.username
+	return render_to_response(
+		'history.html', 
+		{ 
+			'history': history,
+			'list' : newlist,
+		},
+		context_instance=RequestContext(request)
+	)
+def history_delete(request, delete):	
+	history=models.Trial_Entry_History.objects.filter(id = delete)
+	for element in history:
+		trial_Entry=models.Trial_Entry.objects.filter(id = element.trial_entry.id)
+		trial_Entry.delete()
+		
+	
+	return render_to_response(
+		'history.html', 
+		{ 
+			'history': history,
+		},
+		context_instance=RequestContext(request)
+	)
+
+def history_commit(request, id):  
+        entries = models.Trial_Entry_History.objects.filter(id = id)
+        for entry in entries:
+                entry.deletable = False;
+                entry.save()
+	
 
 def index(request, abtest=None):
 	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
@@ -265,9 +302,13 @@ def varieties_view(request, yearname, fieldname, abtest=None):
 
 	if request.method == 'GET':
 		varieties_form = variety_trials_forms.SelectVarietiesForm(request.GET)
+		print request.GET
 		if varieties_form.is_valid():
-			
-			varieties = varieties_form.cleaned_data['varieties']
+			varieties = []
+			varieties.append(varieties_form.cleaned_data['varieties'])
+			varieties.append(varieties_form.cleaned_data['varieties1'])
+			varieties.append(varieties_form.cleaned_data['varieties2'])
+			varieties.append(varieties_form.cleaned_data['varieties3'])
 			print '1'
 			locations = models.Location.objects.all()
 			
