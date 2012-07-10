@@ -1,1 +1,1 @@
-{{raw|safe}} {# safe disables html-escaping#}
+{{raw_json|safe}} {# safe disables html-escaping#}

@@ -2,12 +2,35 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
+from django.core import serializers
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data.Page import Page
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
+try:
+	import simplejson as json # Python 2.5
+except ImportError:
+	import json # Python 2.6
 
+
+def index(request, abtest=None):
+	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
+	varieties_form = variety_trials_forms.SelectVarietiesForm()
+	variety_list = models.Variety.objects.all()
+	curyear = datetime.date.today().year - 1
+	
+
+	return render_to_response(
+		'main.html', 
+		{ 
+			'zipcode_radius_form': zipcode_radius_form,
+			'varieties_form': varieties_form,
+			'variety_list': variety_list,
+			'curyear': curyear
+		},
+		context_instance=RequestContext(request)
+	)
 
 def variety_info(request, variety_name):	
 	variety=models.Variety.objects.filter(name=variety_name)
@@ -32,6 +55,50 @@ def variety_info(request, variety_name):
 		},
 		context_instance=RequestContext(request)
 	)
+
+def to_json(request):
+	data = {'hello': 'there'}
+	
+	return render_to_response(
+		'raw.json', 
+		{
+			'raw_json': json.dumps(data),
+		},
+		context_instance=RequestContext(request)
+	)
+
+def zipcode_to_json(request, zipcode):
+	try:
+		locations = Locations_from_Zipcode_x_Radius(
+			zipcode, None
+		).fetch()
+	except models.Zipcode.DoesNotExist:
+		# TODO: message that says 'Zipcode does not exist!'
+		return HttpResponseRedirect('/')
+	
+	entries = models.Trial_Entry.objects.select_related(depth=2).filter(location__in=locations)
+	varieties = models.Variety.objects.filter(pk__in=set([e.variety.id for e in entries]))
+	data = list(entries)+locations+list(varieties)
+	needed_fields = (
+		'pk',
+		'model',
+		'variety',
+		'location',
+		'name',
+		'bushels_acre',
+		'protein_percent',
+		'test_weight'
+		)
+	
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	# WHY is json_serializer pusing out a list, and not wrapping it with '{' and '}'?
+	# ...turns out '[]' is valid JSON...
+	response.write('{"list":')
+	json_serializer.serialize(data, fields=needed_fields, stream=response)
+	#json_serializer.serialize(data, stream=response)
+	response.write('}')
+	return response
 	
 def history(request):	
 	history=models.Trial_Entry_History.objects.all()
@@ -49,6 +116,7 @@ def history(request):
 		},
 		context_instance=RequestContext(request)
 	)
+	
 def history_delete(request, delete):	
 	history=models.Trial_Entry_History.objects.filter(id = delete)
 	for element in history:
@@ -71,23 +139,7 @@ def history_commit(request, id):
                 entry.save()
 	
 
-def index(request, abtest=None):
-	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
-	varieties_form = variety_trials_forms.SelectVarietiesForm()
-	variety_list = models.Variety.objects.all()
-	curyear = datetime.date.today().year - 1
-	
 
-	return render_to_response(
-		'main.html', 
-		{ 
-			'zipcode_radius_form': zipcode_radius_form,
-			'varieties_form': varieties_form,
-			'variety_list': variety_list,
-			'curyear': curyear
-		},
-		context_instance=RequestContext(request)
-	)
 		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':

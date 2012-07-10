@@ -20,22 +20,23 @@ urlpatterns = patterns('',
     
     (r'^$', views.index), # the home page
     ## TODO: There are 3 views of our data, reduce to 2 if not 1.
-    (r'^view/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)', views.zipcode_view), # defaults to location-based view
-    (r'^view/location/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)', views.locations_view), # view based on variety head-to-head comparison
+    (r'^view/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/', views.zipcode_view), # defaults to location-based view
+    (r'^view/location/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/', views.locations_view), # view based on variety head-to-head comparison
     (r'^view/variety/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/', views.varieties_view), # view based on proximity
     #(r'^(?P<abtest>[1234567890]+)/', views.index),
-    #(r'^view/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)', views.zipcode_view),
-    #(r'^view/location/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)', views.locations_view),
-    #(r'^view/variety/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)', views.varieties_view),
+    #(r'^view/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)/', views.zipcode_view),
+    #(r'^view/location/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)/', views.locations_view),
+    #(r'^view/variety/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)/', views.varieties_view),
     (r'^add_trials/', views.add_trial_entry_csv_file), # page to upload a spreadsheet to
     (r'^add_trials_confirm/', views.add_form_confirmation), # Page to confirmations
     (r'^sucess/', views.redirect_sucess), # Page to sucess
     (r'^add_info/', views.add_information), # Page to confirmations
     (r'^add_data_variety_or_location/', views.adding_to_database_confirm), # Page to adding to database
-    (r'^view/info/(?P<variety_name>[a-zA-Z_]+)', views.variety_info), # defaults to location-based view
+    (r'^view/info/(?P<variety_name>[a-zA-Z_]+)/', views.variety_info), # defaults to location-based view
 		(r'^view/history/', views.history), # defaults to location-based view
-		(r'^view/delete/(?P<delete>[1234567890]+)', views.history_delete), # defaults to location-based view
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}) # serves static/img static/css static/js etc.
-                       
+		(r'^view/delete/(?P<delete>[1234567890]+)/', views.history_delete), # defaults to location-based view
+		(r'^json/', views.to_json),
+		(r'^(?P<zipcode>[1234567890]+)/json/', views.zipcode_to_json),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}), # serves static/img static/css static/js etc.
 )
 
