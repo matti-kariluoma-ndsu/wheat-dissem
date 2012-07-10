@@ -243,7 +243,7 @@ def handle_csv_file(uploaded_file):
 				print "Writing %s as %s" % (name, insertion_dict[name])
 				insertion_dict[name] = None
 			model_instance.save() # ARE YOU BRAVE ENOUGH? 
-			
+			models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
 			
 	return (False, errors)
 	
@@ -343,6 +343,7 @@ def checking_for_data(uploaded_file):
 						print "Writing %s as %s" % (name, insertion_dict[name])
 						insertion_dict[name] = None
 					model_instance.save() # ARE YOU BRAVE ENOUGH? 
+					models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
 
 				else:
 					json.dump(givenval,open(str(file_counter)+".txt",'w'))
@@ -440,10 +441,14 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 			
 			print "Writing %s as %s" % (name, data[name])
 			data[name] = None
+		
+		
+		
 		model_instance.save() # ARE YOU BRAVE ENOUGH? 
 		
+		models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
 		f.close()
-
+	
 	for filetitle in glob.glob("*.txt"):
 		 os.remove("/home/kalith/summerjob/wheat-dissem/"+str(filetitle))
 		
