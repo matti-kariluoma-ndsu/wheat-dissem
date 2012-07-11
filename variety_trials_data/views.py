@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
+from django.core import serializers
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
@@ -18,6 +19,8 @@ def get_entries(locations, year_list):
 					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
 				)
 			)
+
+	
 def variety_info(request, variety_name):	
 	variety=models.Variety.objects.filter(name=variety_name)
 	"""
@@ -459,3 +462,24 @@ def disease_json(request, id):
 	d = models.Disease_Entry.objects.filter(pk=id)
 	return HttpResponseRedirect("/")
 	
+
+
+def variety_json_all(request):
+	varieties = models.Variety.objects.all()
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	# WHY is json_serializer pusing out a list, and not wrapping it with '{' and '}'?
+	# ...turns out '[]' is valid JSON...
+	json_serializer.serialize(varieties, stream=response)
+	#json_serializer.serialize(data, stream=response)
+	return response	
+
+def location_json_all(request):
+	locations = models.Location.objects.all()
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	# WHY is json_serializer pusing out a list, and not wrapping it with '{' and '}'?
+	# ...turns out '[]' is valid JSON...
+	json_serializer.serialize(locations, stream=response)
+	#json_serializer.serialize(data, stream=response)
+	return response			

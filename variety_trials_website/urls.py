@@ -34,6 +34,8 @@ urlpatterns = patterns('',
     (r'^trial_entry/(?P<id>[1234567890]+)/json', views.trial_entry_json),
     (r'^zipcode/(?P<id>[1234567890]+)/json', views.zipcode_json),
     (r'^location/(?P<id>[1234567890]+)/json', views.location_json),
+    (r'^location/all/json', views.location_json_all),
+    (r'^variety/all/json', views.variety_json_all),
     (r'^disease/(?P<id>[1234567890]+)/json', views.disease_json),
 	
                        
