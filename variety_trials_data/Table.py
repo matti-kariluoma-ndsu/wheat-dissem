@@ -88,11 +88,18 @@ class LSD_Row(Row):
 					location_lsds.append(entry.lsd_10)
 				else:
 					location_lsds.append(None)	
-				
-		lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
+		
+		if lsd_1yr is not None and lsd_2yr is not None and lsd_3yr is not None:	
+			lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
+		
+		elif lsd_1yr is not None and lsd_2yr is not None:
+			lsds = ['LSD', lsd_1yr, lsd_2yr]
+			
+		elif lsd_1yr is not None:
+			lsds = ['LSD', lsd_1yr]
 		
 		for l in location_lsds: 
-			lsds = l
+			lsds.append(l)
 		
 		return lsds
 	
