@@ -36,16 +36,16 @@ class LSD_Row(Row):
 	"""
 	A row that keeps track of which Table it belongs to.
 	"""
-	def __init__(self, table):
+	def __init__(self, subtable):
 		#super(LSD_Row, self).__init__(list()) # call Row.__init__()
-		self.table = table
+		self.subtable = subtable
 		Row.__init__(self, [])
 	
 	def populate(self, probability):
 		
-		y_columns = self.table.year_columns
+		y_columns = self.subtable.year_columns
 		years_i = []
-		l_columns = self.table.location_columns
+		l_columns = self.subtable.location_columns
 		location_lsds = []
 		
 		years_i = list(y_columns[0]) # Grabs the y key, e.g., {y:{v:value}}.
@@ -79,7 +79,7 @@ class LSD_Row(Row):
 		Grab the LSDs for the location columns in the Table object. 
 		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
 		"""	
-		for entry in self.table.entries:
+		for entry in self.subtable.entries:
 			for l in l_columns[0].keys():
 				if entry.hsd_10 is not None and l.name == entry.location.name:
 					location_lsds.append(entry.hsd_10)
@@ -223,9 +223,9 @@ class Label_Row(Row):
 	"""
 	A row that keeps track of which Table it belongs to.
 	"""
-	def __init__(self, table):
+	def __init__(self, subtable):
 		super(Label_Row, self).__init__() # call Row.__init__()
-		self.table = table
+		self.table = subtable
 		
 class Column:
 	"""
@@ -290,16 +290,16 @@ class SubTable:
 			self.entries = entries
 			self.probability = probability
 			
-		def get(self, years, varieties, locations): # 'Years', 'varieties' and 'locations' are string values passed by the user to parse the database.
-			year_columns = self.populate_year_average_columns( years, varieties) 
-			location_columns = self.populate_location_columns( locations, year_columns[0])
-			top_row = self.populate_header_row( year_columns[0], location_columns[0])
-			row_labels_column = self.populate_row_labels_column( year_columns[0])
-			self.year_columns = year_columns[0]
-			self.location_columns = location_columns[0]
+		def get(self, years, varieties, locations): 
+			year_columns = self.populate_year_average_columns(years, varieties) 
+			location_columns = self.populate_location_columns(years, locations)
+			top_row = self.populate_header_row(year_columns, location_columns)
+			row_labels_column = self.populate_row_labels_column(year_columns, location_columns)
+			self.year_columns = year_columns
+			self.location_columns = location_columns
 			self.top_row = top_row
 			self.row_labels_column = row_labels_column
-			return self.collate_table( top_row, row_labels_column, year_columns[0], location_columns[0], self.probability)
+			return self.collate_table(top_row, row_labels_column, year_columns, location_columns, self.probability)
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
@@ -382,7 +382,7 @@ class SubTable:
 			
 			return location_columns
 			
-		def populate_row_labels_column(self, year_columns):
+		def populate_row_labels_column(self, year_columns, location_columns):
 			"""
 			Returns a list containing the labels for each row in the Table object.
 			
@@ -391,10 +391,13 @@ class SubTable:
 			
 			temp = []
 				
-			for k in temp.keys():
-				t.append(k) # This grabs the variety name, but not the value associated with it.
+			for k in year_columns.keys():
+				temp.append(k) # This grabs the variety name, but not the value associated with it.
 				
-			row_labels_column = set(sorted(t)) # Remove possible duplicates.
+			for j in location_columns.keys():
+				temp.append(j) # Same process as the above for-loop, but for the location columns.
+				
+			row_labels_column = set(sorted(temp)) # Remove the duplicates and sort them.
 					
 			return row_labels_column 
 			
@@ -428,7 +431,7 @@ class SubTable:
 			keys: header; rows; years; locations; lsds.
 			"""	
 			try:
-				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns[0], 'locations':location_columns[0]}
+				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns, 'locations':location_columns}
 			except (IndexError, SyntaxError, KeyError):
 				pass
 				
