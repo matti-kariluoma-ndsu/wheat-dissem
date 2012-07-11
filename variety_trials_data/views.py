@@ -443,3 +443,19 @@ def inspect(request):
 		'masterList':masterList
 		}
 	)
+def trial_entry_json(request, id):
+	v = models.Trial_Entry.objects.filter(pk=id)
+	return HttpResponseRedirect("/")
+	
+def zipcode_json(request, id):
+	z = models.Zipcode.objects.filter(pk=id)
+	return HttpResponseRedirect("/")
+	
+def location_json(request, id):
+	l = models.Location.objects.filter(pk=id)
+	return HttpResponseRedirect("/")
+	
+def disease_json(request, id):
+	d = models.Disease_Entry.objects.filter(pk=id)
+	return HttpResponseRedirect("/")
+	
