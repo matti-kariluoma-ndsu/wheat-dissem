@@ -361,7 +361,7 @@ class SubTable:
 				
 				location_columns = {y_temp[0]:query_set_year1, y_temp[1]:query_set_year2, y_temp[2]:query_set_year3}
 							
-			elif len(years) == 2:
+			elif len(years) == 2: # Reduce the number of years to 2, and hope that the years are sorted.
 				t = years[:1]
 				y_temp = t
 				
@@ -371,7 +371,7 @@ class SubTable:
 			
 				location_columns = {y_temp[0]:query_set_year1, y_temp[1]:query_set_year2}
 			
-			elif len(years) == 1:
+			elif len(years) == 1: # Reduce the number of years to 1, and hope that the years are sorted.
 				t = years[0]
 				y_temp = t
 			
@@ -390,12 +390,6 @@ class SubTable:
 			"""
 			
 			temp = []
-			t = []
-			
-			try:
-				temp = year_columns[0]
-			except (IndexError, SyntaxError, KeyError):
-				pass
 				
 			for k in temp.keys():
 				t.append(k) # This grabs the variety name, but not the value associated with it.
@@ -449,13 +443,10 @@ class SubTable:
 			Returns the specified year's column from a Table object's years_columns field
 			as a list.
 			"""
-			
-			try:
-				temp = year_columns[0] # Grabs the dictionary of year columns.
-			except (IndexError, SyntaxError, KeyError):
-				pass
 				
-			column = temp[year]
+			column = []	
+				
+			column.append(year_columns[year])
 			return column
 			
 		def get_location_column(self, location, location_columns): 
@@ -464,12 +455,9 @@ class SubTable:
 			location_columns field as a list.
 			"""
 			
-			try:
-				temp = location_columns[0] # Grabs the dictionary of location columns.
-			except (IndexError, SyntaxError, KeyError):
-				pass
+			column = []
 			
-			column = temp[location]
+			column.append(location in location_columns.keys()) # This could be wrong, but I am trying to get the value from a nested key. The dictionary that is passed to this method should look like this: {year:{location:value}}
 			return column
 			
 		def set_value_count_for_column(self, year_columns, year): 
