@@ -44,21 +44,20 @@ class LSD_Row(Row):
 	def populate(self, probability):
 		
 		y_columns = self.subtable.year_columns
-		years_i = []
 		l_columns = self.subtable.location_columns
 		location_lsds = []
 		
-		years_i = list(y_columns[0]) # Grabs the y key, e.g., {y:{v:value}}.
+		# Grabs the year keys from year_columns.
 		
-		if len(years_i) == 3:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
-			data_3yr = years_i[2]
+		if len(y_columns) == 3:
+			data_1yr = y_columns[0]
+			data_2yr = y_columns[1]
+			data_3yr = y_columns[2]
 		elif len(years_i) == 2:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
+			data_1yr = y_columns[0]
+			data_2yr = y_columns[1]
 		elif len(years_i) == 1:
-			data_1yr = years_i[0]
+			data_1yr = y_columns[0]
 		else:
 			pass
 		
@@ -80,7 +79,7 @@ class LSD_Row(Row):
 		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
 		"""	
 		for entry in self.subtable.entries:
-			for l in l_columns[0].keys():
+			for l in l_columns.keys():
 				if entry.hsd_10 is not None and l.name == entry.location.name:
 					location_lsds.append(entry.hsd_10)
 				elif entry.lsd_05 is not None and l.name == entry.location.name:
