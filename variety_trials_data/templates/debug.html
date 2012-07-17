@@ -1,0 +1,56 @@
+{%extends "base.html"%}
+{% block content%}
+<table id ="debug"></table>
+
+{% endblock %}
+{% block javascript %}
+
+var table = document.getElementById('debug');
+
+
+function cell(constructorParametersObject){
+    this.position = constructorParametersObject.pk;
+    this.tag = constructorParametersObject.type;
+    this.value = constructorParametersObject.value;
+}
+var entryList=[]
+var entry1 = {
+    url: '/trial_entry/1/json',
+	dataType: "json",
+    data: {
+        'key': 'value'
+    },
+}
+var entry2 = {
+    url: '/trial_entry/2/json',
+	dataType: "json",
+    data: {
+        'key': 'value'
+    },
+}
+
+var cellList = [];
+var x =0;
+function processAjaxFunction(response_data) {
+	document.writeln(x)
+    $('#debug').text(x+"Response is " + response_data + ", or " + JSON.stringify(response_data));
+	x++
+    for (var i in response_data ){
+        //alert("Making a cell from "+JSON.stringify(response_data[i]));
+        /// add a new object to our array with push()
+        cellList.push(new cell(response_data[i]));
+        //alert("Made the cell "+JSON.stringify(cellList[i]));
+	}
+	if (x==2)
+	{
+	table.write("<tr>"+cellList[1].position+"</tr>")
+	}
+}
+entryList.push(entry1)
+entryList.push(entry2)
+
+
+for (i=0; i<2; i++){
+	$.ajax(entryList[i]).done(processAjaxFunction)
+	}
+{% endblock %}

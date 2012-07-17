@@ -37,6 +37,8 @@ urlpatterns = patterns('',
     (r'^location/all/json', views.location_json_all),
     (r'^variety/all/json', views.variety_json_all),
     (r'^disease/(?P<id>[1234567890]+)/json', views.disease_json),
+    (r'^debug', views.debug),
+	
 	
                        
 )

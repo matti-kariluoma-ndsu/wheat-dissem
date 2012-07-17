@@ -7,7 +7,7 @@ from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
-
+import json
 def get_entries(locations, year_list):
 	# We do a depth=2 so we can access entry.variety.name
 	# We do a depth=3 so we can access entry.harvest_date.date.year
@@ -448,19 +448,42 @@ def inspect(request):
 	)
 def trial_entry_json(request, id):
 	v = models.Trial_Entry.objects.filter(pk=id)
-	return HttpResponseRedirect("/")
+	response = HttpResponse()
+	needed_fields = (
+		'pk',
+		'model',
+		'variety',
+		'location',
+		'name',
+		'bushels_acre',
+		'protein_percent',
+		'test_weight'
+		)
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(v,fields=needed_fields, stream=response)
+	
+	return response
 	
 def zipcode_json(request, id):
 	z = models.Zipcode.objects.filter(pk=id)
-	return HttpResponseRedirect("/")
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(z, stream=response)
+	return response
 	
 def location_json(request, id):
 	l = models.Location.objects.filter(pk=id)
-	return HttpResponseRedirect("/")
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(l, stream=response)
+	return response
 	
 def disease_json(request, id):
 	d = models.Disease_Entry.objects.filter(pk=id)
-	return HttpResponseRedirect("/")
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(d, stream=response)
+	return response
 	
 
 
@@ -482,4 +505,8 @@ def location_json_all(request):
 	# ...turns out '[]' is valid JSON...
 	json_serializer.serialize(locations, stream=response)
 	#json_serializer.serialize(data, stream=response)
-	return response			
+	return response		
+
+def debug(request):
+	return render_to_response(
+		'debug.html',{})
