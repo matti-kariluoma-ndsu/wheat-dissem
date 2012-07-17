@@ -99,6 +99,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	# 'variety_trials_data.redirect_middleware.RedirectFallbackMiddleware',
 )
 
 ROOT_URLCONF = 'variety_trials_website.urls'
@@ -118,7 +119,7 @@ INSTALLED_APPS = (
     #'django.contrib.auth',
     #'django.contrib.contenttypes',
     #'django.contrib.sessions',
-    #'django.contrib.sites',
+    'django.contrib.sites',
     #'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
@@ -126,6 +127,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'variety_trials_data',
+	'django.contrib.redirects',
 )
 
 # A sample logging configuration. The only tangible logging
