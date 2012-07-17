@@ -2,6 +2,7 @@ from django.db import models
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
 
+
 # Create your models here.
 class Disease(models.Model):
 	name = models.CharField(max_length=200)
@@ -117,7 +118,7 @@ class Trial_Entry_History(models.Model):
 			trial = str(self.trial_entry)
 		except ObjectDoesNotExist:
 			trial = str("none")
-		return trial +" by "+str(self.username)+" at "+str(self.created_date.date.year)
+		return trial +" by "+str(self.username)+" at "+str(self.created_date.year)
 
 # Now add custom forms to populate these data:
 class VarietyForm(ModelForm):
