@@ -2,22 +2,36 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
+from django.core import serializers
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
+from variety_trials_data.Page import Page
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
+try:
+	import simplejson as json # Python 2.5
+except ImportError:
+	import json # Python 2.6
 
-def get_entries(locations, year_list):
-	# We do a depth=2 so we can access entry.variety.name
-	# We do a depth=3 so we can access entry.harvest_date.date.year
-	#TODO: Somehow reduce this to depth=1
-	return models.Trial_Entry.objects.select_related(depth=3).filter(
-				location__in=locations
-			).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
-				)
-			)
+
+def index(request, abtest=None):
+	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
+	varieties_form = variety_trials_forms.SelectVarietiesForm()
+	variety_list = models.Variety.objects.all()
+	curyear = datetime.date.today().year - 1
+	
+
+	return render_to_response(
+		'main.html', 
+		{ 
+			'zipcode_radius_form': zipcode_radius_form,
+			'varieties_form': varieties_form,
+			'variety_list': variety_list,
+			'curyear': curyear
+		},
+		context_instance=RequestContext(request)
+	)
+
 def variety_info(request, variety_name):	
 	variety=models.Variety.objects.filter(name=variety_name)
 	"""
@@ -41,25 +55,91 @@ def variety_info(request, variety_name):
 		},
 		context_instance=RequestContext(request)
 	)
-	
 
-def index(request, abtest=None):
-	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
-	varieties_form = variety_trials_forms.SelectVarietiesForm()
-	variety_list = models.Variety.objects.all()
-	curyear = datetime.date.today().year - 1
+def to_json(request):
+	data = {'hello': 'there'}
 	
-
 	return render_to_response(
-		'main.html', 
-		{ 
-			'zipcode_radius_form': zipcode_radius_form,
-			'varieties_form': varieties_form,
-			'variety_list': variety_list,
-			'curyear': curyear
+		'raw.json', 
+		{
+			'raw_json': json.dumps(data),
 		},
 		context_instance=RequestContext(request)
 	)
+
+def zipcode_to_json(request, zipcode):
+	try:
+		locations = Locations_from_Zipcode_x_Radius(
+			zipcode, None
+		).fetch()
+	except models.Zipcode.DoesNotExist:
+		# TODO: message that says 'Zipcode does not exist!'
+		return HttpResponseRedirect('/')
+	
+	entries = models.Trial_Entry.objects.select_related(depth=2).filter(location__in=locations)
+	varieties = models.Variety.objects.filter(pk__in=set([e.variety.id for e in entries]))
+	data = list(entries)+locations+list(varieties)
+	needed_fields = (
+		'pk',
+		'model',
+		'variety',
+		'location',
+		'name',
+		'bushels_acre',
+		'protein_percent',
+		'test_weight'
+		)
+	
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	# WHY is json_serializer pusing out a list, and not wrapping it with '{' and '}'?
+	# ...turns out '[]' is valid JSON...
+	response.write('{"list":')
+	json_serializer.serialize(data, fields=needed_fields, stream=response)
+	#json_serializer.serialize(data, stream=response)
+	response.write('}')
+	return response
+	
+def history(request):	
+	history=models.Trial_Entry_History.objects.all()
+	newlist = []
+	
+	for element in history:
+		newlist.append(element)
+		element.created_date
+		element.username
+	return render_to_response(
+		'history.html', 
+		{ 
+			'history': history,
+			'list' : newlist,
+		},
+		context_instance=RequestContext(request)
+	)
+	
+def history_delete(request, delete):	
+	history=models.Trial_Entry_History.objects.filter(id = delete)
+	for element in history:
+		trial_Entry=models.Trial_Entry.objects.filter(id = element.trial_entry.id)
+		trial_Entry.delete()
+		
+	
+	return render_to_response(
+		'history.html', 
+		{ 
+			'history': history,
+		},
+		context_instance=RequestContext(request)
+	)
+
+def history_commit(request, id):  
+        entries = models.Trial_Entry_History.objects.filter(id = id)
+        for entry in entries:
+                entry.deletable = False;
+                entry.save()
+	
+
+
 		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
@@ -165,6 +245,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			#'moisture_basis': ['Moisture Basis','Ranking: 1 (Dry) to 9 (Flooded)',
 				#'No Description.', '/static/img/button_moisture_basis.jpg', '/static/img/button_high_moisture_basis.jpg']
 	}
+	
 	#retrieves the list of locations and finds the locations that have been excluded by the user, storing them in neg_locations
 	try:
 		pos_locations = Locations_from_Zipcode_x_Radius(
@@ -179,7 +260,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	for e in pos_locations:
 		if locations.count(e)==0:
 			neg_locations.append(e)
-			
+	
 	this_year = datetime.date.today().year - 1
 
 	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
@@ -220,79 +301,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			del unit_blurbs[name]
 	"""
 	
-	from variety_trials_data.Table import SubTable
-	t = SubTable(get_entries(locations, year_list), 0.05)
-	
-	lsd_row = t.get(year_list, varieties, locations)
-	
-	print t.top_row
-	print t.year_columns
-	print t.location_columns
-	for row in t.row_labels_column:
-		print row
-	print lsd_row
-		
-	# TODO: respect/update the cur_year value.
-	try:
-		sorted_list = LSD_Calculator(get_entries(locations, year_list), locations, varieties, year_list, curyear, field).fetch(reduce_to_one_subset=one_subset)
-	except TypeError:
-		# TODO: we can do more for the user than redirect to /
-		return HttpResponseRedirect("/")
-	
-	# New idea, return a list of tables instead of a list of rows
-	tables = []
-	header_rows = [sorted_list[0]]
-	lsd_rows = []
-	rows = []
-	i = 0;
-			
-	for row in sorted_list[1::]:
-		if len(row) > 0:
-			if row[0][0] == 'Variety':
-				tables.append(rows)
-				rows = []
-				header_rows.append(row)
-			elif row[0] == 'LSD':
-				lsd_rows.append(row)
-			else:
-				rows.append(row)
-				
-	tables.append(rows)
-
-	dict_tables = []
-	for h in header_rows:
-		dict_tables.append(dict(header=h))
-	for l, i in zip(lsd_rows, range(len(lsd_rows))):
-		dict_tables[i]['lsd'] = l
-	for r, i in zip(tables, range(len(tables))):
-		dict_tables[i]['rows'] = r
-	
-	for table in dict_tables:
-		order = table['header'][0][1][0]
-		#print order
-		table['order'] = tuple((order[0], order[0]+order[1], order[0]+order[1]+order[2]))
-		table['header'][0] = ('Variety', -1)
-	
-	remove_incomplete_tables = True
-	# remove tables that are incomplete
-	if remove_incomplete_tables:
-		keep_me = []
-		for table in dict_tables:
-			full = True
-			for row in table['rows']:
-				if None in row:
-					full = False
-			if full:
-				keep_me.append(table)
-		dict_tables = keep_me
-	'''
-	for table in dict_tables:
-		print table['header']
-		for row in table['rows']:
-			print row
-		print table['lsd']
-		print ''
-	'''
+	page = Page(locations[0:8], year_list, curyear, fieldname, 0.05)
 	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
@@ -307,41 +316,22 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	except TypeError:
 		ab = None
 	
-	# turn the headers from a list of names to a tuple of (location_name, location_id)
-	heading_list = []
-	
-	#TODO: this is very bad for the database...
-	try:
-		pass
-		#curyear = sorted_list[0][0] # we sent a preference for curyear, but what was returned may be different
-	except IndexError: # will happen if all locations have been deselected...
-		sorted_list = [[curyear]]
-		return HttpResponseRedirect("/")
-	
 	if one_subset: # the variety view
 		view = 'variety'
-	directHome=0
-	for l in sorted_list[1::]:
-		if l[1]==l[2]==l[3]==None:
-			directHome=1
-		else:
-			directHome=0
-			break
-	if directHome==1:
-		return HttpResponseRedirect("/")
-		
-		#iterate through sorted list and send the user to the home page if it's all empty
 	else: # the location view
 		view = 'location'
+	
 	location_get_string=''
 	variety_get_string=''
+	"""
 	for v in varieties:
 		variety_get_string='&varieties='+str(v.id)
 	for l in locations:
 		location_get_string='&locations='+str(l.id)
 	variety_get_string = '?'+variety_get_string[1::]
+	"""
 	return render_to_response(
-		'tabbed_view.html',
+		'tabbed_object_view.html',
 		{
 			'zipcode': zipcode,
 			'search_radius': search_radius,
@@ -351,9 +341,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			'field_list': field_list,
 			'location_list': locations,
 			'curyear': curyear,
-			'heading_list': sorted_list[0][1::],
-			'sorted_list': sorted_list[1::],
-			'tables': dict_tables,
+			'page': page,
 			'years': year_list,
 			'blurbs' : unit_blurbs,
 			'curfield' : fieldname,
@@ -366,9 +354,13 @@ def varieties_view(request, yearname, fieldname, abtest=None):
 
 	if request.method == 'GET':
 		varieties_form = variety_trials_forms.SelectVarietiesForm(request.GET)
+		print request.GET
 		if varieties_form.is_valid():
-			
-			varieties = varieties_form.cleaned_data['varieties']
+			varieties = []
+			varieties.append(varieties_form.cleaned_data['varieties'])
+			varieties.append(varieties_form.cleaned_data['varieties1'])
+			varieties.append(varieties_form.cleaned_data['varieties2'])
+			varieties.append(varieties_form.cleaned_data['varieties3'])
 			print '1'
 			locations = models.Location.objects.all()
 			
@@ -389,16 +381,120 @@ def add_trial_entry_csv_file(request):
 	if request.method == 'POST': # If the form has been submitted...
 		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
 		if form.is_valid():
-			success, errors = variety_trials_forms.handle_csv_file(request.FILES['csv_file'])
+			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
 			if success:
 				return HttpResponseRedirect('/success/')
 			else:
 				form = variety_trials_forms.UploadCSVForm()
 	else:	
 		form = variety_trials_forms.UploadCSVForm()
-
+	#print errors
 	return render_to_response(
 		'add_from_csv_template.html', 
 		{'form': form, 'format_errors': errors},
 		context_instance=RequestContext(request)
 	)
+
+
+def add_form_confirmation(request):
+	
+	errors = {} 
+	givenvalues = {}
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
+		if form.is_valid():
+			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
+			if not errors:
+				return HttpResponseRedirect("/sucess/")
+			else:
+				form = variety_trials_forms.UploadCSVForm()
+				return render_to_response(
+					'add_form_confirmation.html', 
+					{'form': form, 'format_errors': errors,},
+					context_instance=RequestContext(request)
+				)
+	else:	
+		form = variety_trials_forms.UploadCSVForm()
+	
+	
+def add_information(request):
+	
+	errors = {}
+	givendetail = []
+	details = [] 
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+		errors = request.POST.getlist("chkError")
+		#givendetail = variety_trials_forms.checking_for_data.givenval
+		for l in errors:
+			split_l = l.split(' ')
+			if len(split_l) > 1:
+				details.append(split_l[0]+" "+split_l[1]+" "+split_l[2])
+				
+				
+		#print details					
+		for detail in details:
+			if detail =='Problem with variety' or detail =='Problem with location':
+				return render_to_response(
+					'add_information.html', 
+					{'format_errors': details ,'error_num':errors},
+					context_instance=RequestContext(request)
+				)
+			
+			
+def adding_to_database_confirm(request):
+	#List for Varieties
+	entered_variety_data = []
+	description_url = []
+	picture_url = []
+	agent_origin = []
+	year_released = []
+	straw_length = []
+	maturity = []
+	grain_color = [] 
+	seed_color = []
+	beard = []
+	wilt = []
+	diseases = []
+	susceptibility = []
+	#Lists for Location data 
+	entered_location_data = []
+	extracted_zip = [] 
+	errorcheck = []
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+	
+		entered_variety_data=request.POST.getlist("varietyname")
+		description_url= request.POST.getlist("description_url")
+		picture_url=request.POST.getlist("picture_url")
+		agent_origin=request.POST.getlist("agent_origin")
+		year_released=request.POST.getlist("year_released")
+		straw_length=request.POST.getlist("straw_length")
+		maturity=request.POST.getlist("maturity")
+		grain_color=request.POST.getlist("grain_color")
+		seed_color=request.POST.getlist("seed_color")
+		beard=request.POST.getlist("beard")
+		wilt=request.POST.getlist("wilt")
+		diseases=request.POST.getlist("diseases")
+		susceptibility=request.POST.getlist("susceptibility")
+		entered_location_data=request.POST.getlist("location")
+		extracted_zip=request.POST.getlist("zipcode")
+		
+		
+		errorcheck= variety_trials_forms.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
+		
+		return HttpResponseRedirect("/sucess/")
+		
+
+							
+def redirect_sucess(request):
+
+	return render_to_response(
+		'success.html'
+	)
+		    
+

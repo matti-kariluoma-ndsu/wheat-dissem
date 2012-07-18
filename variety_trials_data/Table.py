@@ -75,7 +75,7 @@ class LSD_Row(Row):
 		"""
 		
 		"""
-		Grab the LSDs for the location columns in the Table object. 
+		Grab the LSDs for the location columns in the SubTable object. 
 		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
 		"""	
 		for entry in self.subtable.entries:
@@ -312,7 +312,7 @@ class SubTable:
 			This function returns a dictionary like so: {year:{variety:test_weight}} 
 			"""
 			
-			year_columns = {} # The big dictionary with all the information you could possible want, e.g. {year: {variety: test_weight}}.
+			year_columns = {} # The big dictionary with all the information you could possible want, except for locations, e.g. {year: {variety: test_weight}}.
 			
 			if len(years) >= 3:
 				t = years[:2] # Reduce the count of years to 3, and hope that the years are sorted.
@@ -406,6 +406,9 @@ class SubTable:
 			row_labels_column = set(sorted(temp)) # Remove the duplicates and sort them.
 					
 			return row_labels_column 
+			
+		def populate_row(self, year_columns, location_columns): # This method is not called in the collate table method, but I'm building it in case you need it.
+			drgerger
 			
 		def populate_header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
 			"""
