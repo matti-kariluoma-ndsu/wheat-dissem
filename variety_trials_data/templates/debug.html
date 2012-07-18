@@ -1,12 +1,14 @@
 {%extends "base.html"%}
 {% block content%}
+<body>
+<p id="response"></p>
 <table id ="debug"></table>
+</body>
 
 {% endblock %}
 {% block javascript %}
 
-var table = document.getElementById('debug');
-
+var table = $('#debug')
 
 function cell(constructorParametersObject){
     this.position = constructorParametersObject.pk;
@@ -15,7 +17,7 @@ function cell(constructorParametersObject){
 }
 var entryList=[]
 var entry1 = {
-    url: '/trial_entry/1/json',
+    url: '/trial_entry/2/json',
 	dataType: "json",
     data: {
         'key': 'value'
@@ -32,8 +34,7 @@ var entry2 = {
 var cellList = [];
 var x =0;
 function processAjaxFunction(response_data) {
-	document.writeln(x)
-    $('#debug').text(x+"Response is " + response_data + ", or " + JSON.stringify(response_data));
+    $('#response').text(x+"Response is " + response_data + ", or " + JSON.stringify(response_data));
 	x++
     for (var i in response_data ){
         //alert("Making a cell from "+JSON.stringify(response_data[i]));
@@ -43,7 +44,10 @@ function processAjaxFunction(response_data) {
 	}
 	if (x==2)
 	{
-	table.write("<tr>"+cellList[1].position+"</tr>")
+	table.append($('<tr>')
+	.append($('<th>').text("The position of the returned JSON objects"))
+	.append($('<td>').text(cellList[0].position))
+	.append($('<td>').text(cellList[1].position)));
 	}
 }
 entryList.push(entry1)
