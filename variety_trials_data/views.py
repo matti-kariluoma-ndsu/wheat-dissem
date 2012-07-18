@@ -56,6 +56,7 @@ def variety_info(request, variety_name):
 		context_instance=RequestContext(request)
 	)
 
+
 def to_json(request):
 	data = {'hello': 'there'}
 	
@@ -66,6 +67,7 @@ def to_json(request):
 		},
 		context_instance=RequestContext(request)
 	)
+
 
 def zipcode_to_json(request, zipcode):
 	try:
@@ -108,6 +110,7 @@ def history(request):
 		newlist.append(element)
 		element.created_date
 		element.username
+
 	return render_to_response(
 		'history.html', 
 		{ 
@@ -122,7 +125,6 @@ def history_delete(request, delete):
 	for element in history:
 		trial_Entry=models.Trial_Entry.objects.filter(id = element.trial_entry.id)
 		trial_Entry.delete()
-		
 	
 	return render_to_response(
 		'history.html', 
@@ -133,14 +135,11 @@ def history_delete(request, delete):
 	)
 
 def history_commit(request, id):  
-        entries = models.Trial_Entry_History.objects.filter(id = id)
-        for entry in entries:
-                entry.deletable = False;
-                entry.save()
-	
+	entries = models.Trial_Entry_History.objects.filter(id = id)
+	for entry in entries:
+		entry.deletable = False;
+		entry.save()
 
-
-		
 def locations_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
 		zipcode=request.GET.__getitem__("zipcode")
@@ -367,9 +366,9 @@ def varieties_view(request, yearname, fieldname, abtest=None):
 			return tabbed_view(request, yearname, fieldname, locations, varieties, True, abtest)
 			
 		else:
-                        for field in varieties_form:
-                                print field.errors
-                                print field.label_tag
+			for field in varieties_form:
+				print field.errors
+				print field.label_tag
 			return HttpResponseRedirect("/") # send to homepage
 	else:
 		return HttpResponseRedirect("/") # send to homepage
@@ -497,4 +496,119 @@ def redirect_sucess(request):
 		'success.html'
 	)
 		    
+
+def inspect(request):
+	
+	
+	cur_year = datetime.date.today().year
+	year_list=list()
+	min_year = datetime.date.today().year
+	date_count=1
+	while date_count>0:
+		min_year-=1
+		date_count=models.Date.objects.filter(date__range=(datetime.date(min_year-1,1,1), datetime.date(min_year,12,31))).count()
+		print str(min_year)+" "+str(date_count)
+	for year in range(min_year+1,cur_year):
+		year_list.append(year)
+	varieties = models.Variety.objects.all().order_by("name")
+	locations = models.Location.objects.all().order_by("name")
+	
+	masterDict=dict()
+	for year in year_list:
+		masterDict[year]=dict()
+		masterDict[year]["header"]=list()
+		for l in locations:
+			masterDict[year]["header"].append(l.name)
+		masterDict[year]["rows"]=dict()
+		for v in varieties:
+			masterDict[year]["rows"][v.name]=dict()
+			for l in locations:
+				masterDict[year]["rows"][v.name][l.id]=" "
+	
+	for entry in models.Trial_Entry.objects.select_related(depth=3).filter(
+			harvest_date__in=models.Date.objects.filter(
+				date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
+			)
+		):
+		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
+
+	masterList=dict()
+	for year in year_list:
+		masterList[year]=dict()
+		masterList[year]["header"]=masterDict[year]["header"]
+		masterList[year]["rows"]=list()
+		x=0
+		for v in varieties:
+			dummy_list=list()
+			dummy_list.append(v.name)
+			masterList[year]["rows"].append(dummy_list)
+			
+			for l in locations:
+				masterList[year]["rows"][x].append(masterDict[year]["rows"][v.name][l.id])
+			x+=1
+	return render_to_response(
+		'inspect.html',
+		{
+		'masterList':masterList
+		}
+	)
+	
+def trial_entry_json(request, id):
+	v = models.Trial_Entry.objects.filter(pk=id)
+	response = HttpResponse()
+	needed_fields = (
+		'pk',
+		'model',
+		'variety',
+		'location',
+		'name',
+		'bushels_acre',
+		'protein_percent',
+		'test_weight'
+		)
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(v,fields=needed_fields, stream=response)
+	
+	return response
+	
+def zipcode_json(request, id):
+	z = models.Zipcode.objects.filter(pk=id)
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(z, stream=response)
+	return response
+	
+def location_json(request, id):
+	l = models.Location.objects.filter(pk=id)
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(l, stream=response)
+	return response
+	
+def disease_json(request, id):
+	d = models.Disease_Entry.objects.filter(pk=id)
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(d, stream=response)
+	return response
+
+def variety_json_all(request):
+	varieties = models.Variety.objects.all()
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(varieties, stream=response)
+	return response	
+
+def location_json_all(request):
+	locations = models.Location.objects.all()
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(locations, stream=response)
+	return response		
+
+def debug(request):
+	return render_to_response(
+		'debug.html',
+		{}
+		)
 

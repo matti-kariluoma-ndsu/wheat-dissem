@@ -1,0 +1,16 @@
+	This service would let farmers go directly from viewing information about a variety to a list of seed sellers that carry that variety. These listings would be created by the sellers and would be sort able by location, name of the seller, varieties carried, proximity to the farmer, or price. Each seller will need to create an account before making a listing. Each account will require an email and a password. Creating another database to store the passwords would be prudent. Each account would have a brief description, location, contact information, and a list of varieties with a price for each variety. The contact information required will be a phone number, an email address that could be hidden from public view, and a physical address.
+	Possible abuses of the system: 
+Automated bots creating accounts.
+Solution: www.captcha.com has a free plug-in for Python.
+A seller may set the price for a variety to $0 to make the listing show up at the top of the page.
+Solution: To prevent this prices entered could be forced to be within a reasonable range of the average price of the seed.
+Listing a price inconsistent with the price charged.
+Solution: Have a way for users to report dishonest behavior on the part of businesses.
+Listing a business under a variety it doesn’t sell.
+Solution: Have a way for users to report dishonest behavior on the part of businesses.
+Impersonating a competitor to draw business away from them.
+ Creating one or more accounts for a nonexistent business with contact information for a business already listed in hopes of attracting more customers.
+Solution: To prevent this we could make any new business listings have unique contact information
+Given there is a report system, we would need to protect it from being abused.
+Solution: Too many reports in too short of a time will temporarily or permanently disable reporting of that listing.
+

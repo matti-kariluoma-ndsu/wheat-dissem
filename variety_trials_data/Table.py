@@ -275,8 +275,108 @@ class Cell:
 		self.field = field
 
 class Table:
-	def __init__():
-		pass
+	def __init__(self, entries, probability):
+		self.entries = entries
+		self.probability = probability
+		(self.years, self.locations, self.varieties) = self._inspect_entries()
+		self.header_row = Row(self.populate_header_row())
+
+	class _meta:
+		"""
+		Stores metadata about entries
+		"""
+		def __init__(self, entries):
+			self.YEA = 'years'
+			self.LOC = 'location'
+			self.VAR = 'varieties'
+			self.ENT = 'entries'
+			self.years = dict()
+			# {y: {'varieties': [v1,v2,v3...], 'locations': [l1,l2,l3...]}, ...}
+			self.locations = dict()
+			# {l: {'years': [y1,y2,y3...], 'varieties': [v1,v2,v3...]}, ...}
+			self.varieties = dict()
+			# {v: {'years': [y1,y2,y3...], 'locations': [l1,l2,l3...]}, ...}
+			for entry in self.entries:
+				year = entry.harvest_date
+				location = entry.location
+				variety = entry.variety
+				
+				try:
+					y = years[year]
+				except KeyError:
+					years[year] = {
+							self.VAR: [variety], 
+							self.LOC: [location],
+							self.ENT: [entry]
+						}
+				else:
+					y[self.VAR].append(variety)
+					y[self.LOC].append(location)
+					y[self.ENT].append(entry)
+				
+				try:
+					l = locations[location]
+				except KeyError:
+					locations[location] = {
+							self.VAR: [variety], 
+							self.YEA: [year],
+							self.ENT: [entry]
+						}
+				else:
+					l[self.VAR].append(variety)
+					l[self.YEA].append(year)
+					l[self.ENT].append(entry)
+				
+				try:
+					v = varieties[variety]
+				except KeyError:
+					varieties[variety] = {
+							self.YEA: [year], 
+							self.LOC: [location],
+							self.ENT: [entry]
+						}
+				else:
+					v[self.YEA].append(YEAR)
+					v[self.LOC].append(location)
+					v[self.ENT].append(entry)
+		
+		def populate_header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
+			"""
+			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
+			the appropriate amount of year headers, i.e. 1yr, 2yr, etc.,
+			appends the sorted location names, and then returns top_row.
+			
+			The final output should look like this:
+			
+			['Varieties', 'someYear', 'someYear', 'someYear, 'Casselton', 'Prosper', 'SomePlace']
+			"""
+			top_row = ['Varieties']
+			
+			try:
+				top_row.extend(self.years)
+				top_row.extend(self.locations)
+			except (IndexError, SyntaxError, KeyError): 
+				pass 
+			
+			return top_row	
+	
+	def _inspect_entries(self):
+			"""
+			We could just ask the user to send the list of years, locations,
+			varieities down with entries, but this is safer as the years/
+			varieties are guranteed to be in entries.
+			"""
+			self.entries_meta = _meta(self.entries)
+			
+			years = list(self.entries_meta.years.keys())
+			locations = list(self.entries_meta.locations.keys())
+			varieties = list(self.entries_meta.varieties.keys())
+			
+			years.sort()
+			locations.sort()
+			varieties.sort()
+			
+			return (years, locations, varieties)
 
 class SubTable:
 		"""
@@ -291,7 +391,6 @@ class SubTable:
 		...  ...  ...  ...  ...
 		"""
 		
-			
 		def __init__(self, entries, probability):
 			self.entries = entries
 			self.probability = probability
@@ -406,10 +505,14 @@ class SubTable:
 			row_labels_column = set(sorted(temp)) # Remove the duplicates and sort them.
 					
 			return row_labels_column 
+
 			
 		def populate_row(self, year_columns, location_columns): # This method is not called in the collate table method, but I'm building it in case you need it.
 			drgerger
 			
+
+
+
 		def populate_header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
 			"""
 			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
@@ -433,6 +536,7 @@ class SubTable:
 				pass 
 			
 			return top_row	
+
 			
 		def collate_table(self, top_row, row_labels_column, year_columns, location_columns, probability): 
 			"""

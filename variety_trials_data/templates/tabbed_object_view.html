@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load django_math %}
 {% block content %}
-<a href="/">Home</a>
+
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
@@ -112,52 +112,33 @@
 
 	<div id="django_trial_results_content">
 		<div>
-			<div colspan="{{ heading_list|length|add:1 }}">
-				{% for fieldname, blurb_list in blurbs.items %}
-				{% if fieldname == curfield %}
-						<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
-						<p>{{blurb_list.2}}</p>
-				{% endif %}
-				{% endfor %}
-			</div>
+			{% for fieldname, blurb_list in blurbs.items %}
+			{% if fieldname == curfield %}
+					<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
+					<p>{{blurb_list.2}}</p>
+			{% endif %}
+			{% endfor %}
 		</div>
+		<div class="current_year">{{curyear}}</div> 
+		<div class="row subheadings thin"></div>
+	{% for table in page.tables %}
 		<div>
-			<div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}} Zipcode: {{zipcode}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
-		</div>
-		<div class = "container">
-			<div class="Column"><h4> Variety</h4></div>
-			{% for heading in heading_list %}
-			<div class="Column"><h4>{{ heading.0 }}</h4>
-			{% if heading.1 != -1 %}
-			<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+			<div class="Column">
+				<h4>Variety</h4>
+			</div>
+		{% for location, column in table.columns.items %}
+			<div class="Column">
+				<h4>{{ location.name }}</h4>
+			{% if location.id != -1 %}
+				<a href="#" onclick="unselect_location({{ location.id }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
 			{% endif %}
 			</div>
-			{% endfor %}
+		{% endfor %}
 		</div>
 		<br style="clear: both;"/>
-		<div class="row subheadings thin">
-		</div>
-	{% for datalist in sorted_list %}
-		{% if datalist.0.0 == "Variety" %}
-		<div class="container">
-			<div></div>
-		</div>
-		<div>
-			<div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
-		</div>
-		<div class="container">
-			{% for heading in datalist %}
-			<div class="Column"><h3>{{ heading.0 }}</h3>
-				{% if heading.1 != -1 %}
-				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
-				{% endif %}
-			</div>
-			{% endfor %}
-		</div>
-		<br style="clear: both;"/>
-		
-		{% else %}
-		{% if datalist.0 == "LSD" %}
+		{% for variety, row in table.rows.items %}
+
+		{% if variety.name == "LSD" %}
 		<div>
 			<div class ='ColumnToLeft'>
 			<form>
@@ -170,31 +151,27 @@
 			<div></div>
 		</div>
 		<div class="LSD_row">
-			{% for element in datalist %}
-			<div class='Column'>{{ element|default_if_none:"--" }}</div>
+			{% for cell in row %}
+			<div class='Column'>{{ cell.get|default_if_none:"--" }}</div>
 			{% endfor %}
 			<br style="clear: both;"/>
 		</div>
 		{% else %}
 		<div class="group {% cycle 'master_odd' 'master_even' %}">
-			{% for element in datalist %}
-				{% if datalist.0 == element %}
-				<form>
-					<div class='ColumnToLeft'>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{element.1}}" onclick="unselect_variety({{element.1}})" /> <a href='/view/info/{{element.0}}/'>{{element.0}}</a>
-					</div>
-				</form>
-				{% else %}
-				<div class='Column'>
-					{{ element|default_if_none:"--" }}
+				<div class='ColumnToLeft'>
+					<form>
+						<input class="variety_checkbox" type="checkbox" name="{{ variety.name }}" value="{{variety.id}}" onclick="unselect_variety({{variety.id}})"> 
+							<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+						</input>
+					</form>
 				</div>
-				{% endif %}
-				
-			{% endfor %}
+				{% for cell in row %}
+				<div class='Column'>{{ cell.column.location.name|default_if_none:"--" }}</div>
+				{% endfor %}
 			<br style="clear: both;"/>
 		</div>
 		{% endif %}
-		{% endif %}
+		{% endfor %}
 	{% endfor %}
 		<div class="bottom_spacer"></div>
 	</div>

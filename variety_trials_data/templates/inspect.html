@@ -1,0 +1,20 @@
+<h4>X's represent data that is in the system</h4>
+{% for year in masterList.items %}
+	
+	<h4>{{year.0}}</h4>
+	<table border="1">
+	<tr>
+	<td> </td>
+	{% for location in year.1.header %}
+		<td>{{location}}</td>
+	{% endfor %}
+	</tr>
+	{% for variety in year.1.rows %}
+		<tr>
+		{% for entry in variety %}
+			<td>{{entry}}</td>
+		{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+{% endfor %}

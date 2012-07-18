@@ -1,5 +1,7 @@
 from django.db import models
 from django.forms import ModelForm
+from django.core.exceptions import ObjectDoesNotExist
+
 
 # Create your models here.
 class Disease(models.Model):
@@ -72,37 +74,51 @@ class Date(models.Model):
 	
 	def __unicode__(self):
 		return str(self.date)
-	
+		
+
+		
 class Trial_Entry(models.Model):
-	bushels_acre				 = models.DecimalField(decimal_places=5, max_digits=10)
-	protein_percent			 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	test_weight					 = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-	kernel_weight				 = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-	plant_height				 = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-	days_to_head				 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	lodging_factor			 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	jday_of_head				 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	bushels_acre         = models.DecimalField(decimal_places=5, max_digits=10)
+	protein_percent      = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	test_weight          = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+	kernel_weight        = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+	plant_height         = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+	days_to_head         = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	lodging_factor       = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	jday_of_head         = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
 	winter_survival_rate = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	shatter							 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	seeds_per_round			 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	canopy_density			 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	canopy_height				 = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-	days_to_flower			 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	seed_oil_percent		 = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+	shatter              = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	seeds_per_round      = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	canopy_density       = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	canopy_height        = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+	days_to_flower       = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	seed_oil_percent     = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
 	planting_method_tags = models.CharField(max_length=200, blank=True, null=True)
-	seeding_rate				 = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
-	previous_crop				 = models.CharField(max_length=200, blank=True, null=True)
-	moisture_basis			 = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
+	seeding_rate         = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True)
+	previous_crop        = models.CharField(max_length=200, blank=True, null=True)
+	moisture_basis       = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
 	lsd_05               = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
 	lsd_10               = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
 	hsd_10               = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True)
-	plant_date					 = models.ForeignKey(Date, related_name='plant_date', blank=True, null=True)
-	harvest_date				 = models.ForeignKey(Date, related_name='harvest_date')
-	location						 = models.ForeignKey(Location)
-	variety							 = models.ForeignKey(Variety)
+	plant_date           = models.ForeignKey(Date, related_name='plant_date', blank=True, null=True)
+	harvest_date         = models.ForeignKey(Date, related_name='harvest_date')
+	location             = models.ForeignKey(Location)
+	variety              = models.ForeignKey(Variety)
+	deletable            = models.BooleanField(editable=False, default=True) # new entries have deletable = True, and a one-way operation is exposed to set deletable = False
 
 	def __unicode__(self):
 		return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.date.year)
+		
+class Trial_Entry_History(models.Model):
+	username     = models.CharField(max_length=200)
+	created_date = models.DateField()
+	trial_entry  = models.ForeignKey(Trial_Entry, on_delete=models.DO_NOTHING)
+	def __unicode__(self):
+		try:
+			trial = str(self.trial_entry)
+		except ObjectDoesNotExist:
+			trial = str("none")
+		return trial +" by "+str(self.username)+" at "+str(self.created_date.year)
 
 # Now add custom forms to populate these data:
 class VarietyForm(ModelForm):

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div>
+	<h1><u>Please Confirm Following Data</u></h1>
+	<br>
+	<br>
+	<h4>Instructions: Following data is/are not in the database please tick on check boxes to verify</h4>
+	<!--TODO: auto generate this file from the model-->
+	<br />
+	<br />
+	<br />
+</div>
+
+
+
+<div class="error">
+
+<form enctype="multipart/form-data" action="/add_info/" method="post">
+{% for error_source, error_msg in format_errors.items%}
+  {% csrf_token %}
+  
+
+	<input type="checkbox" name="chkError" value="{{ error_source }}" /> 	{{ error_source }}: <b>{{ error_msg }} </b><br />
+   
+   
+
+
+{% endfor %}
+<input type="submit" value="Submit" />
+</form>
+
+</div>
+{% endblock %}
