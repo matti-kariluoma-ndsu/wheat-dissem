@@ -36,49 +36,50 @@ class LSD_Row(Row):
 	"""
 	A row that keeps track of which Table it belongs to.
 	"""
-	def __init__(self, table):
+	def __init__(self, subtable):
 		#super(LSD_Row, self).__init__(list()) # call Row.__init__()
-		self.table = table
+		self.subtable = subtable
 		Row.__init__(self, [])
 	
 	def populate(self, probability):
 		
-		y_columns = self.table.year_columns
-		years_i = []
-		l_columns = self.table.location_columns
+		y_columns = self.subtable.year_columns
+		l_columns = self.subtable.location_columns
 		location_lsds = []
 		
-		years_i = list(y_columns[0].keys())
+		# Grabs the year keys from year_columns.
 		
-		if len(years_i) == 3:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
-			data_3yr = years_i[2]
+		if len(y_columns) == 3:
+			data_1yr = y_columns[0]
+			data_2yr = y_columns[1]
+			data_3yr = y_columns[2]
 		elif len(years_i) == 2:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
+			data_1yr = y_columns[0]
+			data_2yr = y_columns[1]
 		elif len(years_i) == 1:
-			data_1yr = years_i[0]
+			data_1yr = y_columns[0]
 		else:
 			pass
 		
-		"""
-		if data_1yr != None:	
+		if data_1yr is not None:	
 			lsd_1yr = self._LSD(data_1yr, probability)
-		if data_2yr != None:
+		if data_2yr is not None:
 			lsd_2yr = self._LSD(data_2yr, probability)
-		if data_3yr != None:
+		if data_3yr is not None:
 			lsd_3yr = self._LSD(data_3yr, probability)
-		"""	
+			
+		"""
 		lsd_1yr = 0.1
-		lsd_2yr = 0.2
+		lsd_2yr = 0.2  # Matti's test values.
 		lsd_3yr = 0.3
+		"""
+		
 		"""
 		Grab the LSDs for the location columns in the Table object. 
 		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
 		"""	
-		for entry in self.table.entries:
-			for l in l_columns[0].keys():
+		for entry in self.subtable.entries:
+			for l in l_columns.keys():
 				if entry.hsd_10 is not None and l.name == entry.location.name:
 					location_lsds.append(entry.hsd_10)
 				elif entry.lsd_05 is not None and l.name == entry.location.name:
@@ -87,11 +88,18 @@ class LSD_Row(Row):
 					location_lsds.append(entry.lsd_10)
 				else:
 					location_lsds.append(None)	
-				
-		lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
 		
-		for l in location_lsds:
-			lsds = l
+		if lsd_1yr is not None and lsd_2yr is not None and lsd_3yr is not None:	
+			lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
+		
+		elif lsd_1yr is not None and lsd_2yr is not None:
+			lsds = ['LSD', lsd_1yr, lsd_2yr]
+			
+		elif lsd_1yr is not None:
+			lsds = ['LSD', lsd_1yr]
+		
+		for l in location_lsds: 
+			lsds.append(l)
 		
 		return lsds
 	
@@ -178,8 +186,8 @@ class LSD_Row(Row):
 		"""
 		
 		trt = response_to_treatments
-		#model = aov(y~trt)
-		#df = df.residual(model)
+		# model = aov(y~trt)
+		# df = df.residual(model)
 		# df is the residual Degrees of Freedom
 		# n are factors, k is responses per factor
 		n = len(trt)
@@ -221,9 +229,9 @@ class Label_Row(Row):
 	"""
 	A row that keeps track of which Table it belongs to.
 	"""
-	def __init__(self, table):
+	def __init__(self, subtable):
 		super(Label_Row, self).__init__() # call Row.__init__()
-		self.table = table
+		self.table = subtable
 		
 class Column:
 	"""
@@ -383,102 +391,103 @@ class SubTable:
 		...  ...  ...  ...  ...
 		"""
 		
+		def __init__(self, entries, probability):
+			self.entries = entries
+			self.probability = probability
 			
-		def __init__(self): # Probability is required for creating the LSD row in the collate_table function.
-			pass
-		
-		
-		
-		def get(self, years, varieties, locations):
-			year_columns = self.populate_year_average_columns( years, varieties) # This order of function calls is important.
-			location_columns = self.populate_location_columns( locations, year_columns[0])
-			top_row = self.populate_header_row( year_columns[0], location_columns[0])
-			row_labels_column = self.populate_row_labels_column( year_columns[0])
-			self.year_columns = year_columns[0]
-			self.location_columns = location_columns[0]
+		def get(self, years, varieties, locations): 
+			year_columns = self.populate_year_average_columns(years, varieties) 
+			location_columns = self.populate_location_columns(years, locations)
+			top_row = self.populate_header_row(year_columns, location_columns)
+			row_labels_column = self.populate_row_labels_column(year_columns, location_columns)
+			self.year_columns = year_columns
+			self.location_columns = location_columns
 			self.top_row = top_row
 			self.row_labels_column = row_labels_column
-			return self.collate_table( top_row, row_labels_column, year_columns[0], location_columns[0], self.probability)
+			return self.collate_table(top_row, row_labels_column, year_columns, location_columns, self.probability)
 			
 		def populate_year_average_columns(self, years, varieties): 
 			"""
-			Appends the variety values for the given years.
-			
-			[(maxYear, value ),...,(minYear, value)] The 'year' key will be numeric. 
+			This function returns a dictionary like so: {year:{variety:test_weight}} 
 			"""
 			
-			y1 = {} # The big dictionary with all the information you could possible want, e.g. {Year: {Variety: Value}}.
-			y2 = [] # This contains just the variety values, it doesn't have all the annoying keys. 
-			y3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
-			v_temp = sorted(varieties, key=attrgetter('name'))
-			y_temp = sorted(years, reverse=True) 
-			year_columns = []
+			year_columns = {} # The big dictionary with all the information you could possible want, e.g. {year: {variety: test_weight}}.
 			
-			if len(y_temp) > 3:
-				t = y_temp[:2] # Reduce the number of years to 3.
+			if len(years) >= 3:
+				t = years[:2] # Reduce the count of years to 3, and hope that the years are sorted.
 				y_temp = t
-			
-			for entry in self.entries: # Yay for n^3.
-				for y in y_temp:
-					for  v in v_temp:
-						if y == entry.harvest_date.date.year and v == entry.variety.name:
-							try:
-								y1 = {y: {v: entry.test_weight}} # I'm not sure if this test weight is already the mean value.
-								y2 = entry.test_weight
-								y3 = y
-							except AttributeError:
-								y1 = {y: {v: None}} 
-								y2 = None
-								y3 = y
-						else:
-							y1 = {y: {v: None}}
-							y2 = None
-							y3 = y
-						year_columns.append([y1, y2, y3])
+				# If the following query is confusing, refer to this link: https://docs.djangoproject.com/en/1.4/ref/models/querysets/#values
+				# When using the .values() function when creating a query set, it pairs values with the keys that are queried, thus creating dictionaries.
+				# The downside of this query is that it doesn't create nested dictionaries.
+				for v in varieties:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year, variety__name=v.test_weight).values(v.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year, variety__name=v.test_weight).values(v.name)
+					query_set_year3 = Trial_Entry.objects.filter(harvest_date__year=y_temp[2].date.year, variety__name=v.test_weight).values(v.name)
+				
+				year_columns = {years[0]:query_set_year1, years[1]:query_set_year2, years[2]:query_set_year3}
+				
+			elif len(years) == 2:
+				t = years[:1]
+				y_temp = t
+				
+				for v in varieties:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year, variety__name=v.test_weight).values(v.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year, variety__name=v.test_weight).values(v.name)
+				
+				year_columns = {years[0]:query_set_year1, years[1]:query_set_year2}
+				
+			elif len(years) == 1:
+				t = years[0]
+				y_temp = t
+				
+				for v in varieties:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year, variety__name=v.test_weight).values(v.name)
+				
+				year_columns = {years[0]:query_set_year1}
 							
 			return year_columns
 			
-		def populate_location_columns(self, locations, year_columns): 
+		def populate_location_columns(self, years, locations):
 			"""
-			Creates a dictionary of locations columns.
-			
-			The final output from l_column should look like this:
-			
-			[(Name, Casselton), (variety, 60.4), (variety, 60.3), (variety, 57.0)]
+			Creates a dictionary of location columns:
+			{location: {variety:test_weight}}
 			"""
 			
-			l_temp = sorted(locations, key=attrgetter('name'))
-			l1 = {} # The big dictionary with all the information you could possible want, e.g. {Location: {Variety: Value}}
-			l2 = [] # This contains just the variety values, it doesn't have all the annoying keys..
-			l3 = [] # This will be a list of headers, which are grabbed in the populate_header_row function.
-			location_columns = []
-			# Grabs the varieties from year_columns. This aligns year_columns and location_columns in Table object.
-			for y, v_dict in year_columns[0].items():
-				v_temp = v_dict.keys() # TODO: logic error, maybe this is meant to be in the calling function?
-				if v_temp is not None and len(v_temp) > 0:
-					break;
+			location_columns = {}
 			
-			for entry in self.entries: # Yay for n^3
-				for l in l_temp:
-					for v in v_temp:
-						if l == entry.location.name and v == entry.variety.name:
-							try:
-								l1 = {l: {v: entry.test_weight}}
-								l2 = entry.test_weight
-								l3 = l
-							except AttributeError:
-								l1 = {l: {v: None}}
-								l2 = None
-								l3 = l
-						else:
-							l1 = {l: {v: None}}
-							l2 = None
-							l3 = l
-						location_columns.append([l1, l2, l3])
+			if len(years) >= 3:
+				t = years[:2] # Reduce the number of years to 3, and hope that the years are sorted.
+				y_temp = t
 				
+				for l in locations:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year,location__name=l.name).values(l.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year,location__name=l.name).values(l.name)
+					query_set_year3 = Trial_Entry.objects.filter(harvest_date__year=y_temp[2].date.year,location__name=l.name).values(l.name)
+				
+				location_columns = {y_temp[0]:query_set_year1, y_temp[1]:query_set_year2, y_temp[2]:query_set_year3}
+							
+			elif len(years) == 2: # Reduce the number of years to 2, and hope that the years are sorted.
+				t = years[:1]
+				y_temp = t
+				
+				for l in locations:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year,location__name=l.name).values(l.name)
+					query_set_year2 = Trial_Entry.objects.filter(harvest_date__year=y_temp[1].date.year,location__name=l.name).values(l.name)
+			
+				location_columns = {y_temp[0]:query_set_year1, y_temp[1]:query_set_year2}
+			
+			elif len(years) == 1: # Reduce the number of years to 1, and hope that the years are sorted.
+				t = years[0]
+				y_temp = t
+			
+				for l in locations:
+					query_set_year1 = Trial_Entry.objects.filter(harvest_date__year=y_temp[0].date.year,location__name=l.name).values(l.name)
+			
+				location_columns = {y_temp[0]:query_set_year1}
+			
 			return location_columns
 			
-		def populate_row_labels_column(self, year_columns):
+		def populate_row_labels_column(self, year_columns, location_columns):
 			"""
 			Returns a list containing the labels for each row in the Table object.
 			
@@ -486,22 +495,41 @@ class SubTable:
 			"""
 			
 			temp = []
-			t = []
-			
-			try:
-				temp = year_columns[0]
-			except (IndexError, SyntaxError, KeyError):
-				pass
 				
-			for k in temp.keys():
-				t.append(k) # This grabs the variety name, but not the value associated with it.
+			for k in year_columns.keys():
+				temp.append(k) # This grabs the variety name, but not the value associated with it.
 				
-			row_labels_column = set(sorted(t)) # Remove possible duplicates.
+			for j in location_columns.keys():
+				temp.append(j) # Same process as the above for-loop, but for the location columns.
+				
+			row_labels_column = set(sorted(temp)) # Remove the duplicates and sort them.
 					
 			return row_labels_column 
+
+		def populate_header_row(self, year_columns, location_columns): # This function requires populated year- and location columns.
+			"""
+			Prefixes to top_row 'Varieties', calculates the sum of year lists and appends
+			the appropriate amount of year headers, i.e. 1yr, 2yr, etc.,
+			appends the sorted location names, and then returns top_row.
 			
-		
+			The final output should look like this:
 			
+			['Varieties', 'someYear', 'someYear', 'someYear, 'Casselton', 'Prosper', 'SomePlace']
+			"""
+			top_row = ['Varieties']
+			
+			try:
+				for y in year_columns.keys():
+					top_row.append(y)
+				
+				for l in location_columns.keys():
+					top_row.append(l)
+					
+			except (IndexError, SyntaxError, KeyError): 
+				pass 
+			
+			return top_row	
+
 			
 		def collate_table(self, top_row, row_labels_column, year_columns, location_columns, probability): 
 			"""
@@ -509,7 +537,7 @@ class SubTable:
 			keys: header; rows; years; locations; lsds.
 			"""	
 			try:
-				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns[0], 'locations':location_columns[0]} # Hrmm.
+				collated_table = {'header':top_row, 'rows':row_labels_column, 'years':year_columns, 'locations':location_columns}
 			except (IndexError, SyntaxError, KeyError):
 				pass
 				
@@ -517,21 +545,17 @@ class SubTable:
 			lsd_row = lsdCalc.populate(probability)
 			collated_table = {'lsds':lsd_row}
 			
-			return collated_table
-			
+			return collated_table	
 			
 		def get_year_column(self, year, year_columns):
 			"""
 			Returns the specified year's column from a Table object's years_columns field
 			as a list.
 			"""
-			
-			try:
-				temp = year_columns[0] # Grabs the dictionary of year columns.
-			except (IndexError, SyntaxError, KeyError):
-				pass
 				
-			column = temp[year]
+			column = []	
+				
+			column.append(year_columns[year])
 			return column
 			
 		def get_location_column(self, location, location_columns): 
@@ -540,12 +564,9 @@ class SubTable:
 			location_columns field as a list.
 			"""
 			
-			try:
-				temp = location_columns[0] # Grabs the dictionary of location columns.
-			except (IndexError, SyntaxError, KeyError):
-				pass
+			column = []
 			
-			column = temp[location]
+			column.append(location in location_columns.keys()) # This could be wrong, but I am trying to get the value from a nested key. The dictionary that is passed to this method should look like this: {year:{location:value}}
 			return column
 			
 		def set_value_count_for_column(self, year_columns, year): 
