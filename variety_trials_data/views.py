@@ -540,6 +540,13 @@ def location_json(request, id):
 	json_serializer.serialize(l, stream=response)
 	return response
 	
+def variety_json(request, id):
+	v = models.Variety.objects.filter(pk=id)
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(v, stream=response)
+	return response
+	
 def disease_json(request, id):
 	d = models.Disease_Entry.objects.filter(pk=id)
 	response = HttpResponse()
