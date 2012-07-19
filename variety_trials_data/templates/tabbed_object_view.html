@@ -126,7 +126,7 @@
 			<div class="Column">
 				<h4>Variety</h4>
 			</div>
-		{% for location, column in table.columns.items %}
+		{% for location in table.locations %}
 			<div class="Column">
 				<h4>{{ location.name }}</h4>
 			{% if location.id != -1 %}
@@ -166,7 +166,7 @@
 					</form>
 				</div>
 				{% for cell in row %}
-				<div class='Column'>{{ cell.column.location.name|default_if_none:"--" }}</div>
+				<div class='Column'>{{ cell|default_if_none:"--" }}</div>
 				{% endfor %}
 			<br style="clear: both;"/>
 		</div>

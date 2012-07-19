@@ -13,10 +13,11 @@ class Cell:
 	"""
 	
 	def __init__(self, row, column, year, fieldname):
-		row.append(self)
 		column.append(self)
-		self.row = row
 		self.column = column
+		# row.append needs self.column to be set
+		row.append(self)
+		self.row = row
 		self.year = year
 		self.fieldname = fieldname
 		self.members = []
@@ -50,7 +51,7 @@ class Cell:
 		self.delete_column()
 		self.delete_values()
 	
-	def get_from(self, year, fieldname):
+	def get(self, year, fieldname):
 		this_year = []
 		for entry in self.members:
 			if entry.harvest_date.date.year == year:
@@ -65,18 +66,24 @@ class Cell:
 		
 		mean = None
 		if len(values) > 0:
-			mean = float(sum(values)) / float(len(values))
+			mean = round(float(sum(values)) / float(len(values)), 1)
 		
 		return mean
-	
-	def get(self):
-		return self.get_from(self.year, self.fieldname)
 		
 	def set_default_year(self, year):
 		self.year = year
 		
 	def set_default_fieldname(self, fieldname):
 		self.fieldname = fieldname
+		
+	def __unicode__(self):
+		unicode_repr = self.get(self.year, self.fieldname)
+		if unicode_repr is None:
+			unicode_repr = u'--'
+		else:
+			unicode_repr = unicode(str(unicode_repr))
+		return unicode_repr
+		#return self.column.location.name
 	
 
 class Row:
@@ -85,28 +92,71 @@ class Row:
 	"""
 	def __init__(self, variety):
 		self.variety = variety
-		self.members = []
-		self.index = 0
+		self.members = {}
+		self.clear()
 	
 	def __iter__(self):
-		self.index = 0
+		if self.key_order is None:
+			self.keys = self.members.keys()
+		else:
+			self.keys = self.key_order
+		self.key_index = 0
+		self.value_index = 0
 		return self
 	
 	def next(self):
-		if self.index == len(self.members):
+		if self.key_index == len(self.keys):
 			raise StopIteration
-		cell = self.members[self.index]
-		self.index = self.index + 1
-		return cell 
+			
+		try:
+			key = self.keys[self.key_index]
+		except IndexError:
+			raise StopIteration
+		
+		try:
+			values = self.members[key]
+		except KeyError:
+			self.key_index = self.key_index + 1
+			return None
+			
+		if len(values) ==  0: 
+			self.key_index = self.key_index + 1
+			return None
+			
+		if self.value_index == len(values):
+			self.key_index = self.key_index + 1
+			self.value_index = 0
+			return self.next()
+
+		cell = values[self.value_index]
+		self.value_index = self.value_index + 1
+		return cell
 	
 	def append(self, value):
-		self.members.append(value)
+		try:
+			col = self.members[value.column.location]
+		except KeyError:
+			col = self.members[value.column.location] = []
+		except AttributeError:
+			try:
+				col = self.members[None]
+			except KeyError:
+				col = self.members[None] = []
+				
+		col.append(value)
 		
+	def set_key_order(self, key_order):
+		self.key_order = key_order
+
 	def clear(self):
 		for m in self.members:
 			if isinstance(m, Cell):
 				m.delete_row()
-		self.members = []
+		self.members = {}
+		self.key_order = None
+		self.keys = None
+		self.key_index = 0
+		self.value_index = 0
 
 class LSD_Row(Row):
 	"""
@@ -335,8 +385,9 @@ class Table:
 		...  ...  ...  ...  ...
 		"""
 			
-		def __init__(self, lsd_probability): # Probability is required for creating the LSD row
+		def __init__(self, locations, lsd_probability): # Probability is required for creating the LSD row
 			self.lsd_probability = lsd_probability
+			self.locations = locations
 			self.rows = {}
 			self.columns = {}
 			self.cells = {}
@@ -346,6 +397,7 @@ class Table:
 				row = self.rows[variety]
 			except KeyError:
 				row = self.rows[variety] = Row(variety)
+				row.set_key_order(self.locations)
 			return row	
 		
 		def get_column(self, location):
@@ -400,7 +452,7 @@ class Page:
 		self.locations = locations
 		self.years = years
 		self.tables = []
-		table = Table(lsd_probability)
+		table = Table(locations, lsd_probability)
 		self.tables.append(table)
 		for entry in self.get_entries():
 			# store like entries for multiple observations and multiple years
