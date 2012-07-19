@@ -13,11 +13,12 @@ class Cell:
 	"""
 	
 	def __init__(self, row, column, year, fieldname):
-		column.append(self)
 		self.column = column
+		self.row = row
+		# aggregate_column.append needs self.row to be set
+		column.append(self)
 		# row.append needs self.column to be set
 		row.append(self)
-		self.row = row
 		self.year = year
 		self.fieldname = fieldname
 		self.members = []
@@ -372,6 +373,80 @@ class Column:
 				m.delete_column()
 		self.members = []
 
+class Aggregate_Cell(Cell):
+	"""
+	A cell whose value is based upon its row
+	"""
+	def __init__(self, row, column, year, fieldname):
+		Cell.__init__(self, row, column, year, fieldname)
+		
+	def append(self, value):
+		return
+	
+	def get(self, year, fieldname):
+		values = []
+		for cell in self.row:
+			if not isinstance(cell, Aggregate_Cell):
+				values.append(cell.get(year, fieldname))
+		
+		mean = None
+		if len(values) > 0:
+			mean = round(float(sum(values)) / float(len(values)), 1)
+		
+		return mean
+
+class Aggregate_Column(Column):
+	"""
+	A column whose cells' value is determined by other cells in its row
+	"""
+	def __init__(self, location):
+		Column.__init__(self, location)
+		self.clear()
+	
+	def __iter__(self):
+		if self.key_order is None:
+			self.keys = self.members.keys()
+		else:
+			self.keys = self.key_order
+		self.index = 0
+		return self
+	
+	def next(self):
+		try:
+			key = self.keys[self.index]
+		except IndexError:
+			raise StopIteration
+			
+		try:
+			cell = self.members[key]
+		except KeyError:
+			cell = None
+			
+		self.index = self.index + 1
+		return cell
+		
+	def append(self, value):
+		try:
+			key = value.row
+		except AttributeError:
+			key = None
+			
+		if key in self.members:
+			return
+			
+		if isinstance(value, Aggregate_Cell):
+			self.members[key] = value
+		else:
+			self.members[key] = Aggregate_Cell(value.row, value.column, value.year, value.fieldname)
+			
+	def clear(self):
+		for m in self.members:
+			if isinstance(m, Cell):
+				m.delete_column()
+		self.members = {}
+		self.key_order = None
+		self.keys  = None
+
 class Table:
 		"""
 		Creates an object with lists for fields that are suitable for a
@@ -454,11 +529,21 @@ class Page:
 		self.tables = []
 		table = Table(locations, lsd_probability)
 		self.tables.append(table)
+		
+		# Add data to the table(s)
 		for entry in self.get_entries():
 			# store like entries for multiple observations and multiple years
 			# entry is used as a lookup
 			# default_* are used when intializing a new cell
 			table.get_cell(entry, default_year, default_fieldname).append(entry)
+		
+		# Sort/split the tables
+		pass
+		
+		# Decorate the tables
+		## Add aggregate columns
+		for year in self.years:
+			pass
 	
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
