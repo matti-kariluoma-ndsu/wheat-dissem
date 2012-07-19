@@ -256,6 +256,17 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	
 	page = Page(locations[0:8], year_list, curyear, fieldname, 0.05)
 	
+	"""
+	import sys
+	for table in page.tables:
+		for variety, row in table.rows.items():
+			sys.stdout.write('['+variety.name+'\n')
+			for cell in row:
+				sys.stdout.write('\t'+unicode(cell))
+			sys.stdout.write(']\n')
+		print table.columns
+	"""
+	
 	locations_form = variety_trials_forms.SelectLocationsForm(initial={
 			'locations': locations,
 			'varieties': varieties,
@@ -284,7 +295,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 	variety_get_string = '?'+variety_get_string[1::]
 	"""
 	return render_to_response(
-		'tabbed_object_view.html',
+		'tabbed_object_table_view.html',
 		{
 			'zipcode': zipcode,
 			'search_radius': search_radius,

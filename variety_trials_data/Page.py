@@ -96,6 +96,33 @@ class Row:
 		self.members = {}
 		self.clear()
 	
+	"""
+	def __getitem__(self, index):
+		if index > 0:
+			raise NotImplementedError
+		if self.key_order is None:
+			self.keys = self.members.keys()
+		else:
+			self.keys = self.key_order
+			
+		try:
+			key = self.keys[self.key_index]
+		except IndexError:
+			return None
+		
+		try:
+			values = self.members[key]
+		except KeyError:
+			return None
+		
+		try:
+			cell = values[index] 
+		except IndexError:
+			cell = None
+			
+		return cell
+	"""
+	
 	def __iter__(self):
 		if self.key_order is None:
 			self.keys = self.members.keys()
@@ -104,7 +131,7 @@ class Row:
 		self.key_index = 0
 		self.value_index = 0
 		return self
-	
+		
 	def next(self):
 		if self.key_index == len(self.keys):
 			raise StopIteration
@@ -119,7 +146,6 @@ class Row:
 		except KeyError:
 			self.key_index = self.key_index + 1
 			return None
-			
 		if len(values) ==  0: 
 			self.key_index = self.key_index + 1
 			return None
@@ -386,14 +412,22 @@ class Aggregate_Cell(Cell):
 	def get(self, year, fieldname):
 		values = []
 		for cell in self.row:
-			if not isinstance(cell, Aggregate_Cell):
-				values.append(cell.get(year, fieldname))
+			if cell is not None and not isinstance(cell, Aggregate_Cell):
+				cell_mean = cell.get(year, fieldname)
+				if cell_mean is not None:
+					values.append(cell_mean)
 		
 		mean = None
 		if len(values) > 0:
 			mean = round(float(sum(values)) / float(len(values)), 1)
 		
 		return mean
+
+class Fake_Location:
+	def __init__(self, name):
+		self.name = name
+		self.id = -1
+		self.pk = -1
 
 class Aggregate_Column(Column):
 	"""
@@ -433,12 +467,17 @@ class Aggregate_Column(Column):
 			
 		if key in self.members:
 			return
-			
-		if isinstance(value, Aggregate_Cell):
-			self.members[key] = value
-		else:
-			self.members[key] = Aggregate_Cell(value.row, value.column, value.year, value.fieldname)
-			
+		
+		if value.column is self:
+			return
+		
+		if isinstance(value, Cell):
+			cell = Aggregate_Cell(value.row, self, value.year, value.fieldname)
+			# Aggregate_Cell needs some help setting attributes
+			cell.set_default_year(value.year)
+			cell.set_default_fieldname(value.fieldname)
+			self.members[key] = cell
+		
 	def clear(self):
 		for m in self.members:
 			if isinstance(m, Cell):
@@ -542,8 +581,22 @@ class Page:
 		
 		# Decorate the tables
 		## Add aggregate columns
-		for year in self.years:
-			pass
+		for table in self.tables:
+			for year in self.years:
+				location_key = Fake_Location(str(year))
+				table.locations.insert(0, location_key)
+				column = Aggregate_Column(location_key)
+				# Only grab one cell from each row
+				for row in table.rows.values():
+					for cell in row:
+						if cell is not None:
+							break
+					column.append(cell)
+				table.columns[location_key] = column
+			for row in table.rows.values():
+				pass#ow.set_key_order(table.locations)
+		
+				
 	
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
