@@ -413,9 +413,10 @@ class Aggregate_Cell(Cell):
 		values = []
 		for cell in self.row:
 			if cell is not None and not isinstance(cell, Aggregate_Cell):
-				cell_mean = cell.get(year, fieldname)
-				if cell_mean is not None:
-					values.append(cell_mean)
+				for year_diff in self.column.years_range:
+					cell_mean = cell.get(year - year_diff, fieldname)
+					if cell_mean is not None:
+						values.append(cell_mean)
 		
 		mean = None
 		if len(values) > 0:
@@ -433,9 +434,14 @@ class Aggregate_Column(Column):
 	"""
 	A column whose cells' value is determined by other cells in its row
 	"""
-	def __init__(self, location):
+	def __init__(self, location, year_num):
+		"""
+		location: a Location (or Fake_Location) object
+		year_num: an integer denoting the number of years to go back for averaging i.e. 3
+		"""
 		Column.__init__(self, location)
 		self.clear()
+		self.years_range = range(year_num)
 	
 	def __iter__(self):
 		if self.key_order is None:
@@ -582,10 +588,11 @@ class Page:
 		# Decorate the tables
 		## Add aggregate columns
 		for table in self.tables:
-			for year in self.years:
-				location_key = Fake_Location(str(year))
+			for year_num in range(len(self.years)):
+				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
+				location_key = Fake_Location("%s-yr" % (year_num))
 				table.locations.insert(0, location_key)
-				column = Aggregate_Column(location_key)
+				column = Aggregate_Column(location_key, year_num)
 				# Only grab one cell from each row
 				for row in table.rows.values():
 					for cell in row:
