@@ -568,7 +568,7 @@ class Page:
 				)
 			)
 			
-	def __init__(self, locations, years, default_year, default_fieldname, lsd_probability):
+	def __init__(self, locations, years, default_year, default_fieldname, lsd_probability, break_into_subtables=False):
 		self.locations = locations
 		self.years = years
 		self.tables = []
@@ -603,6 +603,36 @@ class Page:
 			for row in table.rows.values():
 				pass#ow.set_key_order(table.locations)
 		
+		if break_into_subtables:
+			pass
+			"""
+			subtables = []
+			# decorate each row and extract info on available data (tuple)
+			for row in table:
+				tuple = 3d_decorate(row)
+				try:
+					list = our_tuples[tuple]
+				except KeyError:
+					list = our_tuples[tuple] = []
+				list.append(row)
+				
+			# for each tuple, combine with other rows that have that same tuple
+			for tuple in sorted(our_tuples.keys()):
+				rows = our_tuples[tuple]
+				while true:
+					(remainder_rows, table) = create_table(rows)
+					subtables.append(table)
+					if not remainder_rows:
+						break
+						
+			# Add all higher-order tables to appropriate lesser-order tables, 
+			# scubbing any extra data
+			large_subtables = list(subtables)
+			for table in reverse(large_subtables):
+				subtables = subtables - table
+				large_subtables.append(append_when_superset_and_scrub(table, subtables)
+				
+			"""
 				
 	
 	def set_defaults(self, year, fieldname):
