@@ -58,18 +58,11 @@ def variety_info(request, variety_name):
 	
 def history(request):	
 	history=models.Trial_Entry_History.objects.all()
-	newlist = []
-	
-	for element in history:
-		newlist.append(element)
-		element.created_date
-		element.username
 
 	return render_to_response(
 		'history.html', 
 		{ 
 			'history': history,
-			'list' : newlist,
 		},
 		context_instance=RequestContext(request)
 	)

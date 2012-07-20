@@ -353,7 +353,7 @@ def checking_for_data(uploaded_file):
 
 def adding_to_database(varietyname, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip):
 	numberoffiles=0
-	os.chdir("/tmp")
+	#os.chdir("/tmp")
 	for files in glob.glob("*.txt"):
 		#print files
 		numberoffiles=numberoffiles+1
@@ -445,11 +445,15 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 		
 		model_instance.save() # ARE YOU BRAVE ENOUGH? 
 		
-		models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
+		models.Trial_Entry_History(
+			trial_entry=model_instance,
+			username="asdasd",
+			created_date = date.today()
+		).save()
 		f.close()
 	
-	for filetitle in glob.glob("*.txt"):
-		 os.remove("/home/kalith/summerjob/wheat-dissem/"+str(filetitle))
+	#for filetitle in glob.glob("*.txt"):
+		 #os.remove("/home/kalith/summerjob/wheat-dissem/"+str(filetitle))
 		
 	
 	return(False,data)
