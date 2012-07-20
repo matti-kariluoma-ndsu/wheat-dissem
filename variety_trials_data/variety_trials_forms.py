@@ -360,7 +360,7 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 	
   #left with calculating the number of files and deleting them in the end.
     
-	
+	data = None		
 	possible_characters = ('/', ' ', '-', '.')
 	for h in range(1,numberoffiles):
 		k=0
@@ -394,7 +394,7 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 				)
 			s.save()
 		'''
-						
+			
 		model_instance = models.Trial_Entry()
 		for name in data.keys():
 			if name == 'plant_date_id':

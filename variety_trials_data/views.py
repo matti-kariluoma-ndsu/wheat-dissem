@@ -331,7 +331,7 @@ def varieties_view(request, yearname, fieldname, abtest=None):
 			return tabbed_view(request, yearname, fieldname, locations, varieties, True, abtest)
 			
 		else:
-			for field in varieties_form:
+			#for field in varieties_form:
 				#print field.errors
 				#print field.label_tag
 			return HttpResponseRedirect("/") # send to homepage
