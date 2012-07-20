@@ -152,7 +152,6 @@ def letter(number):
 def handle_csv_file(uploaded_file):
 	
 	#l = models.Location(name="some name",zipcode = models.Zipcode(zipcode = "1256",city="some state",state,latitude,longitude,timezone,daylight_savings)
-	print "hellow"
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
 	# No good, the uploaded_file is an object, not a file or stream...
 	"""
@@ -197,23 +196,23 @@ def handle_csv_file(uploaded_file):
 				for i in range(len(headers)):
 					headers[i] = headers[i].replace('"','') # remove all double quotes
 					headers[i] = headers[i].replace("'",'') # remove all single quotes
-				print headers
+				#print headers
 				skip = False
 		else:
 			column_number = 0
-			print line
+			#print line
 			#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
 			for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
 				if column == ',': # a special case caused by '^,|,$'
 					column = ''
 				column = column.replace('"','')
 				column = column.replace("'",'')
-				print "column: %s" % (column)
+				#print "column: %s" % (column)
 				
 				if column.strip() != '':
 					try:
 						name = headers[column_number].strip()
-						print "field: %s" % (name)
+						#print "field: %s" % (name)
 						#Making objects to add to database.
 						
 						if name == "harvest_date_id":
@@ -240,7 +239,7 @@ def handle_csv_file(uploaded_file):
 			model_instance = models.Trial_Entry()
 			for name in insertion_dict.keys():
 				setattr(model_instance, name, insertion_dict[name])
-				print "Writing %s as %s" % (name, insertion_dict[name])
+				#print "Writing %s as %s" % (name, insertion_dict[name])
 				insertion_dict[name] = None
 			model_instance.save() # ARE YOU BRAVE ENOUGH? 
 			models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
@@ -285,7 +284,7 @@ def checking_for_data(uploaded_file):
 					skip = False
 			else:
 				column_number = 0
-				print line
+				#print line
 				#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
 				for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
 					if column == ',': # a special case caused by '^,|,$'
@@ -340,7 +339,7 @@ def checking_for_data(uploaded_file):
 					for name in insertion_dict.keys():
 						
 						setattr(model_instance, name, insertion_dict[name])
-						print "Writing %s as %s" % (name, insertion_dict[name])
+						#print "Writing %s as %s" % (name, insertion_dict[name])
 						insertion_dict[name] = None
 					model_instance.save() # ARE YOU BRAVE ENOUGH? 
 					models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
@@ -348,15 +347,15 @@ def checking_for_data(uploaded_file):
 				else:
 					json.dump(givenval,open(str(file_counter)+".txt",'w'))
 					file_counter=file_counter+1
-					print givenval
+					#print givenval
 				
 		return (False, errors)
 
 def adding_to_database(varietyname, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip):
 	numberoffiles=0
-	os.chdir("/home/kalith/summerjob/wheat-dissem")
+	os.chdir("/tmp")
 	for files in glob.glob("*.txt"):
-		print files
+		#print files
 		numberoffiles=numberoffiles+1
 	
   #left with calculating the number of files and deleting them in the end.
@@ -365,7 +364,7 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 	possible_characters = ('/', ' ', '-', '.')
 	for h in range(1,numberoffiles):
 		k=0
-		print h
+		#print h
 		f = open(str(h)+".txt", 'r')
 		data = json.load(f)
 		#saving verified inputs to the database
@@ -420,17 +419,17 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 					forgineid = element.id
 				setattr(model_instance, name,forgineid)
 			elif name == 'location_id':
-				print entered_location_data[k]
+				#print entered_location_data[k]
 				locationlist = models.Zipcode.objects.all().filter (city=str(entered_location_data[k]),zipcode = extracted_zip[k])
 				locationid = 1
 				for element in locationlist:
 					locationid = element.id
 				
-				print locationid
+				#print locationid
 				setattr(model_instance, name, locationid)
 				k=k+1
 			elif name == 'variety_id':
-				print data[name]
+				#print data[name]
 				varietylist = models.Variety.objects.all().filter (name=data[name])
 				varietyid = 1
 				for element in varietylist:
@@ -439,7 +438,7 @@ def adding_to_database(varietyname, description_url, picture_url, agent_origin, 
 			else:
 				setattr(model_instance, name, data[name])
 			
-			print "Writing %s as %s" % (name, data[name])
+			#print "Writing %s as %s" % (name, data[name])
 			data[name] = None
 		
 		

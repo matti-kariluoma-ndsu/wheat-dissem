@@ -138,7 +138,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 				) 
 			
 			#sort locations by distance
-			print radius
+			#print radius
 			
 			#TODO: there must be a better way to populate the varieties list
 			varieties = []
@@ -318,22 +318,22 @@ def varieties_view(request, yearname, fieldname, abtest=None):
 
 	if request.method == 'GET':
 		varieties_form = variety_trials_forms.SelectVarietiesForm(request.GET)
-		print request.GET
+		#print request.GET
 		if varieties_form.is_valid():
 			varieties = []
 			varieties.append(varieties_form.cleaned_data['varieties'])
 			varieties.append(varieties_form.cleaned_data['varieties1'])
 			varieties.append(varieties_form.cleaned_data['varieties2'])
 			varieties.append(varieties_form.cleaned_data['varieties3'])
-			print '1'
+			#print '1'
 			locations = models.Location.objects.all()
 			
 			return tabbed_view(request, yearname, fieldname, locations, varieties, True, abtest)
 			
 		else:
 			for field in varieties_form:
-				print field.errors
-				print field.label_tag
+				#print field.errors
+				#print field.label_tag
 			return HttpResponseRedirect("/") # send to homepage
 	else:
 		return HttpResponseRedirect("/") # send to homepage
@@ -473,7 +473,7 @@ def inspect(request):
 	while date_count>0:
 		min_year-=1
 		date_count=models.Date.objects.filter(date__range=(datetime.date(min_year-1,1,1), datetime.date(min_year,12,31))).count()
-		print str(min_year)+" "+str(date_count)
+		#print str(min_year)+" "+str(date_count)
 	for year in range(min_year+1,cur_year):
 		year_list.append(year)
 	varieties = models.Variety.objects.all().order_by("name")
