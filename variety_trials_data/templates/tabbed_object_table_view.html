@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% load django_math %}
+{% block content %}
+
+<div class="location_form units">
+	{% for fieldname, blurb_list in blurbs.items %}
+	<div class="{{fieldname}}" style="display:none">
+		<form name="{{fieldname}}_location_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
+			
+			{% for field in locations_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="{{fieldname}} submit" />
+		</form>
+	</div>
+	{% endfor %}
+</div>
+<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+	{% for yearname in years %}
+	<div style="display:none">
+		<form name="{{yearname}}_location_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
+			
+			{% for field in locations_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			{% for field in varieties_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="{{yearname}} submit" />
+		</form>
+	</div>
+	{% endfor %}
+</div>
+<div class="variety_form units">
+	{% for fieldname, blurb_list in blurbs.items %}
+	<div class="{{fieldname}}" style="display:none">
+		<form name="{{fieldname}}_variety_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
+			
+			{% for field in locations_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="{{fieldname}} submit" />
+		</form>
+	</div>
+	{% endfor %}
+</div>
+<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+	{% for yearname in years %}
+	<div style="display:none">
+		<form name="{{yearname}}_variety_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
+			
+			{% for field in locations_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			{% for field in varieties_form %}
+			<div class="input row">
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="{{yearname}} submit" />
+		</form>
+	</div>
+	{% endfor %}
+</div>
+
+	<div class="top_spacer"></div>
+	<div>
+	{% for fieldname, blurb_list in blurbs.items %}
+		<p>	
+		
+		{% if fieldname == curfield %}
+			* <a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
+		{% else %}
+			<a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
+		{% endif %}
+		
+		</p>
+	{% endfor %}
+	</div>
+	
+	<br style="clear: both;"/>
+	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+	{% for yearname in years %}
+		<!--TODO: auto-generate these year button images-->
+		<p>
+		
+		{% if yearname == curyear %}
+			* <a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
+		{% else %}
+			<a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
+		{% endif %}
+		
+		</p>
+	{% endfor %}
+	</div>
+
+	<div id="django_trial_results_content">
+		<div>
+			{% for fieldname, blurb_list in blurbs.items %}
+			{% if fieldname == curfield %}
+					<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
+					<p>{{blurb_list.2}}</p>
+			{% endif %}
+			{% endfor %}
+		</div>
+		<div class="current_year">{{curyear}}</div> 
+		<div class="row subheadings thin"></div>
+		<table>
+	{% for table in page.tables %}
+		<tr>
+			<th>
+				<h4>Variety</h4>
+			</th>
+		{% for location in table.locations %}
+			<th>
+				<h4>{{ location.name }}</h4>
+			{% if location.id != -1 %}
+				<a href="#" onclick="unselect_location({{ location.id }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+			{% endif %}
+			</th>
+		{% endfor %}
+		</tr>
+		<br style="clear: both;"/>
+		{% for variety, row in table.rows.items %}
+
+		{% if variety.name == "LSD" %}
+		<tr class="LSD_row">
+			<th>
+			<form>
+				<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
+			</form>
+			</th>
+			<br style="clear: both;"/>
+			{% for cell in row %}
+			<td>
+			{{ cell.get|default_if_none:"--" }}
+			</td>
+			{% endfor %}
+		</tr>
+		{% else %}
+		<tr class="group {% cycle 'master_odd' 'master_even' %}">
+				<th>
+					<form>
+						<input class="variety_checkbox" type="checkbox" name="{{ variety.name }}" value="{{variety.id}}" onclick="unselect_variety({{variety.id}})"> 
+							<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+						</input>
+					</form>
+				</th>
+				{% for cell in row %}
+				<td>
+				{{ cell|default_if_none:"--" }}
+				</td>
+				{% endfor %}
+		</tr>
+		{% endif %}
+		{% endfor %}
+	{% endfor %}
+	</table>
+		<div class="bottom_spacer"></div>
+	</div>
+	<div class="clear">&#160;</div>
+
+	<!--
+	<div id='dynamic_content'></div>
+	-->
+{% endblock %}
+
+{% load jsonify %}
+
+{% block javascript %}
+
+	function unselect_location(location_value) {
+		$("#id_locations option[value='"+location_value+"']").removeAttr("selected");
+	}
+	
+	function select_location(location_value) {
+		$("#id_locations option[value='"+location_value+"']").attr("selected","selected");
+	}
+	
+	function unselect_variety(variety_value) {
+		$("#id_varieties option[value='"+variety_value+"']").removeAttr("selected");
+	}
+	
+	function select_variety(variety_value) {
+		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
+	}
+
+	function submit_variety_comparison() {
+		$("#id_varieties").each(
+			function() {
+				$("#id_varieties option").removeAttr("selected");
+			}
+		);
+		
+		$('.variety_checkbox').each( 
+			function() {
+				if ($(this).attr('checked'))
+				{
+					select_variety($(this).attr('value'));
+				}
+			}
+		);
+		
+		document['{{curfield}}_variety_form'].submit();
+		return false;
+	}
+
+{% endblock %}
+
+{% block jquery %}
+
+  $('.group .master').toggle(
+    function(){
+      $(this).siblings('.slave').show();
+    },
+    function(){
+      $(this).siblings('.slave').hide();  
+    }
+  );
+
+{% endblock %}
