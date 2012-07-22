@@ -293,3 +293,7 @@ Non-google:
 http://roberto.open-lab.com/2010/01/30/javascript-grid-editor-i-want-to-be-excel/
 https://github.com/mleibman/SlickGrid
 http://mleibman.github.com/SlickGrid/examples/example3-editing.html
+
+Secretary view needs
+* Testing for multiple lines entry
+* Summary of about-to-commit data at end of "are you sure" pipeline?
