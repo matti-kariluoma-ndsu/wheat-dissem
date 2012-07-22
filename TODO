@@ -275,3 +275,21 @@ multiple-select: adcc766712e777872b04d8620cb3ba82c53aee6f
 
 Caching:
 https://docs.djangoproject.com/en/dev/topics/cache/
+
+In-page spreadsheet requirements
+* Able to paste data from Excel/Open/LibreOffice
+* Ability to lock 1st row/ name column headers
+* Reliance on Javascript acceptable
+* Ability to render in all browsers not necessary
+
+Google:
+http://stackoverflow.com/questions/4143901/access-google-spreadsheet-or-google-data-api-only-with-javascript
+https://developers.google.com/google-apps/documents-list/#creating_a_new_document_or_file_with_metadata_only
+https://developers.google.com/google-apps/documents-list/#deleting_documents_and_files
+Will need to hide/diable the headers. 
+Can we use google's spreadsheet editor? Only in a new window/iframe...
+
+Non-google:
+http://roberto.open-lab.com/2010/01/30/javascript-grid-editor-i-want-to-be-excel/
+https://github.com/mleibman/SlickGrid
+http://mleibman.github.com/SlickGrid/examples/example3-editing.html

@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from django.core import serializers
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
+from variety_trials_data import handle_csv
 from variety_trials_data.Page import Page
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
@@ -310,7 +311,7 @@ def add_trial_entry_csv_file(request):
 	if request.method == 'POST': # If the form has been submitted...
 		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
 		if form.is_valid():
-			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
+			success, errors = handle_csv.checking_for_data(request.FILES['csv_file'])
 			if success:
 				return HttpResponseRedirect('/success/')
 			else:
@@ -335,7 +336,7 @@ def add_form_confirmation(request):
 	if request.method == 'POST': # If the form has been submitted...
 		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
 		if form.is_valid():
-			success, errors = variety_trials_forms.checking_for_data(request.FILES['csv_file'])
+			success, errors = handle_csv.checking_for_data(request.FILES['csv_file'])
 			if not errors:
 				return HttpResponseRedirect("/sucess/")
 			else:
@@ -415,7 +416,7 @@ def adding_to_database_confirm(request):
 		extracted_zip=request.POST.getlist("zipcode")
 		
 		
-		errorcheck= variety_trials_forms.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
+		errorcheck= handle_csv.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
 		
 		return HttpResponseRedirect("/sucess/")
 		
