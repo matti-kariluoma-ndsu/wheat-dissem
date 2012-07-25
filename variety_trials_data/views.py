@@ -3,6 +3,7 @@ from django.template import RequestContext
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from django.core import serializers
+from django.utils import simplejson
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data.Page import Page
@@ -512,15 +513,17 @@ def trial_entry_json(request, id):
 	v = models.Trial_Entry.objects.filter(pk=id)
 	response = HttpResponse()
 	needed_fields = (
-		'pk',
-		'model',
-		'variety',
-		'location',
-		'name',
-		'bushels_acre',
-		'protein_percent',
-		'test_weight'
+		"pk",
+		"model",
+		"variety",
+		"location",
+		"name",
+		"bushels_acre",
+		"protein_percent",
+		"test_weight"
 		)
+	# json = simplejson.dumps(needed_fields)
+	# return HttpResponse(json, mimetype="application/x-javascript")
 	json_serializer = serializers.get_serializer("json")()
 	json_serializer.serialize(v,fields=needed_fields, stream=response)
 	
