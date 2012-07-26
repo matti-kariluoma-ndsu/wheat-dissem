@@ -390,3 +390,23 @@ def add_trial_entry_csv_file(request):
 		{'form': form, 'format_errors': errors},
 		context_instance=RequestContext(request)
 	)
+	
+def test_view(request):
+	
+	li = models.Location.objects.all()
+	
+	return render_to_response(
+		'test.html',
+		{"list":li},
+		context_instance=RequestContext(request)
+		)
+		
+def test_var(request):
+	
+	li = models.Trial_Entry.objects.filter(pk__in=[1,2,3])
+	
+	return render_to_response(
+		'test.html',
+		{"list":li},
+		context_instance=RequestContext(request)
+		)
