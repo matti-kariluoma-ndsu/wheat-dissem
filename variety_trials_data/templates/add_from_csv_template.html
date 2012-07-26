@@ -87,7 +87,7 @@
 
 <script >
 
-
+   
     function countEmpty(arr) {
       var empty = 0;
       for (var i = 0, ilen = arr.length; i < ilen; i++) {
@@ -106,6 +106,12 @@
       cols: 26,
       minSpareRows: 1,
       contextMenu: true,
+      rowHeaders: true,
+    	colHeaders: ["bushels_acre","protein_percent","test_weight",	"kernel_weight",	
+      "plant_height",	"days_to_head",	"lodging_factor",	"jday_of_head",	"winter_survival_rate",	"shatter","	seeds_per_round",
+      "canopy_density",	"canopy_height",	"days_to_flower",	"seed_oil_percent",	"planting_method_tags",	"seeding_rate",	
+      "previous_crop",	"moisture_basis",	"lsd_05",	"lsd_10",	"hsd_10",	
+"plant_date_id",	"harvest_date_id",	"location_id",	"variety_id"],
       legend: [
         {
           match: function (row, col, data) {
@@ -119,7 +125,7 @@
               //whole row is empty
               for (var c = 0, clen = tpl.length; c < clen; c++) {
                 var td = container.handsontable('getCell', row, c);
-                td.innerHTML = tpl[c];
+
                 td.className = "placeholder";
               }
             }
@@ -155,15 +161,7 @@
       }
     });
 
-    var data = [
-      ["bushels_acre","protein_percent","test_weight",	"kernel_weight",	
-      "plant_height",	"days_to_head",	"lodging_factor",	"jday_of_head",	"winter_survival_rate",	"shatter","	seeds_per_round",
-      "canopy_density",	"canopy_height",	"days_to_flower",	"seed_oil_percent",	"planting_method_tags",	"seeding_rate",	
-      "previous_crop",	"moisture_basis",	"lsd_05",	"lsd_10",	"hsd_10",	
-"plant_date_id",	"harvest_date_id",	"location_id",	"variety_id"
-],
-
-    ];
+    var data = [];
 
     container.handsontable("loadData", data);
 </script>
