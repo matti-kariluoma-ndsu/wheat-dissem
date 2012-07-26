@@ -297,3 +297,6 @@ http://mleibman.github.com/SlickGrid/examples/example3-editing.html
 Secretary view needs
 * Testing for multiple lines entry
 * Summary of about-to-commit data at end of "are you sure" pipeline?
+
+Javascript's introspection of passed arguments:
+http://javascriptweblog.wordpress.com/2011/01/18/javascripts-arguments-object-and-beyond/
