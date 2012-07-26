@@ -43,5 +43,6 @@ urlpatterns = patterns('',
 		(r'^variety/all/json', views.variety_json_all),
 		(r'^disease/(?P<id>[1234567890]+)/json', views.disease_json),
 		(r'^debug', views.debug),
+		(r'^%s/' % settings.DAJAX_MEDIA_PREFIX, include('dajax.urls')),
 )
 

@@ -19,6 +19,8 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+DAJAX_JS_FRAMEWORK = "jQuery"
+DAJAX_MEDIA_PREFIX="dajax" #the domain at which the dajax information is stored
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -88,7 +90,7 @@ SECRET_KEY = 'zvzu%y8rvs#g42qiwc-9^_hm@-j58-8x9koh%w%5^rnb$ay@gd'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    'django.template.loaders.eggs.Loader',
 )
 
 USE_ETAGS=True # see CommonMiddleWare
@@ -132,6 +134,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'variety_trials_data',
 	'django.contrib.redirects',
+	'dajax',
 )
 
 # A sample logging configuration. The only tangible logging

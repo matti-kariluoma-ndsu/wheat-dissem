@@ -46,7 +46,7 @@ function processAjaxFunction(response_data) {
 }
 
 function proofOfConcept(response_data) {
-// document.write(response_data)
+document.write(response_data)
 if (response_data) {
 if($("tr.v"+response_data[0].fields.variety).length==0){
 table.append($("<tr class=v"+response_data[0].fields.variety+">").append($("<td class=l"+response_data[0].fields.location+">").text="v"+response_data[0].fields.variety))
@@ -64,23 +64,23 @@ cellList.push(cell(response_data));
 
 // for(i=1;i<100;i+=i)
 // {
-var entry = {
+// var entry = {
 // url: "/trial_entry/"+i+"/json",
-url: "/trial_entry/3/json",
-dataType: "json",
-data: {
-	"location":"location",
-	"key": "value"
-	},
-}
+// url: "/trial_entry/3/json",
+// dataType: "json",
+// data: {
+	// "location":"location",
+	// "key": "value"
+	// },
+// }
 // entryList.push(entry)
 // }
 // for (i=0; i<entryList.length; i++){
 	// $.ajax(entryList[i]).done(proofOfConcept)
 	// }
 
-$.ajax(entry).done(proofOfConcept)
-
+// $.ajax(entry).done(proofOfConcept)
+dajax.trial_entry(3)
 
 
 
