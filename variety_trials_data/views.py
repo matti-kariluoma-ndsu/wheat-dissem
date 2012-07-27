@@ -533,6 +533,15 @@ def zipcode_json(request, id):
 	json_serializer.serialize(z, stream=response)
 	return response
 	
+def zipcode_near_json(request, zipcode):
+	locations = Locations_from_Zipcode_x_Radius(
+					zipcode, None
+				).fetch()
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(locations, stream=response)
+	return response
+	
 def location_json(request, id):
 	l = models.Location.objects.filter(pk=id)
 	response = HttpResponse()
