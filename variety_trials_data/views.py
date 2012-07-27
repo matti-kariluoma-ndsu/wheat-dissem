@@ -536,15 +536,21 @@ def zipcode_json(request, id):
 def location_json(request, id):
 	l = models.Location.objects.filter(pk=id)
 	response = HttpResponse()
+	needed_fields={
+		'name'
+	}
 	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(l, stream=response)
+	json_serializer.serialize(l, fields=needed_fields, stream=response)
 	return response
 	
 def variety_json(request, id):
 	v = models.Variety.objects.filter(pk=id)
 	response = HttpResponse()
+	needed_fields={
+		'name'
+	}
 	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(v, stream=response)
+	json_serializer.serialize(v, fields=needed_fields, stream=response)
 	return response
 	
 def disease_json(request, id):
@@ -557,6 +563,7 @@ def disease_json(request, id):
 def variety_json_all(request):
 	varieties = models.Variety.objects.all()
 	response = HttpResponse()
+	
 	json_serializer = serializers.get_serializer("json")()
 	json_serializer.serialize(varieties, stream=response)
 	return response	
