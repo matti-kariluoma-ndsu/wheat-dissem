@@ -522,9 +522,9 @@ def zipcode_near_json(request, zipcode):
 def location_json(request, id):
 	l = models.Location.objects.filter(pk=id)
 	response = HttpResponse()
-	needed_fields={
-		'name'
-	}
+	needed_fields=(
+		'name',
+	)
 	json_serializer = serializers.get_serializer("json")()
 	json_serializer.serialize(l, fields=needed_fields, stream=response)
 	return response
@@ -532,9 +532,9 @@ def location_json(request, id):
 def variety_json(request, id):
 	v = models.Variety.objects.filter(pk=id)
 	response = HttpResponse()
-	needed_fields={
-		'name'
-	}
+	needed_fields=(
+		'name',
+	)
 	json_serializer = serializers.get_serializer("json")()
 	json_serializer.serialize(v, fields=needed_fields, stream=response)
 	return response
