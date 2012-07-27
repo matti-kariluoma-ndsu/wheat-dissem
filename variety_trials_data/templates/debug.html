@@ -37,86 +37,110 @@ $('#'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name)
 
 }
 
-function populateLocation(response_data){
-for (i=0;i<8;i++){
-$('#location').append($('<th id= l'+response_data[i].pk+'>').text(response_data[i].fields.name+response_data[i].pk))
-locationList.push(response_data[i])
-}
+function populateLocation(response_data)
+{
+	for (i=0;i<8;i++)
+	{
+		$('#location').append($('<th id= l'+response_data[i].pk+'>').text(response_data[i].fields.name+response_data[i].pk))
+		locationList.push(response_data[i])
+	}
 }
 
-function processAjaxFunction(response_data) {
-	if (response_data.length>0&&response_data){
+function processAjaxFunction(response_data) 
+{
+	if (response_data.length>0&&response_data)
+	{
     $('#response').text(x+"Response is " + response_data[0].fields.variety + ", or " + JSON.stringify(response_data));
 	}
+	
 	x++
-    for (var i in response_data ){
-        //alert("Making a cell from "+JSON.stringify(response_data[i]));
-        /// add a new object to our array with push()
-        cellList.push(new cell(response_data[i]));
-        //alert("Made the cell "+JSON.stringify(cellList[i]));
+	
+  for (var i in response_data )
+  {
+		//alert("Making a cell from "+JSON.stringify(response_data[i]));
+		/// add a new object to our array with push()
+		cellList.push(new cell(response_data[i]));
+		//alert("Made the cell "+JSON.stringify(cellList[i]));
 	}
+	
 	if (x==2)
 	{
-	table.append($('<tr id=>')
-	.append($('<th>').text("The position of the returned JSON objects"))
-	.append($('<td>').text(cellList[0].position))
-	.append($('<td>').text(cellList[1].position)));
+		table.append($('<tr id=>')
+		.append($('<th>').text("The position of the returned JSON objects"))
+		.append($('<td>').text(cellList[0].position))
+		.append($('<td>').text(cellList[1].position)));
 	}
 	
 }
 
-function locationAjax(){
-var entryLocation = {
-	url: '/zipcode/near/58701/json',
-	async: false,
-	dataType: "json",
-	data: {
-		'location':'location',
-		'key': 'value'
-	}
-}
-$.ajax(entryLocation).done(populateLocation)
-}
-
-function proofOfConcept(response_data) {
-if(response_data[0]){
-if($('#'+response_data[0].fields.variety).length==0){
-table.append($('<tr id='+response_data[0].fields.variety+'>').append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.location)))
-var entryVariety = {
-	url: '/variety/'+response_data[0].fields.variety+'/json',
-	dataType: "json",
-	data: {
-		'location':'location',
-		'key': 'value'
-	}
-}
-$.ajax(entryVariety).done(populateVariety)
-}
-else{
-	if($('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).length==0){
-		$('#'+response_data[0].fields.variety).append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.location))
-	}
-}}}
-
-locationAjax()
-
-for(i=1;i<100;i--)
+function locationAjax()
 {
-	var entry = {
-		// async: false,
-		url: '/trial_entry/'+i+'/json',
+	var entryLocation = {
+		url: '/zipcode/near/58701/json',
+		async: false,
 		dataType: "json",
 		data: {
 			'location':'location',
 			'key': 'value'
-		},
-}
-entryList.push(entry)
+		}
+	}
+	
+	$.ajax(entryLocation).done(populateLocation)
 }
 
+function proofOfConcept(response_data)
+{
+	if(response_data[0])
+	{
+		if($('#'+response_data[0].fields.variety).length==0)
+		{
+			table.append($('<tr id='+response_data[0].fields.variety+'>').append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.bushels_acre)))
+			var entryVariety = {
+				url: '/variety/'+response_data[0].fields.variety+'/json',
+				dataType: "json",
+				data: {
+					'location':'location',
+					'key': 'value'
+				}
+			}
+			
+			$.ajax(entryVariety).done(populateVariety)
+		}
+		else
+		{
+			if($('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).length==0)
+			{
+				$('#'+response_data[0].fields.variety).append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.bushels_acre))
+			}
+		}
+	}
+}
 
-for (i=0; i<entryList.length; i++){
-	$.ajax(entryList[i]).done(proofOfConcept)
+function main()
+{
+	locationAjax()
+
+	for(i=1;i<100;i++)
+	{
+		var entry = {
+			// async: false,
+			url: '/trial_entry/'+i+'/json',
+			dataType: "json",
+			data: {
+				'location':'location',
+				'key': 'value'
+			},
+		}
+		
+		entryList.push(entry)
 	}
 
+
+	for (i=0; i<entryList.length; i++)
+	{
+		$.ajax(entryList[i]).done(proofOfConcept)
+	}
+}
+
+main();
 {% endblock %}
