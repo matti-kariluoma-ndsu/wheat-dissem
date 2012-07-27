@@ -510,11 +510,33 @@ def zipcode_json(request, id):
 	json_serializer.serialize(z, stream=response)
 	return response
 	
+def zipcode_near_json(request, zipcode):
+	locations = Locations_from_Zipcode_x_Radius(
+					zipcode, None
+				).fetch()
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(locations, stream=response)
+	return response
+	
 def location_json(request, id):
 	l = models.Location.objects.filter(pk=id)
 	response = HttpResponse()
+	needed_fields={
+		'name'
+	}
 	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(l, stream=response)
+	json_serializer.serialize(l, fields=needed_fields, stream=response)
+	return response
+	
+def variety_json(request, id):
+	v = models.Variety.objects.filter(pk=id)
+	response = HttpResponse()
+	needed_fields={
+		'name'
+	}
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(v, fields=needed_fields, stream=response)
 	return response
 	
 def disease_json(request, id):
@@ -527,6 +549,7 @@ def disease_json(request, id):
 def variety_json_all(request):
 	varieties = models.Variety.objects.all()
 	response = HttpResponse()
+	
 	json_serializer = serializers.get_serializer("json")()
 	json_serializer.serialize(varieties, stream=response)
 	return response	

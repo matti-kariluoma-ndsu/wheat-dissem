@@ -1,39 +1,53 @@
 {%extends "base.html"%}
 {% block content%}
-<table id ="debug"></table>
+<body>
+<p id="response"></p>
+<table>
+<thead><tr id=location><th></th></tr></thead>
+<tbody id="debug"></tbody>
+</table>
+</body>
 
+<style type="text/css">
+table,th,td
+{
+border:1px solid black;
+}
+</style>
 {% endblock %}
 {% block javascript %}
 
-var table = document.getElementById('debug');
-
+var locationList = []
+var table = $('#debug')
+var cellList = [];
+var x =0;
+var entryList=[]
 
 function cell(constructorParametersObject){
     this.position = constructorParametersObject.pk;
     this.tag = constructorParametersObject.type;
     this.value = constructorParametersObject.value;
-}
-var entryList=[]
-var entry1 = {
-    url: '/trial_entry/1/json',
-	dataType: "json",
-    data: {
-        'key': 'value'
-    },
-}
-var entry2 = {
-    url: '/trial_entry/2/json',
-	dataType: "json",
-    data: {
-        'key': 'value'
-    },
+	this.location = constructorParametersObject.location;
+	this.variety = constructorParametersObject.variety;
+	
 }
 
-var cellList = [];
-var x =0;
+function populateVariety(response_data){
+$('#'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name)
+
+}
+
+function populateLocation(response_data){
+for (i=0;i<8;i++){
+$('#location').append($('<th id= l'+response_data[i].pk+'>').text(response_data[i].fields.name+response_data[i].pk))
+locationList.push(response_data[i])
+}
+}
+
 function processAjaxFunction(response_data) {
-	document.writeln(x)
-    $('#debug').text(x+"Response is " + response_data + ", or " + JSON.stringify(response_data));
+	if (response_data.length>0&&response_data){
+    $('#response').text(x+"Response is " + response_data[0].fields.variety + ", or " + JSON.stringify(response_data));
+	}
 	x++
     for (var i in response_data ){
         //alert("Making a cell from "+JSON.stringify(response_data[i]));
@@ -43,14 +57,66 @@ function processAjaxFunction(response_data) {
 	}
 	if (x==2)
 	{
-	table.write("<tr>"+cellList[1].position+"</tr>")
+	table.append($('<tr id=>')
+	.append($('<th>').text("The position of the returned JSON objects"))
+	.append($('<td>').text(cellList[0].position))
+	.append($('<td>').text(cellList[1].position)));
+	}
+	
+}
+
+function locationAjax(){
+var entryLocation = {
+	url: '/zipcode/near/58701/json',
+	async: false,
+	dataType: "json",
+	data: {
+		'location':'location',
+		'key': 'value'
 	}
 }
-entryList.push(entry1)
-entryList.push(entry2)
+$.ajax(entryLocation).done(populateLocation)
+}
 
-
-for (i=0; i<2; i++){
-	$.ajax(entryList[i]).done(processAjaxFunction)
+function proofOfConcept(response_data) {
+if(response_data[0]){
+if($('#'+response_data[0].fields.variety).length==0){
+table.append($('<tr id='+response_data[0].fields.variety+'>').append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.location)))
+var entryVariety = {
+	url: '/variety/'+response_data[0].fields.variety+'/json',
+	dataType: "json",
+	data: {
+		'location':'location',
+		'key': 'value'
 	}
+}
+$.ajax(entryVariety).done(populateVariety)
+}
+else{
+	if($('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).length==0){
+		$('#'+response_data[0].fields.variety).append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.location))
+	}
+}}}
+
+locationAjax()
+
+for(i=1;i<100;i--)
+{
+	var entry = {
+		// async: false,
+		url: '/trial_entry/'+i+'/json',
+		dataType: "json",
+		data: {
+			'location':'location',
+			'key': 'value'
+		},
+}
+entryList.push(entry)
+}
+
+
+for (i=0; i<entryList.length; i++){
+	$.ajax(entryList[i]).done(proofOfConcept)
+	}
+
 {% endblock %}
