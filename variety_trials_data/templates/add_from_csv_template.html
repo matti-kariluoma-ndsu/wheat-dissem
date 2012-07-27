@@ -1,7 +1,23 @@
 {% extends "base.html" %}
 
-{% block content %}
 
+  
+{% block content %}
+<head>
+
+
+  <script src="../static/lib/jquery.min.js"></script>
+  <script src="../static/js/jquery.handsontable.js"></script>
+  <script src="../static/lib/bootstrap-typeahead.js"></script>
+  <script src="../static/lib/jquery.autoresize.js"></script>
+  <script src="../static/lib/jQuery-contextMenu/jquery.contextMenu.js"></script>
+  <script src="../static/lib/jQuery-contextMenu/jquery.ui.position.js"></script>
+  <link rel="stylesheet" media="screen" href="../static/lib/jQuery-contextMenu/jquery.contextMenu.css">
+  <link rel="stylesheet" media="screen" href="../static/css/jquery.handsontable.css">
+  
+  <script src="../static/js/json2.min.js"></script>
+  <link rel="stylesheet" media="screen" href="../static/css/demo.css">
+  </head>
 
 <div>
 	<h4>Instructions: download the spreadsheet template file below, enter 
@@ -44,7 +60,120 @@
           </div>
         {% endfor %}
     {% endfor %}
+    <input type="textarea" id="kk" />
   <input type="submit" value="Submit" />
 </form>
+<br>
+<p>Or copy paste the data,  </p>
+<br>
+
+
+  
+<div id="container">
+
+
+  <div id="exampleGrid" class="dataTable"></div>
+  <br>
+<p>Preview of the CSV list:</p> <br>
+<div id="exampleConsole">  </div>
+
+  
+
+  <style>
+    .placeholder {
+      color: #777;
+      font-style: italic;
+    }
+  </style>
+
+<script >
+
+   
+    function countEmpty(arr) {
+      var empty = 0;
+      for (var i = 0, ilen = arr.length; i < ilen; i++) {
+        if (arr[i] === '') {
+          empty++;
+        }
+      }
+      return empty;
+    }
+
+    var tpl = ["one", "two", "three"];
+
+    var container = $("#exampleGrid");
+    container.handsontable({
+      rows: 2,
+      cols: 26,
+      minSpareRows: 1,
+      contextMenu: true,
+      rowHeaders: true,
+    	colHeaders: ["bushels_acre","protein_percent","test_weight",	"kernel_weight",	
+      "plant_height",	"days_to_head",	"lodging_factor",	"jday_of_head",	"winter_survival_rate",	"shatter","	seeds_per_round",
+      "canopy_density",	"canopy_height",	"days_to_flower",	"seed_oil_percent",	"planting_method_tags",	"seeding_rate",	
+      "previous_crop",	"moisture_basis",	"lsd_05",	"lsd_10",	"hsd_10",	
+"plant_date_id",	"harvest_date_id",	"location_id",	"variety_id"],
+      legend: [
+        {
+          match: function (row, col, data) {
+            if (row === 0) {
+              return;
+            }
+
+            var data = data();
+            var empty = countEmpty(data[row]);
+            if (empty === data[row].length) {
+              //whole row is empty
+              for (var c = 0, clen = tpl.length; c < clen; c++) {
+                var td = container.handsontable('getCell', row, c);
+
+                td.className = "placeholder";
+              }
+            }
+            else {
+              var td = container.handsontable('getCell', row, 0);
+              if (td.className === 'placeholder') {
+                for (var c = 0, clen = tpl.length; c < clen; c++) {
+                  var td = container.handsontable('getCell', row, c);
+                  td.className = "";
+                }
+              }
+            }
+          }
+        }
+        
+      ],
+      onChange: function (changes) {
+        for (var i = 0, ilen = changes.length; i < ilen; i++) {
+          if (changes[i][2] === '') { //if oldVal is empty
+            var data = container.handsontable('getData');
+            var row = changes[i][0];
+            if (countEmpty(data[row]) === data[row].length - 1) {
+              //other cells in this row are empty
+              for (var c = 0, clen = tpl.length; c < clen; c++) {
+                if (changes[i][1] !== c) {
+                  container.handsontable('setDataAtCell', row, c, tpl[c]);
+                }
+              }
+            }
+          }
+        }
+
+         $("#exampleConsole").text(JSON.stringify(data));
+         $("#kk").val(JSON.stringify(data));
+      }
+    });
+
+    var data = [];
+
+    container.handsontable("loadData", data);
+</script>
+
+
+  
+</div>
+
+
+
 
 {% endblock %}
