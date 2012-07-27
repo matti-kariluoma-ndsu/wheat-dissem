@@ -60,6 +60,7 @@
           </div>
         {% endfor %}
     {% endfor %}
+    <input type="textarea" id="kk" />
   <input type="submit" value="Submit" />
 </form>
 <br>
@@ -140,6 +141,7 @@
             }
           }
         }
+        
       ],
       onChange: function (changes) {
         for (var i = 0, ilen = changes.length; i < ilen; i++) {
@@ -158,6 +160,7 @@
         }
 
          $("#exampleConsole").text(JSON.stringify(data));
+         $("#kk").val(JSON.stringify(data));
       }
     });
 
