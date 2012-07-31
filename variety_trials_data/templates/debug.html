@@ -78,10 +78,14 @@ var entryLocation = {
 $.ajax(entryLocation).done(populateLocation)
 }
 
-function proofOfConcept(response_data) {
+function populateTrialEntry(response_data) {
 if(response_data[0]){
 if($('#'+response_data[0].fields.variety).length==0){
-table.append($('<tr id='+response_data[0].fields.variety+'>').append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.location)))
+table.append($('<tr id='+response_data[0].fields.variety+'>'))//.append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.location)))
+for (i=0;i<8;i++){
+$('#'+response_data[0].fields.variety).append('<td class='+locationList[i].pk+'>')
+}
+$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
 var entryVariety = {
 	url: '/variety/'+response_data[0].fields.variety+'/json',
 	dataType: "json",
@@ -93,14 +97,12 @@ var entryVariety = {
 $.ajax(entryVariety).done(populateVariety)
 }
 else{
-	if($('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).length==0){
-		$('#'+response_data[0].fields.variety).append($('<td headers= l'+response_data[0].fields.location+' class='+response_data[0].fields.location+'>').text(response_data[0].fields.location))
-	}
+	$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
 }}}
 
 locationAjax()
 
-for(i=1;i<100;i--)
+for(i=1;i<100;i++)
 {
 	var entry = {
 		// async: false,
@@ -116,7 +118,7 @@ entryList.push(entry)
 
 
 for (i=0; i<entryList.length; i++){
-	$.ajax(entryList[i]).done(proofOfConcept)
+	$.ajax(entryList[i]).done(populateTrialEntry)
 	}
 
 {% endblock %}
