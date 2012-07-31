@@ -1,0 +1,19 @@
+/*This file is only needed for demo purposes in index.html*/
+body {
+  margin-top: 1.0em;
+  background-color: #ffffff;
+  font-family: Helvetica, Arial, FreeSans, sans-serif;
+  color: #000000;
+  font-size: 13px;
+  overflow:hidden;
+}
+
+
+#container exampleGrid{
+  margin: 0 auto;
+  right: 10000px;
+  width: 700px;
+  padding-bottom: 20px;
+}
+
+

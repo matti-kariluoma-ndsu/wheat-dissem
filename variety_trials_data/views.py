@@ -566,3 +566,79 @@ def debug(request):
 		'debug.html',
 		{}
 		)
+def add_variety(request):
+	
+
+	return render_to_response(
+		'add_v.html'
+	)
+
+def add_new_variety(request):
+	#List for Varieties
+	entered_variety_data = []
+	description_url = []
+	picture_url = []
+	agent_origin = []
+	year_released = []
+	straw_length = []
+	maturity = []
+	grain_color = [] 
+	seed_color = []
+	beard = []
+	wilt = []
+	diseases = []
+	susceptibility = []
+	#Lists for Location data 
+	entered_location_data = []
+	extracted_zip = [] 
+	errorcheck = []
+	# a dictionary, keys are strings (source of error), values are strings (message)
+	
+	if request.method == 'POST': # If the form has been submitted...
+	
+		entered_variety_data=request.POST.getlist("varietyname")
+		description_url= request.POST.getlist("description_url")
+		picture_url=request.POST.getlist("picture_url")
+		agent_origin=request.POST.getlist("agent_origin")
+		year_released=request.POST.getlist("year_released")
+		straw_length=request.POST.getlist("straw_length")
+		maturity=request.POST.getlist("maturity")
+		grain_color=request.POST.getlist("grain_color")
+		seed_color=request.POST.getlist("seed_color")
+		beard=request.POST.getlist("beard")
+		wilt=request.POST.getlist("wilt")
+
+
+		
+	for l in range(len(entered_variety_data)):
+			
+		d = models.Variety(
+				name=entered_variety_data[l],
+				description_url = description_url[l]
+				,agent_origin=agent_origin[l],
+				year_released=year_released[l],
+				straw_length=straw_length[l],
+				maturity=maturity[l][l],
+				grain_color=grain_color[l],
+				seed_color=seed_color[l], 
+				beard=beard[l],
+				wilt=wilt[l]
+			 	)
+
+				
+		d.save()
+	model_instance = models.Variety()
+	model_instance.save() # ARE YOU BRAVE ENOUGH? 
+		
+	return HttpResponseRedirect("/sucess/")
+		
+
+							
+def redirect_sucess(request):
+
+	return render_to_response(
+		'success.html'
+	)
+		    
+
+
