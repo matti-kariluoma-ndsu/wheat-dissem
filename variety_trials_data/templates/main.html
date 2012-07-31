@@ -54,6 +54,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 }
 </script>
 
+<noscript>
 <div>
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
 	<hr>
@@ -62,6 +63,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 	(HRSW) variety trials conducted in North Dakota. Available data 
 	include yield, protein percent, test weight, kernel weight, 
 	plant height, etc.</p>
+	
 	
 </div>
 <div class="location_form" >
@@ -101,6 +103,13 @@ function move(listBoxTo,optionValue,optionDisplayText){
 		</form>
 	
 </div>
+</noscript>
+<div>
+<table>
+<thead><tr id=location><th></th></tr></thead>
+<tbody id="debug"></tbody>
+</table>
+</div>
 {% endblock %}
 
 {% block javascript %}
@@ -123,4 +132,96 @@ $("#selectRight option").each(
 			}
 		);
 	}
+
+	
+	var locationList = []
+var table = $('#debug')
+var cellList = [];
+var x =0;
+var entryList=[]
+
+function cell(constructorParametersObject){
+    this.position = constructorParametersObject.pk;
+    this.tag = constructorParametersObject.type;
+    this.value = constructorParametersObject.value;
+	this.location = constructorParametersObject.location;
+	this.variety = constructorParametersObject.variety;
+	
+}
+
+function populateVariety(response_data){
+//prepends the name of the variety to the <tr> that has tha same id as the variety
+$('#'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name)
+
+}
+
+function populateLocation(response_data){
+// adds the eight closes locations to the table header and an array
+for (i=0;i<8;i++){
+$('#location').append($('<th id= l'+response_data[i].pk+'>').text(response_data[i].fields.name+response_data[i].pk))
+locationList.push(response_data[i])
+}
+}
+
+
+function locationAjax(){
+// ajax call to get the locations
+var entryLocation = {
+	url: '/zipcode/near/58701/json',
+	async: false,
+	dataType: "json",
+	data: {
+		'location':'location',
+		'key': 'value'
+	}
+}
+$.ajax(entryLocation).done(populateLocation)
+}
+
+function populateTrialEntry(response_data) {
+	// if the response object is valid
+	if(response_data[0]){
+			if($('#'+response_data[0].fields.variety).length==0){// if there is no table row associated with the variety found in the response data, create one and populate it with the data in response_data
+				table.append($('<tr id='+response_data[0].fields.variety+'>'))
+				for (i=0;i<8;i++){// append a cell for each location
+					$('#'+response_data[0].fields.variety).append('<td class='+locationList[i].pk+'>')
+				}
+				$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
+				var entryVariety = {//ajax call to get the name of the variety
+					url: '/variety/'+response_data[0].fields.variety+'/json',
+					dataType: "json",
+					data: {
+						'location':'location',
+						'key': 'value'
+					}
+				}
+				$.ajax(entryVariety).done(populateVariety)
+			}
+		else{// if the table row already exists, populate the cell corresponding to the response_data
+			$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
+		}
+	}
+}
+
+locationAjax()
+
+for(i=1;i<100;i++)
+{
+	var entry = {
+		// async: false,
+		url: '/trial_entry/'+i+'/json',
+		dataType: "json",
+		data: {
+			'location':'location',
+			'key': 'value'
+		},
+}
+entryList.push(entry)
+}
+
+
+for (i=0; i<entryList.length; i++){
+	$.ajax(entryList[i]).done(populateTrialEntry)
+	}
+
 {% endblock %}

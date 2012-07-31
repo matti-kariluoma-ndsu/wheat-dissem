@@ -1,7 +1,59 @@
 {% extends "base.html" %}
 {% load django_math %}
 {% block content %}
+<style type="text/css">
+table,th,td,td
+{
+border:1px solid black;
+}
+</style>
 <div>
-	<p>This is the page where the information on {{variety_name}} number :{{index}} will be displayed.</p>
+	<p>This is the page where the information on {{variety_name}}, variety number {{index}} will be displayed.</p>
+	<table>
+	<tr>
+	<th>Variety</th>
+	<th>{{variety_name}}</th>
+	</tr>
+	<tr>
+	<td>Index</td>
+	<td>{{index}}</td>
+	</tr>
+	<tr>
+	<td>Year Released</td>
+	<td>{{year_released}}</td>
+	</tr>
+	<tr>
+	<td>Description</td>
+	<td>{{description_url}}</td>
+	</tr>
+	<tr>
+	<td>Picture</td>
+	<td>{{picture_url}}</td>
+	</tr>
+	<tr>
+	<td>Agent Origin</td>
+	<td>{{agent_origin}}</td>
+	</tr>
+	<tr>
+	<td>Stdaw Length</td>
+	<td>{{stdaw_length}}</td>
+	</tr>
+	<tr>
+	<td>Maturity</td>
+	<td>{{maturity}}</td>
+	</tr>
+	<tr>
+	<td>Grain Color</td>
+	<td>{{grain_color}}</td>
+	</tr>
+	<tr>
+	<td>Beard</td>
+	<td>{{beard}}</td>
+	</tr>
+	<tr>
+	<td>Wilt</td>
+	<td>{{wilt}}</td>
+	</tr>
+	</table>
 </div>
 {% endblock %}
