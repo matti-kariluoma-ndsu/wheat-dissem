@@ -47,7 +47,9 @@
 
     <br />
     <br />
+
    <form action="/add_new_variety/" method="post"> 
+
   			<table>
 <tr>
 <td>*Enter the Variety Name:</td>
@@ -56,7 +58,7 @@
 
 <tr>
 <td>Enter the description url :</td>
-<td><input type="text" name="description_url" /></td>
+<td><input type="text" name="description_url" value="{{error}}" /></td>
 </tr>
 
 <tr>
@@ -86,7 +88,7 @@
 
 <tr>
 <td>Enter the grain color :</td>
-<td><input type="text" name="grain_color" /></td>
+<td><input type="text" name="grain_color" value=""/></td>
 </tr>
 
 <tr>
@@ -106,12 +108,11 @@
 
 
 </table>
- 
+
     <input type="submit" value="Submit" />    
     
  </form>   
-    
-    
+
 
     </td>
   </tr>
@@ -126,45 +127,26 @@
 
   <div class="Page">
   <div class="Pad">
+ <form action="/edit_variety/" method="post"> 
+ <table>
+ <tr>
+<td>*Enter the Variety Name:</td>
+<td><input type="text" name="varietyname" /><br /> </td>
+</tr>
+ 
+ 
+ </table>
+ 
 
-  Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />Tab2<br />
-
+ <input type="submit" value="Submit" />    
+    
+ </form>   
   <!-- *** Page2 End ***** -->
 
   </div>
   </div>
 
-  <div class="Page">
-  <div class="Pad">
-
-  <!-- *** Page3 Start *** -->
-
-  <br />
-
-  <table>
-  <tr>
-    <td>Username:&nbsp;</td>
-    <td><input style="width: 120px;" type="text"     name="username" /></td>
-  </tr>
-  <tr>
-    <td>Password:&nbsp;</td>
-    <td><input style="width: 120px;" type="password" name="password" /></td>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td><input type="submit" value="Submit" /></td>
-  </tr>
-  </table>
-
-  <!-- *** Page3 End ***** -->
-
-  </div>
-  </div>
-
-</div>
-
-</div>
-
+ 
 
 
 <script type="text/javascript">
