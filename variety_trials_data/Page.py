@@ -575,15 +575,48 @@ class Page:
 		table = Table(locations, lsd_probability)
 		self.tables.append(table)
 		
-		# Add data to the table(s)
-		for entry in self.get_entries():
-			# store like entries for multiple observations and multiple years
-			# entry is used as a lookup
-			# default_* are used when intializing a new cell
-			table.get_cell(entry, default_year, default_fieldname).append(entry)
+		if not break_into_subtables:					
+			for entry in self.get_entries():
+				# store like entries for multiple observations and multiple years
+				# entry is used as a lookup
+				# default_* are used when intializing a new cell
+				table.get_cell(entry, default_year, default_fieldname).append(entry)			
+		else:
+			self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+			for entry in self.get_entries():
+				table.get_cell(entry, default_year, default_fieldname).append(entry)
+				year = entry.harvest_date.date.year
+				variety = entry.variety
+				location = entry.location
+				try:
+					d = self.decomposition[year][variety]
+				except KeyError:
+					try:
+						d = self.decomposition[year][variety] = dict([(l, False) for l in self.locations])
+					except KeyError:
+						self.decomposition[year] = {}
+						d = self.decomposition[year][variety] = dict([(l, False) for l in self.locations])
+				
+				try:
+					d[location] = True
+				except KeyError:
+					pass
+					
+			#print self.decomposition[default_year]
 		
-		# Sort/split the tables
-		pass
+			# Sort/split the tables
+			move = True
+			new_table = Table(locations, lsd_probability)
+			self.tables.append(new_table)
+			new_table.columns = table.columns.copy() # TODO: don't bring along the cells in each column
+			for (variety, row) in table.rows.items():
+				if move:
+					move = False
+					new_table.rows[variety] = row # TODO: put the cells from these rows into the columns
+				else:
+					move = True
+			for key in new_table.rows:
+				del table.rows[key]
 		
 		# Decorate the tables
 		## Add aggregate columns
@@ -600,40 +633,6 @@ class Page:
 							break
 					column.append(cell)
 				table.columns[location_key] = column
-			for row in table.rows.values():
-				pass#ow.set_key_order(table.locations)
-		
-		if break_into_subtables:
-			pass
-			"""
-			subtables = []
-			# decorate each row and extract info on available data (tuple)
-			for row in table:
-				tuple = 3d_decorate(row)
-				try:
-					list = our_tuples[tuple]
-				except KeyError:
-					list = our_tuples[tuple] = []
-				list.append(row)
-				
-			# for each tuple, combine with other rows that have that same tuple
-			for tuple in sorted(our_tuples.keys()):
-				rows = our_tuples[tuple]
-				while true:
-					(remainder_rows, table) = create_table(rows)
-					subtables.append(table)
-					if not remainder_rows:
-						break
-						
-			# Add all higher-order tables to appropriate lesser-order tables, 
-			# scubbing any extra data
-			large_subtables = list(subtables)
-			for table in reverse(large_subtables):
-				subtables = subtables - table
-				large_subtables.append(append_when_superset_and_scrub(table, subtables)
-				
-			"""
-				
 	
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
