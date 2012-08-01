@@ -300,3 +300,16 @@ Secretary view needs
 
 Javascript's introspection of passed arguments:
 http://javascriptweblog.wordpress.com/2011/01/18/javascripts-arguments-object-and-beyond/
+
+Notes from July 27 meeting
+* Allow variety descriptions (the varieties table) to be updated
+** What about protection from deletion/malicious overwrite?
+* Makes sure any data view has all varieities listed so we can do a 
+head-head
+* Update the main page to check for javascript, do an instant-search 
+type query when the zipcode is entered (i.e. dynamic keeps the zipcode 
+form on the main page)
+* Fill in zipcode as typed, with name data
+* Ensure newly entered varieties can show up in search
+* drive by 1-yr mean; allow holes in the 2,3 yr .
+
