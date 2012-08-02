@@ -626,19 +626,21 @@ class Page:
 		
 		# Decorate the tables
 		## Add aggregate columns
-		for table in self.tables:
-			for year_num in range(len(self.years)):
-				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
-				location_key = Fake_Location("%s-yr" % (year_num))
-				table.locations.insert(0, location_key)
-				column = Aggregate_Column(location_key, year_num)
-				# Only grab one cell from each row
-				for row in table.rows.values():
-					for cell in row:
-						if cell is not None:
-							break
-					column.append(cell)
-				table.columns[location_key] = column
+		
+		# TODO: the table.columns object is unintentionally being shared by all tables
+		#for table in self.tables:
+		for year_num in range(len(self.years)):
+			year_num = year_num + 1 # we want 1-indexed, not 0-indexed
+			location_key = Fake_Location("%s-yr" % (year_num))
+			table.locations.insert(0, location_key)
+			column = Aggregate_Column(location_key, year_num)
+			# Only grab one cell from each row
+			for row in table.rows.values():
+				for cell in row:
+					if cell is not None:
+						break
+				column.append(cell)
+			table.columns[location_key] = column
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
