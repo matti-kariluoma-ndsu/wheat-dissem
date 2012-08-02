@@ -605,18 +605,24 @@ class Page:
 			#print self.decomposition[default_year]
 		
 			# Sort/split the tables
-			move = True
-			new_table = Table(locations, lsd_probability)
-			self.tables.append(new_table)
-			new_table.columns = table.columns.copy() # TODO: don't bring along the cells in each column
-			for (variety, row) in table.rows.items():
-				if move:
-					move = False
-					new_table.rows[variety] = row # TODO: put the cells from these rows into the columns
+			variety_order = sorted(self.decomposition[default_year], key = lambda variety: self.decomposition[default_year][variety], reverse=True)
+			
+			prev = None
+			for variety in variety_order:
+				if prev is None:
+					prev = variety
+					new_table = Table(locations, lsd_probability)
+					self.tables.append(new_table)
+					new_table.columns = table.columns.copy() # TODO: don't bring along the cells in each column
 				else:
-					move = True
-			for key in new_table.rows:
-				del table.rows[key]
+					if self.decomposition[default_year][variety] != self.decomposition[default_year][prev]:
+						prev = variety
+						new_table = Table(locations, lsd_probability)
+						self.tables.append(new_table)
+						new_table.columns = table.columns.copy() # TODO: don't bring along the cells in each column
+				new_table.rows[variety] = table.rows[variety] # TODO: put the cells from these rows into the columns
+				del table.rows[variety]
+				
 		
 		# Decorate the tables
 		## Add aggregate columns
@@ -633,7 +639,7 @@ class Page:
 							break
 					column.append(cell)
 				table.columns[location_key] = column
-	
+		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
 			table.set_defaults(year, fieldname)
