@@ -127,7 +127,8 @@
 			<th>
 				<h4>Variety</h4>
 			</th>
-		{% for location in table.locations %}
+		{% comment %}{% for location in table.locations %}{% endcomment %}
+		{% for location in table.visible_locations %}
 			<th>
 				<h4>{{ location.name }}</h4>
 			{% if location.id != -1 %}
@@ -149,7 +150,7 @@
 			<br style="clear: both;"/>
 			{% for cell in row %}
 			<td>
-			{{ cell.get|default_if_none:"--" }}
+			{{ cell|default_if_none:"--" }}
 			</td>
 			{% endfor %}
 		</tr>

@@ -80,7 +80,7 @@ class Cell:
 	def __unicode__(self):
 		unicode_repr = self.get(self.year, self.fieldname)
 		if unicode_repr is None:
-			unicode_repr = u'--'
+			unicode_repr = u'-!-'
 		else:
 			unicode_repr = unicode(str(unicode_repr))
 		return unicode_repr
@@ -478,7 +478,7 @@ class Aggregate_Column(Column):
 			return
 		
 		if isinstance(value, Cell):
-			cell = Aggregate_Cell(value.row, self, value.year, value.fieldname)
+			cell = Aggregate_Cell(key, self, value.year, value.fieldname)
 			# Aggregate_Cell needs some help setting attributes
 			cell.set_default_year(value.year)
 			cell.set_default_fieldname(value.fieldname)
@@ -507,7 +507,8 @@ class Table:
 			
 		def __init__(self, locations, lsd_probability): # Probability is required for creating the LSD row
 			self.lsd_probability = lsd_probability
-			self.locations = locations
+			self.locations = list(locations) # create a copy
+			self.visible_locations = list(locations) # create a copy
 			self.rows = {}
 			self.columns = {}
 			self.cells = {}
@@ -517,7 +518,7 @@ class Table:
 				row = self.rows[variety]
 			except KeyError:
 				row = self.rows[variety] = Row(variety)
-				row.set_key_order(self.locations)
+				row.set_key_order(self.visible_locations)
 			return row	
 		
 		def get_column(self, location):
@@ -607,40 +608,51 @@ class Page:
 			# Sort/split the tables
 			variety_order = sorted(self.decomposition[default_year], key = lambda variety: self.decomposition[default_year][variety], reverse=True)
 			
-			prev = None
-			for variety in variety_order:
-				if prev is None:
-					prev = variety
-					new_table = Table(locations, lsd_probability)
-					self.tables.append(new_table)
-					new_table.columns = table.columns.copy() # TODO: don't bring along the cells in each column
-				else:
+			if len(variety_order) > 0:
+				prev = variety_order[0]
+				truth_table = self.decomposition[default_year][prev]
+				delete_these = []
+				for (index, location) in enumerate(table.visible_locations):
+					if not truth_table[location]:
+						delete_these.append(index)
+				for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
+					table.visible_locations.pop(index)
+				
+				def create_new_table(template_table):
+					_table = Table(locations, lsd_probability)
+					_table.visible_locations = list(template_table.visible_locations)
+					self.tables.append(_table)
+					_table.columns = template_table.columns.copy() # TODO: don't bring along the cells in each column
+					return _table
+					
+				new_table = create_new_table(table)
+				for variety in variety_order:
 					if self.decomposition[default_year][variety] != self.decomposition[default_year][prev]:
 						prev = variety
-						new_table = Table(locations, lsd_probability)
-						self.tables.append(new_table)
-						new_table.columns = table.columns.copy() # TODO: don't bring along the cells in each column
-				new_table.rows[variety] = table.rows[variety] # TODO: put the cells from these rows into the columns
-				del table.rows[variety]
+						new_table = create_new_table(table)
+					new_table.rows[variety] = table.rows[variety] # TODO: put the cells from these rows into the columns
+					del table.rows[variety]
 				
 		
 		# Decorate the tables
 		## Add aggregate columns
 		
 		# TODO: the table.columns object is unintentionally being shared by all tables
-		#for table in self.tables:
-		for year_num in range(len(self.years)):
-			year_num = year_num + 1 # we want 1-indexed, not 0-indexed
-			location_key = Fake_Location("%s-yr" % (year_num))
-			table.locations.insert(0, location_key)
-			column = Aggregate_Column(location_key, year_num)
-			# Only grab one cell from each row
-			for row in table.rows.values():
-				for cell in row:
+		for table in self.tables:
+			for year_num in sorted(range(len(self.years)), reverse=True):
+				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
+				location_key = Fake_Location("%s-yr" % (year_num))
+				table.locations.insert(0, location_key)
+				table.visible_locations.insert(0, location_key)
+				column = Aggregate_Column(location_key, year_num)
+				# Only grab one cell from each row
+				for row in table.rows.values():
+					for cell in row:
+						if cell is not None:
+							break
 					if cell is not None:
-						break
-				column.append(cell)
-			table.columns[location_key] = column
+						column.append(cell)
+				table.columns[location_key] = column
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
