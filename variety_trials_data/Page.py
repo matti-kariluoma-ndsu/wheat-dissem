@@ -610,6 +610,8 @@ class Page:
 			
 			if len(variety_order) > 0:
 				prev = variety_order[0]
+				
+				# delete locations that have no data in the current year
 				truth_table = self.decomposition[default_year][prev]
 				delete_these = []
 				for (index, location) in enumerate(table.visible_locations):
@@ -624,7 +626,8 @@ class Page:
 					self.tables.append(_table)
 					_table.columns = template_table.columns.copy() # TODO: don't bring along the cells in each column
 					return _table
-					
+				
+				# Move balanced varieties to their own tables
 				new_table = create_new_table(table)
 				for variety in variety_order:
 					if self.decomposition[default_year][variety] != self.decomposition[default_year][prev]:
@@ -635,10 +638,12 @@ class Page:
 				
 		
 		# Decorate the tables
-		## Add aggregate columns
 		
-		# TODO: the table.columns object is unintentionally being shared by all tables
 		for table in self.tables:
+			## Reset cell/column references
+			#table.cells.clear()
+			table.columns.clear()
+			## Add aggregate columns
 			for year_num in sorted(range(len(self.years)), reverse=True):
 				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
 				location_key = Fake_Location("%s-yr" % (year_num))
@@ -652,8 +657,9 @@ class Page:
 							break
 					if cell is not None:
 						column.append(cell)
-				table.columns[location_key] = column
-		
+				table.columns[location_key] = column # this isn't being set for tables past the first...
+				print [cell.column.location.name for cell in table.rows.values()[0] if cell is not None]
+				
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
 			table.set_defaults(year, fieldname)
