@@ -344,9 +344,10 @@ class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is based upon its row
 	"""
-	def __init__(self, row):
-		Cell.__init__(self)
+	def __init__(self, year, fieldname, row, column):
+		Cell.__init__(self, year, fieldname)
 		self.row = row
+		self.column = column
 		
 	def append(self, value):
 		return
@@ -376,34 +377,15 @@ class Aggregate_Column(Column):
 	"""
 	A column whose cells' value is determined by other cells in its row
 	"""
-	def __init__(self, location, row, year_num):
+	def __init__(self, location, year_num):
 		"""
 		location: a Location (or Fake_Location) object
 		year_num: an integer denoting the number of years to go back for averaging i.e. 3
 		"""
 		Column.__init__(self, location)
+		self.members = []
 		self.clear()
 		self.years_range = range(year_num)
-		self.member = Aggregate_Cell(row)
-	
-	def __iter__(self):
-		self.index = 0
-		return self
-	
-	def next(self):
-		if self.index == 1:
-			raise StopIteration
-		else:
-			self.index = 1
-			return self.member
-		
-	def append(self, value):
-		return
-		
-	def clear(self):
-		if isinstance(self.member, Cell):
-			self.member.delete_column()
-		self.member = None
 
 class Table:
 		"""
@@ -532,7 +514,6 @@ class Page:
 						table.add_cell(variety, location, cell)
 		
 		# Decorate the tables
-		"""
 		for table in self.tables:
 			## Add aggregate columns
 			for year_num in sorted(range(len(self.years)), reverse=True):
@@ -541,16 +522,11 @@ class Page:
 				table.locations.insert(0, location_key)
 				table.visible_locations.insert(0, location_key)
 				column = Aggregate_Column(location_key, year_num)
-				# Only grab one cell from each row
 				for row in table.rows.values():
-					for cell in row:
-						if cell is not None:
-							break
-					if cell is not None:
-						column.append(cell)
+					column.append(Aggregate_Cell(default_year, default_fieldname, row, column))
 				table.columns[location_key] = column # this isn't being set for tables past the first...
 				print [cell.column.location.name for cell in table.rows.values()[0] if cell is not None]
-		"""
+		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
 			table.set_defaults(year, fieldname)
