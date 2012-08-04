@@ -133,7 +133,32 @@ class LSD_Row(Row):
 	def __init__(self, variety, table):
 		Row.__init__(self, variety)
 		self.table = table
+	
+	def __iter__(self):
+		self.key_order = self.table.visible_locations
+		self.key_index = 0
+		return self
 		
+	def next(self):
+		if self.key_index == len(self.keys):
+			raise StopIteration
+			
+		try:
+			key = self.keys[self.key_index]
+		except IndexError:
+			raise StopIteration
+		
+		try:
+			cell = self.members[key]
+		except KeyError:
+			self.key_index = self.key_index + 1
+			return None
+
+		self.key_index = self.key_index + 1
+		return cell
+	
+	def append(self, value):
+		return
 	
 	def populate(self, probability):
 	
@@ -311,6 +336,10 @@ class LSD_Row(Row):
 		
 		return lsds
 
+	def clear(self):
+		Row.clear(self)
+		self.table = None
+
 class Column:
 	"""
 	Contains references to each Cell in this column.
@@ -358,8 +387,11 @@ class Aggregate_Cell(Cell):
 			if cell is not None and not isinstance(cell, Aggregate_Cell):
 				for year_diff in self.column.years_range:
 					cell_mean = cell.get(year - year_diff, fieldname)
-					if cell_mean is not None:
+					if cell_mean is None:
+						pass # This subset is not balanced across years!
+					else:
 						values.append(cell_mean)
+					
 		
 		mean = None
 		if len(values) > 0:
@@ -526,8 +558,9 @@ class Page:
 					cell = Aggregate_Cell(default_year, default_fieldname, row, column)
 					column.append(cell)
 					row.append(cell)
-				table.columns[location_key] = column # this isn't being set for tables past the first...
-				print [cell.column.location.name for cell in table.rows.values()[0] if cell is not None]
+				table.columns[location_key] = column
+			## Add LSD rows
+			
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
