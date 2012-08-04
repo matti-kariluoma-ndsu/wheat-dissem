@@ -220,7 +220,7 @@ def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, 
 			del unit_blurbs[name]
 	"""
 	
-	page = Page(locations[0:8], year_list, curyear, fieldname, 0.05, break_into_subtables=True)
+	page = Page(locations[0:8], year_list, curyear, 0.05, break_into_subtables=True)
 	
 	"""
 	import sys
