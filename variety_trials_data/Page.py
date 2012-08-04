@@ -12,17 +12,8 @@ class Cell:
 	Helper class; Cells for our Table class.
 	"""
 	
-	def __init__(self, row, column, year, fieldname):
-		self.column = column
-		self.row = row
-		# aggregate_column.append needs self.row to be set
-		column.append(self)
-		# row.append needs self.column to be set
-		row.append(self)
-		self.year = year
-		self.fieldname = fieldname
-		self.members = []
-		self.index = 0
+	def __init__(self):
+		self.clear()
 		
 	def __iter__(self):
 		self.index = 0
@@ -37,20 +28,18 @@ class Cell:
 	
 	def append(self, value):
 		self.members.append(value)
-		
+	
 	def delete_row(self):
 		self.row = None
 	
 	def delete_column(self):
 		self.column = None
-		
-	def delete_values(self):
-		self.members = []
-		
+	
 	def clear(self):
 		self.delete_row()
 		self.delete_column()
-		self.delete_values()
+		self.members = []
+		self.index = 0
 	
 	def get(self, year, fieldname):
 		this_year = []
@@ -71,12 +60,6 @@ class Cell:
 		
 		return mean
 		
-	def set_default_year(self, year):
-		self.year = year
-		
-	def set_default_fieldname(self, fieldname):
-		self.fieldname = fieldname
-		
 	def __unicode__(self):
 		unicode_repr = self.get(self.year, self.fieldname)
 		if unicode_repr is None:
@@ -95,33 +78,6 @@ class Row:
 		self.variety = variety
 		self.members = {}
 		self.clear()
-	
-	"""
-	def __getitem__(self, index):
-		if index > 0:
-			raise NotImplementedError
-		if self.key_order is None:
-			self.keys = self.members.keys()
-		else:
-			self.keys = self.key_order
-			
-		try:
-			key = self.keys[self.key_index]
-		except IndexError:
-			return None
-		
-		try:
-			values = self.members[key]
-		except KeyError:
-			return None
-		
-		try:
-			cell = values[index] 
-		except IndexError:
-			cell = None
-			
-		return cell
-	"""
 	
 	def __iter__(self):
 		if self.key_order is None:
@@ -161,16 +117,9 @@ class Row:
 	
 	def append(self, value):
 		try:
-			col = self.members[value.column.location]
-		except KeyError:
-			col = self.members[value.column.location] = []
+			self.members[value.column.location] = value
 		except AttributeError:
-			try:
-				col = self.members[None]
-			except KeyError:
-				col = self.members[None] = []
-				
-		col.append(value)
+			col = self.members[None] = value
 		
 	def set_key_order(self, key_order):
 		self.key_order = key_order
@@ -403,8 +352,9 @@ class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is based upon its row
 	"""
-	def __init__(self, row, column, year, fieldname):
-		Cell.__init__(self, row, column, year, fieldname)
+	def __init__(self, row):
+		Cell.__init__(self)
+		self.row = row
 		
 	def append(self, value):
 		return
@@ -434,7 +384,7 @@ class Aggregate_Column(Column):
 	"""
 	A column whose cells' value is determined by other cells in its row
 	"""
-	def __init__(self, location, year_num):
+	def __init__(self, location, row, year_num):
 		"""
 		location: a Location (or Fake_Location) object
 		year_num: an integer denoting the number of years to go back for averaging i.e. 3
@@ -442,55 +392,26 @@ class Aggregate_Column(Column):
 		Column.__init__(self, location)
 		self.clear()
 		self.years_range = range(year_num)
+		self.member = Aggregate_Cell(row)
 	
 	def __iter__(self):
-		if self.key_order is None:
-			self.keys = self.members.keys()
-		else:
-			self.keys = self.key_order
 		self.index = 0
 		return self
 	
 	def next(self):
-		try:
-			key = self.keys[self.index]
-		except IndexError:
+		if self.index == 1:
 			raise StopIteration
-			
-		try:
-			cell = self.members[key]
-		except KeyError:
-			cell = None
-			
-		self.index = self.index + 1
-		return cell
+		else:
+			self.index = 1
+			return self.member
 		
 	def append(self, value):
-		try:
-			key = value.row
-		except AttributeError:
-			key = None
-			
-		if key in self.members:
-			return
-		
-		if value.column is self:
-			return
-		
-		if isinstance(value, Cell):
-			cell = Aggregate_Cell(key, self, value.year, value.fieldname)
-			# Aggregate_Cell needs some help setting attributes
-			cell.set_default_year(value.year)
-			cell.set_default_fieldname(value.fieldname)
-			self.members[key] = cell
+		return
 		
 	def clear(self):
-		for m in self.members:
-			if isinstance(m, Cell):
-				m.delete_column()
-		self.members = {}
-		self.key_order = None
-		self.keys  = None
+		if isinstance(self.member, Cell):
+			self.member.delete_column()
+		self.member = None
 
 class Table:
 		"""
@@ -509,9 +430,9 @@ class Table:
 			self.lsd_probability = lsd_probability
 			self.locations = list(locations) # create a copy
 			self.visible_locations = list(locations) # create a copy
-			self.rows = {}
-			self.columns = {}
-			self.cells = {}
+			self.rows = {} # variety: [Row(), ...]
+			self.columns = {} # location: [Column(), ...]
+			self.cells = {} # (variety, location): Cell()
 			
 		def get_row(self, variety):
 			try:
@@ -527,34 +448,9 @@ class Table:
 			except KeyError:
 				col = self.columns[location] = Column(location)
 			return col
-		
-		def get_cell(self, entry, default_year, default_fieldname):
-			try:
-				cell = self.cells[(entry.variety, entry.location)]
-			except KeyError:
-				# create a new cell object, which adds itself to the given row & column
-				cell = self.cells[(entry.variety, entry.location)] = Cell(
-						self.get_row(entry.variety), 
-						self.get_column(entry.location), 
-						default_year, 
-						default_fieldname)
-			return cell
-	
-		def set_defaults(self, year, fieldname):
-			for rows in self.rows.values():
-				for cell in rows:
-					cell.set_default_year(year)
-					cell.set_default_field(fieldname)
-		
-		def set_default_year(self, year):
-			for rows in self.rows.values():
-				for cell in rows:
-					cell.set_default_year(year)
-		
-		def set_default_field(self, fieldname):
-			for rows in self.rows.values():
-				for cell in rows:
-					cell.set_default_field(fieldname)
+			
+		def append(self, cell):
+			pass
 
 class Page:
 	def get_entries(self):
@@ -641,8 +537,16 @@ class Page:
 		
 		for table in self.tables:
 			## Reset cell/column references
-			#table.cells.clear()
+			for column in table.columns.values():
+				column.clear() # clears all references except for column.location
 			table.columns.clear()
+			for row in table.rows.values():
+				for (location, cell_list) in row.members.items():
+					location = cell.column.location
+					column = table.get_column(location)
+					cell.column = column
+					column.append(cell)
+					
 			## Add aggregate columns
 			for year_num in sorted(range(len(self.years)), reverse=True):
 				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
