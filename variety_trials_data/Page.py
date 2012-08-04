@@ -523,7 +523,9 @@ class Page:
 				table.visible_locations.insert(0, location_key)
 				column = Aggregate_Column(location_key, year_num)
 				for row in table.rows.values():
-					column.append(Aggregate_Cell(default_year, default_fieldname, row, column))
+					cell = Aggregate_Cell(default_year, default_fieldname, row, column)
+					column.append(cell)
+					row.append(cell)
 				table.columns[location_key] = column # this isn't being set for tables past the first...
 				print [cell.column.location.name for cell in table.rows.values()[0] if cell is not None]
 		
