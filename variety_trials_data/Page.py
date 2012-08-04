@@ -12,8 +12,10 @@ class Cell:
 	Helper class; Cells for our Table class.
 	"""
 	
-	def __init__(self):
+	def __init__(self, year, fieldname):
 		self.clear()
+		self.year = year
+		self.fieldname = fieldname
 		
 	def __iter__(self):
 		self.index = 0
@@ -85,7 +87,6 @@ class Row:
 		else:
 			self.keys = self.key_order
 		self.key_index = 0
-		self.value_index = 0
 		return self
 		
 	def next(self):
@@ -98,21 +99,12 @@ class Row:
 			raise StopIteration
 		
 		try:
-			values = self.members[key]
+			cell = self.members[key]
 		except KeyError:
 			self.key_index = self.key_index + 1
 			return None
-		if len(values) ==  0: 
-			self.key_index = self.key_index + 1
-			return None
-			
-		if self.value_index == len(values):
-			self.key_index = self.key_index + 1
-			self.value_index = 0
-			return self.next()
 
-		cell = values[self.value_index]
-		self.value_index = self.value_index + 1
+		self.key_index = self.key_index + 1
 		return cell
 	
 	def append(self, value):
@@ -454,6 +446,8 @@ class Table:
 			column = self.get_column(location)
 			cell.row = row
 			cell.column = column
+			row.append(cell)
+			column.append(cell)
 			self.cells[(variety, location)] = cell
 			
 
@@ -470,7 +464,7 @@ class Page:
 				)
 			)
 			
-	def __init__(self, locations, years, default_year, lsd_probability, break_into_subtables=False):
+	def __init__(self, locations, years, default_year, default_fieldname, lsd_probability, break_into_subtables=False):
 		self.locations = locations
 		self.years = years
 		self.tables = []
@@ -488,7 +482,7 @@ class Page:
 					d = cells[variety]
 				except KeyError:
 					d = cells[variety] = {}
-				cell = d[location] = Cell()
+				cell = d[location] = Cell(default_year, default_fieldname)
 					
 			cell.append(entry)
 			
@@ -534,10 +528,8 @@ class Page:
 						prev = variety
 						table = Table(locations, visible_locations, lsd_probability)
 						self.tables.append(table)
-					for (location, cell_list) in cells[variety].items():
-						for cell in cell_list:
-							table.add_cell(variety, location, cell)
-				
+					for (location, cell) in cells[variety].items():
+						table.add_cell(variety, location, cell)
 		
 		# Decorate the tables
 		"""
