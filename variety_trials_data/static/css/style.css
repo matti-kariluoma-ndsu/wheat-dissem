@@ -44,7 +44,8 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
   
 
 .row_label {
-	font-size: 8pt; text-align: right; float: right;
+	font-size: 1em; 
+	text-align: left;
 }
 
 .thin {
@@ -162,8 +163,11 @@ body{min-width:960px}.container_12,.container_16{margin-left:auto;margin-right:a
 	padding-left: 0.2em;
 	padding-right: 0.2em;
 	border-right: 1px dotted #666;
-	text-align: left;
 	width: 70px;
+}
+
+.cell {
+	text-align: right;
 }
 
 .Column { 

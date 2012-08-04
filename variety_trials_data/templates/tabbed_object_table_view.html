@@ -156,7 +156,7 @@
 		</tr>
 		{% else %}
 		<tr class="group {% cycle 'master_odd' 'master_even' %}">
-				<th>
+				<th class="row_label">
 					<form>
 						<input class="variety_checkbox" type="checkbox" name="{{ variety.name }}" value="{{variety.id}}" onclick="unselect_variety({{variety.id}})"> 
 							<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
@@ -164,7 +164,7 @@
 					</form>
 				</th>
 				{% for cell in row %}
-				<td>
+				<td class="padded cell">
 				{{ cell|default_if_none:"--" }}
 				</td>
 				{% endfor %}
