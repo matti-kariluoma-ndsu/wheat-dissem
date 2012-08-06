@@ -470,6 +470,21 @@ class Table:
 			row.append(cell)
 			column.append(cell)
 			self.cells[(variety, location)] = cell
+		
+		def sorted_rows(self):
+			alpha_sorted = sorted(self.rows.items(), key=lambda (variety, row): variety.name) # sort by variety.name
+			
+			## Move the LSD row to the end of the list
+			lsd_row = None
+			for variety in self.rows:
+				if variety.name == "LSD":
+					lsd_row = (variety, self.rows[variety])
+					break
+			if lsd_row is not None:
+				alpha_sorted.remove(lsd_row) # remove it from its alphabetical position
+				alpha_sorted.append(lsd_row) # append it to the end of the list
+				
+			return alpha_sorted
 			
 
 class Page:

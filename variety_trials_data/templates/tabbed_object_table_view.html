@@ -55,7 +55,7 @@
 			</th>
 		{% endfor %}
 		</tr>
-	{% for variety, row in table.rows.items %}
+	{% for variety, row in table.sorted_rows %}
 		{% if variety.name == "LSD" %}
 		<tr class="variety_trials__LSD_row">
 			<th>
