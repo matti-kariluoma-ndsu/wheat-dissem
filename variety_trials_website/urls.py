@@ -17,13 +17,13 @@ urlpatterns = patterns('',
 		
 		(r'^$', views.index), # the home page
 		## TODO: There are 3 views of our data, reduce to 2 if not 1.
-		(r'^view/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/', views.zipcode_view), # defaults to location-based view
-		(r'^view/location/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/', views.locations_view), # view based on variety head-to-head comparison
-		(r'^view/variety/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/', views.varieties_view), # view based on proximity
-		#(r'^(?P<abtest>[1234567890]+)/', views.index),
-		#(r'^view/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)/', views.zipcode_view),
-		#(r'^view/location/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)/', views.locations_view),
-		#(r'^view/variety/(?P<yearname>[1234567890]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[1234567890]+)/', views.varieties_view),
+		(r'^view/(?P<yearname>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.zipcode_view), # defaults to location-based view
+		(r'^view/location/(?P<yearname>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.locations_view), # view based on variety head-to-head comparison
+		(r'^view/variety/(?P<yearname>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.varieties_view), # view based on proximity
+		#(r'^(?P<abtest>[0-9]+)/', views.index),
+		#(r'^view/(?P<yearname>[0-9]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[0-9]+)/', views.zipcode_view),
+		#(r'^view/location/(?P<yearname>[0-9]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[0-9]+)/', views.locations_view),
+		#(r'^view/variety/(?P<yearname>[0-9]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[0-9]+)/', views.varieties_view),
 		(r'^add_trials/', views.add_trial_entry_csv_file), # page to upload a spreadsheet to
 		(r'^add_trials_confirm/', views.add_form_confirmation), # Page to confirmations
 		(r'^sucess/', views.redirect_sucess), # Page to sucess
@@ -31,18 +31,18 @@ urlpatterns = patterns('',
 		(r'^add_data_variety_or_location/', views.adding_to_database_confirm), # Page to adding to database
 		(r'^view/info/(?P<variety_name>[a-zA-Z_]+)/', views.variety_info), # defaults to location-based view
 		(r'^view/history/', views.history), # defaults to location-based view
-		(r'^view/delete/(?P<delete>[1234567890]+)/', views.history_delete), # defaults to location-based view
+		(r'^view/delete/(?P<delete>[0-9]+)/', views.history_delete), # defaults to location-based view
 		#(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}), # serves static/img static/css static/js etc.
 		(r'^view/info/(?P<variety_name>[a-zA-Z_]+)', views.variety_info), # defaults to location-based view
 		(r'^inspect/', views.inspect),
-		(r'^trial_entry/(?P<id>[1234567890]+)/json', views.trial_entry_json),
-		(r'^zipcode/(?P<id>[1234567890]+)/json', views.zipcode_json),
-		(r'^zipcode/near/(?P<zipcode>[1234567890]+)/json', views.zipcode_near_json),
-		(r'^location/(?P<id>[1234567890]+)/json', views.location_json),
-		(r'^variety/(?P<id>[1234567890]+)/json', views.variety_json),
+		(r'^trial_entry/(?P<id>[0-9]+)/json', views.trial_entry_json),
+		(r'^zipcode/(?P<id>[0-9]+)/json', views.zipcode_json),
+		(r'^zipcode/near/(?P<zipcode>[0-9]+)/json', views.zipcode_near_json),
+		(r'^location/(?P<id>[0-9]+)/json', views.location_json),
+		(r'^variety/(?P<id>[0-9]+)/json', views.variety_json),
 		(r'^location/all/json', views.location_json_all),
 		(r'^variety/all/json', views.variety_json_all),
-		(r'^disease/(?P<id>[1234567890]+)/json', views.disease_json),
+		(r'^disease/(?P<id>[0-9]+)/json', views.disease_json),
 		(r'^debug', views.debug),
 )
 
