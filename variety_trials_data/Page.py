@@ -126,6 +126,12 @@ class Row:
 		self.key_index = 0
 		self.value_index = 0
 
+class Fake_Variety:
+	def __init__(self, name):
+		self.name = name
+		self.id = -1
+		self.pk = -1
+
 class LSD_Row(Row):
 	"""
 	A row that keeps track of which Table it belongs to.
@@ -136,27 +142,15 @@ class LSD_Row(Row):
 	
 	def __iter__(self):
 		self.key_order = self.table.visible_locations
-		self.key_index = 0
-		return self
+		return Row.__iter__(self)
 		
 	def next(self):
-		if self.key_index == len(self.keys):
-			raise StopIteration
-			
-		try:
-			key = self.keys[self.key_index]
-		except IndexError:
-			raise StopIteration
+		cell = Row.next(self)
+		if isinstance(cell, Aggregate_Cell):
+			return "M-LSD"
+		else:
+			return "D-LSD"
 		
-		try:
-			cell = self.members[key]
-		except KeyError:
-			self.key_index = self.key_index + 1
-			return None
-
-		self.key_index = self.key_index + 1
-		return cell
-	
 	def append(self, value):
 		return
 	
@@ -560,7 +554,13 @@ class Page:
 					row.append(cell)
 				table.columns[location_key] = column
 			## Add LSD rows
-			
+			variety_key = Fake_Variety("LSD")
+			row = LSD_Row(variety_key, table)
+			for column in table.columns.values():
+				cell = Aggregate_Cell(default_year, default_fieldname, row, column)
+				column.append(cell)
+				row.append(cell)
+			table.rows[variety_key] = row
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
