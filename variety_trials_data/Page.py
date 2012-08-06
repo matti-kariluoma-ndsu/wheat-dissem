@@ -148,11 +148,10 @@ class LSD_Row(Row):
 		cell = Row.next(self)
 		if isinstance(cell, Aggregate_Cell):
 			return "M-LSD"
-		else:
+		elif isinstance(cell, Cell):
 			return "D-LSD"
-		
-	def append(self, value):
-		return
+		else:
+			return cell
 	
 	def populate(self, probability):
 	
@@ -541,6 +540,13 @@ class Page:
 		
 		# Decorate the tables
 		for table in self.tables:
+			## Add LSD rows
+			variety_key = Fake_Variety("LSD")
+			row = LSD_Row(variety_key, table)
+			table.rows[variety_key] = row
+			for column in table.columns.values():
+				cell = Cell(default_year, default_fieldname)
+				table.add_cell(variety_key, column.location, cell)
 			## Add aggregate columns
 			for year_num in sorted(range(len(self.years)), reverse=True):
 				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
@@ -548,19 +554,11 @@ class Page:
 				table.locations.insert(0, location_key)
 				table.visible_locations.insert(0, location_key)
 				column = Aggregate_Column(location_key, year_num)
+				table.columns[location_key] = column
 				for row in table.rows.values():
 					cell = Aggregate_Cell(default_year, default_fieldname, row, column)
-					column.append(cell)
-					row.append(cell)
-				table.columns[location_key] = column
-			## Add LSD rows
-			variety_key = Fake_Variety("LSD")
-			row = LSD_Row(variety_key, table)
-			for column in table.columns.values():
-				cell = Aggregate_Cell(default_year, default_fieldname, row, column)
-				column.append(cell)
-				row.append(cell)
-			table.rows[variety_key] = row
+					table.add_cell(row.variety, location_key, cell)
+				
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
