@@ -50,6 +50,7 @@ class Cell:
 				this_year.append(entry)
 		print this_year
 		
+		values = []
 		for entry in this_year:
 			try:
 				value = getattr(entry, fieldname)
@@ -57,7 +58,7 @@ class Cell:
 				value = None
 			if value is not None:
 				values.append(value)
-		
+
 		mean = None
 		if len(values) > 0:
 			mean = round(float(sum(values)) / float(len(values)), 1)
