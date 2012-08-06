@@ -48,13 +48,15 @@ class Cell:
 		for entry in self.members:
 			if entry.harvest_date.date.year == year:
 				this_year.append(entry)
+		print this_year
 		
-		values = []
 		for entry in this_year:
 			try:
-				values.append(getattr(entry, fieldname))
+				value = getattr(entry, fieldname)
 			except AttributeError:
-				pass
+				value = None
+			if value is not None:
+				values.append(value)
 		
 		mean = None
 		if len(values) > 0:
@@ -70,8 +72,7 @@ class Cell:
 			unicode_repr = unicode(str(unicode_repr))
 		return unicode_repr
 		#return self.column.location.name
-	
-
+		
 class Row:
 	"""
 	Contains references to each Cell in this row.
@@ -149,7 +150,19 @@ class LSD_Row(Row):
 		if isinstance(cell, Aggregate_Cell):
 			return "M-LSD"
 		elif isinstance(cell, Cell):
-			return "D-LSD"
+			## Grab a real cell from the column
+			for real_cell in cell.column:
+				if real_cell is not None:
+					break
+			lsd = None
+			if real_cell is not None:		
+				# intentionally use cell.year instead of real_cell.year
+				lsd = real_cell.get(cell.year, "hsd_10") # TODO: this will try and average if multiple values datapoints found...
+				if lsd is None:
+					lsd = real_cell.get(cell.year, "lsd_10")
+				if lsd is None:
+					lsd = real_cell.get(cell, "lsd_05")
+			return lsd
 		else:
 			return cell
 	
