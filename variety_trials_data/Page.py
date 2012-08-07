@@ -488,7 +488,7 @@ class Table:
 			
 
 class Page:
-	def get_entries(self):
+	def get_entries(self, min_year, max_year):
 		# We do a depth=2 so we can access entry.variety.name
 		# We do a depth=3 so we can access entry.harvest_date.date.year
 		#TODO: Somehow reduce this to depth=1
@@ -496,18 +496,17 @@ class Page:
 				location__in=self.locations
 			).filter(
 				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min(self.years),1,1), datetime.date(max(self.years),12,31))
+					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
 				)
 			)
 			
-	def __init__(self, locations, years, default_year, default_fieldname, lsd_probability, break_into_subtables=False):
+	def __init__(self, locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False):
 		self.locations = locations
-		self.years = years
 		self.tables = []
 		
 		cells = {} # variety: {location: Cell() }
 		decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
-		for entry in self.get_entries():
+		for entry in self.get_entries(default_year - year_range, default_year):
 			year = entry.harvest_date.date.year
 			variety = entry.variety
 			location = entry.location
@@ -577,7 +576,7 @@ class Page:
 				cell = Cell(default_year, default_fieldname)
 				table.add_cell(variety_key, column.location, cell)
 			## Add aggregate columns
-			for year_num in sorted(range(len(self.years)), reverse=True):
+			for year_num in sorted(range(year_range), reverse=True):
 				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
 				location_key = Fake_Location("%s-yr" % (year_num))
 				table.locations.insert(0, location_key)

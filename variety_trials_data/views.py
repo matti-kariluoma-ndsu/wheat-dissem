@@ -88,37 +88,38 @@ def history_commit(request, id):
 		entry.deletable = False;
 		entry.save()
 
-def locations_view(request, yearname, fieldname, abtest=None):
-	if request.method == 'GET':
-		zipcode=request.GET.__getitem__("zipcode")
-		locations_form = variety_trials_forms.SelectLocationsForm(request.GET)
-		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
-		if locations_form.is_valid():
-			zipcode = locations_form.cleaned_data['zipcode']
-			locations = locations_form.cleaned_data['locations']
-			varieties = locations_form.cleaned_data['varieties']
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode)
-		else:
-			return zipcode_view(request, yearname, fieldname, abtest)
-	else:
-		return HttpResponseRedirect("/") # send to homepage
+# TODO: does this belong in the DB?
+unit_blurbs = {
+		'bushels_acre': [
+			'Yield', 
+			'Bushels per Acre', 
+			'The average number of bushels that can be expected from each acre of farmed land.'
+			],
+		'protein_percent': [
+			'Protein', 
+			'Percent of Mass',
+			'The average percentage of protein usable for baking. 12% or greater is required for export to	many countries.'
+			],
+		'test_weight': [
+			'Test Weight',
+			'Pounds per Bushel', 
+			'The average weight of each bushel.'
+		]
+}
 
 def zipcode_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
 		if zipcode_radius_form.is_valid():
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
-			#radius = zipcode_radius_form.cleaned_data['search_radius']
-			radius = None
 			
 			try:
-				locations = Locations_from_Zipcode_x_Radius(
-					zipcode, radius
-				).fetch()
+				locations = Locations_from_Zipcode_x_Radius(zipcode).fetch()
 			except models.Zipcode.DoesNotExist:
 				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
 						#'radius': zipcode_radius_form.cleaned_data['search_radius']
 					})
+				# TODO: return to main page and show error
 				return render_to_response(
 					'main.html', 
 					{
@@ -130,179 +131,46 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					},
 					context_instance=RequestContext(request)
 				) 
+	
+			try:
+				curyear = int(yearname)
+			except ValueError:
+				curyear = datetime.date.today().year
 			
-			#sort locations by distance
-			#print radius
+			for field in models.Trial_Entry._meta.fields:
+				if field.name == fieldname:
+					break;
 			
-			#TODO: there must be a better way to populate the varieties list
-			varieties = []
+			year_range = 3
 			
-			for entry in models.Trial_Entry.objects.select_related(depth=1).filter(location__in=locations):
-				varieties.append(entry.variety)
+			page = Page(locations[0:8], curyear, year_range, fieldname, 0.05, break_into_subtables=True)
 			
-			varieties = list(set(varieties)) # remove duplicates
+			"""
+			import sys
+			for table in page.tables:
+				for variety, row in table.rows.items():
+					sys.stdout.write('['+variety.name+'\n')
+					for cell in row:
+						sys.stdout.write('\t'+unicode(cell))
+					sys.stdout.write(']\n')
+				print table.columns
+			"""
 			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, False, abtest, zipcode, radius)
-			
-		else:
-			return HttpResponseRedirect("/") # send to homepage
+			return render_to_response(
+				'tabbed_object_table_view.html',
+				{
+					'zipcode_get_string': '?zipcode=',
+					'zipcode': zipcode,
+					'not_location_get_string': '&not_location=',
+					'curyear': curyear,
+					'page': page,
+					'years': [curyear - diff for diff in range(year_range)],
+					'blurbs' : unit_blurbs,
+					'curfield' : fieldname,
+				},
+				context_instance=RequestContext(request)
+			)
 
-	else:
-		# seems an error occured...
-		return HttpResponseRedirect("/") # send to homepage
-
-def tabbed_view(request, yearname, fieldname, locations, varieties, one_subset, abtest=None, zipcode=None, search_radius=None):
-	# TODO: does this belong in the DB?
-	unit_blurbs = {
-			'bushels_acre': ['Yield', 'Bushels per Acre', 
-				'The average number of bushels that can be expected from each acre of farmed land.',
-				'/static/img/button_yield.jpg','/static/img/button_high_yield.jpg'],
-			'protein_percent': ['Protein', 'Percent of Mass',
-				'The average percentage of protein usable for baking. 12% or greater is required for export to	many countries.',
-				'/static/img/button_protein_percent.jpg', '/static/img/button_high_protein_percent.jpg'],
-			'test_weight': ['Test Weight','Pounds per Bushel',
-				'The average weight of each bushel.', '/static/img/button_test_weight.jpg',
-				'/static/img/button_high_test_weight.jpg'],
-	}
-	
-	#retrieves the list of locations and finds the locations that have been excluded by the user, storing them in neg_locations
-	try:
-		pos_locations = Locations_from_Zipcode_x_Radius(
-				zipcode, search_radius
-			).fetch()
-	
-	except models.Zipcode.DoesNotExist:
-		None
-		
-	neg_locations=[]
-	locations=list(locations)
-	for e in pos_locations:
-		if locations.count(e)==0:
-			neg_locations.append(e)
-	
-	this_year = datetime.date.today().year - 1
-
-	# Only ever use 3 years of data. But how do we know whether this year's data is in or not?
-	year_list = [this_year, this_year-1, this_year-2]
-	
-	try:
-		curyear = int(yearname)
-	except ValueError:
-		curyear = max(year_list)
-
-	
-	field_list = []
-	for field in models.Trial_Entry._meta.fields:
-		if (field.get_internal_type() == 'DecimalField' 
-				or field.get_internal_type() == 'PositiveIntegerField' 
-				or field.get_internal_type() == 'SmallIntegerField'
-				or field.get_internal_type() == 'IntegerField'):
-					# Check for empty queries
-					# Raw SQL query... here we go!
-					count = 0
-					for object in models.Trial_Entry.objects.raw(
-							"SELECT id FROM variety_trials_data_trial_entry WHERE %s!='' LIMIT 6", #TODO: hardcoded numeric value
-							[field.name]
-						):
-							if getattr(object, field.name):
-								count += 1
-					if count > 5:  #TODO: hardcoded numeric value
-						field_list.append(field.name)
-	
-	for field in models.Trial_Entry._meta.fields:
-		if field.name == fieldname:
-			break;
-	
-	# Remove all fields from `unit_blurbs' that aren't in `field_list'
-	"""
-	for name in unit_blurbs.keys():
-		if name not in field_list:
-			del unit_blurbs[name]
-	"""
-	
-	page = Page(locations[0:8], year_list, curyear, fieldname, 0.05, break_into_subtables=True)
-	
-	"""
-	import sys
-	for table in page.tables:
-		for variety, row in table.rows.items():
-			sys.stdout.write('['+variety.name+'\n')
-			for cell in row:
-				sys.stdout.write('\t'+unicode(cell))
-			sys.stdout.write(']\n')
-		print table.columns
-	"""
-	
-	locations_form = variety_trials_forms.SelectLocationsForm(initial={
-			'locations': locations,
-			'varieties': varieties,
-			'zipcode': zipcode
-		})
-	
-	try:
-		ab = int(abtest)
-	except ValueError:
-		ab = None
-	except TypeError:
-		ab = None
-	
-	if one_subset: # the variety view
-		view = 'variety'
-	else: # the location view
-		view = 'location'
-	
-	location_get_string=''
-	variety_get_string=''
-	"""
-	for v in varieties:
-		variety_get_string='&varieties='+str(v.id)
-	for l in locations:
-		location_get_string='&locations='+str(l.id)
-	variety_get_string = '?'+variety_get_string[1::]
-	"""
-	return render_to_response(
-		'tabbed_object_table_view.html',
-		{
-			'zipcode': zipcode,
-			'search_radius': search_radius,
-			'location_get_string': location_get_string,
-			'variety_get_string': variety_get_string,
-			'locations_form': locations_form,
-			'field_list': field_list,
-			'location_list': locations,
-			'curyear': curyear,
-			'page': page,
-			'years': year_list,
-			'blurbs' : unit_blurbs,
-			'curfield' : fieldname,
-			'view': view
-		},
-		context_instance=RequestContext(request)
-	)
-
-def varieties_view(request, yearname, fieldname, abtest=None):
-
-	if request.method == 'GET':
-		varieties_form = variety_trials_forms.SelectVarietiesForm(request.GET)
-		#print request.GET
-		if varieties_form.is_valid():
-			varieties = []
-			varieties.append(varieties_form.cleaned_data['varieties'])
-			varieties.append(varieties_form.cleaned_data['varieties1'])
-			varieties.append(varieties_form.cleaned_data['varieties2'])
-			varieties.append(varieties_form.cleaned_data['varieties3'])
-			#print '1'
-			locations = models.Location.objects.all()
-			
-			return tabbed_view(request, yearname, fieldname, locations, varieties, True, abtest)
-			
-		else:
-			#for field in varieties_form:
-				#print field.errors
-				#print field.label_tag
-			return HttpResponseRedirect("/") # send to homepage
-	else:
-		return HttpResponseRedirect("/") # send to homepage
 def add_trial_entry_csv_file(request):
 	
 	errors = {} 

@@ -5,11 +5,9 @@
 	{% for fieldname, blurb_list in blurbs.items %}
 		<p>	
 		{% if fieldname == curfield %}
-			* <a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
-		{% else %}
-			<a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
+			* 
 		{% endif %}
-		
+			<a href="/view/{{curyear}}/{{fieldname}}/{{zipcode_get_string}}{{zipcode}}">{{fieldname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -19,11 +17,9 @@
 		<p>
 		
 		{% if yearname == curyear %}
-			* <a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
-		{% else %}
-			<a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
+			*
 		{% endif %}
-		
+			<a href="/view/{{yearname}}/{{curfield}}/{{zipcode_get_string}}{{zipcode}}">{{yearname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -39,8 +35,12 @@
 		</div>
 		<div>{{curyear}}</div> 
 		<table>
-		<tbody>
+		<thead>
+		</thead>
+		<form action="#" method="GET">
+		<input type="hidden" name="zipcode" value="{{zipcode}}"/>
 {% for table in page.tables %}
+		<tbody>
 		<tr>
 			<th>
 				<h4>Variety</h4>
@@ -50,7 +50,7 @@
 			<th>
 				<h4>{{ location.name }}</h4>
 			{% if location.id != -1 %}
-				<a href="#" onclick="unselect_location({{ location.id }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
+				<a href="/view/{{curyear}}/{{curfield}}/{{zipcode_get_string}}{{zipcode}}{{not_location_get_string}}{{location.name}}">(x)</a>
 			{% endif %}
 			</th>
 		{% endfor %}
@@ -59,19 +59,21 @@
 		{% if variety.name == "LSD" %}
 		<tr class="variety_trials__LSD_row">
 			<th>
-			<form>
-				<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false;">
-			</form>
+				<input type="submit" value="Compare Selected"/>
 			</th>
 		{% else %}
 		<tr class="variety_trials__row {% cycle 'variety_trials__row_odd' 'variety_trials__row_even' %}">
-				<th>
-				<form>
-					<input class="variety_trials__variety_checkbox" type="checkbox" name="{{ variety.name }}" value="{{variety.id}}" onclick="unselect_variety({{variety.id}}); return false;"> 
-						<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
-					</input>
-				</form>
-				</th>
+			<th>
+				<input
+					class="variety_trials__variety_checkbox"
+					type="checkbox"
+					id="id_{{variety.name}}"
+					name="variety"
+					value="{{variety.name}}"/>
+				<label for="id_{{variety.name}}">
+					<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+				</label>
+			</th>
 		{% endif %}
 		{% for cell in row %}
 			<td>
@@ -80,8 +82,11 @@
 		{% endfor %}
 		</tr>
 	{% endfor %}
-{% endfor %}
 		</tbody>
+{% endfor %}
+		</form>
+		<tfoot>
+		</tfoot>
 		</table>
 	</div>
 {% endblock %}

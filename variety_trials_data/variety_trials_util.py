@@ -1345,7 +1345,7 @@ class Locations_from_Zipcode_x_Radius:
 	def __init__(self):
 		pass
 	
-	def __init__(self, zipcode, radius):
+	def __init__(self, zipcode, radius='ALL'):
 		"""
 		Initializes internal data structures using the input zipcode and
 		radius. 
@@ -1463,4 +1463,3 @@ class Locations_from_Zipcode_x_Radius:
 			print "%f\t%s" %(distances[l], l.name)
 		"""
 		return sorted_list
-
