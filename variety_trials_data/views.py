@@ -16,7 +16,7 @@ except ImportError:
 
 
 def index(request, abtest=None):
-	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm()
+	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm()
 	varieties_form = variety_trials_forms.SelectVarietiesForm()
 	variety_list = models.Variety.objects.all()
 	curyear = datetime.date.today().year - 1
@@ -109,7 +109,7 @@ unit_blurbs = {
 
 def zipcode_view(request, yearname, fieldname, abtest=None):
 	if request.method == 'GET':
-		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(request.GET)
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
 		if zipcode_radius_form.is_valid():
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			
@@ -143,7 +143,9 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 			
 			year_range = 3
 			
-			page = Page(locations[0:8], curyear, year_range, fieldname, 0.05, break_into_subtables=True)
+			lsd_probability = 0.05
+			
+			page = Page(locations[0:8], curyear, year_range, fieldname, lsd_probability, break_into_subtables=True)
 			
 			"""
 			import sys

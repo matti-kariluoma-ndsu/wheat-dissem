@@ -1,10 +1,18 @@
 from django import forms
 from variety_trials_data import models
 
-class SelectLocationByZipcodeRadiusForm(forms.Form):
+class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
+	not_location = forms.MultipleChoiceField(
+			required=False,
+			choices=[(location.name, location.name) for location in models.Location.objects.all()]
+			)
+	variety = forms.MultipleChoiceField(
+			required=False,
+			choices=[(variety.name, variety.name) for variety in models.Variety.objects.all()]
+			)
 		
-class SelectVarietiesForm(SelectLocationByZipcodeRadiusForm):
+class SelectVarietiesForm(SelectLocationByZipcodeForm):
 	varieties = forms.ModelMultipleChoiceField(
 			widget=forms.Select(),
 			queryset=models.Variety.objects.all()
