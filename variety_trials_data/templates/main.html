@@ -2,6 +2,13 @@
 {% load django_math %}
 {% block content %}
 
+<div>
+<table>
+<thead><tr id=location><th></th></tr></thead>
+<tbody id="debug"></tbody>
+</table>
+</div>
+
 <script type="text/javascript">
 
 function movePosition(side){
@@ -104,12 +111,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 	
 </div>
 </noscript>
-<div>
-<table>
-<thead><tr id=location><th></th></tr></thead>
-<tbody id="debug"></tbody>
-</table>
-</div>
+
 {% endblock %}
 
 {% block javascript %}
@@ -178,12 +180,26 @@ var entryLocation = {
 $.ajax(entryLocation).done(populateLocation)
 }
 
+function trialEntryList(response_data) {
+for (i=0; i<response_data.length; i++){
+	var entry = {
+		// async: false,
+		url: '/trial_entry/'+response_data[i]+'/json',
+		dataType: "json",
+		data: {
+			'location':'location',
+			'key': 'value'
+		},
+}
+$.ajax(entry).done(populateTrialEntry)
+}}
+
 function populateTrialEntry(response_data) {
 	// if the response object is valid
 	if(response_data[0]){
 			if($('#'+response_data[0].fields.variety).length==0){// if there is no table row associated with the variety found in the response data, create one and populate it with the data in response_data
 				table.append($('<tr id='+response_data[0].fields.variety+'>'))
-				for (i=0;i<8;i++){// append a cell for each location
+				for (i=0;i<locationList.length;i++){// append a cell for each location
 					$('#'+response_data[0].fields.variety).append('<td class='+locationList[i].pk+'>')
 				}
 				$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
@@ -205,23 +221,11 @@ function populateTrialEntry(response_data) {
 
 locationAjax()
 
-for(i=1;i<100;i++)
-{
-	var entry = {
-		// async: false,
-		url: '/trial_entry/'+i+'/json',
-		dataType: "json",
-		data: {
-			'location':'location',
-			'key': 'value'
-		},
-}
-entryList.push(entry)
+var trial_entry = {
+	url: '58102/last_three_years/json',
+	dataType: "json",
 }
 
-
-for (i=0; i<entryList.length; i++){
-	$.ajax(entryList[i]).done(populateTrialEntry)
-	}
+$.ajax(trial_entry).done(trialEntryList)
 
 {% endblock %}

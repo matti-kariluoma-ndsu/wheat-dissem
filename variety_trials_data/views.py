@@ -594,3 +594,11 @@ def debug(request):
 		'debug.html',
 		{}
 		)
+
+def trial_entry_id_json(request, zipcode):
+	list=range(100)
+	response = HttpResponse()
+	# json_serializer = serializers.get_serializer("json")()
+	json.dump(list, response)
+	return response
+
