@@ -596,7 +596,26 @@ def debug(request):
 		)
 
 def trial_entry_id_json(request, zipcode):
-	list=range(100)
+	min_year=2009
+	max_year=2011
+	list=[]
+	try:
+		locations = Locations_from_Zipcode_x_Radius(zipcode,"ALL").fetch()
+	except models.Zipcode.DoesNotExist:
+		locations=models.Location.objects.all()
+	
+	d=models.Trial_Entry.objects.select_related(depth=3).filter(
+				location__in=locations
+			).filter(
+				harvest_date__in=models.Date.objects.filter(
+					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+				)
+			)
+	for trial in d:
+		list.append(trial.pk)
+			
+			
+
 	response = HttpResponse()
 	# json_serializer = serializers.get_serializer("json")()
 	json.dump(list, response)

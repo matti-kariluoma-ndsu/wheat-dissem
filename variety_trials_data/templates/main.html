@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% load django_math %}
 {% block content %}
-
+<style type="text/css">
+table,th,td
+{
+border:1px solid black;
+}
+</style>
 <div>
 <table>
 <thead><tr id=location><th></th></tr></thead>
@@ -144,7 +149,7 @@ $("#selectRight option").each(
 	}
 
 	
-	var locationList = []
+var locationList = []
 var table = $('#debug')
 var cellList = [];
 var x =0;
@@ -163,13 +168,14 @@ function populateVariety(response_data){
 //prepends the name of the variety to the <tr> that has tha same id as the variety
 $('#'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name)
 
+
 }
 
 function populateLocation(response_data){
 // adds the eight closes locations to the table header and an array
 for (i=0;i<8;i++){
 $('#location').append($('<th id= l'+response_data[i].pk+'>').text(response_data[i].fields.name+response_data[i].pk))
-locationList.push(response_data[i])
+locationList.push(response_data[i].pk)
 }
 }
 
@@ -204,20 +210,20 @@ $.ajax(entry).done(populateTrialEntry)
 
 function populateTrialEntry(response_data) {
 	// if the response object is valid
-	if(response_data[0]){
+	
+	if($.inArray(response_data[0].fields.location, locationList)> -1){
 			if($('#'+response_data[0].fields.variety).length==0){// if there is no table row associated with the variety found in the response data, create one and populate it with the data in response_data
 				table.append($('<tr id='+response_data[0].fields.variety+'>'))
 				for (i=0;i<locationList.length;i++){// append a cell for each location
-					$('#'+response_data[0].fields.variety).append('<td class='+locationList[i].pk+'>')
+					$('#'+response_data[0].fields.variety).append('<td class='+locationList[i]+'>')
 				}
 				$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
 				var entryVariety = {//ajax call to get the name of the variety
 					url: '/variety/'+response_data[0].fields.variety+'/json',
 					dataType: "json",
-					data: {
-						'location':'location',
-						'key': 'value'
-					}
+				}
+				if (response_data[0].fields.variety==3){
+				alert(JSON.stringify(response_data))
 				}
 				$.ajax(entryVariety).done(populateVariety)
 			}
