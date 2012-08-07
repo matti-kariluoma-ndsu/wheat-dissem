@@ -28,6 +28,8 @@ urlpatterns = patterns('',
 		(r'^add_variety/', views.add_variety), # page to variety
 		(r'^add_new_variety/', views.add_new_variety), # page to variety
 		(r'^edit_variety/', views.edit_variety), # page to variety
+		(r'^edited_variety/', views.edited_variety), # page to variety
+
 
 		(r'^add_trials_confirm/', views.add_form_confirmation), # Page to confirmations
 		(r'^sucess/', views.redirect_sucess), # Page to sucess
