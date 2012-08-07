@@ -61,7 +61,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 }
 </script>
 
-<noscript>
+<div id=main>
 <div>
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
 	<hr>
@@ -83,6 +83,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 
 	TODO: fix input validation strings return an error.
 	-->
+	<noscript>
 	<form action="/view/{{curyear}}/bushels_acre/" method="GET">
 		{% for field in zipcode_radius_form %}
 		<div class="input row">
@@ -92,11 +93,17 @@ function move(listBoxTo,optionValue,optionDisplayText){
 		{% endfor %}
 		<input type="submit" value="Submit" />
 	</form>
+	</noscript>
+	<form name='js_zipcode' action='' method='get'>
+	Zipcode: <input id="js_zipcode" type="text" name="zipcode" /><br />
+	<INPUT TYPE="button" NAME="button" Value="Click" onClick="makeTable();return false">
+	</form>
 </div>
 
 <div>
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
+	<noscript>
 	<form action="/view/variety/{{curyear}}/bushels_acre/" method="GET">
 		{% for field in varieties_form %}
 		<div class="input row">
@@ -105,12 +112,13 @@ function move(listBoxTo,optionValue,optionDisplayText){
 		</div>
 		
 		{% endfor %}
-		
-		<input type="submit" value="Submit"; onClick = "javascript:select_all();">
+		<input id= type="submit" value="Submit"; onClick = "javascript:select_all();">
 		</form>
+		</noscript>
+		<button onClick = "makeTable(#id_zipcode);">Submit</button>
 	
 </div>
-</noscript>
+</div>
 
 {% endblock %}
 
@@ -166,10 +174,10 @@ locationList.push(response_data[i])
 }
 
 
-function locationAjax(){
+function locationAjax(zipcode){
 // ajax call to get the locations
 var entryLocation = {
-	url: '/zipcode/near/58701/json',
+	url: '/zipcode/near/'+zipcode+'/json',
 	async: false,
 	dataType: "json",
 	data: {
@@ -218,14 +226,17 @@ function populateTrialEntry(response_data) {
 		}
 	}
 }
-
-locationAjax()
+function makeTable()
+{
+var zipcode=$('#js_zipcode').val()
+locationAjax(zipcode)
 
 var trial_entry = {
-	url: '58102/last_three_years/json',
+	url: zipcode+'/last_three_years/json',
 	dataType: "json",
 }
 
 $.ajax(trial_entry).done(trialEntryList)
+}
 
 {% endblock %}
