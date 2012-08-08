@@ -467,3 +467,38 @@ def trial_entry_id_json(request, zipcode):
 	json.dump(list, response)
 	return response
 
+	
+def trial_entry_json(request, zipcode):
+	min_year=2009
+	max_year=2011
+	list=[]
+	try:
+		locations = Locations_from_Zipcode_x_Radius(zipcode,"ALL").fetch()[0:8]
+	except models.Zipcode.DoesNotExist:
+		locations=models.Location.objects.all()
+	
+	d=models.Trial_Entry.objects.select_related(depth=3).filter(
+				location__in=locations
+			).filter(
+				harvest_date__in=models.Date.objects.filter(
+					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+				)
+			)
+
+			
+			
+
+	response = HttpResponse()
+	needed_fields = (
+		'pk',
+		'model',
+		'variety',
+		'location',
+		'name',
+		'bushels_acre',
+		'protein_percent',
+		'test_weight'
+		)
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(d,fields=needed_fields, stream=response)
+	return response
