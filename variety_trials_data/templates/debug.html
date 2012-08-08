@@ -32,13 +32,15 @@ function cell(constructorParametersObject){
 	
 }
 
-function populateVariety(response_data){
-$('#'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name)
-
+function populateVariety(response_data)
+{
+	//prepends the name of the variety to the <tr> that has tha same id as the variety
+	$('#'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name)
 }
 
 function populateLocation(response_data)
 {
+	// adds the eight closes locations to the table header and an array
 	for (i=0;i<8;i++)
 	{
 		$('#location').append($('<th id= l'+response_data[i].pk+'>').text(response_data[i].fields.name+response_data[i].pk))
@@ -46,35 +48,9 @@ function populateLocation(response_data)
 	}
 }
 
-function processAjaxFunction(response_data) 
-{
-	if (response_data.length>0&&response_data)
-	{
-    $('#response').text(x+"Response is " + response_data[0].fields.variety + ", or " + JSON.stringify(response_data));
-	}
-	
-	x++
-	
-  for (var i in response_data )
-  {
-		//alert("Making a cell from "+JSON.stringify(response_data[i]));
-		/// add a new object to our array with push()
-		cellList.push(new cell(response_data[i]));
-		//alert("Made the cell "+JSON.stringify(cellList[i]));
-	}
-	
-	if (x==2)
-	{
-		table.append($('<tr id=>')
-		.append($('<th>').text("The position of the returned JSON objects"))
-		.append($('<td>').text(cellList[0].position))
-		.append($('<td>').text(cellList[1].position)));
-	}
-	
-}
-
 function locationAjax()
 {
+	// ajax call to get the locations
 	var entryLocation = {
 		url: '/zipcode/near/58701/json',
 		async: false,
@@ -84,8 +60,43 @@ function locationAjax()
 			'key': 'value'
 		}
 	}
-	
 	$.ajax(entryLocation).done(populateLocation)
+}
+
+function populateTrialEntry(response_data) 
+{
+	// if the response object is valid
+	if(response_data[0])
+	{
+		// if there is no table row associated with the variety found in 
+		// the response data, create one and populate it with the data in 
+		// response_data
+		if($('#'+response_data[0].fields.variety).length==0)
+		{
+			table.append($('<tr id='+response_data[0].fields.variety+'>'))
+			for (i=0;i<8;i++)// append a cell for each location
+			{
+				$('#'+response_data[0].fields.variety).append('<td class='+locationList[i].pk+'>')
+			}
+			$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
+			//ajax call to get the name of the variety
+			var entryVariety = { 
+				url: '/variety/'+response_data[0].fields.variety+'/json',
+				dataType: "json",
+				data: {
+					'location':'location',
+					'key': 'value'
+				}
+			}
+			$.ajax(entryVariety).done(populateVariety)
+		}
+		// if the table row already exists, populate the cell corresponding 
+		// to the response_data
+		else 
+		{
+			$('#'+response_data[0].fields.variety+' > td.'+response_data[0].fields.location).text(response_data[0].fields.location)
+		}
+	}
 }
 
 function proofOfConcept(response_data)
@@ -138,7 +149,7 @@ function main()
 
 	for (i=0; i<entryList.length; i++)
 	{
-		$.ajax(entryList[i]).done(proofOfConcept)
+		$.ajax(entryList[i]).done(populateTrialEntry)
 	}
 }
 

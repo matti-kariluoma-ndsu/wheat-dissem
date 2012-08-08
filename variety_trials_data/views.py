@@ -7,6 +7,7 @@ from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
 from variety_trials_data.Page import Page
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
 import datetime
 try:
@@ -33,26 +34,36 @@ def index(request, abtest=None):
 		context_instance=RequestContext(request)
 	)
 
-def variety_info(request, variety_name):	
-	variety=models.Variety.objects.filter(name=variety_name)
-	"""
-	year_released = variety.values('year_released')[0]['year_released']
-	index = variety.values('id')[0]['id']
-	name=variety.values('name')[0]['name']
-	description_url = variety.values('description_url')[0]['description_url']
-	"""
-	for v in variety:
-		index=v.id
-		name=v.name
-		year_released=v.year_released
-		picture_url=v.picture_url
-		
-	
+def variety_info(request, variety_name):
+	variety=models.Variety.objects.filter(name=variety_name)[0]
+	index = variety.id
+	name=variety.name
+	description_url = variety.description_url
+	picture_url=variety.picture_url
+	agent_origin=variety.agent_origin
+	year_released=variety.year_released
+	straw_length=variety.straw_length
+	maturity=variety.maturity
+	grain_color=variety.grain_color
+	beard=variety.beard
+	wilt=variety.wilt
+
+
 	return render_to_response(
 		'variety_info.html', 
 		{ 
 			'index': index,
-			'variety_name': name
+			'variety_name': variety_name,
+			'year_released' : year_released,
+			'description_url' : description_url,
+			'picture_url' : picture_url,
+			'agent_origin' : agent_origin,
+			'straw_length' : straw_length,
+			'maturity' : maturity,
+			'grain_color' : grain_color,
+			'beard' : beard,
+			# 'diseases' : diseases,
+			'wilt' : wilt
 		},
 		context_instance=RequestContext(request)
 	)
@@ -172,7 +183,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 				},
 				context_instance=RequestContext(request)
 			)
-
+			
 def add_trial_entry_csv_file(request):
 	
 	errors = {} 
@@ -195,8 +206,6 @@ def add_trial_entry_csv_file(request):
 		context_instance=RequestContext(request)
 	)
 
-
-
 def add_form_confirmation(request):
 	
 	errors = {} 
@@ -218,7 +227,6 @@ def add_form_confirmation(request):
 				)
 	else:	
 		form = variety_trials_forms.UploadCSVForm()
-	
 	
 def add_information(request):
 	
@@ -244,8 +252,7 @@ def add_information(request):
 					{'format_errors': details ,'error_num':errors},
 					context_instance=RequestContext(request)
 				)
-			
-			
+	
 def adding_to_database_confirm(request):
 	#List for Varieties
 	entered_variety_data = []
@@ -289,15 +296,12 @@ def adding_to_database_confirm(request):
 		errorcheck= handle_csv.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
 		
 		return HttpResponseRedirect("/sucess/")
-		
 
-							
 def redirect_sucess(request):
 
 	return render_to_response(
 		'success.html'
 	)
-		    
 
 def inspect(request):
 	
@@ -436,3 +440,30 @@ def debug(request):
 		'debug.html',
 		{}
 		)
+
+def trial_entry_id_json(request, zipcode):
+	min_year=2009
+	max_year=2011
+	list=[]
+	try:
+		locations = Locations_from_Zipcode_x_Radius(zipcode,"ALL").fetch()
+	except models.Zipcode.DoesNotExist:
+		locations=models.Location.objects.all()
+	
+	d=models.Trial_Entry.objects.select_related(depth=3).filter(
+				location__in=locations
+			).filter(
+				harvest_date__in=models.Date.objects.filter(
+					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+				)
+			)
+	for trial in d:
+		list.append(trial.pk)
+			
+			
+
+	response = HttpResponse()
+	# json_serializer = serializers.get_serializer("json")()
+	json.dump(list, response)
+	return response
+
