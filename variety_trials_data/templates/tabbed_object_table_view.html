@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load django_math %}
+{% load get_urlencode %}
 {% block content %}
 	<div>
 	{% for fieldname, blurb_list in blurbs.items %}
@@ -7,7 +8,7 @@
 		{% if fieldname == curfield %}
 			* 
 		{% endif %}
-			<a href="/view/{{curyear}}/{{fieldname}}/{{zipcode_get_string}}{{zipcode}}">{{fieldname}}</a>
+			<a href="/view/{{curyear}}/{{fieldname}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}">{{fieldname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -19,7 +20,7 @@
 		{% if yearname == curyear %}
 			*
 		{% endif %}
-			<a href="/view/{{yearname}}/{{curfield}}/{{zipcode_get_string}}{{zipcode}}">{{yearname}}</a>
+			<a href="/view/{{yearname}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}">{{yearname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -37,8 +38,12 @@
 		<table>
 		<thead>
 		</thead>
-		<form action="#" method="GET">
-		<input type="hidden" name="zipcode" value="{{zipcode}}"/>
+		<form action="/view/{{curyear}}/{{curfield}}/" method="GET">
+		<div style="display: none;">
+			{% for field in hidden_zipcode_form %}
+			{{ field.label_tag }}: {{ field }}
+			{% endfor %}
+		</div>
 {% for table in page.tables %}
 		<tbody>
 		<tr>
@@ -50,7 +55,7 @@
 			<th>
 				<h4>{{ location.name }}</h4>
 			{% if location.id != -1 %}
-				<a href="/view/{{curyear}}/{{curfield}}/{{zipcode_get_string}}{{zipcode}}{{not_location_get_string}}{{location.name}}">(x)</a>
+				<a href="/view/{{curyear}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}">(x)</a>
 			{% endif %}
 			</th>
 		{% endfor %}

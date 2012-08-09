@@ -48,7 +48,7 @@ class Cell:
 		for entry in self.members:
 			if entry.harvest_date.date.year == year:
 				this_year.append(entry)
-		print this_year
+		#print this_year
 		
 		values = []
 		for entry in this_year:

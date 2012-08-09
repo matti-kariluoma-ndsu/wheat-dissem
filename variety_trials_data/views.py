@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
+from django.utils.http import urlencode
 from django.core import serializers
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
@@ -17,18 +18,16 @@ except ImportError:
 
 
 def index(request, abtest=None):
-	zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm()
-	varieties_form = variety_trials_forms.SelectVarietiesForm()
-	variety_list = models.Variety.objects.all()
+	zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
+	# TODO: don't pass a curyear, instead have main.html point
+	# to an intelligent url such as /view/last_3_years/bushels_acre/?...
 	curyear = datetime.date.today().year - 1
 	
 
 	return render_to_response(
 		'main.html', 
 		{ 
-			'zipcode_radius_form': zipcode_radius_form,
-			'varieties_form': varieties_form,
-			'variety_list': variety_list,
+			'zipcode_radius_form': zipcode_form,
 			'curyear': curyear
 		},
 		context_instance=RequestContext(request)
@@ -119,33 +118,52 @@ unit_blurbs = {
 }
 
 def zipcode_view(request, yearname, fieldname, abtest=None):
-	if request.method == 'GET':
+	if request.method != 'GET':
+		# Redirect to home if they try to POST
+		# TODO: what is the behavior of HEAD?
+		return HttpResponseRedirect('/')
+	else:
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
-		if zipcode_radius_form.is_valid():
+		if not zipcode_radius_form.is_valid():
+			# TODO: Have this view point to / , and if successful redirect them
+			#   to the proper view with the URL filled out
+			# OR: Have a zipcode form on the /view/year/field/ page
+			return HttpResponseRedirect('/')
+		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
+			not_locations = zipcode_radius_form.cleaned_data['not_location']
+			varieties = zipcode_radius_form.cleaned_data['variety']
+			
+			hidden_zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm(
+				initial={
+					'zipcode': zipcode,
+					'not_location': not_locations,
+					}
+				)
 			
 			try:
 				locations = Locations_from_Zipcode_x_Radius(zipcode).fetch()
 			except models.Zipcode.DoesNotExist:
 				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
-						#'radius': zipcode_radius_form.cleaned_data['search_radius']
+						#'radius': zipcode_radius_form.cleaned_data['search_radius'],
 					})
 				# TODO: return to main page and show error
 				return render_to_response(
 					'main.html', 
 					{
 						'zipcode_radius_form': zipcode_radius_form,
-						'varieties_form': variety_trials_forms.SelectVarietiesForm(),
-						'variety_list': models.Variety.objects.all(),
 						'curyear': datetime.date.today().year,
 						'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
 					},
 					context_instance=RequestContext(request)
 				) 
-	
+			
+			
+			
 			try:
 				curyear = int(yearname)
 			except ValueError:
+				# TODO: redirect to /view/curyear/field/?... instead
 				curyear = datetime.date.today().year
 			
 			for field in models.Trial_Entry._meta.fields:
@@ -172,18 +190,23 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 			return render_to_response(
 				'tabbed_object_table_view.html',
 				{
-					'zipcode_get_string': '?zipcode=',
+					'hidden_zipcode_form': hidden_zipcode_form,
+					'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
 					'zipcode': zipcode,
-					'not_location_get_string': '&not_location=',
+					'not_location_get_string': '&%s' % (urlencode([('not_location', l) for l in not_locations])),
+					'not_locations': not_locations,
+					'variety_get_string': '&%s' % (urlencode([('variety', v) for v in varieties])),
+					'varieties': varieties,
 					'curyear': curyear,
 					'page': page,
-					'years': [curyear - diff for diff in range(year_range)],
+					'years': [curyear - diff for diff in range(year_range)], # TODO: returns wrong range when we are viewing curyear-1
 					'blurbs' : unit_blurbs,
 					'curfield' : fieldname,
 				},
 				context_instance=RequestContext(request)
 			)
-			
+	
+				
 def add_trial_entry_csv_file(request):
 	
 	errors = {} 

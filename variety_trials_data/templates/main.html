@@ -7,12 +7,6 @@ table,th,td
 border:1px solid black;
 }
 </style>
-<div>
-<table>
-<thead><tr id=location><th></th></tr></thead>
-<tbody id="debug"></tbody>
-</table>
-</div>
 
 <div id="main">
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
@@ -25,7 +19,9 @@ border:1px solid black;
 	
 	
 </div>
-<div class="location_form" >
+
+<noscript>
+<div id="static_form" class="location_form" >
 	{% for error in error_list %}
 	<p style='color: red'>{{ error }}</p>
 	{% endfor %}
@@ -35,30 +31,48 @@ border:1px solid black;
 
 	TODO: fix input validation strings return an error.
 	-->
-	<noscript>
-	<form action="/view/{{curyear}}/bushels_acre/" method="GET">
-		{% for field in zipcode_radius_form %}
-		{% if field.name == 'zipcode' %}
-		<div>
-		{% else %}
-		<div> <!--style="display: none">-->
-		{% endif %}
-			{{ field.errors }}
-			{{ field.label_tag }}: {{ field }}
-		</div>
-		{% endfor %}
-		<input type="submit" value="Submit" />
-	</form>
-	</noscript>
+	
+		<form action="/view/{{curyear}}/bushels_acre/" method="GET">
+			{% for field in zipcode_form %}
+			{% if field.name == 'zipcode' %}
+			<div>
+			{% else %}
+			<div> <!--style="display: none">-->
+			{% endif %}
+				{{ field.errors }}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+			{% endfor %}
+			<input type="submit" value="Submit" />
+		</form>
+</div>
+</noscript>
+
+<div id="dynamic_form" style="display: none;">
 	<form name='js_zipcode' action='' method='get'>
 	Zipcode: <input id="js_zipcode" type="text" name="zipcode" /><br />
-	<INPUT TYPE="button" NAME="button" Value="Click" onClick="makeTable();return false">
+	<input type="button" name="button" value="Click" onclick="makeTable(); return false;">
 	</form>
 </div>
 
+<div id="dynamic_table" style="display: none;">
+	<table>
+	<thead><tr id=location><th></th></tr></thead>
+	<tbody id="debug"></tbody>
+	</table>
+</div>
 {% endblock %}
 
 {% block javascript %}
+
+function main()
+{
+	$('#dynamic_table').show();
+	$('#dynamic_form').show();
+	$('#static_form').hide();
+}
+
+main();
 
 function select_variety(variety_value) {
 		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
