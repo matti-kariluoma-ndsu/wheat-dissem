@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 		
 		(r'^$', views.index), # the home page
 		## TODO: There are 3 views of our data, reduce to 2 if not 1.
-		(r'^view/last_3_years/(?P<fieldname>[a-z0-9_]+)/', views.zipcode_view), # defaults to location-based view
+		(r'^view/last_(?P<year_range>[0-9]+)_years/(?P<fieldname>[a-z0-9_]+)/', views.zipcode_view), # defaults to location-based view
 		(r'^view/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.historical_zipcode_view), # defaults to location-based view
 		#(r'^view/location/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.locations_view), # view based on variety head-to-head comparison
 		#(r'^view/variety/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.varieties_view), # view based on proximity

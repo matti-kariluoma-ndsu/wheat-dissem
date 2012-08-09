@@ -117,7 +117,10 @@ unit_blurbs = {
 		]
 }
 
-def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None):
+def get_locations(zipcode):
+	return Locations_from_Zipcode_x_Radius(zipcode).fetch()
+
+def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None, locations=None, year_range=3):
 	if request.method != 'GET':
 		# Redirect to home if they try to POST
 		# TODO: what is the behavior of HEAD?
@@ -142,23 +145,24 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					}
 				)
 			
-			try:
-				locations = Locations_from_Zipcode_x_Radius(zipcode).fetch()
-			except models.Zipcode.DoesNotExist:
-				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
-						#'radius': zipcode_radius_form.cleaned_data['search_radius'],
-					})
-				# TODO: return to main page and show error
-				return render_to_response(
-					'main.html', 
-					{
-						'zipcode_form': zipcode_form,
-						'curyear': datetime.date.today().year,
-						'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
-					},
-					context_instance=RequestContext(request)
-				) 
-			
+			if locations is None:
+				try:
+					locations = get_locations(zipcode)
+				except models.Zipcode.DoesNotExist:
+					zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+							#'radius': zipcode_radius_form.cleaned_data['search_radius'],
+						})
+					# TODO: return to main page and show error
+					return render_to_response(
+						'main.html', 
+						{
+							'zipcode_form': zipcode_form,
+							'curyear': datetime.date.today().year,
+							'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
+						},
+						context_instance=RequestContext(request)
+					) 
+				
 			
 			try:
 				maxyear = int(startyear)
@@ -171,14 +175,15 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				# TODO: redirect to /view/curyear/field/?... instead
 				curyear = maxyear
 			
+			if curyear > maxyear:
+				curyear = maxyear
+			
 			if year_url_bit is None:
 				year_url_bit = startyear
 			
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
-			
-			year_range = 3
 			
 			if years is None:
 				years = [maxyear - diff for diff in range(year_range)]
@@ -218,11 +223,62 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				context_instance=RequestContext(request)
 			)
 
-def zipcode_view(request, fieldname, abtest=None):
-	curyear = 2011
-	year_range = 3
-	years = [curyear - diff for diff in range(year_range)]
-	return historical_zipcode_view(request, curyear, fieldname, abtest=abtest, years=years, year_url_bit='last_3_years')
+def zipcode_view(request, year_range, fieldname, abtest=None):
+	if request.method != 'GET':
+		# Redirect to home if they try to POST
+		# TODO: what is the behavior of HEAD?
+		return HttpResponseRedirect('/')
+	else:
+		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
+		if not zipcode_radius_form.is_valid():
+			# TODO: Have this view point to / , and if successful redirect them
+			#   to the proper view with the URL filled out
+			# OR: Have a zipcode form on the /view/year/field/ page
+			return HttpResponseRedirect('/')
+		else:
+			zipcode = zipcode_radius_form.cleaned_data['zipcode']
+			not_locations = zipcode_radius_form.cleaned_data['not_location']
+			varieties = zipcode_radius_form.cleaned_data['variety']
+			
+			try:
+				locations = get_locations(zipcode)
+			except models.Zipcode.DoesNotExist:
+				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+						#'radius': zipcode_radius_form.cleaned_data['search_radius'],
+					})
+				# TODO: return to main page and show error
+				return render_to_response(
+					'main.html', 
+					{
+						'zipcode_form': zipcode_form,
+						'curyear': datetime.date.today().year,
+						'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
+					},
+					context_instance=RequestContext(request)
+				)
+			
+			result = 0;
+			curyear = datetime.date.today().year
+			while result < 1:
+				result = models.Trial_Entry.objects.filter(
+						location__in = locations
+					).filter(
+							harvest_date__in = models.Date.objects.filter(
+								date__range=(
+										datetime.date(curyear,1,1),
+										datetime.date(curyear,12,31)
+									)
+							)
+					).count()
+				if result < 1: 
+					curyear = curyear - 1
+				
+			try:
+				year_range = int(year_range)
+			except ValueError:
+				year_range = 3
+			years = [curyear - diff for diff in range(year_range)]
+			return historical_zipcode_view(request, curyear, fieldname, abtest=abtest, years=years, year_url_bit='last_3_years', locations=locations, year_range=year_range)
 	
 				
 def add_trial_entry_csv_file(request):
