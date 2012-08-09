@@ -488,25 +488,38 @@ class Table:
 			
 
 class Page:
-	def get_entries(self, min_year, max_year):
+	def get_entries(self, min_year, max_year, variety_names):
 		# We do a depth=2 so we can access entry.variety.name
 		# We do a depth=3 so we can access entry.harvest_date.date.year
 		#TODO: Somehow reduce this to depth=1
-		return models.Trial_Entry.objects.select_related(depth=3).filter(
-				location__in=self.locations
-			).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+		if variety_names is None:
+			result = models.Trial_Entry.objects.select_related(depth=3).filter(
+					location__in=self.locations
+				).filter(
+					harvest_date__in=models.Date.objects.filter(
+						date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+					)
 				)
-			)
+		else:
+			varieties = models.Variety.objects.filter(name__in=variety_names)
+			result = models.Trial_Entry.objects.select_related(depth=3).filter(
+					variety__in=varieties
+				).filter(
+					location__in=self.locations
+				).filter(
+					harvest_date__in=models.Date.objects.filter(
+						date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+					)
+				)
+		return result
 			
-	def __init__(self, locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False):
+	def __init__(self, locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=None):
 		self.locations = locations
 		self.tables = []
 		
 		cells = {} # variety: {location: Cell() }
 		decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
-		for entry in self.get_entries(default_year - year_range, default_year):
+		for entry in self.get_entries(default_year - year_range, default_year, varieties):
 			year = entry.harvest_date.date.year
 			variety = entry.variety
 			location = entry.location
@@ -565,7 +578,24 @@ class Page:
 						self.tables.append(table)
 					for (location, cell) in cells[variety].items():
 						table.add_cell(variety, location, cell)
-		
+		else:
+			# delete locations that have no data in the current year
+			delete_these = []
+			for (index, location) in enumerate(visible_locations):
+				delete = True
+				for variety in cells:
+					delete = delete and not decomposition[default_year][variety][location]
+				if delete:
+					delete_these.append(index)
+			for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
+				visible_locations.pop(index)
+			table = Table(locations, visible_locations, lsd_probability)
+			self.tables.append(table)
+			for variety in cells:
+				for location in cells[variety]:
+					cell = cells[variety][location]
+					table.add_cell(variety, location, cell)
+			
 		# Decorate the tables
 		for table in self.tables:
 			## Add LSD rows

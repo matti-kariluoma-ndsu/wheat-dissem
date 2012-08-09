@@ -202,7 +202,10 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			lsd_probability = 0.05
 			
 			try:
-				page = Page(locations[0:8], curyear, year_range, fieldname, lsd_probability, break_into_subtables=True)
+				if len(varieties) == 0:
+					page = Page(locations[0:8], curyear, year_range, fieldname, lsd_probability, break_into_subtables=True)
+				else:
+					page = Page(locations, curyear, year_range, fieldname, lsd_probability, varieties=varieties)
 			except:
 				# TODO: Print message to the user telling them why we are exiting
 				return HttpResponseRedirect('/')
@@ -232,7 +235,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					'year_url_bit': year_url_bit,
 					'curyear': curyear,
 					'page': page,
-					'years': years, # TODO: returns wrong range when we are viewing curyear-1
+					'years': years,
 					'blurbs' : unit_blurbs,
 					'curfield' : fieldname,
 				},
@@ -254,7 +257,6 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			not_locations = zipcode_radius_form.cleaned_data['not_location']
-			varieties = zipcode_radius_form.cleaned_data['variety']
 			
 			try:
 				locations = get_locations(zipcode, not_locations)
