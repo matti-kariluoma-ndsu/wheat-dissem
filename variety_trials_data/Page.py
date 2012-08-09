@@ -389,13 +389,17 @@ class Aggregate_Cell(Cell):
 		return
 	
 	def get(self, year, fieldname):
+		balanced = True
 		values = []
 		for cell in self.row:
-			if cell is not None and not isinstance(cell, Aggregate_Cell):
+			if balanced and cell is not None and not isinstance(cell, Aggregate_Cell):
 				for year_diff in self.column.years_range:
 					cell_mean = cell.get(year - year_diff, fieldname)
 					if cell_mean is None:
-						pass # This subset is not balanced across years!
+						# This subset is not balanced across years!
+						values = []
+						balanced = False
+						break
 					else:
 						values.append(cell_mean)
 					
