@@ -278,7 +278,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			except ValueError:
 				year_range = 3
 			years = [curyear - diff for diff in range(year_range)]
-			return historical_zipcode_view(request, curyear, fieldname, abtest=abtest, years=years, year_url_bit='last_3_years', locations=locations, year_range=year_range)
+			return historical_zipcode_view(request, curyear, fieldname, abtest=abtest, years=years, year_url_bit='last_%d_years' % (year_range), locations=locations, year_range=year_range)
 	
 				
 def add_trial_entry_csv_file(request):
