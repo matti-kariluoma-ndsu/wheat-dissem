@@ -489,14 +489,18 @@ class Table:
 				alpha_sorted.append(lsd_row) # append it to the end of the list
 				
 			return alpha_sorted
-			
+		
+		def set_defaults(self, year, fieldname):
+			for cell in self.cells.values():
+				cell.year = year
+				cell.fieldname = fieldname
 
 class Page:
 	def get_entries(self, min_year, max_year, variety_names):
 		# We do a depth=2 so we can access entry.variety.name
 		# We do a depth=3 so we can access entry.harvest_date.date.year
 		#TODO: Somehow reduce this to depth=1
-		if variety_names is None:
+		if len(variety_names) == 0:
 			result = models.Trial_Entry.objects.select_related(depth=3).filter(
 					location__in=self.locations
 				).filter(
@@ -517,7 +521,7 @@ class Page:
 				)
 		return result
 			
-	def __init__(self, locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=None):
+	def __init__(self, locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
 		self.locations = locations
 		self.tables = []
 		

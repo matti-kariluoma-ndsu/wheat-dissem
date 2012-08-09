@@ -4,6 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from django.utils.http import urlencode
 from django.core import serializers
+from django.core.cache import cache
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
@@ -118,7 +119,12 @@ unit_blurbs = {
 }
 
 def get_locations(zipcode, not_locations):
-	locations = Locations_from_Zipcode_x_Radius(zipcode).fetch()
+	# retrieve from cache, if absent, add to cache.
+	locations = cache.get(zipcode)
+	if locations is None:
+		locations = Locations_from_Zipcode_x_Radius(zipcode).fetch()
+		cache.set(zipcode, locations, 300) # expires in 300 seconds (5 minutes)
+		
 	not_location = models.Location.objects.filter(name__in=not_locations)
 	
 	delete_me = []
@@ -201,14 +207,41 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			
 			lsd_probability = 0.05
 			
-			try:
-				if len(varieties) == 0:
-					page = Page(locations[0:8], curyear, year_range, fieldname, lsd_probability, break_into_subtables=True)
-				else:
-					page = Page(locations, curyear, year_range, fieldname, lsd_probability, varieties=varieties)
-			except:
-				# TODO: Print message to the user telling them why we are exiting
-				return HttpResponseRedirect('/')
+			break_into_subtables = False
+			if len(varieties) == 0:
+				break_into_subtables = True
+				locations = locations[0:8]
+				
+			cache_key = '%s%s%s%s%s' % (
+					[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
+					year_range, 
+					lsd_probability, 
+					break_into_subtables, 
+					sorted(varieties)
+				)
+			cache_key = cache_key.replace(' ','')
+				
+			print cache_key
+			page = cache.get(cache_key)
+			if page is not None:
+				for table in page.tables:
+					table.set_defaults(curyear, fieldname)
+			else:
+				try:
+					page = Page(
+							locations,
+							curyear, 
+							year_range, 
+							fieldname, 
+							lsd_probability, 
+							break_into_subtables=break_into_subtables, 
+							varieties=varieties
+						)
+				except:
+					# TODO: Print message to the user telling them why we are exiting
+					return HttpResponseRedirect('/')
+				cache.set(cache_key, page, 300) # expires after 300 seconds (5 minutes)
+					
 			
 			"""
 			import sys
