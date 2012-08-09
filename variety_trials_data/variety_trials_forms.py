@@ -3,6 +3,7 @@ from variety_trials_data import models
 
 class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
+	year = forms.CharField(max_length=4, required=False)
 	not_location = forms.MultipleChoiceField(
 			required=False,
 			choices=[(location.name, location.name) for location in models.Location.objects.all()]

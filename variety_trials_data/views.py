@@ -27,7 +27,7 @@ def index(request, abtest=None):
 	return render_to_response(
 		'main.html', 
 		{ 
-			'zipcode_radius_form': zipcode_form,
+			'zipcode_form': zipcode_form,
 			'curyear': curyear
 		},
 		context_instance=RequestContext(request)
@@ -117,7 +117,7 @@ unit_blurbs = {
 		]
 }
 
-def zipcode_view(request, yearname, fieldname, abtest=None):
+def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None):
 	if request.method != 'GET':
 		# Redirect to home if they try to POST
 		# TODO: what is the behavior of HEAD?
@@ -133,6 +133,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			not_locations = zipcode_radius_form.cleaned_data['not_location']
 			varieties = zipcode_radius_form.cleaned_data['variety']
+			yearname = zipcode_radius_form.cleaned_data['year']
 			
 			hidden_zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm(
 				initial={
@@ -151,7 +152,7 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 				return render_to_response(
 					'main.html', 
 					{
-						'zipcode_radius_form': zipcode_radius_form,
+						'zipcode_form': zipcode_form,
 						'curyear': datetime.date.today().year,
 						'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
 					},
@@ -159,18 +160,28 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 				) 
 			
 			
-			
+			try:
+				maxyear = int(startyear)
+			except ValueError:
+				maxyear = datetime.date.today().year
+				
 			try:
 				curyear = int(yearname)
 			except ValueError:
 				# TODO: redirect to /view/curyear/field/?... instead
-				curyear = datetime.date.today().year
+				curyear = maxyear
+			
+			if year_url_bit is None:
+				year_url_bit = startyear
 			
 			for field in models.Trial_Entry._meta.fields:
 				if field.name == fieldname:
 					break;
 			
 			year_range = 3
+			
+			if years is None:
+				years = [maxyear - diff for diff in range(year_range)]
 			
 			lsd_probability = 0.05
 			
@@ -197,14 +208,21 @@ def zipcode_view(request, yearname, fieldname, abtest=None):
 					'not_locations': not_locations,
 					'variety_get_string': '&%s' % (urlencode([('variety', v) for v in varieties])),
 					'varieties': varieties,
+					'year_url_bit': year_url_bit,
 					'curyear': curyear,
 					'page': page,
-					'years': [curyear - diff for diff in range(year_range)], # TODO: returns wrong range when we are viewing curyear-1
+					'years': years, # TODO: returns wrong range when we are viewing curyear-1
 					'blurbs' : unit_blurbs,
 					'curfield' : fieldname,
 				},
 				context_instance=RequestContext(request)
 			)
+
+def zipcode_view(request, fieldname, abtest=None):
+	curyear = 2011
+	year_range = 3
+	years = [curyear - diff for diff in range(year_range)]
+	return historical_zipcode_view(request, curyear, fieldname, abtest=abtest, years=years, year_url_bit='last_3_years')
 	
 				
 def add_trial_entry_csv_file(request):

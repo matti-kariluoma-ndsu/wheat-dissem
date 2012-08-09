@@ -32,12 +32,12 @@ border:1px solid black;
 	TODO: fix input validation strings return an error.
 	-->
 	
-		<form action="/view/{{curyear}}/bushels_acre/" method="GET">
+		<form action="/view/last_3_years/bushels_acre/" method="GET">
 			{% for field in zipcode_form %}
 			{% if field.name == 'zipcode' %}
 			<div>
 			{% else %}
-			<div> <!--style="display: none">-->
+			<div style="display: none;">
 			{% endif %}
 				{{ field.errors }}
 				{{ field.label_tag }}: {{ field }}
@@ -49,9 +49,9 @@ border:1px solid black;
 </noscript>
 
 <div id="dynamic_form" style="display: none;">
-	<form name='js_zipcode' action='' method='get'>
+	<form name='js_zipcode' action='#' method='get'>
 	Zipcode: <input id="js_zipcode" type="text" name="zipcode" /><br />
-	<input type="button" name="button" value="Click" onclick="makeTable(); return false;">
+	<input type="submit" value="Submit" onclick="makeTable(); return false;">
 	</form>
 </div>
 
@@ -67,7 +67,6 @@ border:1px solid black;
 
 function main()
 {
-	$('#dynamic_table').show();
 	$('#dynamic_form').show();
 	$('#static_form').hide();
 }
@@ -126,31 +125,31 @@ locationList.push(response_data[i].pk)
 
 
 function locationAjax(zipcode){
-// ajax call to get the locations
-var entryLocation = {
-	url: '/zipcode/near/'+zipcode+'/json',
-	async: false,
-	dataType: "json",
-	data: {
-		'location':'location',
-		'key': 'value'
-	}
+	// ajax call to get the locations
+	var entryLocation = {
+		url: '/zipcode/near/'+zipcode+'/json',
+		async: false,
+		dataType: "json",
+		data: {
+			'location':'location',
+			'key': 'value'
+		}
 }
 $.ajax(entryLocation).done(populateLocation)
 }
 
 function trialEntryList(response_data) {
-for (i=0; i<response_data.length; i++){
-	var entry = {
-		// async: false,
-		url: '/trial_entry/'+response_data[i]+'/json',
-		dataType: "json",
-		data: {
-			'location':'location',
-			'key': 'value'
-		},
-}
-$.ajax(entry).done(populateTrialEntry)
+	for (i=0; i<response_data.length; i++){
+		var entry = {
+			// async: false,
+			url: '/trial_entry/'+response_data[i]+'/json',
+			dataType: "json",
+			data: {
+				'location':'location',
+				'key': 'value'
+			},
+	}
+	$.ajax(entry).done(populateTrialEntry)
 }}
 
 function populateTrialEntry(response_data) {
@@ -179,15 +178,16 @@ function populateTrialEntry(response_data) {
 }
 function makeTable()
 {
-var zipcode=$('#js_zipcode').val()
-locationAjax(zipcode)
+	$('#dynamic_table').show();
+	var zipcode=$('#js_zipcode').val()
+	locationAjax(zipcode)
 
-var trial_entry = {
-	url: zipcode+'/last_three_years/json',
-	dataType: "json",
-}
+	var trial_entry = {
+		url: zipcode+'/last_three_years/json',
+		dataType: "json",
+	}
 
-$.ajax(trial_entry).done(trialEntryList)
+	$.ajax(trial_entry).done(trialEntryList)
 }
 
 {% endblock %}
