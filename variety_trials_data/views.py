@@ -117,8 +117,18 @@ unit_blurbs = {
 		]
 }
 
-def get_locations(zipcode):
-	return Locations_from_Zipcode_x_Radius(zipcode).fetch()
+def get_locations(zipcode, not_locations):
+	locations = Locations_from_Zipcode_x_Radius(zipcode).fetch()
+	not_location = models.Location.objects.filter(name__in=not_locations)
+	
+	delete_me = []
+	for (index, location) in enumerate(locations):
+		if location in not_location:
+			delete_me.append(index)
+	for index in sorted(delete_me, reverse=True):
+		locations.pop(index)
+		
+	return locations
 
 def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None, locations=None, year_range=3):
 	if request.method != 'GET':
@@ -147,7 +157,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			
 			if locations is None:
 				try:
-					locations = get_locations(zipcode)
+					locations = get_locations(zipcode, not_locations)
 				except models.Zipcode.DoesNotExist:
 					zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
 							#'radius': zipcode_radius_form.cleaned_data['search_radius'],
@@ -241,7 +251,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			varieties = zipcode_radius_form.cleaned_data['variety']
 			
 			try:
-				locations = get_locations(zipcode)
+				locations = get_locations(zipcode, not_locations)
 			except models.Zipcode.DoesNotExist:
 				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
 						#'radius': zipcode_radius_form.cleaned_data['search_radius'],
@@ -277,8 +287,19 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 				year_range = int(year_range)
 			except ValueError:
 				year_range = 3
+				
 			years = [curyear - diff for diff in range(year_range)]
-			return historical_zipcode_view(request, curyear, fieldname, abtest=abtest, years=years, year_url_bit='last_%d_years' % (year_range), locations=locations, year_range=year_range)
+			
+			return historical_zipcode_view(
+					request, 
+					curyear, 
+					fieldname, 
+					abtest=abtest, 
+					years=years, 
+					year_url_bit='last_%d_years' % (year_range), 
+					locations=locations, 
+					year_range=year_range
+				)
 	
 				
 def add_trial_entry_csv_file(request):
