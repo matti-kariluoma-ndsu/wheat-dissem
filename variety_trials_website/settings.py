@@ -1,6 +1,6 @@
 # Django settings for variety_trials_website project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (

@@ -5,11 +5,7 @@ path = '/home/kariluom/repo/wheat-dissem/'
 if path not in sys.path:
     sys.path.append(path)
 
-path='/home/kariluom/repo/wheat-dissem/variety_trials_website'
-if path not in sys.path:
-    sys.path.append(path)
-
-os.chdir("/home/kariluom/repo/wheat-dissem/variety_trials_website")
+os.chdir("/home/kariluom/repo/wheat-dissem/")
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'variety_trials_website.settings'
 
