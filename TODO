@@ -316,3 +316,24 @@ form on the main page)
 In order to hide columns, use the row.set_key_order fucntion
 ** To reduce the overhead, have the rows bakc-reference the table's 
 copy of the sorted_locations (ideally a visible_locations subset)
+
+Notes from Aug 10 Meeting
+* Put back 'x site-years' message for each n-yr mean
+* Ensure 8 locations (after some fall off during calculation ... maybe start with more/all then cut?
+* Stop automagically adding locations, makes custom queries difficult
+* Add radio-select to main page,
+** Nearest
+** ND
+** MN
+** ALL
+* Roll up advanced search page, user manual desribing GET structure
+* Add variety names/checkboxes to head-head view OR "clear"/back button
+* Investigate algorithm for removing small subtables from end of page
+* vareity descriptors
+** externel URL(s) for now
+** later use to enhance v-to-v view
+* Rollout Sep 1
+* JSONP for other sites to grab from DB
+* Copyright footer (brought to you by ransom, wiermnma, kariluoma)
+** link to static about us page for workers
+* Anything special so google can find us?
