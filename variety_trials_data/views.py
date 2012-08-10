@@ -17,6 +17,7 @@ try:
 except ImportError:
 	import json # Python 2.6
 
+home_url = '/'
 
 def index(request, abtest=None):
 	zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
@@ -26,10 +27,11 @@ def index(request, abtest=None):
 	
 
 	return render_to_response(
-		'main.html', 
+		'main_ndsu.html', 
 		{ 
 			'zipcode_form': zipcode_form,
-			'curyear': curyear
+			'curyear': curyear,
+			'home_url': home_url,
 		},
 		context_instance=RequestContext(request)
 	)
@@ -221,7 +223,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				)
 			cache_key = cache_key.replace(' ','')
 				
-			print cache_key
+			#print cache_key
 			page = cache.get(cache_key)
 			if page is not None:
 				for table in page.tables:
@@ -255,7 +257,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			"""
 			
 			return render_to_response(
-				'tabbed_object_table_view.html',
+				'tabbed_view_table_ndsu.html',
 				{
 					'hidden_zipcode_form': hidden_zipcode_form,
 					'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
@@ -271,6 +273,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					'years': years,
 					'blurbs' : unit_blurbs,
 					'curfield' : fieldname,
+					'home_url': home_url,
 				},
 				context_instance=RequestContext(request)
 			)

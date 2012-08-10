@@ -1,91 +1,15 @@
 {% extends "base_ag_ndsu.html" %}
 {% load django_math %}
+{% load get_urlencode %}
 {% block navigation %}
-<div class="location_form units">
-	{% for fieldname, blurb_list in blurbs.items %}
-	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_location_form" action="/view/location/{{curyear}}/{{fieldname}}/" method="get">
-			{% for field in locations_form %}
-			<div class="input row">
-				{{ field.errors }}
-				{{ field.label_tag }}: {{ field }}
-			</div>
-			{% endfor %}
-			<input type="submit" value="{{fieldname}} submit" />
-		</form>
-	</div>
-	{% endfor %}
-</div>
-<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-	{% for yearname in years %}
-	<div style="display:none">
-		<form name="{{yearname}}_location_form" action="/view/location/{{yearname}}/{{curfield}}/" method="get">
-			{% for field in locations_form %}
-			<div class="input row">
-				{{ field.errors }}
-				{{ field.label_tag }}: {{ field }}
-			</div>
-			{% endfor %}
-			{% for field in varieties_form %}
-			<div class="input row">
-				{{ field.errors }}
-				{{ field.label_tag }}: {{ field }}
-			</div>
-			{% endfor %}
-			<input type="submit" value="{{yearname}} submit" />
-		</form>
-	</div>
-	{% endfor %}
-</div>
-<div class="variety_form units">
-	{% for fieldname, blurb_list in blurbs.items %}
-	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_variety_form" action="/view/variety/{{curyear}}/{{fieldname}}/" method="get">
-			{% for field in locations_form %}
-			<div class="input row">
-				{{ field.errors }}
-				{{ field.label_tag }}: {{ field }}
-			</div>
-			{% endfor %}
-			<input type="submit" value="{{fieldname}} submit" />
-		</form>
-	</div>
-	{% endfor %}
-</div>
-<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-	{% for yearname in years %}
-	<div style="display:none">
-		<form name="{{yearname}}_variety_form" action="/view/variety/{{yearname}}/{{curfield}}/" method="get">
-			{% csrf_token %}
-			{% for field in locations_form %}
-			<div class="input row">
-				{{ field.errors }}
-				{{ field.label_tag }}: {{ field }}
-			</div>
-			{% endfor %}
-			{% for field in varieties_form %}
-			<div class="input row">
-				{{ field.errors }}
-				{{ field.label_tag }}: {{ field }}
-			</div>
-			{% endfor %}
-			<input type="submit" value="{{yearname}} submit" />
-		</form>
-	</div>
-	{% endfor %}
-</div>
 
 <ul class="navTree navTreeLevel0">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<li class="navTreeItem navTreeTopNode">
 		{% if fieldname == curfield %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
-			* {{blurb_list.0}}
-		</a>
+			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}"><h2 style="display: inline;">*</h2>{{fieldname}}</a> 
 		{% else %}
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
-			{{blurb_list.0}}
-		</a>
+			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">{{fieldname}}</a>
 		{% endif %}
 	</li>
 	{% endfor %}
@@ -94,13 +18,11 @@
 <ul class="navTree navTreeLevel0">
 	{% for yearname in years %}
 	<li class="navTreeItem navTreeTopNode">
-		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
-			* {{yearname}}
+			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}"><h2 style="display: inline;">*</h2>{{yearname}}</a>
 		{% else %}
-			{{yearname}}
+			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}">{{yearname}}</a>
 		{% endif %}
-		</a>
 	</li>
 	{% endfor %}
 </ul>
@@ -109,142 +31,78 @@
 {% endblock %}
 
 {% block content %}
-<div class="top_spacer"></div>
-
-<div id="django_trial_results_content">
-	<table border='1'>
-		<tr>
-			<td colspan="{{ heading_list|length|add:1 }}">
-				{% for fieldname, blurb_list in blurbs.items %}
-				{% if fieldname == curfield %}
-						<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
-						<p>{{blurb_list.2}}</p>
-				{% endif %}
-				{% endfor %}
-			</td>
-		</tr>
-		<tr>
-			<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
-		</tr>
-	{% for table in tables %}
-		<tr class="spacer_row">
-			<td></td>
-		</tr>
-		<tr>
-			<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
-		</tr>
-		<tr class="Variety padded">
-			{% for heading in table.header %}
-			<td class="padded"><h4>{{ heading.0 }}</h4>
-				{% if heading.1 != -1 %}
-				<a href="#" onclick="unselect_location({{ heading.1 }}); document['{{curfield}}_location_form'].submit(); return false">(x)</a>
-				{% else %}
-				<p style="font-size: 0.8em;">
-					{% if heading.0 == '1-yr' %}
-					{{ table.order.0 }} site-years
-					{% endif %}
-					{% if heading.0 == '2-yr' %}
-					{{ table.order.1 }} site-years
-					{% endif %}
-					{% if heading.0 == '3-yr' %}
-					{{ table.order.2 }} site-years
-					{% endif %}
-				</p>
-				{% endif %}
-			</td>
+<div>
+		<div>
+			{% for fieldname, blurb_list in blurbs.items %}
+			{% if fieldname == curfield %}
+					<p>{{blurb_list.0}}: {{blurb_list.1}}</p>
+					<p>{{blurb_list.2}}</p>
+			{% endif %}
 			{% endfor %}
-		</tr>
-		{% for row in table.rows %}
-		<tr class="group {% cycle 'master_odd' 'master_even' %}">
-			{% for element in row %}
-				{% if row.0 == element %}
-				<td class='padded' style="text-align: left; width: 120px;">
-					<form>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> {{ element.0 }}
-					</form>
-				</td>
-				{% else %}
-				<td class='padded'>
-					{{ element|default_if_none:"--" }}
-				</td>
-				{% endif %}
+		</div>
+		<div>{{year_url_bit}}</div> 
+		<table>
+		<thead>
+		</thead>
+		<form action="/view/{{year_url_bit}}/{{curfield}}/" method="GET">
+		<div style="display: none;">
+			{% for field in hidden_zipcode_form %}
+			{{ field.label_tag }}: {{ field }}
 			{% endfor %}
-		</tr>
+		</div>
+{% for table in page.tables %}
+		<tbody>
+		<tr>
+			<th>
+				<h4>Variety</h4>
+			</th>
+		{% comment %}{% for location in table.locations %}{% endcomment %}
+		{% for location in table.visible_locations %}
+			<th>
+				<h4>{{ location.name }}</h4>
+			{% if location.id != -1 %}
+				<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
+			{% endif %}
+			</th>
 		{% endfor %}
-		<tr>
+		</tr>
+	{% for variety, row in table.sorted_rows %}
+		{% if variety.name == "LSD" %}
+		<tr class="variety_trials__LSD_row">
+			<th>
+				<input type="submit" value="Compare Selected"/>
+			</th>
+		{% else %}
+		<tr class="variety_trials__row {% cycle 'variety_trials__row_odd' 'variety_trials__row_even' %}">
+			<th>
+				<input
+					class="variety_trials__variety_checkbox"
+					type="checkbox"
+					id="id_{{variety.name}}"
+					name="variety"
+					value="{{variety.name}}"/>
+				<label for="id_{{variety.name}}">
+					<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+				</label>
+			</th>
+		{% endif %}
+		{% for cell in row %}
 			<td>
-			<form>
-				<input type="submit" value="Compare Selected" onclick="submit_variety_comparison(); return false">
-			</form>
+			{{ cell|default_if_none:"--" }}
 			</td>
-		</tr>
-		<tr class="spacer_row">
-			<td></td>
-		</tr>
-		<tr class="LSD_row">
-			{% for element in table.lsd %}
-			<td class='padded'>{{ element|default_if_none:"--" }}</td>
-			{% endfor %}
+		{% endfor %}
 		</tr>
 	{% endfor %}
-		<tr class="bottom_spacer"></tr>
-  </table>
-</div>
-<div class="clear">&#160;</div>
-
+		</tbody>
+{% endfor %}
+		</form>
+		<tfoot>
+		</tfoot>
+		</table>
+	</div>
 {% endblock %}
-
-{% load jsonify %}
 
 {% block javascript %}
 
-	function unselect_location(location_value) {
-		$("#id_locations option[value='"+location_value+"']").removeAttr("selected");
-	}
 	
-	function select_location(location_value) {
-		$("#id_locations option[value='"+location_value+"']").attr("selected","selected");
-	}
-	
-	function unselect_variety(variety_value) {
-		$("#id_varieties option[value='"+variety_value+"']").removeAttr("selected");
-	}
-	
-	function select_variety(variety_value) {
-		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
-	}
-
-	function submit_variety_comparison() {
-		$("#id_varieties").each(
-			function() {
-				$("#id_varieties option").removeAttr("selected");
-			}
-		);
-		
-		$('.variety_checkbox').each( 
-			function() {
-				if ($(this).attr('checked'))
-				{
-					select_variety($(this).attr('value'));
-				}
-			}
-		);
-		
-		document['{{curfield}}_variety_form'].submit();
-		return false;
-	}
-
-{% endblock %}
-
-{% block jquery %}
-
-  $('.group .master').toggle(
-    function(){
-      $(this).siblings('.slave').show();
-    },
-    function(){
-      $(this).siblings('.slave').hide();  
-    }
-  );
-
 {% endblock %}
