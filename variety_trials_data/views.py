@@ -217,8 +217,9 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				if scope == variety_trials_forms.ScopeConstants.near:
 					locations = locations[0:8]
 				
-			cache_key = '%s%s%s%s%s' % (
+			cache_key = '%s%s%s%s%s%s' % (
 					[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
+					curyear,
 					year_range, 
 					lsd_probability, 
 					break_into_subtables, 
