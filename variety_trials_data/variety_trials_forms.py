@@ -1,8 +1,31 @@
 from django import forms
 from variety_trials_data import models
 
+class ScopeConstants:
+	near = 'NEAR'
+	nd = 'ND'
+	mn = 'MN'
+	all = 'ALL'
+	def get_list(self):
+		return [
+				self.near, 
+				self.nd, 
+				self.mn, 
+				self.all
+			]
+
 class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(max_length=5, required=True)
+	scope = forms.ChoiceField(
+			widget=forms.RadioSelect(),
+			choices=(
+					(ScopeConstants.near,	'Nearby Locations'),
+					(ScopeConstants.nd,	'All of ND'),
+					(ScopeConstants.mn,	'All of MN'),
+					(ScopeConstants.all,	'All Locations')
+				),
+			initial=ScopeConstants.near
+		)
 	year = forms.CharField(max_length=4, required=False)
 	not_location = forms.MultipleChoiceField(
 			required=False,

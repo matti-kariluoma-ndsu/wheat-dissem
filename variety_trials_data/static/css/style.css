@@ -1,11 +1,6 @@
-.variety_trials__location_form 
+#variety_trials__scope_input li
 {
-  display: none;
-}
-
-.variety_trials__variety_form 
-{
-  display: none;
+	list-style-type: none;
 }
 
 .variety_trials__row th

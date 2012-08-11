@@ -8,7 +8,7 @@
 		{% if fieldname == curfield %}
 			* 
 		{% endif %}
-			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">{{fieldname}}</a>
+			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">{{fieldname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -20,7 +20,7 @@
 		{% if yearname == curyear %}
 			*
 		{% endif %}
-			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}">{{yearname}}</a>
+			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}">{{yearname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -55,7 +55,7 @@
 			<th>
 				<h4>{{ location.name }}</h4>
 			{% if location.id != -1 %}
-				<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
+				<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
 			{% endif %}
 			</th>
 		{% endfor %}

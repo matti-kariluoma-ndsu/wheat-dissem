@@ -10,7 +10,7 @@ from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
 from variety_trials_data.Page import Page
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Radius, Filter_by_Field, LSD_Calculator
+from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Scope
 import datetime
 try:
 	import simplejson as json # Python 2.5
@@ -118,12 +118,13 @@ unit_blurbs = {
 		]
 }
 
-def get_locations(zipcode, not_locations):
+def get_locations(zipcode, not_locations, scope=variety_trials_forms.ScopeConstants.near):
+	cache_key = '%s%s' % (zipcode, scope)
 	# retrieve from cache, if absent, add to cache.
-	locations = cache.get(zipcode)
+	locations = cache.get(cache_key)
 	if locations is None:
-		locations = Locations_from_Zipcode_x_Radius(zipcode).fetch()
-		cache.set(zipcode, locations, 300) # expires in 300 seconds (5 minutes)
+		locations = Locations_from_Zipcode_x_Scope(zipcode, scope).fetch()
+		cache.set(cache_key, locations, 300) # expires in 300 seconds (5 minutes)
 		
 	not_location = models.Location.objects.filter(name__in=not_locations)
 	
@@ -150,6 +151,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			return HttpResponseRedirect('/')
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
+			scope = zipcode_radius_form.cleaned_data['scope']
 			not_locations = zipcode_radius_form.cleaned_data['not_location']
 			varieties = zipcode_radius_form.cleaned_data['variety']
 			yearname = zipcode_radius_form.cleaned_data['year']
@@ -157,6 +159,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			hidden_zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm(
 				initial={
 					'zipcode': zipcode,
+					'scope': scope,
 					'not_location': not_locations,
 					'year': yearname,
 					}
@@ -164,7 +167,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			
 			if locations is None:
 				try:
-					locations = get_locations(zipcode, not_locations)
+					locations = get_locations(zipcode, not_locations, scope)
 				except models.Zipcode.DoesNotExist:
 					zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
 							#'radius': zipcode_radius_form.cleaned_data['search_radius'],
@@ -210,7 +213,9 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			break_into_subtables = False
 			if len(varieties) == 0:
 				break_into_subtables = True
-				locations = locations[0:8]
+				#if scope != variety_trials_forms.ScopeConstants.all:
+				if scope == variety_trials_forms.ScopeConstants.near:
+					locations = locations[0:8]
 				
 			cache_key = '%s%s%s%s%s' % (
 					[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
@@ -260,6 +265,8 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					'hidden_zipcode_form': hidden_zipcode_form,
 					'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
 					'zipcode': zipcode,
+					'scope_get_string': '&%s' % (urlencode( [('scope', scope)] )),
+					'scope': scope,
 					'not_location_get_string': '&%s' % (urlencode([('not_location', l) for l in not_locations])),
 					'not_locations': not_locations,
 					'variety_get_string': '&%s' % (urlencode([('variety', v) for v in varieties])),
@@ -289,13 +296,14 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			return HttpResponseRedirect('/')
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
+			scope = zipcode_radius_form.cleaned_data['scope']
 			not_locations = zipcode_radius_form.cleaned_data['not_location']
 			
 			try:
-				locations = get_locations(zipcode, not_locations)
+				locations = get_locations(zipcode, not_locations, scope)
 			except models.Zipcode.DoesNotExist:
 				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
-						#'radius': zipcode_radius_form.cleaned_data['search_radius'],
+						'scope': scope,
 					})
 				# TODO: return to main page and show error
 				return render_to_response(
