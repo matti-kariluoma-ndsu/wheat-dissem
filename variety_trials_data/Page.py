@@ -429,6 +429,14 @@ class Aggregate_Column(Column):
 		self.members = []
 		self.clear()
 		self.years_range = range(year_num)
+		
+	def get_site_years(self):
+		"""
+		Calculates the amount of data that is in this aggregate.
+		The formula is num_years * num_locations (sites)
+		"""
+		site_years = 8
+		return site_years
 
 class Table:
 		"""
@@ -447,9 +455,9 @@ class Table:
 			self.lsd_probability = lsd_probability
 			self.locations = list(locations) # create a copy
 			self.visible_locations = list(visible_locations) # create a copy
-			self.rows = {} # variety: [Row(), ...]
-			self.columns = {} # location: [Column(), ...]
-			self.cells = {} # (variety, location): Cell()
+			self.rows = {} # variety: Row(), ...
+			self.columns = {} # location: Column(), ...
+			self.cells = {} # (variety, location): Cell(), ...
 			
 		def get_row(self, variety):
 			try:
@@ -489,6 +497,10 @@ class Table:
 				alpha_sorted.append(lsd_row) # append it to the end of the list
 				
 			return alpha_sorted
+		
+		def sorted_visible_columns(self):
+			return [(self.get_column(location), location) for location in self.visible_locations]
+			
 		
 		def set_defaults(self, year, fieldname):
 			for cell in self.cells.values():
