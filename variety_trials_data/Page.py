@@ -435,8 +435,19 @@ class Aggregate_Column(Column):
 		Calculates the amount of data that is in this aggregate.
 		The formula is num_years * num_locations (sites)
 		"""
-		site_years = 8
-		return site_years
+		for cell in self.members:
+			if cell is not None:
+				row = cell.row
+				num_locations = len([inner_cell for inner_cell in row if inner_cell is not None and inner_cell.row.variety.id != -1])
+				break
+			
+		num_years = 0
+		for year_diff in self.years_range:
+			cell_mean = cell.get(cell.year - year_diff, cell.fieldname)
+			if cell_mean is None:
+				num_years = num_years + 1
+		
+		return num_locations * num_years
 
 class Table:
 		"""
@@ -501,7 +512,6 @@ class Table:
 		def sorted_visible_columns(self):
 			return [(self.get_column(location), location) for location in self.visible_locations]
 			
-		
 		def set_defaults(self, year, fieldname):
 			for cell in self.cells.values():
 				cell.year = year
