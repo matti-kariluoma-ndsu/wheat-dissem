@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load django_math %}
 {% block content %}
+
 <style type="text/css">
 table,th,td
 {
@@ -51,15 +52,19 @@ border:1px solid black;
 		{% endfor %}
 		<input type="submit" value="Submit" />
 	</form>
+	
+	<form name='js_zipcode_form' action='' method='get'>
+	Zipcode: <input id="zipcode" type="text" name="zipcode" /><br />
+	</form>
 	</noscript>
-	<form name='js_zipcode' action='' method='get'>
+	<form>
 	Zipcode: <input id="js_zipcode" type="text" name="zipcode" /><br />
-	<INPUT TYPE="button" NAME="button" Value="Click" onClick="variety_trials_app.makeTable();return false">
+	<INPUT TYPE="submit" NAME="button" Value="Click" onClick="variety_trials_app.makeTable();return false">
 	</form>
 </div>
 
 {% endblock %}
-
+<script>
 {% block javascript %}
 
 function select_variety(variety_value) {
@@ -132,52 +137,38 @@ var variety_trials_app = {
 		}
 	},
 	
-	store_data: function(response_data){
-		var variety_pk=response_data.fields.variety
-		var location_pk = response_data.fields.location
-		var trial_pk = response_data.pk
-		var cell = new cell(response_data)
-		var row = rows[variety_pk]
-		var column = columns[location_pk]
-		if(!row){
-			new row(response_data)
-		}
-		row.add_cell(cell)
-		
-		if(!column){
-			new column(response_data)
-		}
-		column.add_cell(cell)
-		
-	},
+	
 	
 	row: function(response_data){
-		this.variety=response_data.fields.variety
-		rows[variety]=[]
-		this.add_cell= function(cell){
-			rows[variety].append(cell)
+		var variety=response_data.fields.variety
+		variety_trials_app.rows[variety]=[]
+		add_cell(variety_trials_app.cells[response_data.fields.location, response_data.fields.variety])
+		function add_cell(cell){
+			variety_trials_app.rows[variety_trials_app.row.variety]=cell
 		}
 	},
 	
 	cell: function(response_data){
 		this.data=response_data
-		cell_list=cells[response_data.fields.location, response_data.fields.variety]
+		cell_list=variety_trials_app.cells[response_data.fields.location, response_data.fields.variety]
 		if(cell_list){
-		cell_list.append(this)
+		cell_list.push(this)
 		}
 		else{
-		cell_list=[]
-		cell_list.append(this)
-		
+		var temp=new Array()
+		temp.push(this)
+		variety_trials_app.cells[response_data.fields.location, response_data.fields.variety]=temp
+		variety_trials_app.column(response_data)
+		variety_trials_app.row(response_data)
 		}
-		return this
 	},
 	
 	column: function(response_data){
 		this.location=response_data.fields.location
-		columns[location]=[]
-		this.add_cell=function(cell){
-			columns[location].append(cell)
+		variety_trials_app.columns[location]=[]
+		add_cell(variety_trials_app.cell[response_data.fields.location, response_data.fields.variety])
+		function add_cell(cell){
+			variety_trials_app.columns[variety_trials_app.column.variety]=cell
 		}
 	},
 	
@@ -217,16 +208,19 @@ var variety_trials_app = {
 		row1.insertAfter(row2)
 	},
 	
+	store_data: function(response_data){
+		var variety_pk=response_data.fields.variety
+		var location_pk = response_data.fields.location
+		var trial_pk = response_data.pk
+		var cell1 = new variety_trials_app.cell(response_data)
+		
+	},
 
 	
 }; 
 
-function cell(constructorParametersObject){
-    this.position = constructorParametersObject.pk;
-    this.tag = constructorParametersObject.type;
-    this.value = constructorParametersObject.value;
-	this.location = constructorParametersObject.location;
-	this.variety = constructorParametersObject.variety;
-	
-}
 {% endblock %}
+</script>
+
+
+
