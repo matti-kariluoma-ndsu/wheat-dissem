@@ -272,3 +272,6 @@ n-checkboxes: c2efd1cf8c4a7eff47447db859ab275a1d0b224e
 4-dropdowns: 5c88ccfda119faa8eba1b781a6fdf391990c54d3
 The original is in master:
 multiple-select: adcc766712e777872b04d8620cb3ba82c53aee6f
+
+This is where i found the auto complete for the zip code
+http://tomcoote.co.uk/wp-content/CodeBank/Demos/JSONSuggestBox/demo.html
