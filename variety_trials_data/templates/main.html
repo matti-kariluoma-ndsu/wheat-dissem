@@ -2,6 +2,7 @@
 {% load django_math %}
 {% block content %}
 
+<link rel="stylesheet" href="../static/js/jsonSuggest.css" type="text/css">
 <script type="text/javascript">
 
 function movePosition(side){
@@ -77,6 +78,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 	<form action="/view/{{curyear}}/bushels_acre/" method="GET">
 		{% for field in zipcode_radius_form %}
 		<div class="input row">
+		
 			{{ field.errors }}
 			{{ field.label_tag }}: {{ field }}
 		</div>
@@ -84,7 +86,7 @@ function move(listBoxTo,optionValue,optionDisplayText){
 		<input type="submit" value="Submit" />
 	</form>
 </div>
-
+<input type="text" size="50" id="suggestBox3" autocomplete="off"><div class="jsonSuggestResults" style="top: 494px; left: 8px; width: 410px; display: none; "></div>
 <div>
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
@@ -99,11 +101,46 @@ function move(listBoxTo,optionValue,optionDisplayText){
 		
 		<input type="submit" value="Submit"; onClick = "javascript:select_all();">
 		</form>
-	
+		
 </div>
+
+
+
+
+
+
+
+
 {% endblock %}
 
 {% block javascript %}
+function callback(item) {
+	alert('You selected \'' + item.text + '\'\n\nHere is the full selected JSON object;\n' + JSON.stringify(item));
+}
+
+jQuery(function() {
+	$('input#suggestBox').jsonSuggest(testData.countryCodes, {onSelect:callback});
+	
+	$('input#suggestBox2').jsonSuggest(testData.webSites, {onSelect:callback});
+	
+	$('input#suggestBox3').jsonSuggest(testData.country, {maxResults:20});
+	
+	
+	$('input#suggestBox4').jsonSuggest(
+		function(text, wildCard, caseSensitive, notCharacter) {
+			// From here you can put your own logic in to say what results show.
+			// For now I'm just going to return some dummy data.
+			
+			return [
+				{text:'View'},
+				{text:'the'},
+				{text:'source'},
+				{text:'for'},
+				{text:'this'},
+				{text:'one'}
+			];
+		}, {ajaxResults:true});
+});
 
 function select_variety(variety_value) {
 		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
