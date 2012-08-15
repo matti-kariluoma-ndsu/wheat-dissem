@@ -380,6 +380,7 @@ class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is based upon its row
 	"""
+	# TODO: Need to keep track of how many years-worth of data we have available
 	def __init__(self, year, fieldname, row, column):
 		Cell.__init__(self, year, fieldname)
 		self.row = row
@@ -438,14 +439,25 @@ class Aggregate_Column(Column):
 		for cell in self.members:
 			if cell is not None:
 				row = cell.row
-				num_locations = len([inner_cell for inner_cell in row if inner_cell is not None and inner_cell.row.variety.id != -1])
+				if isinstance(row, LSD_Row):
+					continue
+				
+				num_years = len(self.years_range) # TODO: instead find the max amount of years reported for each cell in this column
+				
+				"""
+				num_locations = 0
+				for cell in row:
+					if not isinstance(cell, Aggregate_Cell) and cell is not None:
+						num_locations = num_locations + 1
+				"""
+				num_locations = len([cell for cell in row if not isinstance(cell, Aggregate_Cell) and cell is not None])
 				break
-			
-		num_years = 0
-		for year_diff in self.years_range:
-			cell_mean = cell.get(cell.year - year_diff, cell.fieldname)
-			if cell_mean is None:
-				num_years = num_years + 1
+				
+		
+		
+		print cell
+		print num_locations
+		print num_years
 		
 		return num_locations * num_years
 
