@@ -16,7 +16,7 @@ border:1px solid black;
 </div>
 
 <INPUT TYPE="button" NAME="button" Value="Swap Rows" onClick="variety_trials_app.reorderTable(1,4);return false">
-<INPUT TYPE="button" NAME="button" Value="RemoveColumn" onClick="variety_trials_app.removeColumn(46);return false">
+<INPUT TYPE="button" NAME="button" Value="Output Data" onClick="variety_trials_app.testData();return false">
 
 <div id="main">
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
@@ -87,10 +87,11 @@ $("#selectRight option").each(
 		);
 	}
 
-	
 var cellList = [];
 var variety_trials_app = {
 	entryList: [],
+	
+	pk: [],
 	table: $('#debug'),
 	locationList: [],
 	cells: {},
@@ -113,19 +114,18 @@ var variety_trials_app = {
 		for (i=0;i<response_data.length;i++)
 		{
 		variety_trials_app.populateTrialEntry(response_data[i])
+		variety_trials_app.store_data(response_data[i])
 		}
 	},
 	
 	populateTrialEntry: function(response_data) {
-		// if the response object is valid
 		if($.inArray(response_data.fields.location, this.locationList)> -1){
-			variety_trials_app.store_data(response_data)
 				if($('.row'+response_data.fields.variety).length==0){// if there is no table row associated with the variety found in the response data, create one and populate it with the data in response_data
 					this.table.append($('<tr class=row'+response_data.fields.variety+'>'))
 					for (i=0;i<this.locationList.length;i++){// append a cell for each location
 						$('.row'+response_data.fields.variety).append('<td class=column'+this.locationList[i]+'>')
 					}
-					$('.row'+response_data.fields.variety+' > td.column'+response_data.fields.location).text(response_data.fields.location)
+					$('.row'+response_data.fields.variety+' > td.column'+response_data.fields.location).text(response_data.fields.bushels_acre)
 					var entryVariety = {//ajax call to get the name of the variety
 						async: false,
 						url: '/variety/'+response_data.fields.variety+'/json',
@@ -134,29 +134,32 @@ var variety_trials_app = {
 					$.ajax(entryVariety).done(variety_trials_app.populateVariety)
 				}
 			else{// if the table row already exists, populate the cell corresponding to the response_data
-				$('.row'+response_data.fields.variety+' > td.column'+response_data.fields.location).text(response_data.fields.location)
+				$('.row'+response_data.fields.variety+' > td.column'+response_data.fields.location).text(response_data.fields.bushels_acre)
 			}	
 		}
 	},
 	
 	store_data: function(response_data){
+		if($.inArray(response_data.pk,variety_trials_app.pk)){
+		
+		}
+		else{
+		pk.push(response_data.pk)
 		var variety_pk=response_data.fields.variety
 		var location_pk = response_data.fields.location
 		var trial_pk = response_data.pk
-		var cell1 = new variety_trials_app.cell(response_data)
-		
+		new variety_trials_app.cell(response_data)
+		}
 	},
 	
 	cell: function(response_data){
 		this.data=response_data
-		cell_list=variety_trials_app.cells[response_data.fields.location, response_data.fields.variety]
+		cell_list=variety_trials_app.cells[response_data.fields.location,response_data.fields.variety]
 		if(cell_list){
 		cell_list.push(this)
 		}
 		else{
-		var temp=new Array()
-		temp.push(this)
-		variety_trials_app.cells[response_data.fields.location, response_data.fields.variety]=temp
+		variety_trials_app.cells[response_data.fields.location,response_data.fields.variety]=[this]
 		variety_trials_app.column(response_data.fields.location,this)
 		variety_trials_app.row(response_data.fields.variety,this)
 		}
@@ -171,20 +174,19 @@ var variety_trials_app = {
 		}
 	},
 	
-	
-	
 	column: function(loc,current_cell){
 		this.location=loc
 		variety_trials_app.columns[location]=[]
 		add_cell(current_cell)
 		function add_cell(cell){
-			variety_trials_app.columns[variety_trials_app.column.variety]=cell
+			variety_trials_app.columns[variety_trials_app.column.location]=cell
 		}
 	},
 	
 	populateVariety: function(response_data){
 		//prepends the name of the variety to the <tr> that has tha same id as the variety
-		$('.row'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name)},
+		$('.row'+response_data[0].pk).prepend($('<th>').text=response_data[0].fields.name+response_data[0].pk)
+	},
 	
 	populateLocation: function(response_data){
 		// adds the eight closes locations to the table header and an array
@@ -205,7 +207,7 @@ var variety_trials_app = {
 			}
 		}
 		$.ajax(entryLocation).done(variety_trials_app.populateLocation)
-		},
+	},
 	
 	reorderTable: function(id1, id2){
 			if(id1>id2){
@@ -217,7 +219,6 @@ var variety_trials_app = {
 		row2=$('#debug > tr:nth-of-type('+id2+')')
 		row1.insertAfter(row2)
 	},
-	
 	
 	get_header_row: function(){
 		head=  $('.header:nth-of-type(1)').clone()
@@ -231,11 +232,26 @@ var variety_trials_app = {
 	},
 	
 	//removes a column, takes the id of the associated location as the argument
-	removeColumn: function(id){
+	remove_column: function(id){
 		column=$('.column'+id)
 		column.remove()
-	}
+	},
 	
+	//exchanges the positions of two columns, takes the id of the associated locations as the arguments UNFINISHEDs
+	swap_columns: function(id1, id2){
+		if(id1>id2){
+			var dummy = id2
+			id2 = id1
+			id1 = dummy
+		}
+		column1=$('.column'+id1)
+		column2=$('.column'+id2)
+		
+	},
+	
+	testData: function(){
+	console.log(variety_trials_app.cells)
+	},
 }; 
 
 {% endblock %}
