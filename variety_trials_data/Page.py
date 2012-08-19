@@ -384,6 +384,16 @@ class Aggregate_Cell(Cell):
 		Cell.__init__(self, year, fieldname)
 		self.row = row
 		self.column = column
+		site_years = 0
+		if not isinstance(self.row, LSD_Row):
+			for cell in self.row:
+				if cell is not None and not isinstance(cell, Aggregate_Cell):
+					print cell
+					for year_diff in self.column.years_range:
+						cell_mean = cell.get(year - year_diff, fieldname)
+						if cell_mean is not None:
+							site_years = site_years + 1
+		self.site_years = site_years
 		
 	def append(self, value):
 		return
@@ -391,18 +401,19 @@ class Aggregate_Cell(Cell):
 	def get(self, year, fieldname):
 		balanced = True
 		values = []
-		for cell in self.row:
-			if balanced and cell is not None and not isinstance(cell, Aggregate_Cell):
-				for year_diff in self.column.years_range:
-					cell_mean = cell.get(year - year_diff, fieldname)
-					if cell_mean is None:
-						# This subset is not balanced across years!
-						values = []
-						balanced = False
-						break
-					else:
-						values.append(cell_mean)
-					
+		if not isinstance(self.row, LSD_Row):
+			for cell in self.row:
+				if balanced and cell is not None and not isinstance(cell, Aggregate_Cell):
+					for year_diff in self.column.years_range:
+						cell_mean = cell.get(year - year_diff, fieldname)
+						if cell_mean is None:
+							# This subset is not balanced across years!
+							values = []
+							balanced = False
+							break
+						else:
+							values.append(cell_mean)
+						
 		
 		mean = None
 		if len(values) > 0:
@@ -429,6 +440,10 @@ class Aggregate_Column(Column):
 		self.members = []
 		self.clear()
 		self.years_range = range(year_num)
+		self.site_years = 0
+	
+	def get_site_years(self):
+		return self.site_years
 
 class Table:
 		"""
@@ -447,8 +462,8 @@ class Table:
 			self.lsd_probability = lsd_probability
 			self.locations = list(locations) # create a copy
 			self.visible_locations = list(visible_locations) # create a copy
-			self.rows = {} # variety: [Row(), ...]
-			self.columns = {} # location: [Column(), ...]
+			self.rows = {} # variety: Row(), ...
+			self.columns = {} # location: Column(), ...
 			self.cells = {} # (variety, location): Cell()
 			
 		def get_row(self, variety):
@@ -490,6 +505,19 @@ class Table:
 				
 			return alpha_sorted
 		
+		def sorted_visible_columns(self):
+			sorted_column_tuples = []
+			for location in self.visible_locations:
+				column = self.get_column(location)
+				if isinstance(column, Aggregate_Column) and column.site_years == 0:
+					for cell in column:
+						if cell.site_years > column.site_years:
+							column.site_years = cell.site_years
+							
+				sorted_column_tuples.append( (column, location) )
+				
+			return sorted_column_tuples
+			
 		def set_defaults(self, year, fieldname):
 			for cell in self.cells.values():
 				cell.year = year
@@ -562,12 +590,19 @@ class Page:
 		
 		if break_into_subtables:
 			# Sort/split the tables
+			
+			# Sort the varieties by number of locations they appear in.
 			variety_order = sorted(decomposition[default_year], key = lambda variety: decomposition[default_year][variety], reverse=True)
 			
 			if len(variety_order) > 0:
 				prev = variety_order[0]
 				
-				# delete locations that have no data in the current year
+				# Delete locations that have no data in the current year.
+				#
+				# This will give undesired results if the variety 'prev' 
+				# is present in n locations, and another variety is present
+				# in a different set of n locations. In practice this case
+				# is hardly seen.
 				truth_table = decomposition[default_year][prev]
 				delete_these = []
 				for (index, location) in enumerate(visible_locations):

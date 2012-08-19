@@ -233,6 +233,16 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				for table in page.tables:
 					table.set_defaults(curyear, fieldname)
 			else:
+				page = Page(
+							locations,
+							curyear, 
+							year_range, 
+							fieldname, 
+							lsd_probability, 
+							break_into_subtables=break_into_subtables, 
+							varieties=varieties
+						)
+				"""
 				try:
 					page = Page(
 							locations,
@@ -246,6 +256,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				except:
 					# TODO: Print message to the user telling them why we are exiting
 					return HttpResponseRedirect('/')
+				"""
 				cache.set(cache_key, page, 300) # expires after 300 seconds (5 minutes)
 					
 			
