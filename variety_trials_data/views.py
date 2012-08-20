@@ -211,14 +211,16 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			lsd_probability = 0.05
 			
 			break_into_subtables = False
+			number_locations = len(locations)
 			if len(varieties) == 0:
 				break_into_subtables = True
 				#if scope != variety_trials_forms.ScopeConstants.all:
 				if scope == variety_trials_forms.ScopeConstants.near:
-					locations = locations[0:8]
+					number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
 				
-			cache_key = '%s%s%s%s%s%s' % (
+			cache_key = '%s%s%s%s%s%s%s' % (
 					[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
+					number_locations,
 					year_url_bit,
 					year_range, 
 					lsd_probability, 
@@ -235,6 +237,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			else:
 				page = Page(
 							locations,
+							number_locations,
 							curyear, 
 							year_range, 
 							fieldname, 

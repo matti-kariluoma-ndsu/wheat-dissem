@@ -396,18 +396,26 @@ class Aggregate_Cell(Cell):
 		# Note we are not making a copy of visible_locations; do not mutate
 		self.visible_locations = visible_locations
 		self.site_years = 0
-		#TODO: have this for-loop and the other in get() use a single code-path?
 		if not isinstance(self.row, LSD_Row):
 			for cell in self.row:
 				if cell is not None and not isinstance(cell, Aggregate_Cell):
-					for year_diff in self.column.years_range:
-						year = self.year - year_diff
-						if year in self.decomposition and self.row.variety in self.decomposition[year]:
-							truth_table = self.decomposition[year][self.row.variety]
-							site_years = len([location for location in self.visible_locations if not isinstance(location, Fake_Location) and truth_table[location]])
-							if site_years > self.site_years:
-								self.site_years = site_years
-		
+					break
+			if cell is not None and not isinstance(cell, Aggregate_Cell):
+				for year_diff in self.column.years_range:
+					year = self.year - year_diff
+					min_site_years = 10000
+					if year in self.decomposition:
+						for col_cell in cell.row:
+							if col_cell is not None:
+								variety = col_cell.row.variety
+								if variety in self.decomposition[year]:
+									truth_table = self.decomposition[year][variety]
+									site_years = len([location for location in self.visible_locations if not isinstance(location, Fake_Location) and truth_table[location]])
+									if site_years < min_site_years:
+										min_site_years = site_years
+					if min_site_years == 10000:
+						min_site_years = 0
+					self.site_years = self.site_years + min_site_years
 		
 	def append(self, value):
 		return
@@ -567,7 +575,7 @@ class Page:
 				)
 		return result
 			
-	def __init__(self, locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
+	def __init__(self, locations, number_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
 		self.locations = locations
 		self.tables = []
 		
@@ -617,11 +625,11 @@ class Page:
 				
 				# Delete locations that have no data in the current year.
 				#
-				# This will give undesired results if the variety 'prev' 
+				# TODO: This will give undesired results if the variety 'prev' 
 				# is present in n locations, and another variety is present
 				# in a different set of n locations. In practice this case
 				# is hardly seen.
-				"""
+				
 				truth_table = decomposition[default_year][prev]
 				delete_these = []
 				for (index, location) in enumerate(visible_locations):
@@ -629,7 +637,10 @@ class Page:
 						delete_these.append(index)
 				for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
 					visible_locations.pop(index)
-				"""
+				
+				if len(visible_locations) > number_locations:
+					visible_locations = visible_locations[0:number_locations]
+				
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability)
 				self.tables.append(table)
@@ -651,6 +662,10 @@ class Page:
 					delete_these.append(index)
 			for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
 				visible_locations.pop(index)
+
+			if len(visible_locations) > number_locations:
+				visible_locations = visible_locations[0:number_locations]
+
 			table = Table(locations, visible_locations, lsd_probability)
 			self.tables.append(table)
 			for variety in cells:
