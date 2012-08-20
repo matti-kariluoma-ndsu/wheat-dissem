@@ -575,7 +575,7 @@ class Page:
 				)
 		return result
 			
-	def __init__(self, locations, number_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
+	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
 		self.locations = locations
 		self.tables = []
 		
@@ -638,8 +638,15 @@ class Page:
 				for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
 					visible_locations.pop(index)
 				
-				if len(visible_locations) > number_locations:
-					visible_locations = visible_locations[0:number_locations]
+				visible_locations = visible_locations[0:number_locations]
+				
+				delete_me = []
+				for (index, location) in enumerate(visible_locations):
+					if location in not_locations:
+						delete_me.append(index)
+				for index in sorted(delete_me, reverse=True):
+					visible_locations.pop(index)
+				
 				
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability)
@@ -663,9 +670,15 @@ class Page:
 			for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
 				visible_locations.pop(index)
 
-			if len(visible_locations) > number_locations:
-				visible_locations = visible_locations[0:number_locations]
-
+			visible_locations = visible_locations[0:number_locations]
+			
+			delete_me = []
+			for (index, location) in enumerate(visible_locations):
+				if location in not_locations:
+					delete_me.append(index)
+			for index in sorted(delete_me, reverse=True):
+				visible_locations.pop(index)
+			
 			table = Table(locations, visible_locations, lsd_probability)
 			self.tables.append(table)
 			for variety in cells:
