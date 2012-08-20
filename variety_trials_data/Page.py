@@ -462,6 +462,7 @@ class Aggregate_Column(Column):
 	def get_site_years(self):
 		return self.site_years
 
+
 class Table:
 		"""
 		Creates an object with lists for fields that are suitable for a

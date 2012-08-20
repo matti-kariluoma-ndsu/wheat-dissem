@@ -329,11 +329,18 @@ Notes from Aug 10 Meeting
 ** later use to enhance v-to-v view
 * Rollout Sep 1
 * JSONP for other sites to grab from DB
-* Copyright footer (brought to you by ransom, wiermnma, kariluoma)
+* Copyright footer (brought to you by ransom, wiersma, kariluoma)
 ** link to static about us page for workers
 * Anything special so google can find us?
+** We need a list of keywords
+*** North Dakota
+*** Minnesota
+*** Wheat Trials
+*** Variety Varietal selection
+*** NDSU MSU
+*** Extension Info Type Breed Description ...
 
-CLicking on 2010,2009 does not show us the data as expected, and mutates
+Clicking on 2010,2009 does not show us the data as expected, and mutates
 the table structure. Set it to reuse the table strucutre, only showing old
 data (as ugly as it may be)
 * Maybe a "rebalance table" or similar-named button that redirects to /view/2010/... ?

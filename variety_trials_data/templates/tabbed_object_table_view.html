@@ -51,6 +51,7 @@
 				<h4>Variety</h4>
 			</th>
 		{% comment %}{% for location in table.locations %}{% endcomment %}
+		{% comment %}{% for location in table.visible_locations %}{% endcomment %}
 		{% for column, location in table.sorted_visible_columns %}
 			<th>
 				<h4>{{ location.name }}</h4>
