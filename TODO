@@ -332,3 +332,8 @@ Notes from Aug 10 Meeting
 * Copyright footer (brought to you by ransom, wiermnma, kariluoma)
 ** link to static about us page for workers
 * Anything special so google can find us?
+
+CLicking on 2010,2009 does not show us the data as expected, and mutates
+the table structure. Set it to reuse the table strucutre, only showing old
+data (as ugly as it may be)
+* Maybe a "rebalance table" or similar-named button that redirects to /view/2010/... ?

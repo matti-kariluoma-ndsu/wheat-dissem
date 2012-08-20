@@ -380,20 +380,34 @@ class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is based upon its row
 	"""
-	def __init__(self, year, fieldname, row, column):
+	def __init__(self, year, fieldname, row, column, decomposition, visible_locations):
+		"""
+		year: passed on to Cell
+		fieldname: passed on to Cell
+		row: the row this aggregate_cell is in
+		column: the column this aggregate_cell is in
+		decomposition: a truth table of what data we have
+		"""
 		Cell.__init__(self, year, fieldname)
 		self.row = row
 		self.column = column
-		site_years = 0
+		# Note we are not making a copy of decomposition; do not mutate
+		self.decomposition = decomposition # {year: {variety: {location: bool, ...}, ...}, ...}
+		# Note we are not making a copy of visible_locations; do not mutate
+		self.visible_locations = visible_locations
+		self.site_years = 0
+		#TODO: have this for-loop and the other in get() use a single code-path?
 		if not isinstance(self.row, LSD_Row):
 			for cell in self.row:
 				if cell is not None and not isinstance(cell, Aggregate_Cell):
-					print cell
 					for year_diff in self.column.years_range:
-						cell_mean = cell.get(year - year_diff, fieldname)
-						if cell_mean is not None:
-							site_years = site_years + 1
-		self.site_years = site_years
+						year = self.year - year_diff
+						if year in self.decomposition and self.row.variety in self.decomposition[year]:
+							truth_table = self.decomposition[year][self.row.variety]
+							site_years = len([location for location in self.visible_locations if not isinstance(location, Fake_Location) and truth_table[location]])
+							if site_years > self.site_years:
+								self.site_years = site_years
+		
 		
 	def append(self, value):
 		return
@@ -408,9 +422,12 @@ class Aggregate_Cell(Cell):
 						cell_mean = cell.get(year - year_diff, fieldname)
 						if cell_mean is None:
 							# This subset is not balanced across years!
+							#"""
 							values = []
 							balanced = False
 							break
+							#"""
+							#pass
 						else:
 							values.append(cell_mean)
 						
@@ -554,7 +571,7 @@ class Page:
 		self.tables = []
 		
 		cells = {} # variety: {location: Cell() }
-		decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
 		for entry in self.get_entries(default_year - year_range, default_year, varieties):
 			year = entry.harvest_date.date.year
 			variety = entry.variety
@@ -603,6 +620,7 @@ class Page:
 				# is present in n locations, and another variety is present
 				# in a different set of n locations. In practice this case
 				# is hardly seen.
+				"""
 				truth_table = decomposition[default_year][prev]
 				delete_these = []
 				for (index, location) in enumerate(visible_locations):
@@ -610,7 +628,7 @@ class Page:
 						delete_these.append(index)
 				for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
 					visible_locations.pop(index)
-				
+				"""
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability)
 				self.tables.append(table)
@@ -657,7 +675,7 @@ class Page:
 				column = Aggregate_Column(location_key, year_num)
 				table.columns[location_key] = column
 				for row in table.rows.values():
-					cell = Aggregate_Cell(default_year, default_fieldname, row, column)
+					cell = Aggregate_Cell(default_year, default_fieldname, row, column, decomposition, table.visible_locations)
 					table.add_cell(row.variety, location_key, cell)
 				
 		
