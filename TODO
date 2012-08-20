@@ -313,10 +313,6 @@ form on the main page)
 * Ensure newly entered varieties can show up in search
 * drive by 1-yr mean; allow holes in the 2,3 yr .
 
-In order to hide columns, use the row.set_key_order fucntion
-** To reduce the overhead, have the rows bakc-reference the table's 
-copy of the sorted_locations (ideally a visible_locations subset)
-
 Notes from Aug 10 Meeting
 * Put back 'x site-years' message for each n-yr mean
 * Ensure 8 locations (after some fall off during calculation ... maybe start with more/all then cut?

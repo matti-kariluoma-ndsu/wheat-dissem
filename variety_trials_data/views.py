@@ -219,7 +219,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				
 			cache_key = '%s%s%s%s%s%s' % (
 					[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
-					curyear, # TODO: remove this, and give Page a function to deal with changing the viewed year.
+					year_url_bit,
 					year_range, 
 					lsd_probability, 
 					break_into_subtables, 
