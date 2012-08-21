@@ -580,6 +580,7 @@ class Page:
 		self.tables = []
 		
 		#TODO: mutate locations before continuing
+		#TODO: consider exposing a remove_locations() function, and remove the list of not_locations from the cahce_key
 		
 		cells = {} # variety: {location: Cell() }
 		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
