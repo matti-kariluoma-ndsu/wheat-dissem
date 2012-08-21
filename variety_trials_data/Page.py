@@ -579,6 +579,8 @@ class Page:
 		self.locations = locations
 		self.tables = []
 		
+		#TODO: mutate locations before continuing
+		
 		cells = {} # variety: {location: Cell() }
 		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
 		for entry in self.get_entries(default_year - year_range, default_year, varieties):
