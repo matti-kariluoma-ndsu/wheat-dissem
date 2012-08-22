@@ -549,44 +549,71 @@ class Table:
 				cell.fieldname = fieldname
 
 class Page:
-	def get_entries(self, min_year, max_year, variety_names):
-		# We do a depth=2 so we can access entry.variety.name
-		# We do a depth=3 so we can access entry.harvest_date.date.year
-		#TODO: Somehow reduce this to depth=1
-		if len(variety_names) == 0:
-			result = models.Trial_Entry.objects.select_related(depth=3).filter(
-					location__in=self.locations
+	def get_entries(self, min_year, max_year, locations, number_locations, variety_names):
+		"""
+		First calls multiple count() calls to the database, and deletes
+		locations from the page that contain no data.
+		
+		Then, the number of locations is truncated to `number_locations'.
+		
+		Finally, the truncated locations and trial entry objects are queried 
+		for and returned.
+		
+		min_year: the oldest data to retrieve
+		max_year: the newest data to retrieve
+		locations: the (previosuly sorted) list of locations to consider
+		number_locations: the length to truncate the list of locations to
+		variety_names: list of varieties to limit ourselves to
+		
+		"""
+		dates = models.Date.objects.filter(
+				date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+			)
+		#
+		## Only use locations with data in the current year
+		#
+		locations_with_data = []
+		for loc in locations:
+			if models.Trial_Entry.objects.filter(
+					location=loc
 				).filter(
-					harvest_date__in=models.Date.objects.filter(
-						date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
-					)
+					harvest_date__in=dates
+				).count() > 0:
+					locations_with_data.append(loc)
+			if len(locations_with_data) >= number_locations:
+				break
+		
+		result = models.Trial_Entry.objects.select_related(
+				'location', 'variety', 'harvest_date__date'
+			).filter(
+				location__in=locations_with_data
+			).filter(
+				harvest_date__in=dates
+			)
+				
+		if len(variety_names) > 0:
+			result = result.filter(
+					variety__in=models.Variety.objects.filter(
+							name__in=variety_names
+						)
 				)
-		else:
-			varieties = models.Variety.objects.filter(name__in=variety_names)
-			result = models.Trial_Entry.objects.select_related(depth=3).filter(
-					variety__in=varieties
-				).filter(
-					location__in=self.locations
-				).filter(
-					harvest_date__in=models.Date.objects.filter(
-						date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
-					)
-				)
-		return result
+				
+		return (locations_with_data, result)
 			
 	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
-		self.locations = locations
-		self.tables = []
-		
-		#
-		## Delete locations that have no data in the current year
-		#
-		
-		
-		
+		self.tables = []	
 		cells = {} # variety: {location: Cell() }
 		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
-		for entry in self.get_entries(default_year - year_range, default_year, varieties):
+		(self.locations, entries) = self.get_entries(
+				default_year - year_range, 
+				default_year, 
+				locations, 
+				number_locations, 
+				varieties
+			)
+		locations = self.locations # discard the input locations
+		
+		for entry in entries:
 			year = entry.harvest_date.date.year
 			variety = entry.variety
 			location = entry.location
@@ -617,29 +644,14 @@ class Page:
 				
 		#print decomposition[default_year]
 		
+		# TODO: visible_locations is now being used to keep locations around, but
+		# TODO: allow the user to deselect some of them. Is this needed for some
+		# TODO: functionality?
 		visible_locations = list(locations) # copy list
 		
-		"""
-		#
-		## Delete locations that have no data in the current year
-		#
-		delete_these = []
-		for (index, location) in enumerate(visible_locations):
-			delete = True
-			for variety in cells:
-				delete = delete and not decomposition[default_year][variety][location]
-			if delete:
-				delete_these.append(index)
-				
-		for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
-			visible_locations.pop(index)
-		"""
-		# cut off the number of locations to `number_locations' before deleting the
-		# user's deselections.
-		visible_locations = visible_locations[0:number_locations]
-		
 		# delete user's deselections.
-		# TODO: consider exposing a remove_locations() function, and remove the list of not_locations from the cache_key
+		# TODO: consider exposing a remove_locations() function, and remove the 
+		# TODO: list of not_locations from the cache_key.
 		if len(not_locations) > 0:
 			delete_these = []
 			for (index, location) in enumerate(visible_locations):
@@ -648,17 +660,23 @@ class Page:
 					
 			for index in sorted(delete_these, reverse=True):
 				visible_locations.pop(index)
-			
+		
+		# TODO: if we rearrange `decomposition', the table layout will change as the 
+		# TODO: user deselects locations. This will also need to be accounted for in
+		# TODO: a remove_locations() function if we want to remove not_locations 
+		# TODO: from the cache key.
+		"""
 		# adjust `decomposition' but not `cells' since we are 
-		# modifying `visible_locations' and not `locations'
+		# modifying `visible_locations' but not `locations'
 		remove_locations = list(set(locations).difference(set(visible_locations)))
-		for year in decomposition:
-			decomposition_year = decomposition[year]
-			for variety in decomposition_year:
-				for location in visible_locations:
-					if location in decomposition_year[variety]:
-						del decomposition_year[variety][location]
-						
+		if len(remove_locations) > 0:
+			for year in decomposition:
+				decomposition_year = decomposition[year]
+				for variety in decomposition_year:
+					for location in remove_locations:
+						if location in decomposition_year[variety]:
+							del decomposition_year[variety][location]
+		"""				
 		#
 		## Make tables from cells
 		#
