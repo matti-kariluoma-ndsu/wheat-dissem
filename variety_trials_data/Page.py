@@ -470,7 +470,6 @@ class Aggregate_Column(Column):
 	def get_site_years(self):
 		return self.site_years
 
-
 class Table:
 		"""
 		Creates an object with lists for fields that are suitable for a
@@ -579,8 +578,11 @@ class Page:
 		self.locations = locations
 		self.tables = []
 		
-		#TODO: mutate locations before continuing
-		#TODO: consider exposing a remove_locations() function, and remove the list of not_locations from the cahce_key
+		#
+		## Delete locations that have no data in the current year
+		#
+		
+		
 		
 		cells = {} # variety: {location: Cell() }
 		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
@@ -617,39 +619,59 @@ class Page:
 		
 		visible_locations = list(locations) # copy list
 		
+		"""
+		#
+		## Delete locations that have no data in the current year
+		#
+		delete_these = []
+		for (index, location) in enumerate(visible_locations):
+			delete = True
+			for variety in cells:
+				delete = delete and not decomposition[default_year][variety][location]
+			if delete:
+				delete_these.append(index)
+				
+		for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
+			visible_locations.pop(index)
+		"""
+		# cut off the number of locations to `number_locations' before deleting the
+		# user's deselections.
+		visible_locations = visible_locations[0:number_locations]
+		
+		# delete user's deselections.
+		# TODO: consider exposing a remove_locations() function, and remove the list of not_locations from the cache_key
+		if len(not_locations) > 0:
+			delete_these = []
+			for (index, location) in enumerate(visible_locations):
+				if location in not_locations:
+					delete_these.append(index)
+					
+			for index in sorted(delete_these, reverse=True):
+				visible_locations.pop(index)
+			
+		# adjust `decomposition' but not `cells' since we are 
+		# modifying `visible_locations' and not `locations'
+		remove_locations = list(set(locations).difference(set(visible_locations)))
+		for year in decomposition:
+			decomposition_year = decomposition[year]
+			for variety in decomposition_year:
+				for location in visible_locations:
+					if location in decomposition_year[variety]:
+						del decomposition_year[variety][location]
+						
+		#
+		## Make tables from cells
+		#
 		if break_into_subtables:
 			# Sort/split the tables
 			
 			# Sort the varieties by number of locations they appear in.
 			variety_order = sorted(decomposition[default_year], key = lambda variety: decomposition[default_year][variety], reverse=True)
 			
-			if len(variety_order) > 0:
+			if len(variety_order) < 1:
+				break_into_subtables = False
+			else:
 				prev = variety_order[0]
-				
-				# Delete locations that have no data in the current year.
-				#
-				# TODO: This will give undesired results if the variety 'prev' 
-				# is present in n locations, and another variety is present
-				# in a different set of n locations. In practice this case
-				# is hardly seen.
-				
-				truth_table = decomposition[default_year][prev]
-				delete_these = []
-				for (index, location) in enumerate(visible_locations):
-					if not truth_table[location]:
-						delete_these.append(index)
-				for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
-					visible_locations.pop(index)
-				
-				visible_locations = visible_locations[0:number_locations]
-				
-				delete_me = []
-				for (index, location) in enumerate(visible_locations):
-					if location in not_locations:
-						delete_me.append(index)
-				for index in sorted(delete_me, reverse=True):
-					visible_locations.pop(index)
-				
 				
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability)
@@ -661,27 +683,8 @@ class Page:
 						self.tables.append(table)
 					for (location, cell) in cells[variety].items():
 						table.add_cell(variety, location, cell)
-		else:
-			# delete locations that have no data in the current year
-			delete_these = []
-			for (index, location) in enumerate(visible_locations):
-				delete = True
-				for variety in cells:
-					delete = delete and not decomposition[default_year][variety][location]
-				if delete:
-					delete_these.append(index)
-			for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
-				visible_locations.pop(index)
-
-			visible_locations = visible_locations[0:number_locations]
-			
-			delete_me = []
-			for (index, location) in enumerate(visible_locations):
-				if location in not_locations:
-					delete_me.append(index)
-			for index in sorted(delete_me, reverse=True):
-				visible_locations.pop(index)
-			
+		
+		if not break_into_subtables:
 			table = Table(locations, visible_locations, lsd_probability)
 			self.tables.append(table)
 			for variety in cells:
@@ -708,19 +711,9 @@ class Page:
 				table.columns[location_key] = column
 				for row in table.rows.values():
 					cell = Aggregate_Cell(default_year, default_fieldname, row, column, decomposition, table.visible_locations)
-					table.add_cell(row.variety, location_key, cell)
-				
+					table.add_cell(row.variety, location_key, cell)				
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
 			table.set_defaults(year, fieldname)
-			
-	def set_default_year(self, year):
-		for table in self.tables:
-			table.set_default_year(year)
-	
-	def set_default_field(self, fieldname):
-		for table in self.tables:
-			table.set_default_field(fieldname)
-			
 
