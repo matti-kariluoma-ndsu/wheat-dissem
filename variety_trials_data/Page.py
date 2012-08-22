@@ -641,7 +641,13 @@ class Page:
 				d[location] = True
 			except KeyError:
 				pass
-				
+		
+		if default_year not in decomposition:
+			years = decomposition.keys()
+			if len(years) > 0:
+				default_year = sorted(years, reverse=True)[0]
+			else:
+				raise BaseException() # TODO: custom exception so we can tell the user what's up
 		#print decomposition[default_year]
 		
 		# TODO: visible_locations is now being used to keep locations around, but
