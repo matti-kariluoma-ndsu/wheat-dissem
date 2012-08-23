@@ -340,3 +340,10 @@ Clicking on 2010,2009 does not show us the data as expected, and mutates
 the table structure. Set it to reuse the table strucutre, only showing old
 data (as ugly as it may be)
 * Maybe a "rebalance table" or similar-named button that redirects to /view/2010/... ?
+
+make static pages
+* /view/ - instructions on get syntax
+* /add/ - secretary jump point
+* /json/ - programmer jump point
+* /about/ - info
+* add to footer at each page, except /add/, which should be palced in robots.txt

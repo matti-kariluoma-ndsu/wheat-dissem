@@ -395,6 +395,9 @@ class Aggregate_Cell(Cell):
 		self.decomposition = decomposition # {year: {variety: {location: bool, ...}, ...}, ...}
 		# Note we are not making a copy of visible_locations; do not mutate
 		self.visible_locations = visible_locations
+		self.calculate_site_years()
+		
+	def calculate_site_years(self):
 		self.site_years = 0
 		if not isinstance(self.row, LSD_Row):
 			for cell in self.row:
@@ -651,6 +654,12 @@ class Page:
 		if mutate_existing_tables:	
 			for table in self.tables:
 				visible_locations = table.visible_locations = remove_locations(table.visible_locations, not_locations)
+				
+				for column in table.columns.values():
+					if isinstance(column, Aggregate_Column):
+						for cell in column:
+							if isinstance(cell, Aggregate_Cell):
+								cell.calculate_site_years()
 		else:
 			visible_locations = remove_locations(list(self.locations), not_locations)
 		
