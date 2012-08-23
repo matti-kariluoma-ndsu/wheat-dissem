@@ -90,8 +90,6 @@ $("#selectRight option").each(
 var cellList = [];
 var variety_trials_app = {
 	entryList: [],
-	
-	pk: [],
 	table: $('#debug'),
 	locationList: [],
 	cells: {},
@@ -140,29 +138,29 @@ var variety_trials_app = {
 	},
 	
 	store_data: function(response_data){
-		if($.inArray(response_data.pk,variety_trials_app.pk)){
-		
+		cell_list=variety_trials_app.cells[response_data.fields.location,response_data.fields.variety]
+		if(cell_list===undefined){
+			var cell = new variety_trials_app.cell(response_data)
+			variety_trials_app.cells[response_data.fields.location,response_data.fields.variety]=cell
+			variety_trials_app.column(response_data.fields.location,cell)
+			variety_trials_app.row(response_data.fields.variety,cell)
 		}
 		else{
-		pk.push(response_data.pk)
-		var variety_pk=response_data.fields.variety
-		var location_pk = response_data.fields.location
-		var trial_pk = response_data.pk
-		new variety_trials_app.cell(response_data)
+			cell_list.add_cell(response_data)
+			
 		}
 	},
 	
 	cell: function(response_data){
-		this.data=response_data
-		cell_list=variety_trials_app.cells[response_data.fields.location,response_data.fields.variety]
-		if(cell_list){
-		cell_list.push(this)
-		}
-		else{
-		variety_trials_app.cells[response_data.fields.location,response_data.fields.variety]=[this]
-		variety_trials_app.column(response_data.fields.location,this)
-		variety_trials_app.row(response_data.fields.variety,this)
-		}
+		this.data=new Array()
+		
+		this.add_cell=variety_trials_app.addcell
+		this.data.push(response_data)
+		
+	},
+	
+	addcell: function(response_data){
+		variety_trials_app.cells[response_data.fields.location,response_data.fields.variety].data.push(response_data)
 	},
 	
 	row: function(va,current_cell){
