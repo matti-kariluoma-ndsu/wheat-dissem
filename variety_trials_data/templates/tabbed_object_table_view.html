@@ -55,9 +55,8 @@
 		{% for column, location in table.sorted_visible_columns %}
 			<th>
 				<h4>{{ location.name }}</h4>
-				
 			{% if location.id == -1 %}
-				<p>{{ column.get_site_years }} site-years</p>
+				<p>{{column.get_site_years}} site-years</p>
 			{% else %}
 				<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
 			{% endif %}
@@ -68,7 +67,7 @@
 		{% if variety.name == "LSD" %}
 		<tr class="variety_trials__LSD_row">
 			<th>
-				<input type="submit" value="Compare Selected"/>
+				<input type="submit" value="Compare Checked"/>
 			</th>
 		{% else %}
 		<tr class="variety_trials__row {% cycle 'variety_trials__row_odd' 'variety_trials__row_even' %}">
