@@ -210,10 +210,9 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				if scope == variety_trials_forms.ScopeConstants.near:
 					number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
 				
-			cache_key = '%s%s%s%s%s%s%s%s' % (
+			cache_key = '%s%s%s%s%s%s%s' % (
 					[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
 					number_locations,
-					[l.pk for l in sorted(not_location_objects, key=lambda location: location.pk)],
 					year_url_bit,
 					year_range, 
 					lsd_probability, 
@@ -227,6 +226,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			if page is not None:
 				for table in page.tables:
 					table.set_defaults(curyear, fieldname)
+				page.mask_locations(not_location_objects)
 			else:
 				page = Page(
 							locations,

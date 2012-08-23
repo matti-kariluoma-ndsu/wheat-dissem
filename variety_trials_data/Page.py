@@ -496,7 +496,7 @@ class Table:
 				row = self.rows[variety]
 			except KeyError:
 				row = self.rows[variety] = Row(variety)
-				row.set_key_order(self.visible_locations)
+				row.set_key_order(self.visible_locations) # pass by reference
 			return row	
 		
 		def get_column(self, location):
@@ -605,33 +605,54 @@ class Page:
 		return (locations_with_data, result)
 	
 	def mask_locations(self, not_locations, mutate_existing_tables=True):
-		visible_locations = list(self.locations) # create copy
-		
-		if len(not_locations) > 0:
-			delete_these = []
-			for (index, location) in enumerate(visible_locations):
-				if location in not_locations:
-					delete_these.append(index)
-					
-			for index in sorted(delete_these, reverse=True):
-				visible_locations.pop(index)
-		
-		# TODO: if we rearrange `decomposition', the table layout will change as the 
-		# TODO: user deselects locations. This will also need to be accounted for in
-		# TODO: a remove_locations() function if we want to remove not_locations 
-		# TODO: from the cache key.
 		"""
-		# adjust `decomposition' but not `cells' since we are 
-		# modifying `visible_locations' but not `locations'
-		remove_locations = list(set(locations).difference(set(visible_locations)))
-		if len(remove_locations) > 0:
-			for year in decomposition:
-				decomposition_year = decomposition[year]
-				for variety in decomposition_year:
-					for location in remove_locations:
-						if location in decomposition_year[variety]:
-							del decomposition_year[variety][location]
+		Returns the last list of locations that have had `not_locations'
+		removed from them, or None if there was a problem. 
+		`mutate_existing_tables' greatly changes the context of this return 
+		value.
+		
+		not_locations: the locations to mask/hide
+		mutate_exisiting_tables: whether or not to iterate over exisiting 
+			tables, or to use self.locations
 		"""
+		def remove_locations(locations, not_locations):
+			"""
+			Remove `not_locations' from `locations', maintaining input order
+			"""
+			if len(not_locations) > 0:
+				delete_these = []
+				for (index, location) in enumerate(locations):
+					if location in not_locations:
+						delete_these.append(index)
+						
+				for index in sorted(delete_these, reverse=True):
+					locations.pop(index)
+			
+			# TODO: if we rearrange `decomposition', the table layout will change as the 
+			# TODO: user deselects locations. This will also need to be accounted for in
+			# TODO: a remove_locations() function if we want to remove not_locations 
+			# TODO: from the cache key.
+			"""
+			# adjust `decomposition' but not `cells' since we are 
+			# modifying `visible_locations' but not `locations'
+			remove_locations = list(set(locations).difference(set(visible_locations)))
+			if len(remove_locations) > 0:
+				for year in decomposition:
+					decomposition_year = decomposition[year]
+					for variety in decomposition_year:
+						for location in remove_locations:
+							if location in decomposition_year[variety]:
+								del decomposition_year[variety][location]
+			"""
+			return locations
+		
+		visible_locations = None
+		
+		if mutate_existing_tables:	
+			for table in self.tables:
+				visible_locations = table.visible_locations = remove_locations(table.visible_locations, not_locations)
+		else:
+			visible_locations = remove_locations(list(self.locations), not_locations)
 		
 		return visible_locations
 	
@@ -684,15 +705,8 @@ class Page:
 				default_year = sorted(years, reverse=True)[0]
 			else:
 				raise BaseException() # TODO: custom exception so we can tell the user what's up
-		#print decomposition[default_year]
 		
 		# hide user's deselections.
-		# TODO: consider exposing a remove_locations() function, and remove the 
-		# TODO: list of not_locations from the cache_key.
-  
-		# TODO: visible_locations is now being used to keep locations around, but
-		# TODO: allow the user to deselect some of them. Is this needed for some
-		# TODO: functionality?
 		visible_locations = self.mask_locations(not_locations, mutate_existing_tables=False)
 			
 		#
