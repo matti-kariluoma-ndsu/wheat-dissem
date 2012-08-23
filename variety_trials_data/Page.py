@@ -655,6 +655,24 @@ class Page:
 		# TODO: functionality?
 		visible_locations = list(locations) # copy list
 		
+		# TODO: move this logic to the get_entries() function
+		"""
+		# delete locations that have no data in the current year
+		delete_these = []
+		for (index, location) in enumerate(visible_locations):
+			delete = True
+			for variety in cells:
+				if variety in decomposition[default_year]:
+					delete = delete and not decomposition[default_year][variety][location]
+				if not delete:
+					break
+			if delete:
+				delete_these.append(index)
+				
+		for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
+			visible_locations.pop(index)
+		"""
+		
 		# delete user's deselections.
 		# TODO: consider exposing a remove_locations() function, and remove the 
 		# TODO: list of not_locations from the cache_key.
