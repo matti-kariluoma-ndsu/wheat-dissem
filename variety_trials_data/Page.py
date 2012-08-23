@@ -566,7 +566,11 @@ class Page:
 		variety_names: list of varieties to limit ourselves to
 		
 		"""
-		dates = models.Date.objects.filter(
+		this_year_dates = models.Date.objects.filter(
+				date__range=(datetime.date(max_year,1,1), datetime.date(max_year,12,31))
+			)
+			
+		all_dates = models.Date.objects.filter(
 				date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
 			)
 		#
@@ -577,7 +581,7 @@ class Page:
 			if models.Trial_Entry.objects.filter(
 					location=loc
 				).filter(
-					harvest_date__in=dates
+					harvest_date__in=this_year_dates
 				).count() > 0:
 					locations_with_data.append(loc)
 			if len(locations_with_data) >= number_locations:
@@ -588,7 +592,7 @@ class Page:
 			).filter(
 				location__in=locations_with_data
 			).filter(
-				harvest_date__in=dates
+				harvest_date__in=all_dates
 			)
 				
 		if len(variety_names) > 0:
@@ -599,7 +603,38 @@ class Page:
 				)
 				
 		return (locations_with_data, result)
-			
+	
+	def mask_locations(self, not_locations, mutate_existing_tables=True):
+		visible_locations = list(self.locations) # create copy
+		
+		if len(not_locations) > 0:
+			delete_these = []
+			for (index, location) in enumerate(visible_locations):
+				if location in not_locations:
+					delete_these.append(index)
+					
+			for index in sorted(delete_these, reverse=True):
+				visible_locations.pop(index)
+		
+		# TODO: if we rearrange `decomposition', the table layout will change as the 
+		# TODO: user deselects locations. This will also need to be accounted for in
+		# TODO: a remove_locations() function if we want to remove not_locations 
+		# TODO: from the cache key.
+		"""
+		# adjust `decomposition' but not `cells' since we are 
+		# modifying `visible_locations' but not `locations'
+		remove_locations = list(set(locations).difference(set(visible_locations)))
+		if len(remove_locations) > 0:
+			for year in decomposition:
+				decomposition_year = decomposition[year]
+				for variety in decomposition_year:
+					for location in remove_locations:
+						if location in decomposition_year[variety]:
+							del decomposition_year[variety][location]
+		"""
+		
+		return visible_locations
+	
 	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
 		self.tables = []	
 		cells = {} # variety: {location: Cell() }
@@ -611,6 +646,7 @@ class Page:
 				number_locations, 
 				varieties
 			)
+				
 		locations = self.locations # discard the input locations
 		
 		for entry in entries:
@@ -650,57 +686,15 @@ class Page:
 				raise BaseException() # TODO: custom exception so we can tell the user what's up
 		#print decomposition[default_year]
 		
+		# hide user's deselections.
+		# TODO: consider exposing a remove_locations() function, and remove the 
+		# TODO: list of not_locations from the cache_key.
+  
 		# TODO: visible_locations is now being used to keep locations around, but
 		# TODO: allow the user to deselect some of them. Is this needed for some
 		# TODO: functionality?
-		visible_locations = list(locations) # copy list
-		
-		# TODO: move this logic to the get_entries() function
-		"""
-		# delete locations that have no data in the current year
-		delete_these = []
-		for (index, location) in enumerate(visible_locations):
-			delete = True
-			for variety in cells:
-				if variety in decomposition[default_year]:
-					delete = delete and not decomposition[default_year][variety][location]
-				if not delete:
-					break
-			if delete:
-				delete_these.append(index)
-				
-		for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
-			visible_locations.pop(index)
-		"""
-		
-		# delete user's deselections.
-		# TODO: consider exposing a remove_locations() function, and remove the 
-		# TODO: list of not_locations from the cache_key.
-		if len(not_locations) > 0:
-			delete_these = []
-			for (index, location) in enumerate(visible_locations):
-				if location in not_locations:
-					delete_these.append(index)
-					
-			for index in sorted(delete_these, reverse=True):
-				visible_locations.pop(index)
-		
-		# TODO: if we rearrange `decomposition', the table layout will change as the 
-		# TODO: user deselects locations. This will also need to be accounted for in
-		# TODO: a remove_locations() function if we want to remove not_locations 
-		# TODO: from the cache key.
-		"""
-		# adjust `decomposition' but not `cells' since we are 
-		# modifying `visible_locations' but not `locations'
-		remove_locations = list(set(locations).difference(set(visible_locations)))
-		if len(remove_locations) > 0:
-			for year in decomposition:
-				decomposition_year = decomposition[year]
-				for variety in decomposition_year:
-					for location in remove_locations:
-						if location in decomposition_year[variety]:
-							del decomposition_year[variety][location]
-		"""				
+		visible_locations = self.mask_locations(not_locations, mutate_existing_tables=False)
+			
 		#
 		## Make tables from cells
 		#
