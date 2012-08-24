@@ -159,17 +159,17 @@ class LSD_Row(Row):
 			for (variety, row) in self.table.sorted_rows():
 				if not isinstance(row, LSD_Row): # prevent infinite recursion!
 					row_lsd_input = []
-					for cell in row:
-						if cell is not None and not isinstance(cell.column, Aggregate_Column):
-							row_lsd_input.append(cell.get_rounded(cell.year, cell.fieldname, digits=5))
+					for row_cell in row:
+						if row_cell is not None and not isinstance(row_cell.column, Aggregate_Column):
+							row_lsd_input.append(row_cell.get_rounded(row_cell.year, row_cell.fieldname, digits=5))
 					cell_lsd_input['2010'].append(row_lsd_input)
 			#"""
 			for row in cell_lsd_input['2010']:
 				print row
 			print "==="
 			#"""
-			lsd = 99.9
-			if len(cell_lsd_input['2010']) > 1 and len(cell_lsd_input['2010'][0]) > 1:
+			lsd = 'M-LSD'
+			if len(cell.column.years_range) == 1 and len(cell_lsd_input['2010']) > 1 and len(cell_lsd_input['2010'][0]) > 1:
 				lsd = self.get_lsd(cell_lsd_input['2010'])
 			return lsd
 		elif isinstance(cell, Cell):
@@ -673,7 +673,7 @@ class Page:
 				except KeyError:
 					decomposition[year] = {}
 					d = decomposition[year][variety] = dict([(l, False) for l in self.locations])
-							
+					
 			try:
 				d[location] = True
 			except KeyError:
@@ -709,10 +709,12 @@ class Page:
 				for variety in variety_order:
 					if decomposition[default_year][variety] != decomposition[default_year][prev]:
 						prev = variety
-						table = Table(locations, visible_locations, lsd_probability)
-						self.tables.append(table)
-					for (location, cell) in cells[variety].items():
-						table.add_cell(variety, location, cell)
+						if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
+							table = Table(locations, visible_locations, lsd_probability)
+							self.tables.append(table)
+					if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
+						for (location, cell) in cells[variety].items():
+							table.add_cell(variety, location, cell)
 		
 		if not break_into_subtables:
 			table = Table(locations, visible_locations, lsd_probability)
