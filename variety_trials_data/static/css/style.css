@@ -43,6 +43,11 @@
 	text-align: left;
 }
 
+.variety_trials__LSD_row th p
+{
+	text-align: right;
+}
+
 .variety_trials__Column 
 { 
 	margin: 0 0 0 8px; 
