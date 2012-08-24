@@ -61,12 +61,18 @@ class Cell:
 
 		mean = None
 		if len(values) > 0:
-			mean = round(float(sum(values)) / float(len(values)), 1)
+			mean = float(sum(values)) / float(len(values))
 		
 		return mean
-		
+	
+	def get_rounded(self, year, fieldname, digits=1):
+		value = self.get(year, fieldname)
+		if value is not None:
+			value = round(value, digits)
+		return value
+	
 	def __unicode__(self):
-		unicode_repr = self.get(self.year, self.fieldname)
+		unicode_repr = self.get_rounded(self.year, self.fieldname)
 		if unicode_repr is None:
 			unicode_repr = u'-!-'
 		else:
@@ -155,12 +161,17 @@ class LSD_Row(Row):
 					row_lsd_input = []
 					for cell in row:
 						if cell is not None and not isinstance(cell.column, Aggregate_Column):
-							row_lsd_input.append(unicode(cell))
+							row_lsd_input.append(cell.get_rounded(cell.year, cell.fieldname, digits=5))
 					cell_lsd_input['2010'].append(row_lsd_input)
+			#"""
 			for row in cell_lsd_input['2010']:
 				print row
 			print "==="
-			return "M-LSD"
+			#"""
+			lsd = 99.9
+			if len(cell_lsd_input['2010']) > 1 and len(cell_lsd_input['2010'][0]) > 1:
+				lsd = self.get_lsd(cell_lsd_input['2010'])
+			return lsd
 		elif isinstance(cell, Cell):
 			## Grab a real cell from the column
 			for real_cell in cell.column:
@@ -178,7 +189,7 @@ class LSD_Row(Row):
 		else:
 			return cell
 	
-	def populate(self, probability):
+	def get_lsd(self, balanced_input, digits=1):
 	
 		def _qnorm(probability):
 			"""
@@ -302,57 +313,10 @@ class LSD_Row(Row):
 
 			return LSD
 		
-		y_columns = self.table.year_columns
-		years_i = []
-		l_columns = self.table.location_columns
-		location_lsds = []
+		lsd = _LSD(balanced_input, self.table.lsd_probability)
+		lsd = round(lsd, digits)
 		
-		years_i = list(y_columns[0].keys())
-		
-		if len(years_i) == 3:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
-			data_3yr = years_i[2]
-		elif len(years_i) == 2:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
-		elif len(years_i) == 1:
-			data_1yr = years_i[0]
-		else:
-			pass
-		
-		"""
-		if data_1yr != None:	
-			lsd_1yr = self._LSD(data_1yr, probability)
-		if data_2yr != None:
-			lsd_2yr = self._LSD(data_2yr, probability)
-		if data_3yr != None:
-			lsd_3yr = self._LSD(data_3yr, probability)
-		"""	
-		lsd_1yr = 0.1
-		lsd_2yr = 0.2
-		lsd_3yr = 0.3
-		"""
-		Grab the LSDs for the location columns in the Table object. 
-		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
-		"""	
-		for entry in self.table.entries:
-			for l in l_columns[0].keys():
-				if entry.hsd_10 is not None and l.name == entry.location.name:
-					location_lsds.append(entry.hsd_10)
-				elif entry.lsd_05 is not None and l.name == entry.location.name:
-					location_lsds.append(entry.lsd_05)
-				elif entry.lsd_10 is not None and l.name == entry.location.name:
-					location_lsds.append(entry.lsd_10)
-				else:
-					location_lsds.append(None)	
-				
-		lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
-		
-		for l in location_lsds:
-			lsds = l
-		
-		return lsds
+		return lsd
 
 	def clear(self):
 		Row.clear(self)
