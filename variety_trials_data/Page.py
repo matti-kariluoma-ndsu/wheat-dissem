@@ -355,8 +355,6 @@ class LSD_Row(Row):
 		for index in sorted(list(set(delete_columns)), reverse=True):
 			for year in balanced_cells:
 				for row in balanced_cells[year]:
-					print row
-					print index
 					row.pop(index)
 		#
 		## delete wildly until balanced
@@ -377,18 +375,18 @@ class LSD_Row(Row):
 			for year in balanced_cells:
 				balanced_cells[year].pop(index)
 		
-		#"""
+		"""
 		for table in balanced_cells:
 			for row in balanced_cells[table]:
 				print row
 			print "==="
-		#"""
+		"""
 		
 		balanced_input = []
 		for year in balanced_cells:
 			balanced_input.extend(balanced_cells[year])
 			
-		print balanced_input
+		#print balanced_input
 		
 		lsd = None
 		if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
