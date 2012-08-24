@@ -313,6 +313,45 @@ form on the main page)
 * Ensure newly entered varieties can show up in search
 * drive by 1-yr mean; allow holes in the 2,3 yr .
 
-In order to hide columns, use the row.set_key_order fucntion
-** To reduce the overhead, have the rows bakc-reference the table's 
-copy of the sorted_locations (ideally a visible_locations subset)
+Notes from Aug 10 Meeting
+* Put back 'x site-years' message for each n-yr mean
+* Ensure 8 locations (after some fall off during calculation ... maybe start with more/all then cut?
+* Stop automagically adding locations, makes custom queries difficult
+* Roll up advanced search page, user manual desribing GET structure
+* Add variety names/checkboxes to head-head view OR "clear"/back button
+* Investigate algorithm for removing small subtables from end of page
+* vareity descriptors
+** externel URL(s) for now
+** later use to enhance v-to-v view
+* Rollout Sep 1
+* JSONP for other sites to grab from DB
+* Copyright footer (brought to you by ransom, wiersma, kariluoma)
+** link to static about us page for workers
+* Anything special so google can find us?
+** We need a list of keywords
+*** North Dakota
+*** Minnesota
+*** Wheat Trials
+*** Variety Varietal selection
+*** NDSU MSU
+*** Extension Info Type Breed Description ...
+
+Clicking on 2010,2009 does not show us the data as expected, and mutates
+the table structure. Set it to reuse the table strucutre, only showing old
+data (as ugly as it may be)
+* Maybe a "rebalance table" or similar-named button that redirects to /view/2010/... ?
+
+make static pages
+* /view/ - instructions on get syntax
+* /add/ - secretary jump point
+* /json/ - programmer jump point
+* /about/ - info
+* add to footer at each page, except /add/, which should be palced in robots.txt
+
+When the user follows a '2010' or '2009' link, etc. that sets the year=
+get parameter to somehting less than the curyear parameter, hide/mask
+the relevenat 'n-yr' column from visible_locations
+
+Questions for Dr. Wiersma:
+1) should deleting a location reconstruct the table structure?
+2) should going back a year shift they n-yr average?

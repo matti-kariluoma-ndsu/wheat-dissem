@@ -2,7 +2,7 @@ from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
 from scipy.special import erfinv
-from itertools import chain
+from itertools import chain, cycle
 from operator import attrgetter
 import copy
 import datetime
@@ -61,18 +61,23 @@ class Cell:
 
 		mean = None
 		if len(values) > 0:
-			mean = round(float(sum(values)) / float(len(values)), 1)
+			mean = float(sum(values)) / float(len(values))
 		
 		return mean
-		
+	
+	def get_rounded(self, year, fieldname, digits=1):
+		value = self.get(year, fieldname)
+		if value is not None:
+			value = round(value, digits)
+		return value
+	
 	def __unicode__(self):
-		unicode_repr = self.get(self.year, self.fieldname)
+		unicode_repr = self.get_rounded(self.year, self.fieldname)
 		if unicode_repr is None:
 			unicode_repr = u'-!-'
 		else:
 			unicode_repr = unicode(str(unicode_repr))
 		return unicode_repr
-		#return self.column.location.name
 		
 class Row:
 	"""
@@ -149,7 +154,8 @@ class LSD_Row(Row):
 	def next(self):
 		cell = Row.next(self)
 		if isinstance(cell, Aggregate_Cell):
-			return "M-LSD"
+			lsd = self.get_lsd(cell)
+			return lsd
 		elif isinstance(cell, Cell):
 			## Grab a real cell from the column
 			for real_cell in cell.column:
@@ -167,7 +173,7 @@ class LSD_Row(Row):
 		else:
 			return cell
 	
-	def populate(self, probability):
+	def get_lsd(self, cell, digits=1):
 	
 		def _qnorm(probability):
 			"""
@@ -291,57 +297,105 @@ class LSD_Row(Row):
 
 			return LSD
 		
-		y_columns = self.table.year_columns
-		years_i = []
-		l_columns = self.table.location_columns
-		location_lsds = []
-		
-		years_i = list(y_columns[0].keys())
-		
-		if len(years_i) == 3:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
-			data_3yr = years_i[2]
-		elif len(years_i) == 2:
-			data_1yr = years_i[0]
-			data_2yr = years_i[1]
-		elif len(years_i) == 1:
-			data_1yr = years_i[0]
-		else:
-			pass
-		
+		cur_year = cell.year
+		balanced_cells = {} # {year: [[], ...] } # n by m cell matrix
+		for year_diff in cell.column.years_range:
+			year = cur_year - year_diff
+			balanced_cells[year] = []
+			cells_append = balanced_cells[year].append
+			for (variety, row) in self.table.sorted_rows():
+				if not isinstance(row, LSD_Row): # prevent infinite recursion!
+					balanced_cells_row = []
+					row_append = balanced_cells_row.append
+					for row_cell in row:
+						if row_cell is not None and not isinstance(row_cell.column, Aggregate_Column):
+							row_append(row_cell.get_rounded(year, row_cell.fieldname, digits=5))
+					cells_append(balanced_cells_row)
 		"""
-		if data_1yr != None:	
-			lsd_1yr = self._LSD(data_1yr, probability)
-		if data_2yr != None:
-			lsd_2yr = self._LSD(data_2yr, probability)
-		if data_3yr != None:
-			lsd_3yr = self._LSD(data_3yr, probability)
-		"""	
-		lsd_1yr = 0.1
-		lsd_2yr = 0.2
-		lsd_3yr = 0.3
+		for table in balanced_cells:
+			for row in balanced_cells[table]:
+				print row
+			print "==="
 		"""
-		Grab the LSDs for the location columns in the Table object. 
-		Search the entries of table in this order: hsd_10, lsd_05, lsd_10.
-		"""	
-		for entry in self.table.entries:
-			for l in l_columns[0].keys():
-				if entry.hsd_10 is not None and l.name == entry.location.name:
-					location_lsds.append(entry.hsd_10)
-				elif entry.lsd_05 is not None and l.name == entry.location.name:
-					location_lsds.append(entry.lsd_05)
-				elif entry.lsd_10 is not None and l.name == entry.location.name:
-					location_lsds.append(entry.lsd_10)
-				else:
-					location_lsds.append(None)	
-				
-		lsds = ['LSD', lsd_1yr, lsd_2yr, lsd_3yr]
 		
-		for l in location_lsds:
-			lsds = l
+		# TODO: the following three loops _can_ be condesed into one loop
 		
-		return lsds
+		#
+		## delete rows that are all None
+		#
+		delete_rows = [] # indexes of rows to delete
+		for year in balanced_cells:
+			for (r, row) in enumerate(balanced_cells[year]):
+				delete_row = True
+				for cell in row:
+					if cell is not None:
+						delete_row = False
+						break
+				if delete_row:
+					delete_rows.append(r)
+					
+		for index in sorted(list(set(delete_rows)), reverse=True):
+			for year in balanced_cells:
+				balanced_cells[year].pop(index)
+		#
+		## delete columns that are all None		
+		#
+		delete_columns = [] # indexes of columns to delete
+		for year in balanced_cells:
+			column_length = len(balanced_cells[year])
+			delete_column = [0] * len(row) # initialize all to zero
+			for row in balanced_cells[year]:
+				for (c, cell) in enumerate(row):
+					if cell is None:
+						delete_column[c] += 1
+			for (index, count) in enumerate(delete_column):
+				if count == column_length:
+					delete_columns.append(index)
+					
+		for index in sorted(list(set(delete_columns)), reverse=True):
+			for year in balanced_cells:
+				for row in balanced_cells[year]:
+					print row
+					print index
+					row.pop(index)
+		#
+		## delete wildly until balanced
+		#
+		delete_rows = [] # indexes of rows to delete
+		for year in balanced_cells:
+			for (r, row) in enumerate(balanced_cells[year]):
+				delete_row = False
+				for cell in row:
+					if cell is None:
+						delete_row = True
+						break
+						
+				if delete_row:
+					delete_rows.append(r)
+					
+		for index in sorted(list(set(delete_rows)), reverse=True):
+			for year in balanced_cells:
+				balanced_cells[year].pop(index)
+		
+		#"""
+		for table in balanced_cells:
+			for row in balanced_cells[table]:
+				print row
+			print "==="
+		#"""
+		
+		balanced_input = []
+		for year in balanced_cells:
+			balanced_input.extend(balanced_cells[year])
+			
+		print balanced_input
+		
+		lsd = None
+		if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
+			lsd = _LSD(balanced_input, self.table.lsd_probability)
+			lsd = round(lsd, digits)
+		
+		return lsd
 
 	def clear(self):
 		Row.clear(self)
@@ -380,32 +434,66 @@ class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is based upon its row
 	"""
-	def __init__(self, year, fieldname, row, column):
+	def __init__(self, year, fieldname, row, column, decomposition, visible_locations):
+		"""
+		year: passed on to Cell
+		fieldname: passed on to Cell
+		row: the row this aggregate_cell is in
+		column: the column this aggregate_cell is in
+		decomposition: a truth table of what data we have
+		"""
 		Cell.__init__(self, year, fieldname)
 		self.row = row
 		self.column = column
+		# Note we are not making a copy of decomposition; do not mutate
+		self.decomposition = decomposition # {year: {variety: {location: bool, ...}, ...}, ...}
+		# Note we are not making a copy of visible_locations; do not mutate
+		self.visible_locations = visible_locations
+		self.calculate_site_years()
 		
+	def calculate_site_years(self):
+		self.site_years = 0
+		if not isinstance(self.row, LSD_Row):
+			for cell in self.row:
+				if cell is not None and not isinstance(cell, Aggregate_Cell):
+					break
+			if cell is not None and not isinstance(cell, Aggregate_Cell):
+				for year_diff in self.column.years_range:
+					year = self.year - year_diff
+					min_site_years = 10000
+					if year in self.decomposition:
+						for col_cell in cell.row:
+							if col_cell is not None:
+								variety = col_cell.row.variety
+								if variety in self.decomposition[year]:
+									truth_table = self.decomposition[year][variety]
+									site_years = len([location for location in self.visible_locations if not isinstance(location, Fake_Location) and truth_table[location]])
+									if site_years < min_site_years:
+										min_site_years = site_years
+					if min_site_years == 10000:
+						min_site_years = 0
+					self.site_years = self.site_years + min_site_years
+	
 	def append(self, value):
 		return
 	
 	def get(self, year, fieldname):
 		balanced = True
 		values = []
-		for cell in self.row:
-			if balanced and cell is not None and not isinstance(cell, Aggregate_Cell):
-				for year_diff in self.column.years_range:
-					cell_mean = cell.get(year - year_diff, fieldname)
-					if cell_mean is None:
-						# This subset is not balanced across years!
-						values = []
-						balanced = False
-						break
-					else:
-						values.append(cell_mean)
-					
+		if not isinstance(self.row, LSD_Row):
+			for cell in self.row:
+				if balanced and cell is not None and not isinstance(cell, Aggregate_Cell):
+					for year_diff in self.column.years_range:
+						cell_mean = cell.get(year - year_diff, fieldname)
+						if cell_mean is None:
+							# This subset is not balanced across years!
+							pass # we will count the number of means found later
+						else:
+							values.append(cell_mean)
+						
 		
 		mean = None
-		if len(values) > 0:
+		if len(values) > 0 and len(values) >= self.column.site_years:
 			mean = round(float(sum(values)) / float(len(values)), 1)
 		
 		return mean
@@ -429,6 +517,10 @@ class Aggregate_Column(Column):
 		self.members = []
 		self.clear()
 		self.years_range = range(year_num)
+		self.site_years = 0
+	
+	def get_site_years(self):
+		return self.site_years
 
 class Table:
 		"""
@@ -447,8 +539,8 @@ class Table:
 			self.lsd_probability = lsd_probability
 			self.locations = list(locations) # create a copy
 			self.visible_locations = list(visible_locations) # create a copy
-			self.rows = {} # variety: [Row(), ...]
-			self.columns = {} # location: [Column(), ...]
+			self.rows = {} # variety: Row(), ...
+			self.columns = {} # location: Column(), ...
 			self.cells = {} # (variety, location): Cell()
 			
 		def get_row(self, variety):
@@ -456,7 +548,7 @@ class Table:
 				row = self.rows[variety]
 			except KeyError:
 				row = self.rows[variety] = Row(variety)
-				row.set_key_order(self.visible_locations)
+				row.set_key_order(self.visible_locations) # pass by reference
 			return row	
 		
 		def get_column(self, location):
@@ -490,44 +582,154 @@ class Table:
 				
 			return alpha_sorted
 		
+		def sorted_visible_columns(self):
+			sorted_column_tuples = []
+			for location in self.visible_locations:
+				column = self.get_column(location)
+				if isinstance(column, Aggregate_Column) and column.site_years == 0:
+					for cell in column:
+						if cell.site_years > column.site_years:
+							column.site_years = cell.site_years
+							
+				sorted_column_tuples.append( (column, location) )
+				
+			return sorted_column_tuples
+			
 		def set_defaults(self, year, fieldname):
 			for cell in self.cells.values():
 				cell.year = year
 				cell.fieldname = fieldname
 
 class Page:
-	def get_entries(self, min_year, max_year, variety_names):
-		# We do a depth=2 so we can access entry.variety.name
-		# We do a depth=3 so we can access entry.harvest_date.date.year
-		#TODO: Somehow reduce this to depth=1
-		if len(variety_names) == 0:
-			result = models.Trial_Entry.objects.select_related(depth=3).filter(
-					location__in=self.locations
-				).filter(
-					harvest_date__in=models.Date.objects.filter(
-						date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
-					)
-				)
-		else:
-			varieties = models.Variety.objects.filter(name__in=variety_names)
-			result = models.Trial_Entry.objects.select_related(depth=3).filter(
-					variety__in=varieties
-				).filter(
-					location__in=self.locations
-				).filter(
-					harvest_date__in=models.Date.objects.filter(
-						date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
-					)
-				)
-		return result
-			
-	def __init__(self, locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
-		self.locations = locations
-		self.tables = []
+	def get_entries(self, min_year, max_year, locations, number_locations, variety_names):
+		"""
+		First calls multiple count() calls to the database, and deletes
+		locations from the page that contain no data.
 		
+		Then, the number of locations is truncated to `number_locations'.
+		
+		Finally, the truncated locations and trial entry objects are queried 
+		for and returned.
+		
+		min_year: the oldest data to retrieve
+		max_year: the newest data to retrieve
+		locations: the (previosuly sorted) list of locations to consider
+		number_locations: the length to truncate the list of locations to
+		variety_names: list of varieties to limit ourselves to
+		
+		"""
+		this_year_dates = models.Date.objects.filter(
+				date__range=(datetime.date(max_year,1,1), datetime.date(max_year,12,31))
+			)
+			
+		all_dates = models.Date.objects.filter(
+				date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
+			)
+		#
+		## Only use locations with data in the current year
+		#
+		locations_with_data = []
+		for loc in locations:
+			if models.Trial_Entry.objects.filter(
+					location=loc
+				).filter(
+					harvest_date__in=this_year_dates
+				).count() > 0:
+					locations_with_data.append(loc)
+			if len(locations_with_data) >= number_locations:
+				break
+		
+		result = models.Trial_Entry.objects.select_related(
+				'location', 'variety', 'harvest_date__date'
+			).filter(
+				location__in=locations_with_data
+			).filter(
+				harvest_date__in=all_dates
+			)
+				
+		if len(variety_names) > 0:
+			result = result.filter(
+					variety__in=models.Variety.objects.filter(
+							name__in=variety_names
+						)
+				)
+				
+		return (locations_with_data, result)
+	
+	def mask_locations(self, not_locations, mutate_existing_tables=True):
+		"""
+		Returns the last list of locations that have had `not_locations'
+		removed from them, or None if there was a problem. 
+		`mutate_existing_tables' greatly changes the context of this return 
+		value.
+		
+		not_locations: the locations to mask/hide
+		mutate_exisiting_tables: whether or not to iterate over exisiting 
+			tables, or to use self.locations
+		"""
+		def remove_locations(locations, not_locations):
+			"""
+			Remove `not_locations' from `locations', maintaining input order
+			"""
+			if len(not_locations) > 0:
+				delete_these = []
+				for (index, location) in enumerate(locations):
+					if location in not_locations:
+						delete_these.append(index)
+						
+				for index in sorted(delete_these, reverse=True):
+					locations.pop(index)
+			
+			# TODO: if we rearrange `decomposition', the table layout will change as the 
+			# TODO: user deselects locations. This will also need to be accounted for in
+			# TODO: a remove_locations() function if we want to remove not_locations 
+			# TODO: from the cache key.
+			"""
+			# adjust `decomposition' but not `cells' since we are 
+			# modifying `visible_locations' but not `locations'
+			remove_locations = list(set(locations).difference(set(visible_locations)))
+			if len(remove_locations) > 0:
+				for year in decomposition:
+					decomposition_year = decomposition[year]
+					for variety in decomposition_year:
+						for location in remove_locations:
+							if location in decomposition_year[variety]:
+								del decomposition_year[variety][location]
+			"""
+			return locations
+		
+		visible_locations = None
+		
+		if mutate_existing_tables:	
+			for table in self.tables:
+				visible_locations = table.visible_locations = remove_locations(table.visible_locations, not_locations)
+				
+				for column in table.columns.values():
+					if isinstance(column, Aggregate_Column):
+						column.site_years = 0 # force recalculation
+						for cell in column:
+							if isinstance(cell, Aggregate_Cell):
+								cell.calculate_site_years()
+		else:
+			visible_locations = remove_locations(list(self.locations), not_locations)
+		
+		return visible_locations
+	
+	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
+		self.tables = []	
 		cells = {} # variety: {location: Cell() }
-		decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
-		for entry in self.get_entries(default_year - year_range, default_year, varieties):
+		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		(self.locations, entries) = self.get_entries(
+				default_year - year_range, 
+				default_year, 
+				locations, 
+				number_locations, 
+				varieties
+			)
+				
+		locations = self.locations # discard the input locations
+		
+		for entry in entries:
 			year = entry.harvest_date.date.year
 			variety = entry.variety
 			location = entry.location
@@ -550,53 +752,57 @@ class Page:
 				except KeyError:
 					decomposition[year] = {}
 					d = decomposition[year][variety] = dict([(l, False) for l in self.locations])
-							
+					
 			try:
 				d[location] = True
 			except KeyError:
 				pass
-				
-		#print decomposition[default_year]
 		
-		visible_locations = list(locations) # copy list
+		if default_year not in decomposition:
+			years = decomposition.keys()
+			if len(years) > 0:
+				default_year = sorted(years, reverse=True)[0]
+			else:
+				raise BaseException() # TODO: custom exception so we can tell the user what's up
 		
+		# hide user's deselections.
+		visible_locations = self.mask_locations(not_locations, mutate_existing_tables=False)
+			
+		#
+		## Make tables from cells
+		#
 		if break_into_subtables:
 			# Sort/split the tables
+			
+			# Sort the varieties by number of locations they appear in.
 			variety_order = sorted(decomposition[default_year], key = lambda variety: decomposition[default_year][variety], reverse=True)
 			
-			if len(variety_order) > 0:
+			if len(variety_order) < 1:
+				break_into_subtables = False
+			else:
 				prev = variety_order[0]
-				
-				# delete locations that have no data in the current year
-				truth_table = decomposition[default_year][prev]
-				delete_these = []
-				for (index, location) in enumerate(visible_locations):
-					if not truth_table[location]:
-						delete_these.append(index)
-				for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
-					visible_locations.pop(index)
 				
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability)
 				self.tables.append(table)
+				make_appendix_table = False
 				for variety in variety_order:
-					if decomposition[default_year][variety] != decomposition[default_year][prev]:
+					if not make_appendix_table and decomposition[default_year][variety] != decomposition[default_year][prev]:
 						prev = variety
-						table = Table(locations, visible_locations, lsd_probability)
-						self.tables.append(table)
-					for (location, cell) in cells[variety].items():
-						table.add_cell(variety, location, cell)
-		else:
-			# delete locations that have no data in the current year
-			delete_these = []
-			for (index, location) in enumerate(visible_locations):
-				delete = True
-				for variety in cells:
-					delete = delete and not decomposition[default_year][variety][location]
-				if delete:
-					delete_these.append(index)
-			for index in sorted(delete_these, reverse=True): # delete, starting from the back of the list
-				visible_locations.pop(index)
+						if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
+							table = Table(locations, visible_locations, lsd_probability)
+							self.tables.append(table)
+						else:
+							make_appendix_table = True # start filling a new table, one without cells
+							table = Table(locations, visible_locations, lsd_probability)
+							self.tables.append(table)
+					if not make_appendix_table:
+						for (location, cell) in cells[variety].items():
+							table.add_cell(variety, location, cell)
+					else:
+						table.get_row(variety)
+		
+		if not break_into_subtables:
 			table = Table(locations, visible_locations, lsd_probability)
 			self.tables.append(table)
 			for variety in cells:
@@ -622,20 +828,10 @@ class Page:
 				column = Aggregate_Column(location_key, year_num)
 				table.columns[location_key] = column
 				for row in table.rows.values():
-					cell = Aggregate_Cell(default_year, default_fieldname, row, column)
-					table.add_cell(row.variety, location_key, cell)
-				
+					cell = Aggregate_Cell(default_year, default_fieldname, row, column, decomposition, table.visible_locations)
+					table.add_cell(row.variety, location_key, cell)				
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
 			table.set_defaults(year, fieldname)
-			
-	def set_default_year(self, year):
-		for table in self.tables:
-			table.set_default_year(year)
-	
-	def set_default_field(self, fieldname):
-		for table in self.tables:
-			table.set_default_field(fieldname)
-			
 
