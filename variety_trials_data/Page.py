@@ -706,15 +706,22 @@ class Page:
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability)
 				self.tables.append(table)
+				make_appendix_table = False
 				for variety in variety_order:
 					if decomposition[default_year][variety] != decomposition[default_year][prev]:
 						prev = variety
 						if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
 							table = Table(locations, visible_locations, lsd_probability)
 							self.tables.append(table)
-					if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
+						else:
+							make_appendix_table = True # start filling a new table, one without cells
+							table = Table(locations, visible_locations, lsd_probability)
+							self.tables.append(table)
+					if not make_appendix_table:
 						for (location, cell) in cells[variety].items():
 							table.add_cell(variety, location, cell)
+					else:
+						table.get_row(variety)
 		
 		if not break_into_subtables:
 			table = Table(locations, visible_locations, lsd_probability)
