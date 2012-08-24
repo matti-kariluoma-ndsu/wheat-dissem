@@ -351,3 +351,7 @@ make static pages
 When the user follows a '2010' or '2009' link, etc. that sets the year=
 get parameter to somehting less than the curyear parameter, hide/mask
 the relevenat 'n-yr' column from visible_locations
+
+Questions for Dr. Wiersma:
+1) should deleting a location reconstruct the table structure?
+2) should going back a year shift they n-yr average?

@@ -2,7 +2,7 @@ from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
 from scipy.special import erfinv
-from itertools import chain
+from itertools import chain, cycle
 from operator import attrgetter
 import copy
 import datetime
@@ -154,23 +154,7 @@ class LSD_Row(Row):
 	def next(self):
 		cell = Row.next(self)
 		if isinstance(cell, Aggregate_Cell):
-			cell_lsd_input = {} # {year: [[], ...] } # n by m cell matrix
-			cell_lsd_input['2010'] = []
-			for (variety, row) in self.table.sorted_rows():
-				if not isinstance(row, LSD_Row): # prevent infinite recursion!
-					row_lsd_input = []
-					for row_cell in row:
-						if row_cell is not None and not isinstance(row_cell.column, Aggregate_Column):
-							row_lsd_input.append(row_cell.get_rounded(row_cell.year, row_cell.fieldname, digits=5))
-					cell_lsd_input['2010'].append(row_lsd_input)
-			#"""
-			for row in cell_lsd_input['2010']:
-				print row
-			print "==="
-			#"""
-			lsd = 'M-LSD'
-			if len(cell.column.years_range) == 1 and len(cell_lsd_input['2010']) > 1 and len(cell_lsd_input['2010'][0]) > 1:
-				lsd = self.get_lsd(cell_lsd_input['2010'])
+			lsd = self.get_lsd(cell)
 			return lsd
 		elif isinstance(cell, Cell):
 			## Grab a real cell from the column
@@ -189,7 +173,7 @@ class LSD_Row(Row):
 		else:
 			return cell
 	
-	def get_lsd(self, balanced_input, digits=1):
+	def get_lsd(self, cell, digits=1):
 	
 		def _qnorm(probability):
 			"""
@@ -313,8 +297,103 @@ class LSD_Row(Row):
 
 			return LSD
 		
-		lsd = _LSD(balanced_input, self.table.lsd_probability)
-		lsd = round(lsd, digits)
+		cur_year = cell.year
+		balanced_cells = {} # {year: [[], ...] } # n by m cell matrix
+		for year_diff in cell.column.years_range:
+			year = cur_year - year_diff
+			balanced_cells[year] = []
+			cells_append = balanced_cells[year].append
+			for (variety, row) in self.table.sorted_rows():
+				if not isinstance(row, LSD_Row): # prevent infinite recursion!
+					balanced_cells_row = []
+					row_append = balanced_cells_row.append
+					for row_cell in row:
+						if row_cell is not None and not isinstance(row_cell.column, Aggregate_Column):
+							row_append(row_cell.get_rounded(year, row_cell.fieldname, digits=5))
+					cells_append(balanced_cells_row)
+		"""
+		for table in balanced_cells:
+			for row in balanced_cells[table]:
+				print row
+			print "==="
+		"""
+		
+		# TODO: the following three loops _can_ be condesed into one loop
+		
+		#
+		## delete rows that are all None
+		#
+		delete_rows = [] # indexes of rows to delete
+		for year in balanced_cells:
+			for (r, row) in enumerate(balanced_cells[year]):
+				delete_row = True
+				for cell in row:
+					if cell is not None:
+						delete_row = False
+						break
+				if delete_row:
+					delete_rows.append(r)
+					
+		for index in sorted(list(set(delete_rows)), reverse=True):
+			for year in balanced_cells:
+				balanced_cells[year].pop(index)
+		#
+		## delete columns that are all None		
+		#
+		delete_columns = [] # indexes of columns to delete
+		for year in balanced_cells:
+			column_length = len(balanced_cells[year])
+			delete_column = [0] * len(row) # initialize all to zero
+			for row in balanced_cells[year]:
+				for (c, cell) in enumerate(row):
+					if cell is None:
+						delete_column[c] += 1
+			for (index, count) in enumerate(delete_column):
+				if count == column_length:
+					delete_columns.append(index)
+					
+		for index in sorted(list(set(delete_columns)), reverse=True):
+			for year in balanced_cells:
+				for row in balanced_cells[year]:
+					print row
+					print index
+					row.pop(index)
+		#
+		## delete wildly until balanced
+		#
+		delete_rows = [] # indexes of rows to delete
+		for year in balanced_cells:
+			for (r, row) in enumerate(balanced_cells[year]):
+				delete_row = False
+				for cell in row:
+					if cell is None:
+						delete_row = True
+						break
+						
+				if delete_row:
+					delete_rows.append(r)
+					
+		for index in sorted(list(set(delete_rows)), reverse=True):
+			for year in balanced_cells:
+				balanced_cells[year].pop(index)
+		
+		#"""
+		for table in balanced_cells:
+			for row in balanced_cells[table]:
+				print row
+			print "==="
+		#"""
+		
+		balanced_input = []
+		for year in balanced_cells:
+			balanced_input.extend(balanced_cells[year])
+			
+		print balanced_input
+		
+		lsd = None
+		if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
+			lsd = _LSD(balanced_input, self.table.lsd_probability)
+			lsd = round(lsd, digits)
 		
 		return lsd
 
@@ -708,7 +787,7 @@ class Page:
 				self.tables.append(table)
 				make_appendix_table = False
 				for variety in variety_order:
-					if decomposition[default_year][variety] != decomposition[default_year][prev]:
+					if not make_appendix_table and decomposition[default_year][variety] != decomposition[default_year][prev]:
 						prev = variety
 						if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
 							table = Table(locations, visible_locations, lsd_probability)
