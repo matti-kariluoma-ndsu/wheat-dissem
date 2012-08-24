@@ -355,3 +355,7 @@ the relevenat 'n-yr' column from visible_locations
 Questions for Dr. Wiersma:
 1) should deleting a location reconstruct the table structure?
 2) should going back a year shift they n-yr average?
+
+If cache kicks in while not_locations is active, the view for the
+table will be off! Soln: page.mask_locations needs to unmask members
+not in the list...???
