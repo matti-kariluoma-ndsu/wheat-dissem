@@ -72,7 +72,6 @@ class Cell:
 		else:
 			unicode_repr = unicode(str(unicode_repr))
 		return unicode_repr
-		#return self.column.location.name
 		
 class Row:
 	"""
@@ -419,7 +418,7 @@ class Aggregate_Cell(Cell):
 					if min_site_years == 10000:
 						min_site_years = 0
 					self.site_years = self.site_years + min_site_years
-		
+	
 	def append(self, value):
 		return
 	
@@ -433,18 +432,13 @@ class Aggregate_Cell(Cell):
 						cell_mean = cell.get(year - year_diff, fieldname)
 						if cell_mean is None:
 							# This subset is not balanced across years!
-							#"""
-							values = []
-							balanced = False
-							break
-							#"""
-							#pass
+							pass # we will count the number of means found later
 						else:
 							values.append(cell_mean)
 						
 		
 		mean = None
-		if len(values) > 0:
+		if len(values) > 0 and len(values) >= self.column.site_years:
 			mean = round(float(sum(values)) / float(len(values)), 1)
 		
 		return mean
@@ -657,6 +651,7 @@ class Page:
 				
 				for column in table.columns.values():
 					if isinstance(column, Aggregate_Column):
+						column.site_years = 0 # force recalculation
 						for cell in column:
 							if isinstance(cell, Aggregate_Cell):
 								cell.calculate_site_years()
