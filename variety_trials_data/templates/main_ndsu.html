@@ -19,11 +19,12 @@
 
 	TODO: fix input validation strings return an error.
 	-->
-	
 		<form action="/view/last_3_years/bushels_acre/" method="GET">
 			{% for field in zipcode_form %}
 			{% if field.name == 'zipcode' %}
 			<div>
+			{% elif field.name == 'scope' %}
+			<div id='variety_trials__scope_input'>
 			{% else %}
 			<div style="display: none;">
 			{% endif %}

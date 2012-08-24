@@ -7,9 +7,9 @@
 	{% for fieldname, blurb_list in blurbs.items %}
 	<li class="navTreeItem navTreeTopNode">
 		{% if fieldname == curfield %}
-			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}"><h2 style="display: inline;">*</h2>{{fieldname}}</a> 
+			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}"><h2 style="display: inline;">*</h2>{{fieldname}}</a> 
 		{% else %}
-			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">{{fieldname}}</a>
+			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">{{fieldname}}</a>
 		{% endif %}
 	</li>
 	{% endfor %}
@@ -19,9 +19,9 @@
 	{% for yearname in years %}
 	<li class="navTreeItem navTreeTopNode">
 		{% if yearname == curyear %}
-			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}"><h2 style="display: inline;">*</h2>{{yearname}}</a>
+			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}"><h2 style="display: inline;">*</h2>{{yearname}}</a>
 		{% else %}
-			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}">{{yearname}}</a>
+			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}">{{yearname}}</a>
 		{% endif %}
 	</li>
 	{% endfor %}
@@ -60,8 +60,10 @@
 		{% for location in table.visible_locations %}
 			<th>
 				<h4>{{ location.name }}</h4>
-			{% if location.id != -1 %}
-				<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
+			{% if location.id == -1 %}
+				<p>{{column.get_site_years}} site-years</p>
+			{% else %}
+				<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
 			{% endif %}
 			</th>
 		{% endfor %}
