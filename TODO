@@ -347,3 +347,7 @@ make static pages
 * /json/ - programmer jump point
 * /about/ - info
 * add to footer at each page, except /add/, which should be palced in robots.txt
+
+When the user follows a '2010' or '2009' link, etc. that sets the year=
+get parameter to somehting less than the curyear parameter, hide/mask
+the relevenat 'n-yr' column from visible_locations

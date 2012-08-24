@@ -148,6 +148,18 @@ class LSD_Row(Row):
 	def next(self):
 		cell = Row.next(self)
 		if isinstance(cell, Aggregate_Cell):
+			cell_lsd_input = {} # {year: [[], ...] } # n by m cell matrix
+			cell_lsd_input['2010'] = []
+			for (variety, row) in self.table.sorted_rows():
+				if not isinstance(row, LSD_Row): # prevent infinite recursion!
+					row_lsd_input = []
+					for cell in row:
+						if cell is not None and not isinstance(cell.column, Aggregate_Column):
+							row_lsd_input.append(unicode(cell))
+					cell_lsd_input['2010'].append(row_lsd_input)
+			for row in cell_lsd_input['2010']:
+				print row
+			print "==="
 			return "M-LSD"
 		elif isinstance(cell, Cell):
 			## Grab a real cell from the column
