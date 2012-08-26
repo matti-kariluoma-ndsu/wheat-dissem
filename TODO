@@ -1,56 +1,54 @@
 (grep for TODOs)
-variety_trials_website/urls.py:         ## TODO: There are 3 views of our data, reduce to 2 if not 1.
-variety_trials_data/Table.py:                   raise BaseException # TODO: raise a standard/helpful error
-variety_trials_data/Table.py:                   raise BaseException #TODO: raise a standard/helpful error
-variety_trials_data/Table.py:           # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
-variety_trials_data/handle_csv.py:      ## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
-variety_trials_data/handle_csv.py:      # TODO: Consider not save() -ing each line, maybe do batches of ~100?
-variety_trials_data/static/lib/jQuery-contextMenu/jquery.contextMenu.js:    // TODO: -
-variety_trials_data/static/lib/jQuery-contextMenu/jquery.ui.position.js:        // TODO: use $.isWindow() in 1.9
-variety_trials_data/static/lib/jquery.js:        // TODO: Stop taunting the data cache; remove global events and always attach to document
-variety_trials_data/static/lib/jquery.js:          // TODO: Move to normal caching system
-variety_trials_data/templates/add_form_confirmation.html:       <!--TODO: auto generate this file from the model-->
-variety_trials_data/templates/add_from_csv_template.html:       <!--TODO: auto generate this file from the model-->
-variety_trials_data/templates/add_information.html:     <!--TODO: auto generate this file from the model-->
-variety_trials_data/templates/tabbed_object_view.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_object_view.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_object_view.html:  <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_object_view.html:          <!--TODO: auto-generate these year button images-->
-variety_trials_data/templates/tabbed_view.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view.html: <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view.html:         <!--TODO: auto-generate these year button images-->
-variety_trials_data/templates/tabbed_view.html:                 <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}} Zipcode: {{zipcode}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view.html:                 <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view_ndsu.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_ndsu.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_ndsu.html:                    <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view_ndsu.html:                    <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/main.html:        TODO: Add noscript version of this field to point to the noscript
-variety_trials_data/templates/main.html:        TODO: fix input validation strings return an error.
-variety_trials_data/templates/main_ndsu.html:   TODO: Add noscript version of this field to point to the noscript
-variety_trials_data/templates/main_ndsu.html:   TODO: fix input validation strings return an error.
-variety_trials_data/templates/tabbed_view_table_ndsu.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_table_ndsu.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_table_ndsu.html:                      <td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view_table_ndsu.html:                      <td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/variety_trials_util.py:                     locations = models.Location.objects.all() # TODO: only return N locations? is that faster?
-variety_trials_data/Page.py:                            lsd = real_cell.get(cell.year, "hsd_10") # TODO: this will try and average if multiple values datapoints found...
-variety_trials_data/Page.py:                            raise BaseException # TODO: raise a standard/helpful error
-variety_trials_data/Page.py:                            raise BaseException #TODO: raise a standard/helpful error
-variety_trials_data/Page.py:                    # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
-variety_trials_data/Page.py:                            raise BaseException # TODO: custom exception so we can tell the user what's up
-variety_trials_data/views.py:   # TODO: don't pass a curyear, instead have main.html point
-variety_trials_data/views.py:# TODO: does this belong in the DB?
-variety_trials_data/views.py:           # TODO: what is the behavior of HEAD?
-variety_trials_data/views.py:                   # TODO: Have this view point to / , and if successful redirect them
-variety_trials_data/views.py:                                   # TODO: return to main page and show error
-variety_trials_data/views.py:                           # TODO: redirect to /view/curyear/field/?... instead
-variety_trials_data/views.py:                                   number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
-variety_trials_data/views.py:                                   # TODO: Print message to the user telling them why we are exiting
-variety_trials_data/views.py:           # TODO: what is the behavior of HEAD?
-variety_trials_data/views.py:                   # TODO: Have this view point to / , and if successful redirect them
-variety_trials_data/views.py:                           # TODO: return to main page and show error
+variety_trials_website/urls.py:19:         ## TODO: There are 3 views of our data, reduce to 2 if not 1.
+variety_trials_data/handle_csv.py:84:   ## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
+variety_trials_data/handle_csv.py:147:  # TODO: Consider not save() -ing each line, maybe do batches of ~100?
+variety_trials_data/templates/add_form_confirmation.html:11:    <!--TODO: auto generate this file from the model-->
+variety_trials_data/templates/add_from_csv_template.html:25:    <!--TODO: auto generate this file from the model-->
+variety_trials_data/templates/add_information.html:11:  <!--TODO: auto generate this file from the model-->
+variety_trials_data/templates/tabbed_object_view.html:21:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_object_view.html:59:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_object_view.html:98:       <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_object_view.html:100:              <!--TODO: auto-generate these year button images-->
+variety_trials_data/templates/tabbed_view.html:21:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view.html:59:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view.html:98:      <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view.html:100:             <!--TODO: auto-generate these year button images-->
+variety_trials_data/templates/tabbed_view.html:125:                     <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}} Zipcode: {{zipcode}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view.html:146:                     <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view_ndsu.html:19:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_ndsu.html:55:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_ndsu.html:123:                        <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view_ndsu.html:144:                        <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/main.html:29:     TODO: Add noscript version of this field to point to the noscript
+variety_trials_data/templates/main.html:32:     TODO: fix input validation strings return an error.
+variety_trials_data/templates/main_ndsu.html:19:        TODO: Add noscript version of this field to point to the noscript
+variety_trials_data/templates/main_ndsu.html:22:        TODO: fix input validation strings return an error.
+variety_trials_data/templates/tabbed_view_table_ndsu.html:19:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_table_ndsu.html:55:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_table_ndsu.html:127:                  <td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view_table_ndsu.html:134:                  <td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/variety_trials_util.py:45:                  locations = models.Location.objects.all() # TODO: only return N locations? is that faster?
+variety_trials_data/Page.py:166:                                lsd = real_cell.get(cell.year, "hsd_10") # TODO: this will try and average if multiple values datapoints found...
+variety_trials_data/Page.py:189:                                raise BaseException # TODO: raise a standard/helpful error
+variety_trials_data/Page.py:213:                                raise BaseException #TODO: raise a standard/helpful error
+variety_trials_data/Page.py:285:                        # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+variety_trials_data/Page.py:765:                                raise BaseException # TODO: custom exception so we can tell the user what's up
+variety_trials_data/views.py:23:        # TODO: don't pass a curyear, instead have main.html point
+variety_trials_data/views.py:102:# TODO: does this belong in the DB?
+variety_trials_data/views.py:134:               # TODO: what is the behavior of HEAD?
+variety_trials_data/views.py:139:                       # TODO: Have this view point to / , and if successful redirect them
+variety_trials_data/views.py:166:                                       # TODO: return to main page and show error
+variety_trials_data/views.py:187:                               # TODO: redirect to /view/curyear/field/?... instead
+variety_trials_data/views.py:211:                                       number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
+variety_trials_data/views.py:254:                                       # TODO: Print message to the user telling them why we are exiting
+variety_trials_data/views.py:298:               # TODO: what is the behavior of HEAD?
+variety_trials_data/views.py:303:                       # TODO: Have this view point to / , and if successful redirect them
+variety_trials_data/views.py:317:                               # TODO: return to main page and show error
+
+variety_trials_data/Page.py:189:                                raise BaseException # TODO: raise a standard/helpful error
+variety_trials_data/Page.py:213:                                raise BaseException #TODO: raise a standard/helpful error
+variety_trials_data/Page.py:765:                                raise BaseException # TODO: custom exception so we can tell the user what's up
+
 
 Each variety could have a scroll-over box to 
 information about that particular variety.
@@ -202,14 +200,7 @@ Notes from Aug 10 Meeting
 * Rollout Sep 1
 * JSONP for other sites to grab from DB
 
-* Copyright footer (brought to you by ransom, wiersma, kariluoma)
-link to static about us page for workers
-make static pages
-* /view/ - instructions on get syntax
-* /add/ - secretary jump point
-* /json/ - programmer jump point
-* /about/ - info
-* add to footer at each page, except /add/, which should be palced in robots.txt
+put /add/  in robots.txt
 
 * Anything special so google can find us?
 ** We need a list of keywords
@@ -219,8 +210,6 @@ make static pages
 *** Variety Varietal selection
 *** NDSU MSU
 *** Extension Info Type Breed Description ...
-
-
 
 Notes from Aug 24 meeting with Dr. Wiersma
 * other jump page for variety-variety if farmers want it/current 
