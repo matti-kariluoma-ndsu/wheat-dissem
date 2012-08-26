@@ -91,9 +91,11 @@
 		</tr>
 	{% endfor %}
 {% endfor %}
+{% if page.appendix_tables|length != 0 %}
 	<tr>
 		<td colspan="777">We have data available for other varieties (for a head-to-head comparison): </td>
 	</tr>
+{% endif %}
 {% for table in page.appendix_tables %}
 		<tr>
 			<th>

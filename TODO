@@ -361,4 +361,8 @@ Notes from Aug 24 meeting with Dr. Wiersma
 * lsd across years, shifting columsn fine
 * v-v wonky with caching
 
-* was bale to crash-the-cache by selecting '2010' after the 5mins
+* was able to crash-the-cache by selecting '2010' after the 5mins
+* why does the head-to-head always show -!- for one of the 1-yr means?
+	is it because of my super-neat lsd code?
+* need a "clear head-to-head" button
+

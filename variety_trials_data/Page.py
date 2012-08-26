@@ -340,8 +340,10 @@ class LSD_Row(Row):
 		delete_columns = [] # indexes of columns to delete
 		for year in balanced_cells:
 			column_length = len(balanced_cells[year])
-			delete_column = [0] * len(row) # initialize all to zero
+			delete_column = None
 			for row in balanced_cells[year]:
+				if delete_column is None:
+					delete_column = [0] * len(row) # initialize all to zero
 				for (c, cell) in enumerate(row):
 					if cell is None:
 						delete_column[c] += 1
