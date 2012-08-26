@@ -2,9 +2,12 @@
 {% load django_math %}
 {% load get_urlencode %}
 {% block content %}
+{% if page == None %}
+	{{ message }}
+{% else %}
 	<div>
 	{% for fieldname, blurb_list in blurbs.items %}
-		<p>	
+		<p>
 		{% if fieldname == curfield %}
 			* 
 		{% endif %}
@@ -141,6 +144,7 @@
 		</tfoot>
 		</table>
 	</div>
+{% endif %}
 {% endblock %}
 
 {% load jsonify %}

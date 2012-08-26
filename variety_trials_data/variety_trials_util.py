@@ -2,6 +2,24 @@ from variety_trials_data import models
 from variety_trials_data.variety_trials_forms import ScopeConstants
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt
 
+class LSDProbabilityOutOfRange(Exception):
+	def __init__(self, message=None):
+		if not message:
+			message = "The alpha-value for the LSD calculation was out of range."
+		Exception.__init__(self, message)
+
+class TooFewDegreesOfFreedom(Exception):
+	def __init__(self, message=None):
+		if not message:
+			message = "Could not calculate the LSD, too few degrees of freedom in the input."
+		Exception.__init__(self, message)
+		
+class NotEnoughDataInYear(Exception):
+	def __init__(self, message=None):
+		if not message:
+			message = "The selected year does not have any data for viewing."
+		Exception.__init__(self, message)
+
 class Locations_from_Zipcode_x_Scope:
 	"""
 	Utility class to return a list of locations located a specified

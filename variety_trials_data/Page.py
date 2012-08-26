@@ -1,5 +1,6 @@
 from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
+from variety_trials_data.variety_trials_util import LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
 from scipy.special import erfinv
 from itertools import chain, cycle
@@ -186,7 +187,7 @@ class LSD_Row(Row):
 			(http://en.wikipedia.org/wiki/Error_function#Inverse_function)
 			"""
 			if probability > 1 or probability <= 0:
-				raise BaseException # TODO: raise a standard/helpful error
+				raise LSDProbabilityOutOfRange("Alpha-value out of range: '%s'" % (P))
 			else:
 				return sqrt(2) * erfinv(2*probability - 1)
 				
@@ -209,8 +210,10 @@ class LSD_Row(Row):
 			n = degrees_of_freedom
 			P = probability
 			t = 0
-			if (n < 1 or P > 1.0 or P <= 0.0 ):
-				raise BaseException #TODO: raise a standard/helpful error
+			if n < 1:
+				raise TooFewDegreesOfFreedom("Not enough degrees of freedom: '%s' to calculate LSD." % (n))
+			elif P > 1.0 or P <= 0.0:
+				raise LSDProbabilityOutOfRange("Alpha-value out of range: '%s'" % (P))
 			elif (n == 2):
 				t = sqrt(2.0/(P*(2.0-P)) - 2.0)
 			elif (n == 1):
@@ -390,8 +393,13 @@ class LSD_Row(Row):
 		
 		lsd = None
 		if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
-			lsd = _LSD(balanced_input, self.table.lsd_probability)
-			lsd = round(lsd, digits)
+			try:
+				lsd = _LSD(balanced_input, self.table.lsd_probability)
+				lsd = round(lsd, digits)
+			except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
+				lsd = None
+			except:
+				lsd = None
 		
 		return lsd
 
@@ -762,7 +770,7 @@ class Page:
 			if len(years) > 0:
 				default_year = sorted(years, reverse=True)[0]
 			else:
-				raise BaseException # TODO: custom exception so we can tell the user what's up
+				raise NotEnoughDataInYear("Not enough data in year %s" % (default_year))
 		
 		# hide user's deselections.
 		visible_locations = list(locations) # make a copy
