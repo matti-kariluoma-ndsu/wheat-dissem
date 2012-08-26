@@ -44,8 +44,8 @@
 			{{ field.label_tag }}: {{ field }}
 			{% endfor %}
 		</div>
-{% for table in page.tables %}
 		<tbody>
+{% for table in page.data_tables %}
 		<tr>
 			<th>
 				<h4>Variety</h4>
@@ -90,8 +90,40 @@
 		{% endfor %}
 		</tr>
 	{% endfor %}
-		</tbody>
 {% endfor %}
+	<tr>
+		<td colspan="777">We have data available for other varieties (for a head-to-head comparison): </td>
+	</tr>
+{% for table in page.appendix_tables %}
+		<tr>
+			<th>
+				<h4>Variety</h4>
+			</th>
+		</tr>
+	{% for variety, row in table.sorted_rows %}
+		{% if variety.name == "LSD" %}
+		<tr class="variety_trials__LSD_row">
+			<th>
+				<input type="submit" value="Compare Checked"/>
+			</th>
+		{% else %}
+		<tr class="variety_trials__row {% cycle 'variety_trials__row_odd' 'variety_trials__row_even' %}">
+			<th>
+				<input
+					class="variety_trials__variety_checkbox"
+					type="checkbox"
+					id="id_{{variety.name}}"
+					name="variety"
+					value="{{variety.name}}"/>
+				<label for="id_{{variety.name}}">
+					<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+				</label>
+			</th>
+		{% endif %}
+		</tr>
+	{% endfor %}
+{% endfor %}
+		</tbody>
 		</form>
 		<tfoot>
 		</tfoot>

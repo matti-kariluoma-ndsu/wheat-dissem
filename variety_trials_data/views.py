@@ -224,7 +224,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			print cache_key
 			page = cache.get(cache_key)
 			if page is not None:
-				for table in page.tables:
+				for table in page.data_tables:
 					table.set_defaults(curyear, fieldname)
 					table.mask_locations(not_location_objects)
 			else:

@@ -108,8 +108,7 @@ class Row:
 		try:
 			cell = self.members[key]
 		except KeyError:
-			self.key_index = self.key_index + 1
-			return None
+			cell = None
 
 		self.key_index = self.key_index + 1
 		return cell
@@ -450,6 +449,7 @@ class Aggregate_Cell(Cell):
 	def calculate_site_years(self):
 		self.site_years = 0
 		if not isinstance(self.row, LSD_Row):
+			cell = None
 			for cell in self.row:
 				if cell is not None and not isinstance(cell, Aggregate_Cell):
 					break
@@ -652,6 +652,10 @@ class Appendix_Table(Table):
 	
 	def add_cell(self, variety, location, cell):
 		row = self.get_row(variety)
+		row.set_key_order(None)
+	
+	def sorted_visible_columns(self):
+		return []
 
 class Page:
 	def get_entries(self, min_year, max_year, locations, number_locations, variety_names):
@@ -711,6 +715,8 @@ class Page:
 	
 	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
 		self.tables = []	
+		self.data_tables = []	
+		self.appendix_tables = []	
 		cells = {} # variety: {location: Cell() }
 		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
 		(locations, entries) = self.get_entries(
@@ -785,28 +791,31 @@ class Page:
 				
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability)
-				self.tables.append(table)
+				self.data_tables.append(table)
 				for variety in variety_order:
 					if not isinstance(table, Appendix_Table) and decomposition[default_year][variety] != decomposition[default_year][prev]:
 						prev = variety
 						if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
 							table = Table(locations, visible_locations, lsd_probability)
-							self.tables.append(table)
+							self.data_tables.append(table)
 						else:
 							table = Appendix_Table(locations, visible_locations, lsd_probability)
-							self.tables.append(table)
+							self.appendix_tables.append(table)
 					
 					for (location, cell) in cells[variety].items():
 						table.add_cell(variety, location, cell)
 		
 		if not break_into_subtables:
 			table = Table(locations, visible_locations, lsd_probability)
-			self.tables.append(table)
+			self.data_tables.append(table)
 			for variety in cells:
 				for location in cells[variety]:
 					cell = cells[variety][location]
 					table.add_cell(variety, location, cell)
-			
+		
+		self.tables.extend(self.data_tables)
+		self.tables.extend(self.appendix_tables)
+		
 		# Decorate the tables
 		for table in self.tables:
 			## Add LSD rows
