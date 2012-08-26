@@ -1,119 +1,73 @@
 (grep for TODOs)
-./urls.py:    ## TODO: There are 3 views of our data, reduce to 2 if not 1.
+variety_trials_website/urls.py:         ## TODO: There are 3 views of our data, reduce to 2 if not 1.
+variety_trials_data/Table.py:                   raise BaseException # TODO: raise a standard/helpful error
+variety_trials_data/Table.py:                   raise BaseException #TODO: raise a standard/helpful error
+variety_trials_data/Table.py:           # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+variety_trials_data/handle_csv.py:      ## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
+variety_trials_data/handle_csv.py:      # TODO: Consider not save() -ing each line, maybe do batches of ~100?
+variety_trials_data/static/lib/jQuery-contextMenu/jquery.contextMenu.js:    // TODO: -
+variety_trials_data/static/lib/jQuery-contextMenu/jquery.ui.position.js:        // TODO: use $.isWindow() in 1.9
+variety_trials_data/static/lib/jquery.js:        // TODO: Stop taunting the data cache; remove global events and always attach to document
+variety_trials_data/static/lib/jquery.js:          // TODO: Move to normal caching system
+variety_trials_data/templates/add_form_confirmation.html:       <!--TODO: auto generate this file from the model-->
+variety_trials_data/templates/add_from_csv_template.html:       <!--TODO: auto generate this file from the model-->
+variety_trials_data/templates/add_information.html:     <!--TODO: auto generate this file from the model-->
+variety_trials_data/templates/tabbed_object_view.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_object_view.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_object_view.html:  <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_object_view.html:          <!--TODO: auto-generate these year button images-->
+variety_trials_data/templates/tabbed_view.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view.html: <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view.html:         <!--TODO: auto-generate these year button images-->
+variety_trials_data/templates/tabbed_view.html:                 <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}} Zipcode: {{zipcode}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view.html:                 <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view_ndsu.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_ndsu.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_ndsu.html:                    <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view_ndsu.html:                    <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/main.html:        TODO: Add noscript version of this field to point to the noscript
+variety_trials_data/templates/main.html:        TODO: fix input validation strings return an error.
+variety_trials_data/templates/main_ndsu.html:   TODO: Add noscript version of this field to point to the noscript
+variety_trials_data/templates/main_ndsu.html:   TODO: fix input validation strings return an error.
+variety_trials_data/templates/tabbed_view_table_ndsu.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_table_ndsu.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
+variety_trials_data/templates/tabbed_view_table_ndsu.html:                      <td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/templates/tabbed_view_table_ndsu.html:                      <td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
+variety_trials_data/variety_trials_util.py:                     locations = models.Location.objects.all() # TODO: only return N locations? is that faster?
+variety_trials_data/Page.py:                            lsd = real_cell.get(cell.year, "hsd_10") # TODO: this will try and average if multiple values datapoints found...
+variety_trials_data/Page.py:                            raise BaseException # TODO: raise a standard/helpful error
+variety_trials_data/Page.py:                            raise BaseException #TODO: raise a standard/helpful error
+variety_trials_data/Page.py:                    # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+variety_trials_data/Page.py:                            raise BaseException # TODO: custom exception so we can tell the user what's up
+variety_trials_data/views.py:   # TODO: don't pass a curyear, instead have main.html point
+variety_trials_data/views.py:# TODO: does this belong in the DB?
+variety_trials_data/views.py:           # TODO: what is the behavior of HEAD?
+variety_trials_data/views.py:                   # TODO: Have this view point to / , and if successful redirect them
+variety_trials_data/views.py:                                   # TODO: return to main page and show error
+variety_trials_data/views.py:                           # TODO: redirect to /view/curyear/field/?... instead
+variety_trials_data/views.py:                                   number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
+variety_trials_data/views.py:                                   # TODO: Print message to the user telling them why we are exiting
+variety_trials_data/views.py:           # TODO: what is the behavior of HEAD?
+variety_trials_data/views.py:                   # TODO: Have this view point to / , and if successful redirect them
+variety_trials_data/views.py:                           # TODO: return to main page and show error
 
-./variety_trials_data/variety_trials_forms.py:	## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
-./variety_trials_data/variety_trials_forms.py:	# TODO: Consider not save() -ing each line, maybe do batches of ~100?
-
-./variety_trials_data/templates/main.html:	TODO: Add noscript version of this field to point to the noscript
-./variety_trials_data/templates/main.html:	TODO: fix input validation strings return an error.
-
-./variety_trials_data/templates/tabbed_view.html:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-./variety_trials_data/templates/tabbed_view.html:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-./variety_trials_data/templates/tabbed_view.html:<td><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-./variety_trials_data/templates/tabbed_view.html:<td><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-./variety_trials_data/templates/tabbed_view.html:	<div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-./variety_trials_data/templates/tabbed_view.html:		<!--TODO: auto-generate these year button images-->
-./variety_trials_data/templates/tabbed_view.html:				<td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
-./variety_trials_data/templates/tabbed_view.html:				<td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
-
-./variety_trials_data/templates/add_from_csv_template.html:	<!--TODO: auto generate this file from the model-->
-
-./variety_trials_data/views.py:	#TODO: Somehow reduce this to depth=1
-./variety_trials_data/views.py:			#TODO: there must be a better way to populate the varieties list
-./variety_trials_data/views.py:	# TODO: does this belong in the DB?
-./variety_trials_data/views.py:							"SELECT id FROM variety_trials_data_trial_entry WHERE %s!='' LIMIT 6", #TODO: hardcoded numeric value
-./variety_trials_data/views.py:					if count > 5:  #TODO: hardcoded numeric value
-./variety_trials_data/views.py:	# TODO: respect/update the cur_year value.
-./variety_trials_data/views.py:		# TODO: we can do more for the user than redirect to /
-./variety_trials_data/views.py:	#TODO: this is very bad for the database...
-
-./variety_trials_data/variety_trials_util.py:	# TODO: pull out into common-function call to make this boolean's use
-./variety_trials_data/variety_trials_util.py:				raise BaseException # TODO: raise a standard/helpful error
-./variety_trials_data/variety_trials_util.py:				raise BaseException #TODO: raise a standard/helpful error
-./variety_trials_data/variety_trials_util.py:		# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
-./variety_trials_data/variety_trials_util.py:			count = [0,0,0] # TODO: _Heavily_ assumes we are only using the last three years
-./variety_trials_data/variety_trials_util.py:						else: # TODO: We should never need to take this else branch
-./variety_trials_data/variety_trials_util.py:		for num_times in range(3): # TODO: hard-coded numeric value
-./variety_trials_data/variety_trials_util.py:		#TODO: mayhap this check should be done before break_into_subsets()?
-./variety_trials_data/variety_trials_util.py:			self.groups_loc[((order,order,order),0)] = [list(common_locations), list(common_locations), list(common_locations)]# TODO: heavily assumes 3-yrs
-./variety_trials_data/variety_trials_util.py:			for l in sorted(self.groups_loc.values()[0][0], key=attrgetter('name')): ##TODO: Super-kludge
-./variety_trials_data/variety_trials_util.py:				#locations = [l_indexes[l] for l in self.groups_loc[key][cy_i]] # TODO: do we need to consider the other years here?
-./variety_trials_data/variety_trials_util.py:				# TODO: kludge, adds unececssary locales, much extra processing. should changfe 'locations' for each year when doing multyear
-./variety_trials_data/variety_trials_util.py:							value = round(value, 1) # TODO: is round necessary here?
-./variety_trials_data/variety_trials_util.py:				for v in sorted(self.groups[key], key=attrgetter('name')): #TODO: we iterated through this already...
-./variety_trials_data/variety_trials_util.py:				for l in sorted(self.groups_loc.values()[0][0], key=attrgetter('name')): ##TODO: Super-kludge	
-./variety_trials_data/variety_trials_util.py:						value = self.lsds[l][cy_i] #TODO: smarter logic needed
-./variety_trials_data/variety_trials_util.py:						value = self.lsds[l][cy_i] #TODO: smarter logic needed
-./variety_trials_data/variety_trials_util.py:	# TODO: pull out into common-function call to make this boolean's use
-./variety_trials_data/variety_trials_util.py:		self.varieties = [] # reset the variable, otherwise we see the last added to our new ones (TODO: might be a useful feature)
-./variety_trials_data/variety_trials_util.py:				raise BaseException # TODO: raise a standard/helpful error
-./variety_trials_data/variety_trials_util.py:				raise BaseException #TODO: raise a standard/helpful error
-./variety_trials_data/variety_trials_util.py:		# TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
-./variety_trials_data/variety_trials_util.py:		for num_times in range(3): # TODO: hard-coded numeric value
-./variety_trials_data/variety_trials_util.py:				location_id = models.Location.objects.get(name__iexact=l).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
-./variety_trials_data/variety_trials_util.py:						variety_id = models.Variety.objects.get(name__iexact=v).id # TODO bad,bad,bad no-no-no we shouldn't need to hit the db like this
-./variety_trials_data/variety_trials_util.py:								value = round(sum(values)/len(values), 1) # TODO: is round necessary here?
-./variety_trials_data/variety_trials_util.py:					for v in sorted(self.groups[key]): #TODO: we iterated through this already...
-./variety_trials_data/variety_trials_util.py:							temp_row.append(max(self.lsds[(l, self.year)])) #TODO: smarter logic needed
-./variety_trials_data/variety_trials_util.py:			# TODO: Search the max distance, then have the user decide what threshold to filter at after _all_ results returned.
-./variety_trials_data/variety_trials_util.py:			# TODO: have the Location objects grab default lat/long, not user entered
-./variety_trials_data/variety_trials_util.py:			#TODO: We just searched a square, now discard searches that are > x miles away.
-
-<div> tags with a good class structure
-to keep the data aligned. Furthermore, it may be possible to represent
-the cells as objects and reduce the need for the server to explicitly
-make the table structure.
-
-The links on "tabbed_view" aren't really hyperlinks to other pages, they
-use javascript to reload the page with new parameters. This won't work 
-if javascript is disabled. Also, would an image hyperlink, or some other
-method, be more clear then a text hyperlink?
-
-Each variety should have a hyperlink (ideally a scroll-over box) to 
+Each variety could have a scroll-over box to 
 information about that particular variety.
 
-
-LSD_Calculator.fetch() is really three functions, one where sub-tables 
-are generated, one where lsds for those sub-tables are calculated, and
-another where everything is collated into an output table. The latter
-step (collated into output table) for sure needs to be cut out into
-a separate method, and all three are candidates for client-side 
-processing.
-
-Someone will need to implement "LSD(list[][], alpha):" in javascript.
-
-The intent of this website is to replace the printed booklets that
-the Plant Sciences dept currently prints and distributes. They already
-have pdf versions of their booklets available on the website, and our
-project would like to deliver in a form familiar to that. Modern
-
-browsers support <link media="print" rel="stylesheet" src="file.css">
-
-It seems the html/css does not keep all of the columns the same size.
-We should try to make them all the same width.
-
-If we use divs instead of tables, we can't (?) control line breaks.
-Looked at Display:Inline, white-space:nowrap but did not help! Maybe we 
-need to have our design allow for a newline in our table? color, shading?
+Modern browsers support 
+<link media="print" rel="stylesheet" src="file.css">
 
 Farmers have expressed interest in seeing information about providers of
 seed, phone numbers/websites and prices if possible. This would info
 would be available from a hyperlink on the variety name.
 
-When the project first began, we entertained the idea of calculating the
-LSD of varieties at some location from raw data. Turns out we only have
-aggregate data availbale, for the foreseeable future. We need to dredge
-up the old data we had and enter the LSD value, back to 2010.
-
-Each page should have a link to the homepage (to start the query over).
-This should be in base.html.
+We need to dredge up the old data we had and enter the LSD value, back 
+to 2010.
 
 When the user clicks the checkboxes next to the variety names, then
 selects "Compare Selected" they can sometimes be brought to the 
-variety-variety view, but no data is on the page. It would be best if
-their was some sort of message to be shown to the user; problem is
-if we use a ResponseRedirect, we can't (?) do a render_to_response()
-to show that message.
+variety-variety view, but no data is on the page. 
 
 * "compare selected" should do nothing if 0 or 1 varieties are selected
   * show a message telling them why they can't compare 0 or 1?
@@ -125,81 +79,31 @@ In addition to the "Yield" "Protein Percent" "Test Weight" buttons at
 the top of the page, we also need a button "All" that shows all of
 those fields. This view would only show the n-yr averages to save space.
 
-
-Implement listing the locations in the url in terms of what has been removed, 
-rather than what is being displayed. In views.py in tabbed_view the locations 
-that have been removed are stored in the lost neg_locations
-
 * 50 mi 58501, 2010, Kidder County has an index of -1, why?
 
 * wierd behavior
   * 56716, 50mi
 
-Notes from Jan 5 meeting:
-zipcode to means only, distance on h
- button to view source data
- note of # locations in each  result
+button to view source data/access the json views
+
 reimagine in terms of smartphone app
  e.g smaller screens, more drill before view
-
-Priority queue
-	Input old data, repair old
-	all-field view
-	only show 1,2,3-yr avg, no longer ask for 50,100,etc. 
 
 Why does Carrington 2011 bushels_acre return 25 up to 41?
 Why does Kidder County 2011 bushels_acre show up twice with different values?
 
-future:
-	sort by proximity
-	UI for entering data, confirmation/error pages
-	Table showing noughts for each variety x location x year data has been entered for
-		mouseover to see number
 
-** REGRESSION ** in the compare varieities view, the data is sometimes not expunged...
 
-Notes from 2012-Mar-20 Meeting
-	*	H-bar gone in some browsers?
-	* Remove empty locations (feature for Jochum) on extension version, keep on 134
-	* Display (how?) the number of site-years in each avg calc
-		* need to give the view the length of the 1,2,3-yr list
-		* footnote?
-	* Fix up the transition from variety-location views
-		* send the string "variety" or "location"?
-	* Don't mind as much about across site-years, we want big tables
-		* maybe do calcs like as now, then collate them into one or more tables?
-		* "inivisibly" drop locations to calculate 3,2-yr lsds
+
+
 ** REGRESSION ** 58103 200 mi.. Barnes?
 ** REGRESSION ** Barlow, Brennan, Faller, Glenn in variety show two tables...
-
-
-Notes from 2012-May-18 Meeting
-
-Talk of how we are going to truncate tables for pretty output.
-	1) when calculating subsets, only show those with greater than 6-10 varieties 
-		and 4-5 locations
-	2) From the zipcode, search for locations in a wideneing radius until the 
-		above criteria are met.
-	3) For the variety-variety view, repeat the above.
-	
-
-If we are going to have access the zipcode at all times, and ditching radius,
-maybe our get paramters can be locations deselected instead? and variety-variety
-views can just be up inthe get bar, since it'll be small? I'd like to have
-a list of numbers, or failing that reduce "varieties=" to "v=" (worse solution)
 
 Think on database synchronization for UMN<=>NDSU. Email admin when something
 happens? if unresolved after 10 days, email users?
 
+UI for entering data, confirmation/error pages
 Reminder to make the user-entry page robust (iterative), and undoable.
-
-If python is still losing references in early July, we'll need to investigate
-a new language. Before that we must try the new classes for variety_trials_util
-and maybe ask the community about a particualr version/implementation (JPython,
-CPython, IronPython, etc.) and see if that helps.
-
-Is it worthwhile to use some other project/library to render our html/
-route pages/handle forms?
 
 For the iterative upload:
 	1) user uploads file
@@ -213,22 +117,20 @@ For the iterative upload:
 	  values pulled from the databse)
 	7) a page showing recent changes with the ability to undo recent changes
 
-BUG
-1) choose zipcode from home
-2) remove a location
-3) click one of the 'yield,protein,...' or '2012,2011,...' breaks it
-
-4 ways to get to v-v from home:
+4 ways to get to variety-varietie from home:
  1) mutliple select
  2) n select
  3) select > text field
  4) checkboxes
 
-Pass objects to the page (dynamic pageview); first we'll need classes in 
-javascript to store our data (or get it on each call with json... maybe that
-is more acceptable). http://www.phpoed.com/3-ways-to-define-a-javascript-class/
+Variety-Variety selection designs in Mr. Sharma's branch:
+	javascript box-to-box: 408feb06df5461d6a6c9398a7bff2cc3be89b33f
+	n-checkboxes: c2efd1cf8c4a7eff47447db859ab275a1d0b224e
+	4-dropdowns: 5c88ccfda119faa8eba1b781a6fdf391990c54d3
+	The original is in master:
+	multiple-select: adcc766712e777872b04d8620cb3ba82c53aee6f
 
-Chew on spaghetti: AJAX or fully load? LSDs can't be calculated w/o all of the
+Philosphize: AJAX or fully load? LSDs can't be calculated w/o all of the
 data, although we could start to populate the table.. but the subtables will 
 morph while loading... desirable? it does show some sort of loading screen...
 
@@ -254,27 +156,12 @@ On page loading speed:
 	css-sprites:
 	http://wellstyled.com/css-nopreload-rollovers.html
 
-On divs and tables: 
-	Consensus on <table> vs <div style=display:table> is table for data, div for layout.
-	http://css-discuss.incutio.com/wiki/Tables_Vs_Divs
+Javascript's introspection of passed arguments:
+	http://javascriptweblog.wordpress.com/2011/01/18/javascripts-arguments-object-and-beyond/
 
-	Examples of div instead of table:
-	http://www.pixy.cz/blogg/clanky/css-3col-layout/
-	http://snook.ca/archives/html_and_css/getting_your_di
-	css clear, display properties:
-	http://www.w3schools.com/cssref/pr_class_clear.asp
-	http://www.w3schools.com/cssref/pr_class_display.asp
-	http://www.quirksmode.org/css/display.html
-
-Variety-Variety selection designs in Mr. Sharma's branch:
-javascript box-to-box: 408feb06df5461d6a6c9398a7bff2cc3be89b33f
-n-checkboxes: c2efd1cf8c4a7eff47447db859ab275a1d0b224e
-4-dropdowns: 5c88ccfda119faa8eba1b781a6fdf391990c54d3
-The original is in master:
-multiple-select: adcc766712e777872b04d8620cb3ba82c53aee6f
-
-Caching:
-https://docs.djangoproject.com/en/dev/topics/cache/
+Caching has been implemented as tempory-files, some thought should be
+given to memcached (a security risk?). Community hivemind says db-based
+is only appreciably faster in edge cases, i.e. dedicated database machine
 
 In-page spreadsheet requirements
 * Able to paste data from Excel/Open/LibreOffice
@@ -298,35 +185,32 @@ Secretary view needs
 * Testing for multiple lines entry
 * Summary of about-to-commit data at end of "are you sure" pipeline?
 
-Javascript's introspection of passed arguments:
-http://javascriptweblog.wordpress.com/2011/01/18/javascripts-arguments-object-and-beyond/
-
 Notes from July 27 meeting
 * Allow variety descriptions (the varieties table) to be updated
 ** What about protection from deletion/malicious overwrite?
-* Makes sure any data view has all varieities listed so we can do a 
-head-head
 * Update the main page to check for javascript, do an instant-search 
 type query when the zipcode is entered (i.e. dynamic keeps the zipcode 
 form on the main page)
 * Fill in zipcode as typed, with name data
 * Ensure newly entered varieties can show up in search
-* drive by 1-yr mean; allow holes in the 2,3 yr .
 
 Notes from Aug 10 Meeting
-* Put back 'x site-years' message for each n-yr mean
-* Ensure 8 locations (after some fall off during calculation ... maybe start with more/all then cut?
-* Stop automagically adding locations, makes custom queries difficult
 * Roll up advanced search page, user manual desribing GET structure
-* Add variety names/checkboxes to head-head view OR "clear"/back button
-* Investigate algorithm for removing small subtables from end of page
 * vareity descriptors
 ** externel URL(s) for now
 ** later use to enhance v-to-v view
 * Rollout Sep 1
 * JSONP for other sites to grab from DB
+
 * Copyright footer (brought to you by ransom, wiersma, kariluoma)
-** link to static about us page for workers
+link to static about us page for workers
+make static pages
+* /view/ - instructions on get syntax
+* /add/ - secretary jump point
+* /json/ - programmer jump point
+* /about/ - info
+* add to footer at each page, except /add/, which should be palced in robots.txt
+
 * Anything special so google can find us?
 ** We need a list of keywords
 *** North Dakota
@@ -339,26 +223,13 @@ Notes from Aug 10 Meeting
 * Maybe a "rebalance table" or similar-named button that redirects to 
 	/view/2010/... when viewing old data?
 
-make static pages
-* /view/ - instructions on get syntax
-* /add/ - secretary jump point
-* /json/ - programmer jump point
-* /about/ - info
-* add to footer at each page, except /add/, which should be palced in robots.txt
-
-Questions for Dr. Wiersma:
-1) should deleting a location reconstruct the table structure?
-2) should going back a year shift they n-yr average?
-
 Notes from Aug 24 meeting with Dr. Wiersma
-* Likes the appendix table at bottom
 * other jump page for variety-variety if farmers want it/current 
 	system confusing
-* Go-ahead on the table resturcutre when a location is removed 
+* Go-ahead on the table restructure when a location is removed 
 ** backing off for now, it'd be easy to merge the tables, but we would
 	have a hard time un-merging them, unless we could make the Table 
 	class support {merge,mix}ing
-* lsd across years, shifting columsn fine
 * v-v wonky with caching
 
 * was able to crash-the-cache by selecting '2010' after the 5mins
@@ -366,3 +237,9 @@ Notes from Aug 24 meeting with Dr. Wiersma
 	is it because of my super-neat lsd code?
 * need a "clear head-to-head" button
 
+* Makes sure any data view has all varieities listed so we can do a 
+head-head
+* Add variety names/checkboxes to head-head view OR "clear"/back button
+
+Investigate an appropriate time to call page.clear(), if ever -or- set
+up garbage-collection __name__() functions, if exists?

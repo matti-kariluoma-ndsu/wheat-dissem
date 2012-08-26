@@ -716,11 +716,7 @@ class Page:
 		return (locations_with_data, result)
 	
 	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
-		self.tables = []	
-		self.data_tables = []	
-		self.appendix_tables = []	
-		cells = {} # variety: {location: Cell() }
-		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		self.clear()
 		(locations, entries) = self.get_entries(
 				default_year - year_range, 
 				default_year, 
@@ -842,4 +838,12 @@ class Page:
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
 			table.set_defaults(year, fieldname)
+			
+	def clear(self):
+		# TOOD: clear all tables, rows, columns, cells with their .clear() functions
+		self.tables = []	
+		self.data_tables = []	
+		self.appendix_tables = []	
+		cells = {} # variety: {location: Cell() }
+		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
 
