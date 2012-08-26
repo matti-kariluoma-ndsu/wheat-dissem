@@ -27,6 +27,16 @@
 
 	<div>
 		<div>
+			{% if varieties|length > 0 %}
+			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{curyear|get_urlencode:'year'}}">Clear head-to-head comparison</a>
+			{% endif %}
+		</div>
+		<div>
+			{% if curyear != maxyear %}
+			<a href="/view/{{curyear}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}">Rebalance the table for this year</a>
+			{% endif %}
+		</div>
+		<div>
 			{% for fieldname, blurb_list in blurbs.items %}
 			{% if fieldname == curfield %}
 					<p>{{blurb_list.0}}: {{blurb_list.1}}</p>

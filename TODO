@@ -220,8 +220,7 @@ make static pages
 *** NDSU MSU
 *** Extension Info Type Breed Description ...
 
-* Maybe a "rebalance table" or similar-named button that redirects to 
-	/view/2010/... when viewing old data?
+
 
 Notes from Aug 24 meeting with Dr. Wiersma
 * other jump page for variety-variety if farmers want it/current 
@@ -235,11 +234,6 @@ Notes from Aug 24 meeting with Dr. Wiersma
 * was able to crash-the-cache by selecting '2010' after the 5mins
 * why does the head-to-head always show -!- for one of the 1-yr means?
 	is it because of my super-neat lsd code?
-* need a "clear head-to-head" button
-
-* Makes sure any data view has all varieities listed so we can do a 
-head-head
-* Add variety names/checkboxes to head-head view OR "clear"/back button
 
 Investigate an appropriate time to call page.clear(), if ever -or- set
 up garbage-collection __name__() functions, if exists?

@@ -340,15 +340,16 @@ class LSD_Row(Row):
 		delete_columns = [] # indexes of columns to delete
 		for year in balanced_cells:
 			column_length = len(balanced_cells[year])
-			delete_column = None
-			for row in balanced_cells[year]:
-				if delete_column is None:
-					delete_column = [0] * len(row) # initialize all to zero
+			delete_column = {} # was `[0] * len(row)' but len(row) != num_columns...?
+			for row in balanced_cells[year]: 
 				for (c, cell) in enumerate(row):
 					if cell is None:
-						delete_column[c] += 1
-			for (index, count) in enumerate(delete_column):
-				if count == column_length:
+						try:
+							delete_column[c] += 1
+						except KeyError:
+							delete_column[c] = 0
+			for index in delete_column:
+				if delete_column[index] == column_length:
 					delete_columns.append(index)
 					
 		for index in sorted(list(set(delete_columns)), reverse=True):
@@ -385,7 +386,7 @@ class LSD_Row(Row):
 		for year in balanced_cells:
 			balanced_input.extend(balanced_cells[year])
 			
-		print balanced_input
+		#print balanced_input
 		
 		lsd = None
 		if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
@@ -652,7 +653,7 @@ class Appendix_Table(Table):
 		"""
 		Table.__init__(self, locations, visible_locations, lsd_probability)
 	
-	def add_cell(self, variety, location, cell):
+	def add_cell(self, variety, location=None, cell=None):
 		row = self.get_row(variety)
 		row.set_key_order(None)
 	
@@ -717,6 +718,8 @@ class Page:
 	
 	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
 		self.clear()
+		cells = {} # variety: {location: Cell() }
+		decomposition = self.decomposition # {year: {variety: {location: bool, ...}, ...}, ...}
 		(locations, entries) = self.get_entries(
 				default_year - year_range, 
 				default_year, 
@@ -810,6 +813,18 @@ class Page:
 				for location in cells[variety]:
 					cell = cells[variety][location]
 					table.add_cell(variety, location, cell)
+			
+		
+		# {Add,add to} appendix tables
+		if len(self.appendix_tables) > 0:
+			table = self.appendix_tables[-1] # grab the last one
+		else:
+			table = Appendix_Table(locations, visible_locations, lsd_probability)
+			self.appendix_tables.append(table)
+			
+		for variety in models.Variety.objects.all():
+			if variety not in cells:
+				table.add_cell(variety)
 		
 		self.tables.extend(self.data_tables)
 		self.tables.extend(self.appendix_tables)
@@ -844,6 +859,5 @@ class Page:
 		self.tables = []	
 		self.data_tables = []	
 		self.appendix_tables = []	
-		cells = {} # variety: {location: Cell() }
-		decomposition = self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
 

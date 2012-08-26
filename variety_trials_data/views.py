@@ -283,6 +283,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					'year_get_string': '&%s' % (urlencode( [('year', curyear)] )),
 					'year_url_bit': year_url_bit,
 					'curyear': curyear,
+					'maxyear': maxyear,
 					'page': page,
 					'years': years,
 					'blurbs' : unit_blurbs,
