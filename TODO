@@ -29,10 +29,7 @@ variety_trials_data/templates/tabbed_view_table_ndsu.html:127:                  
 variety_trials_data/templates/tabbed_view_table_ndsu.html:134:                  <td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
 variety_trials_data/variety_trials_util.py:45:                  locations = models.Location.objects.all() # TODO: only return N locations? is that faster?
 variety_trials_data/Page.py:166:                                lsd = real_cell.get(cell.year, "hsd_10") # TODO: this will try and average if multiple values datapoints found...
-variety_trials_data/Page.py:189:                                raise BaseException # TODO: raise a standard/helpful error
-variety_trials_data/Page.py:213:                                raise BaseException #TODO: raise a standard/helpful error
 variety_trials_data/Page.py:285:                        # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
-variety_trials_data/Page.py:765:                                raise BaseException # TODO: custom exception so we can tell the user what's up
 variety_trials_data/views.py:23:        # TODO: don't pass a curyear, instead have main.html point
 variety_trials_data/views.py:102:# TODO: does this belong in the DB?
 variety_trials_data/views.py:134:               # TODO: what is the behavior of HEAD?
@@ -44,11 +41,6 @@ variety_trials_data/views.py:254:                                       # TODO: 
 variety_trials_data/views.py:298:               # TODO: what is the behavior of HEAD?
 variety_trials_data/views.py:303:                       # TODO: Have this view point to / , and if successful redirect them
 variety_trials_data/views.py:317:                               # TODO: return to main page and show error
-
-variety_trials_data/Page.py:189:                                raise BaseException # TODO: raise a standard/helpful error
-variety_trials_data/Page.py:213:                                raise BaseException #TODO: raise a standard/helpful error
-variety_trials_data/Page.py:765:                                raise BaseException # TODO: custom exception so we can tell the user what's up
-
 
 Each variety could have a scroll-over box to 
 information about that particular variety.

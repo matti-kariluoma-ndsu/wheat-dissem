@@ -246,9 +246,11 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear) as error:
 					page = None
 					message = " ".join([ERROR_MESSAGE, error.message])
+					raise
 				except:
 					page = None
 					message = ERROR_MESSAGE
+					raise
 					
 				
 			"""
@@ -260,7 +262,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 						sys.stdout.write('\t'+unicode(cell))
 					sys.stdout.write(']\n')
 				print table.columns
-			"""
+			#"""
 			response = None
 			if page is not None:
 				try:
@@ -291,6 +293,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				except: # We have no expected exceptions for this code block
 					page = None
 					message = ERROR_MESSAGE
+					raise
 			
 			if response is None:
 				response = render_to_response(
@@ -318,6 +321,13 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 						context_instance=RequestContext(request)
 					)
 			
+			# TODO: is python's refcount/garbage collection enough?
+			"""
+			if page is not None:
+				page.clear() # clear references
+				page = None
+			#"""
+				
 			return response
 
 def zipcode_view(request, year_range, fieldname, abtest=None):

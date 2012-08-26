@@ -43,6 +43,8 @@ class Cell:
 		self.delete_column()
 		self.members = []
 		self.index = 0
+		self.year = 0
+		self.fieldname = "no_field"
 	
 	def get(self, year, fieldname):
 		this_year = []
@@ -75,7 +77,7 @@ class Cell:
 	def __unicode__(self):
 		unicode_repr = self.get_rounded(self.year, self.fieldname)
 		if unicode_repr is None:
-			unicode_repr = u'-!-'
+			unicode_repr = u'--'
 		else:
 			unicode_repr = unicode(str(unicode_repr))
 		return unicode_repr
@@ -318,7 +320,7 @@ class LSD_Row(Row):
 			for row in balanced_cells[table]:
 				print row
 			print "==="
-		"""
+		#"""
 		
 		#
 		## delete rows that are all None
@@ -383,7 +385,7 @@ class LSD_Row(Row):
 			for row in balanced_cells[table]:
 				print row
 			print "==="
-		"""
+		#"""
 		
 		balanced_input = []
 		for year in balanced_cells:
@@ -435,6 +437,7 @@ class Column:
 			if isinstance(m, Cell):
 				m.delete_column()
 		self.members = []
+		self.index = 0
 
 class Aggregate_Cell(Cell):
 	"""
@@ -456,7 +459,7 @@ class Aggregate_Cell(Cell):
 		# Note we are not making a copy of visible_locations; do not mutate
 		self.visible_locations = visible_locations
 		self.calculate_site_years()
-		
+	
 	def calculate_site_years(self):
 		self.site_years = 0
 		if not isinstance(self.row, LSD_Row):
@@ -504,6 +507,12 @@ class Aggregate_Cell(Cell):
 			mean = round(float(sum(values)) / float(len(values)), 1)
 		
 		return mean
+	
+	def clear(self):
+		Cell.clear(self)
+		self.decomposition = {}
+		self.visible_locations = []
+		self.site_years = 0
 
 class Fake_Location:
 	def __init__(self, name):
@@ -524,10 +533,14 @@ class Aggregate_Column(Column):
 		self.members = []
 		self.clear()
 		self.years_range = range(year_num)
-		self.site_years = None
-	
+		
 	def get_site_years(self):
 		return self.site_years
+		
+	def clear(self):
+		Column.clear(self)
+		self.site_years = None
+		self.years_range = []
 
 class Table:
 		"""
@@ -546,10 +559,23 @@ class Table:
 			self.lsd_probability = lsd_probability
 			self.locations = list(locations) # create a copy
 			self.visible_locations = list(visible_locations) # create a copy
+			self.cells = {} # (variety, location): Cell()
 			self.rows = {} # variety: Row(), ...
 			self.columns = {} # location: Column(), ...
-			self.cells = {} # (variety, location): Cell()
-			
+		
+		def clear(self):
+			self.locations = []
+			self.visible_locations = []
+			for cell in self.cells.values():
+				cell.clear()
+			for row in self.rows.values():
+				row.clear()
+			for column in self.columns.values():
+				column.clear()
+			self.cells = {}
+			self.rows = {}
+			self.columns = {}
+		
 		def get_row(self, variety):
 			try:
 				row = self.rows[variety]
@@ -725,9 +751,10 @@ class Page:
 		return (locations_with_data, result)
 	
 	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
+		self.tables = []	
+		decomposition = self.decomposition = {}# {year: {variety: {location: bool, ...}, ...}, ...}
 		self.clear()
 		cells = {} # variety: {location: Cell() }
-		decomposition = self.decomposition # {year: {variety: {location: bool, ...}, ...}, ...}
 		(locations, entries) = self.get_entries(
 				default_year - year_range, 
 				default_year, 
@@ -863,9 +890,14 @@ class Page:
 			table.set_defaults(year, fieldname)
 			
 	def clear(self):
-		# TOOD: clear all tables, rows, columns, cells with their .clear() functions
+		for table in self.tables:
+			table.clear()
 		self.tables = []	
 		self.data_tables = []	
 		self.appendix_tables = []	
+		for year in self.decomposition:
+			for variety in self.decomposition[year]:
+				self.decomposition[year][variety] = {}
+			self.decomposition[year] = {}
 		self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
 
