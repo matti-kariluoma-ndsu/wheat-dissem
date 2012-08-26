@@ -226,7 +226,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			if page is not None:
 				for table in page.tables:
 					table.set_defaults(curyear, fieldname)
-				page.mask_locations(not_location_objects)
+					table.mask_locations(not_location_objects)
 			else:
 				page = Page(
 							locations,

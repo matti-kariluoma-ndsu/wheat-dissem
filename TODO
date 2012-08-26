@@ -336,10 +336,8 @@ Notes from Aug 10 Meeting
 *** NDSU MSU
 *** Extension Info Type Breed Description ...
 
-Clicking on 2010,2009 does not show us the data as expected, and mutates
-the table structure. Set it to reuse the table strucutre, only showing old
-data (as ugly as it may be)
-* Maybe a "rebalance table" or similar-named button that redirects to /view/2010/... ?
+* Maybe a "rebalance table" or similar-named button that redirects to 
+	/view/2010/... when viewing old data?
 
 make static pages
 * /view/ - instructions on get syntax
@@ -348,22 +346,19 @@ make static pages
 * /about/ - info
 * add to footer at each page, except /add/, which should be palced in robots.txt
 
-When the user follows a '2010' or '2009' link, etc. that sets the year=
-get parameter to somehting less than the curyear parameter, hide/mask
-the relevenat 'n-yr' column from visible_locations
-
 Questions for Dr. Wiersma:
 1) should deleting a location reconstruct the table structure?
 2) should going back a year shift they n-yr average?
 
-
-If cache kicks in while not_locations is active, the view for the
-table will be off! Soln: page.mask_locations needs to unmask members
-not in the list...???
-
-Notes from Aug 24 meeting
+Notes from Aug 24 meeting with Dr. Wiersma
 * Likes the appendix table at bottom
-* other page for -variety
+* other jump page for variety-variety if farmers want it/current 
+	system confusing
 * Go-ahead on the table resturcutre when a location is removed 
+** backing off for now, it'd be easy to merge the tables, but we would
+	have a hard time un-merging them, unless we could make the Table 
+	class support {merge,mix}ing
 * lsd across years, shifting columsn fine
 * v-v wonky with caching
+
+* was bale to crash-the-cache by selecting '2010' after the 5mins
