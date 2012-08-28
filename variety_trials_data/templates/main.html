@@ -119,27 +119,11 @@ function callback(item) {
 }
 
 jQuery(function() {
-	$('input#suggestBox').jsonSuggest(testData.countryCodes, {onSelect:callback});
-	
-	$('input#suggestBox2').jsonSuggest(testData.webSites, {onSelect:callback});
+
 	
 	$('input#suggestBox3').jsonSuggest(testData.country, {maxResults:20});
 	
-	
-	$('input#suggestBox4').jsonSuggest(
-		function(text, wildCard, caseSensitive, notCharacter) {
-			// From here you can put your own logic in to say what results show.
-			// For now I'm just going to return some dummy data.
-			
-			return [
-				{text:'View'},
-				{text:'the'},
-				{text:'source'},
-				{text:'for'},
-				{text:'this'},
-				{text:'one'}
-			];
-		}, {ajaxResults:true});
+
 });
 
 function select_variety(variety_value) {
