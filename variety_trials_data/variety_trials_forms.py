@@ -10,7 +10,14 @@ import glob
 import os
 
 class SelectLocationByZipcodeRadiusForm(forms.Form):
-	zipcode = forms.CharField(max_length=5, required=True)
+	zipcode = forms.CharField(
+			max_length=5, 
+			required=True, 
+			widget=forms.TextInput(attrs={
+					'autocomplete': "off",
+					'onkeyup': 'initSuggest(); return false;',
+				})
+		)
 		
 class SelectVarietiesForm(SelectLocationByZipcodeRadiusForm):
 	varieties = forms.ModelMultipleChoiceField(

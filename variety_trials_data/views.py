@@ -533,6 +533,20 @@ def zipcode_json(request, id):
 	json_serializer.serialize(z, stream=response)
 	return response
 	
+def autocomplete_zipcode_json(request, partial_zipcode):
+	"""
+	if str(partial_zipcode)[0] != 0:
+		filter_less_than = 10000
+	elif
+	""" 
+	#TODO: filter properly for zipcodes starting with 0, 00
+	#TODO: do any zipcodes start with 000? 0000? does zip 00000 exist? 
+	z = models.Zipcode.objects.filter(zipcode__startswith=partial_zipcode).filter(zipcode__gt=10000)
+	response = HttpResponse()
+	json_serializer = serializers.get_serializer("json")()
+	json_serializer.serialize(z, stream=response)
+	return response
+	
 def location_json(request, id):
 	l = models.Location.objects.filter(pk=id)
 	response = HttpResponse()

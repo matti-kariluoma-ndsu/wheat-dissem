@@ -86,7 +86,9 @@ function move(listBoxTo,optionValue,optionDisplayText){
 		<input type="submit" value="Submit" />
 	</form>
 </div>
-<input type="text" size="50" id="suggestBox3" autocomplete="off"><div class="jsonSuggestResults" style="top: 494px; left: 8px; width: 410px; display: none; "></div>
+<input type="text" size="50" id="suggestBox3" onkeyup="initSuggest()" autocomplete="off">
+<div class="jsonSuggestResults" style="top: 494px; left: 8px; width: 410px; display: none; ">
+</div>
 <div>
 	<hr>
 	<p>You can also compare varieties (hold the ctrl key to select multiple):</p>
@@ -114,34 +116,56 @@ function move(listBoxTo,optionValue,optionDisplayText){
 {% endblock %}
 
 {% block javascript %}
-function callback(item) {
-	alert('You selected \'' + item.text + '\'\n\nHere is the full selected JSON object;\n' + JSON.stringify(item));
+
+jQuery(
+function() 
+{
+	var entry1 = {
+    url: '/autocomplete/zipcode/581/json',
+	dataType: "json",
+    data: {
+        'key': 'value'
+    },
+	}
+
+	
+	
+}
+);
+
+function initSuggest()
+{
+	var input = $('input#id_zipcode')
+	var get_url = "/autocomplete/zipcode/"+input.val()+"/json/"
+	var entry1 = {
+    url: get_url,
+		dataType: "json",
+	}
+	
+	function processAjaxFunction(zipcodes) 
+	{
+		testData = {}
+		testData.city = []
+		for (i=0; i < zipcodes.length; i++)
+		{
+			zipcode_object = zipcodes[i];
+			//alert(JSON.stringify(zipcode_object));
+			testData.city.push({
+				text: String(zipcode_object.fields.zipcode),
+				extra: zipcode_object.fields.city + ", " + zipcode_object.fields.state
+				})
+		}
+		
+		
+		//testData.city=[{"text":"58102","extra":"Fargo,ND"}];
+		input.jsonSuggest(testData.city, {maxResults:20});
+	}
+	
+	jQuery.ajax(entry1).done(processAjaxFunction);
+	
+	
+	
+	
 }
 
-jQuery(function() {
-
-	
-	$('input#suggestBox3').jsonSuggest(testData.country, {maxResults:20});
-	
-
-});
-
-function select_variety(variety_value) {
-		$("#id_varieties option[value='"+variety_value+"']").attr("selected","selected");
-	}
-
-//selects everything in the selectRight box
-function select_all() {
-$("#id_varieties option").each(
-			function() {
-				$(this).removeAttr("selected");
-			}
-		);
-	
-$("#selectRight option").each(
-			function() {
-				select_variety($(this).attr("value"));
-			}
-		);
-	}
 {% endblock %}
