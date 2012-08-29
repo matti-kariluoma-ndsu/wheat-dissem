@@ -173,3 +173,5 @@ CACHES = {
     }
 }
 
+HOME_URL = '/'
+

@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from django.utils.http import urlencode
 from django.core import serializers
 from django.core.cache import cache
+from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
@@ -17,7 +18,6 @@ try:
 except ImportError:
 	import json # Python 2.6
 
-HOME_URL = '/'
 ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
 
 
@@ -33,7 +33,7 @@ def index(request, abtest=None):
 		{ 
 			'zipcode_form': zipcode_form,
 			'curyear': curyear,
-			'home_url': home_url,
+			'home_url': HOME_URL,
 		},
 		context_instance=RequestContext(request)
 	)
@@ -249,11 +249,11 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear) as error:
 					page = None
 					message = " ".join([ERROR_MESSAGE, error.message])
-					raise
+					#raise
 				except:
 					page = None
 					message = ERROR_MESSAGE
-					raise
+					#raise
 					
 				
 			"""
@@ -270,7 +270,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			if page is not None:
 				try:
 					response = render_to_response(
-						'tabbed_object_table_view.html',
+						'tabbed_view_table_ndsu.html',
 						{
 							'hidden_zipcode_form': hidden_zipcode_form,
 							'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
@@ -297,11 +297,11 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				except: # We have no expected exceptions for this code block
 					page = None
 					message = ERROR_MESSAGE
-					raise
+					#raise
 			
 			if response is None:
 				response = render_to_response(
-						'tabbed_object_table_view.html',
+						'tabbed_view_table_ndsu.html',
 						{
 							'hidden_zipcode_form': hidden_zipcode_form,
 							'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),

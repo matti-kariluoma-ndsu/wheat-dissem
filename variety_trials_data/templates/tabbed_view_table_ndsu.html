@@ -32,6 +32,22 @@
 
 {% block content %}
 <div>
+{% if page == None %}
+<p>{{ message }}</p>
+{% else %}
+		<div>
+			{% if varieties|length > 0 %}
+			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{curyear|get_urlencode:'year'}}">Clear head-to-head comparison</a>
+			{% endif %}
+		</div>
+		<div>
+			{% if curyear != maxyear %}
+			<a href="/view/{{curyear}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}">Rebalance the table for this year</a>
+			{% endif %}
+		</div>
+		<div>
+			<p>This data is for the time period {{year_url_bit}}</p>
+		</div> 
 		<div>
 			{% for fieldname, blurb_list in blurbs.items %}
 			{% if fieldname == curfield %}
@@ -40,7 +56,7 @@
 			{% endif %}
 			{% endfor %}
 		</div>
-		<div>{{year_url_bit}}</div> 
+		
 		<table>
 		<thead>
 		</thead>
@@ -50,7 +66,7 @@
 			{{ field.label_tag }}: {{ field }}
 			{% endfor %}
 		</div>
-{% for table in page.tables %}
+{% for table in page.data_tables %}
 		<tbody>
 		<tr>
 			<th>
@@ -97,12 +113,43 @@
 		{% endfor %}
 		</tr>
 	{% endfor %}
-		</tbody>
 {% endfor %}
+{% if page.appendix_tables|length != 0 %}
+	<tr>
+		<td colspan="777">We have data available for other varieties (for a head-to-head comparison): </td>
+	</tr>
+{% endif %}
+{% for table in page.appendix_tables %}
+{% for variety, row in table.sorted_rows %}
+		{% if variety.name == "LSD" %}
+		<tr class="variety_trials__LSD_row">
+			<th>
+				<input type="submit" value="Compare Selected"/>
+				<p>LSD:</p>
+			</th>
+		{% else %}
+		<tr class="variety_trials__row {% cycle 'variety_trials__row_odd' 'variety_trials__row_even' %}">
+			<th>
+				<input
+					class="variety_trials__variety_checkbox"
+					type="checkbox"
+					id="id_{{variety.name}}"
+					name="variety"
+					value="{{variety.name}}"/>
+				<label for="id_{{variety.name}}">
+					<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+				</label>
+			</th>
+		{% endif %}
+		</tr>
+	{% endfor %}
+{% endfor %}
+	</tbody>
 		</form>
 		<tfoot>
 		</tfoot>
 		</table>
+{% endif %}
 	</div>
 {% endblock %}
 
