@@ -21,50 +21,33 @@ ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to
 
 def index(request, abtest=None):
 	zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
-	# TODO: don't pass a curyear, instead have main.html point
-	# to an intelligent url such as /view/last_3_years/bushels_acre/?...
-	curyear = datetime.date.today().year - 1
 	
-
 	return render_to_response(
 		'main.html', 
 		{ 
-			'zipcode_form': zipcode_form,
-			'curyear': curyear
+			'zipcode_form': zipcode_form
 		},
 		context_instance=RequestContext(request)
 	)
 
 def variety_info(request, variety_name):
-	variety=models.Variety.objects.filter(name=variety_name)[0]
-	index = variety.id
-	name=variety.name
-	description_url = variety.description_url
-	picture_url=variety.picture_url
-	agent_origin=variety.agent_origin
-	year_released=variety.year_released
-	straw_length=variety.straw_length
-	maturity=variety.maturity
-	grain_color=variety.grain_color
-	beard=variety.beard
-	wilt=variety.wilt
-
+	try:
+		variety = models.Variety.objects.filter(name=variety_name).get()
+		message = None
+	except models.Variety.DoesNotExist:
+		variety = None
+		message = " ".join([
+				ERROR_MESSAGE, 
+				"Variety '%s' not found." % (variety_name),
+				"Try replacing any special characters (spaces, apostrophes, etc.) with '+'.",
+				"Variety names are case-sensitive."
+			])
 
 	return render_to_response(
 		'variety_info.html', 
 		{ 
-			'index': index,
-			'variety_name': variety_name,
-			'year_released' : year_released,
-			'description_url' : description_url,
-			'picture_url' : picture_url,
-			'agent_origin' : agent_origin,
-			'straw_length' : straw_length,
-			'maturity' : maturity,
-			'grain_color' : grain_color,
-			'beard' : beard,
-			# 'diseases' : diseases,
-			'wilt' : wilt
+			'variety': variety,
+			'message': message,
 		},
 		context_instance=RequestContext(request)
 	)

@@ -1,59 +1,60 @@
 {% extends "base.html" %}
 {% load django_math %}
 {% block content %}
-<style type="text/css">
-table,th,td,td
-{
-border:1px solid black;
-}
-</style>
 <div>
-	<p>This is the page where the information on {{variety_name}}, variety number {{index}} will be displayed.</p>
-	<table>
-	<tr>
-	<th>Variety</th>
-	<th>{{variety_name}}</th>
-	</tr>
-	<tr>
-	<td>Index</td>
-	<td>{{index}}</td>
-	</tr>
-	<tr>
-	<td>Year Released</td>
-	<td>{{year_released}}</td>
-	</tr>
-	<tr>
-	<td>Description</td>
-	<td>{{description_url}}</td>
-	</tr>
-	<tr>
-	<td>Picture</td>
-	<td>{{picture_url}}</td>
-	</tr>
-	<tr>
-	<td>Agent Origin</td>
-	<td>{{agent_origin}}</td>
-	</tr>
-	<tr>
-	<td>Stdaw Length</td>
-	<td>{{stdaw_length}}</td>
-	</tr>
-	<tr>
-	<td>Maturity</td>
-	<td>{{maturity}}</td>
-	</tr>
-	<tr>
-	<td>Grain Color</td>
-	<td>{{grain_color}}</td>
-	</tr>
-	<tr>
-	<td>Beard</td>
-	<td>{{beard}}</td>
-	</tr>
-	<tr>
-	<td>Wilt</td>
-	<td>{{wilt}}</td>
-	</tr>
+{% if not variety %}
+	<p>{{message}}</p>
+{% else %}
+	<table class="variety_trials__detail">
+		<tr>
+			<th>Variety Name</th>
+			<td>{{variety.name}}</td>
+		</tr>
+		<tr>
+			<th>Index</th>
+			<td>{{variety.pk}}</td>
+		</tr>
+		<tr>
+			<th>Year Released</th>
+			<td>{{variety.year_released}}</td>
+		</tr>
+		<tr>
+			<th>Description</th>
+			<td>{{variety.description_url}}</td>
+		</tr>
+		<tr>
+			<th>Picture</th>
+			<td>{{variety.picture_url}}</td>
+		</tr>
+		<tr>
+			<th>Agent Origin</th>
+			<td>{{variety.agent_origin}}</td>
+		</tr>
+		<tr>
+			<th>Straw Length</th>
+			<td>{{variety.straw_length}}</td>
+		</tr>
+		<tr>
+			<th>Maturity</th>
+			<td>{{variety.maturity}}</td>
+		</tr>
+		<tr>
+			<th>Grain Color</th>
+			<td>{{variety.grain_color}}</td>
+		</tr>
+		<tr>
+			<th>Seed Color</th>
+			<td>{{variety.seed_color}}</td>
+		</tr>
+		<tr>
+			<th>Beard</th>
+			<td>{{variety.beard}}</td>
+		</tr>
+		<tr>
+			<th>Wilt</th>
+			<td>{{variety.wilt}}</td>
+		</tr>
 	</table>
+{% endif %}
 </div>
 {% endblock %}
