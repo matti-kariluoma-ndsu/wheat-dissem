@@ -218,3 +218,8 @@ Notes from Aug 24 meeting with Dr. Wiersma
 
 Investigate an appropriate time to call page.clear(), if ever -or- set
 up garbage-collection __name__() functions, if exists?
+
+
+Source for zipcode-autocomplete
+	http://tomcoote.co.uk/wp-content/CodeBank/Demos/JSONSuggestBox/demo.html
+

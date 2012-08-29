@@ -15,7 +15,14 @@ class ScopeConstants:
 			]
 
 class SelectLocationByZipcodeForm(forms.Form):
-	zipcode = forms.CharField(max_length=5, required=True)
+	zipcode = forms.CharField(
+			max_length=5, 
+			required=True,
+			widget=forms.TextInput(attrs={
+					'autocomplete': "off",
+					'onkeyup': 'initSuggest(); return false;',
+				})
+		)
 	scope = forms.ChoiceField(
 			widget=forms.RadioSelect(),
 			choices=(
@@ -53,6 +60,7 @@ class SelectVarietiesForm(SelectLocationByZipcodeForm):
 			widget=forms.Select(),
 			queryset=models.Variety.objects.all()
                         )
+                        
 class SelectLocationsForm(SelectVarietiesForm):
 	locations = forms.ModelMultipleChoiceField(
 		widget=forms.SelectMultiple(attrs={'size': 20}),

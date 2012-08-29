@@ -27,6 +27,12 @@ urlpatterns = patterns('',
 		#(r'^view/location/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[0-9]+)/', views.locations_view),
 		#(r'^view/variety/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z_]+)/(?P<abtest>[0-9]+)/', views.varieties_view),
 		(r'^add_trials/', views.add_trial_entry_csv_file), # page to upload a spreadsheet to
+		(r'^add_variety/', views.add_variety), # page to variety
+		(r'^add_new_variety/', views.add_new_variety), # page to variety
+		(r'^edit_variety/', views.edit_variety), # page to variety
+		(r'^edited_variety/', views.edited_variety), # page to variety
+
+
 		(r'^add_trials_confirm/', views.add_form_confirmation), # Page to confirmations
 		(r'^sucess/', views.redirect_sucess), # Page to sucess
 		(r'^add_info/', views.add_information), # Page to confirmations
@@ -37,6 +43,7 @@ urlpatterns = patterns('',
 		#(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL}), # serves static/img static/css static/js etc.
 		(r'^view/info/(?P<variety_name>[a-zA-Z_]+)', views.variety_info), # defaults to location-based view
 		(r'^inspect/', views.inspect),
+
 		(r'^trial_entry/(?P<id>[0-9]+)/json', json_views.trial_entry_json),
 		(r'^zipcode/(?P<id>[0-9]+)/json', json_views.zipcode_json),
 		(r'^zipcode/near/(?P<zipcode>[0-9]+)/json', json_views.zipcode_near_json),
@@ -47,6 +54,8 @@ urlpatterns = patterns('',
 		(r'^location/all/json', json_views.location_json_all),
 		(r'^variety/all/json', json_views.variety_json_all),
 		(r'^disease/(?P<id>[0-9]+)/json', json_views.disease_json),
+		(r'^autocomplete/zipcode/(?P<partial_zipcode>[1234567890]+)/json', json_views.autocomplete_zipcode_json),
+		
 		(r'^debug', views.debug),
 )
 

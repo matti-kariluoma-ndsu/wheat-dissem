@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% load django_math %}
 {% block content %}
-
 <style type="text/css">
 table,th,td
 {
 border:1px solid black;
 }
 </style>
+
+
 
 <div id="main">
 	<h2 style="margin-left: 2em;">NDSU Hard Red Spring Wheat Trial Results</h2>
@@ -40,6 +40,8 @@ border:1px solid black;
 		</form>
 		<form id="dynamic_form" style="display: none;">
 			Zipcode: <input id="js_zipcode" type="text" name="zipcode" /><br />
+			<div class="jsonSuggestResults" style="top: 494px; left: 8px; width: 410px;">
+			</div>
 			<input TYPE="submit" Value="Submit" onClick="variety_trials_app.makeTable(); return false;">
 		</form>
 </div>
@@ -48,10 +50,11 @@ border:1px solid black;
 	<INPUT TYPE="button" NAME="button" Value="Swap Rows" onClick="variety_trials_app.reorderTable(1,4); return false;">
 	<INPUT TYPE="button" NAME="button" Value="Output Data" onClick="variety_trials_app.testData(); return false;">
 	<table>
-	<thead><tr id=location><th></th></tr></thead>
-	<tbody id="debug"></tbody>
+		<thead><tr id=location><th></th></tr></thead>
+		<tbody id="debug"></tbody>
 	</table>
 </div>
+
 {% endblock %}
 
 {% block javascript %}
@@ -64,6 +67,37 @@ function main()
 }
 
 main();
+
+function initSuggest()
+{
+	var input = $('input#id_zipcode')
+	var get_url = "/autocomplete/zipcode/"+input.val()+"/json/"
+	var entry1 = {
+    url: get_url,
+		dataType: "json",
+	}
+	
+	function processAjaxFunction(zipcodes) 
+	{
+		testData = {}
+		testData.city = []
+		for (i=0; i < zipcodes.length; i++)
+		{
+			zipcode_object = zipcodes[i];
+			//alert(JSON.stringify(zipcode_object));
+			testData.city.push({
+				text: String(zipcode_object.fields.zipcode),
+				extra: zipcode_object.fields.city + ", " + zipcode_object.fields.state
+				})
+		}
+		
+		
+		//testData.city=[{"text":"58102","extra":"Fargo,ND"}];
+		input.jsonSuggest(testData.city, {maxResults:20});
+	}
+	
+	jQuery.ajax(entry1).done(processAjaxFunction);
+}
 
 var variety_trials_app = {
 	entryList: [],

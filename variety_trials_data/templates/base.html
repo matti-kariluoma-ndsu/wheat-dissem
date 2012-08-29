@@ -33,8 +33,12 @@
   <!-- For the less-enabled mobile browsers like Opera Mini -->
   <link rel="stylesheet" media="handheld" href="/static/css/handheld.css">
   <link rel="stylesheet" media="print" href="/static/css/print.css">
+  
+  <link rel="stylesheet" href="/static/js/jsonSuggest.css" type="text/css">
+  
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="/static/js/modernizr-1.5.min.js"></script>
+  
 
 </head>
 <body>
@@ -69,9 +73,11 @@
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script>!window.jQuery && document.write('<script src="/static/js/jquery-1.4.2.min.js"><\/script>')</script>
+<script>!window.jQuery && document.write('<script src="/static/js/jquery-1.7.2.min.js"><\/script>')</script>
 
 <!-- custom scripts -->
+<script language="JavaScript" src="/static/js/jquery.jsonSuggest.js"></script>
+<script language="JavaScript" src="/static/js/json2.js"></script>
 
 <script>
 	{% block javascript %}

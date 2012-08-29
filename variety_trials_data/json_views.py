@@ -34,6 +34,22 @@ def json_response(request, iterable_result, needed_fields=None):
 		
 	return response
 
+def autocomplete_zipcode_json(request, partial_zipcode):
+	"""
+	if str(partial_zipcode)[0] != 0:
+		filter_less_than = 10000
+	elif
+	""" 
+	#TODO: filter properly for zipcodes starting with 0, 00
+	#TODO: do any zipcodes start with 000? 0000? does zip 00000 exist? 
+	z = models.Zipcode.objects.filter(
+			zipcode__startswith=partial_zipcode
+		).filter(
+			zipcode__gt=10000
+		)
+
+	return json_response(request, z)
+
 def trial_entry_json(request, id):
 	v = models.Trial_Entry.objects.filter(pk=id)
 	needed_fields = (

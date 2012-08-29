@@ -1,0 +1,56 @@
+.TabView {
+position:relative;
+left:250px;
+
+
+
+}
+div.TabView div.Tabs
+{
+  height: 24px;
+  overflow: hidden;
+
+}
+
+div.TabView div.Tabs a
+{
+  float: left;  
+  display: block;
+  width:  90px;
+  text-align: center;
+  height:      24px;
+  padding-top: 3px;
+  vertical-align: middle;
+	border: 1px solid black;
+	border-bottom-width: 0;
+
+  text-decoration: none;
+  font-family: "Times New Roman", Serif;
+  font-weight: 900;
+  color: #000080;
+}
+
+div.TabView div.Tabs a:hover, div.TabView div.Tabs a.Active
+{
+background-color: lightyellow;
+}
+
+div.TabView div.Pages
+{
+  clear: both;
+  border: 1px solid #404040;
+  overflow: hidden;
+}
+
+div.TabView div.Pages div.Page
+{
+  height: 100%;
+  padding: 0px;
+  overflow: hidden;
+}
+
+div.TabView div.Pages div.Page div.Pad
+{
+  padding: 3px 5px;
+
+}
