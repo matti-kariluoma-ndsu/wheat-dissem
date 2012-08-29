@@ -70,3 +70,27 @@
 	text-align:left;
 	display:inline;
 }
+
+#variety_trials__footer
+{
+	font-size: 0.8em;
+	text-align: center;
+}
+
+#variety_trials__footer p
+{
+	margin-bottom: 0.5em;
+}
+
+#variety_trials__footer ul
+{
+	margin-top: 0.5em;
+}
+
+#variety_trials__footer ul li
+{
+	list-style-type: none;
+	display: inline;
+	padding-left: 1em;
+
+}
