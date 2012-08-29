@@ -3,7 +3,6 @@ from django.template import RequestContext
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from django.utils.http import urlencode
-from django.core import serializers
 from django.core.cache import cache
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
@@ -119,15 +118,7 @@ unit_blurbs = {
 		]
 }
 
-def get_locations(zipcode, scope=variety_trials_forms.ScopeConstants.near):
-	cache_key = '%s%s' % (zipcode, scope)
-	# retrieve from cache, if absent, add to cache.
-	locations = cache.get(cache_key)
-	if locations is None:
-		locations = Locations_from_Zipcode_x_Scope(zipcode, scope).fetch()
-		cache.set(cache_key, locations, 300) # expires in 300 seconds (5 minutes)
-		
-	return locations
+
 
 def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None, locations=None, year_range=3):
 	if request.method != 'GET':
@@ -572,112 +563,9 @@ def inspect(request):
 		'masterList':masterList
 		}
 	)
-	
-def trial_entry_json(request, id):
-	v = models.Trial_Entry.objects.filter(pk=id)
-	response = HttpResponse()
-	needed_fields = (
-		'pk',
-		'model',
-		'variety',
-		'location',
-		'name',
-		'bushels_acre',
-		'protein_percent',
-		'test_weight'
-		)
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(v,fields=needed_fields, stream=response)
-	
-	return response
-	
-def zipcode_json(request, id):
-	z = models.Zipcode.objects.filter(pk=id)
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(z, stream=response)
-	return response
-	
-def zipcode_near_json(request, zipcode):
-	locations = Locations_from_Zipcode_x_Radius(
-					zipcode, None
-				).fetch()
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(locations, stream=response)
-	return response
-	
-def location_json(request, id):
-	l = models.Location.objects.filter(pk=id)
-	response = HttpResponse()
-	needed_fields=(
-		'name',
-	)
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(l, fields=needed_fields, stream=response)
-	return response
-	
-def variety_json(request, id):
-	v = models.Variety.objects.filter(pk=id)
-	response = HttpResponse()
-	needed_fields=(
-		'name',
-	)
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(v, fields=needed_fields, stream=response)
-	return response
-	
-def disease_json(request, id):
-	d = models.Disease_Entry.objects.filter(pk=id)
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(d, stream=response)
-	return response
-
-def variety_json_all(request):
-	varieties = models.Variety.objects.all()
-	response = HttpResponse()
-	
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(varieties, stream=response)
-	return response	
-
-def location_json_all(request):
-	locations = models.Location.objects.all()
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(locations, stream=response)
-	return response		
 
 def debug(request):
 	return render_to_response(
 		'debug.html',
 		{}
 		)
-
-def trial_entry_id_json(request, zipcode):
-	min_year=2009
-	max_year=2011
-	list=[]
-	try:
-		locations = Locations_from_Zipcode_x_Radius(zipcode,"ALL").fetch()
-	except models.Zipcode.DoesNotExist:
-		locations=models.Location.objects.all()
-	
-	d=models.Trial_Entry.objects.select_related(depth=3).filter(
-				location__in=locations
-			).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
-				)
-			)
-	for trial in d:
-		list.append(trial.pk)
-			
-			
-
-	response = HttpResponse()
-	# json_serializer = serializers.get_serializer("json")()
-	json.dump(list, response)
-	return response
-

@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from variety_trials_data import models
 from variety_trials_data.variety_trials_forms import ScopeConstants
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt
@@ -111,3 +112,13 @@ class Locations_from_Zipcode_x_Scope:
 			print "%f\t%s" %(distances[l], l.name)
 		"""
 		return sorted_list
+		
+def get_locations(zipcode, scope=ScopeConstants.near):
+	cache_key = '%s%s' % (zipcode, scope)
+	# retrieve from cache, if absent, add to cache.
+	locations = cache.get(cache_key)
+	if locations is None:
+		locations = Locations_from_Zipcode_x_Scope(zipcode, scope).fetch()
+		cache.set(cache_key, locations, 300) # expires in 300 seconds (5 minutes)
+		
+	return locations
