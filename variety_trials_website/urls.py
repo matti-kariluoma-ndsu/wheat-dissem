@@ -4,6 +4,7 @@ from django.conf import settings
 from variety_trials_data.models import *
 from variety_trials_data import views
 from variety_trials_data import json_views
+from variety_trials_data import adding_data_views
 
 # Uncomment the next two lines to enable the admin:
 #from django.contrib import admin
@@ -29,7 +30,7 @@ urlpatterns = patterns('',
 		(r'^view/variety/(?P<variety_name>[a-zA-Z_]+)/', views.variety_info),
 		(r'^view/available/', views.inspect),
 		
-		(r'^data/$', views.index),
+		(r'^data/$', views.howto_api),
 		(r'^data/trial_entry/id_(?P<id>[0-9]+)/json/', json_views.trial_entry_json),
 		(r'^data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/json/', json_views.trial_entry_near_json),
 		(r'^data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/ids/json/', json_views.trial_entry_near_ids_json),
@@ -42,19 +43,19 @@ urlpatterns = patterns('',
 		(r'^data/variety/id_(?P<id>[0-9]+)/json/', json_views.variety_json),
 		(r'^data/disease/id_(?P<id>[0-9]+)/json/', json_views.disease_json),
 		
-		(r'^add/$', views.index),
-		(r'^add/trial_entry/', views.add_trial_entry_csv_file), # page to upload a spreadsheet to
-		(r'^add/variety/', views.add_variety), # page to variety
+		(r'^add/$', views.howto_add_data),
+		(r'^add/trial_entry/', adding_data_views.add_trial_entry_csv_file), # page to upload a spreadsheet to
+		(r'^add/variety/', adding_data_views.add_variety), # page to variety
 		
-		(r'^add_new_variety/', views.add_new_variety), # page to variety
-		(r'^edit_variety/', views.edit_variety), # page to variety
-		(r'^edited_variety/', views.edited_variety), # page to variety
-		(r'^add_trials_confirm/', views.add_form_confirmation), # Page to confirmations
-		(r'^add_info/', views.add_information), # Page to confirmations
-		(r'^add_data_variety_or_location/', views.adding_to_database_confirm), # Page to adding to database
-		(r'^sucess/', views.redirect_sucess), # Page to sucess
+		(r'^add_new_variety/', adding_data_views.add_new_variety), # page to variety
+		(r'^edit_variety/', adding_data_views.edit_variety), # page to variety
+		(r'^edited_variety/', adding_data_views.edited_variety), # page to variety
+		(r'^add_trials_confirm/', adding_data_views.add_form_confirmation), # Page to confirmations
+		(r'^add_info/', adding_data_views.add_information), # Page to confirmations
+		(r'^add_data_variety_or_location/', adding_data_views.adding_to_database_confirm), # Page to adding to database
+		(r'^sucess/', adding_data_views.redirect_sucess), # Page to sucess
 		
-		(r'^add/history/', views.history), # defaults to location-based view
-		(r'^add/history/delete/(?P<delete>[0-9]+)/', views.history_delete), # defaults to location-based view
+		(r'^add/history/', adding_data_views.history), # defaults to location-based view
+		(r'^add/history/delete/(?P<delete>[0-9]+)/', adding_data_views.history_delete), # defaults to location-based view
 )
 
