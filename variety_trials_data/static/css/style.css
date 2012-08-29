@@ -132,3 +132,34 @@
 {
 	list-style-type: none;
 }
+
+.variety_trials__two_column
+{
+	float:left;
+	width:100%;
+	position: relative;
+	right: 50%;
+}
+
+.variety_trials__two_column div ul li
+{
+	list-style-type: none;
+}
+
+.variety_trials__two_column_left
+{
+	float: left;
+	width: 46%;
+	position: relative;
+	left: 52%;
+	overflow: hidden;
+}
+
+.variety_trials__two_column_right
+{
+	float:left;
+	width: 46%;
+	position: relative;
+	left: 56%;
+	overflow: hidden;
+}

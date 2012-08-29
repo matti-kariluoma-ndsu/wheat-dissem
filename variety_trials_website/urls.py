@@ -21,13 +21,26 @@ urlpatterns = patterns('',
 		
 		(r'^$', views.index), # the home page
 		
-		(r'^about/', views.index),
+		(r'^about/', views.about),
 		
-		(r'^view/$', views.index),
+		(r'^view/$', views.advanced_search),
 		(r'^view/last_(?P<year_range>[0-9]+)_years/(?P<fieldname>[a-z0-9_]+)/', views.zipcode_view), # defaults to location-based view
 		(r'^view/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.historical_zipcode_view), # defaults to location-based view
 		(r'^view/variety/(?P<variety_name>[a-zA-Z_]+)/', views.variety_info),
 		(r'^view/available/', views.inspect),
+		
+		(r'^data/$', views.index),
+		(r'^data/trial_entry/id_(?P<id>[0-9]+)/json/', json_views.trial_entry_json),
+		(r'^data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/json/', json_views.trial_entry_near_json),
+		(r'^data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/ids/json/', json_views.trial_entry_near_ids_json),
+		(r'^data/zipcode/id_(?P<id>[0-9]+)/json/', json_views.zipcode_json),
+		(r'^data/zipcode/partial_zipcode_(?P<partial_zipcode>[1234567890]+)/json/', json_views.autocomplete_zipcode_json),
+		(r'^data/location/id_(?P<id>[0-9]+)/json/', json_views.location_json),
+		(r'^data/location/all/json/', json_views.location_json_all),
+		(r'^data/location/near_zipcode_(?P<zipcode>[0-9]+)/json/', json_views.zipcode_near_json),
+		(r'^data/variety/all/json/', json_views.variety_json_all),
+		(r'^data/variety/id_(?P<id>[0-9]+)/json/', json_views.variety_json),
+		(r'^data/disease/id_(?P<id>[0-9]+)/json/', json_views.disease_json),
 		
 		(r'^add/$', views.index),
 		(r'^add/trial_entry/', views.add_trial_entry_csv_file), # page to upload a spreadsheet to
@@ -43,20 +56,5 @@ urlpatterns = patterns('',
 		
 		(r'^add/history/', views.history), # defaults to location-based view
 		(r'^add/history/delete/(?P<delete>[0-9]+)/', views.history_delete), # defaults to location-based view
-		
-		(r'^data/$', views.index),
-		(r'^data/trial_entry/id_(?P<id>[0-9]+)/json/', json_views.trial_entry_json),
-		(r'^data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/json/', json_views.trial_entry_near_json),
-		(r'^data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/ids/json/', json_views.trial_entry_near_ids_json),
-		(r'^data/zipcode/id_(?P<id>[0-9]+)/json/', json_views.zipcode_json),
-		(r'^data/zipcode/partial_zipcode_(?P<partial_zipcode>[1234567890]+)/json/', json_views.autocomplete_zipcode_json),
-		(r'^data/location/id_(?P<id>[0-9]+)/json/', json_views.location_json),
-		(r'^data/location/all/json/', json_views.location_json_all),
-		(r'^data/location/near_zipcode_(?P<zipcode>[0-9]+)/json/', json_views.zipcode_near_json),
-		(r'^data/variety/all/json/', json_views.variety_json_all),
-		(r'^data/variety/id_(?P<id>[0-9]+)/json/', json_views.variety_json),
-		(r'^data/disease/id_(?P<id>[0-9]+)/json/', json_views.disease_json),
-		
-		
 )
 

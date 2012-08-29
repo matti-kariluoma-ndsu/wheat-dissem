@@ -15,13 +15,31 @@ import datetime
 
 ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
 
-def index(request, abtest=None):
+def index(request):
 	zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
 	
 	return render_to_response(
 		'main.html', 
 		{ 
 			'zipcode_form': zipcode_form
+		},
+		context_instance=RequestContext(request)
+	)
+	
+def about(request):
+	
+	return render_to_response(
+		'about.html', 
+		{ 
+		},
+		context_instance=RequestContext(request)
+	)
+	
+def advanced_search(request):
+	
+	return render_to_response(
+		'advanced_search.html', 
+		{ 
 		},
 		context_instance=RequestContext(request)
 	)
