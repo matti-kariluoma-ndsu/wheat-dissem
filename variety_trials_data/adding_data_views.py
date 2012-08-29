@@ -45,33 +45,7 @@ def generate_unique_name():
 		unixtime = '%s%s' % (unixtime, '0')
 	return '%s%s' % (username, unixtime)
 
-def add_trial_entry_csv_file(request):
-	message = None
-	username_unique = None
-	
-	if request.method == 'POST': # If another view has kicked us back here
-		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
-		if not form.is_valid():
-			# try and reuse the username_unique
-			try:
-				username_unique = request.POST['username_unique']
-			except:
-				username_unique = generate_unique_name()
-				
-			message = "There was a problem with your submission. Please try again."
-		else:
-			username_unique = request.POST['username_unique']
-	
-
-	# create a blank upload form
-	if username_unique is None:
-		username_unique = generate_unique_name()
-		
-	form = variety_trials_forms.UploadCSVForm(initial={
-			'username_unique': username_unique,
-		})
-	
-	# Give the embedded spreadsheet it's column names
+def trial_entry_spreadsheet_headers():
 	headers = []
 	for field in models.Trial_Entry._meta.fields:
 		if (field.get_internal_type() == 'ForeignKey' 
@@ -89,6 +63,21 @@ def add_trial_entry_csv_file(request):
 		if field in headers:
 			headers.remove(field)
 	
+	return headers
+
+def add_trial_entry_csv_file(request):
+	message = None
+	
+	# create a blank upload form
+	username_unique = generate_unique_name()
+		
+	form = variety_trials_forms.UploadCSVForm(initial={
+			'username_unique': username_unique,
+		})
+	
+	# Give the embedded spreadsheet it's column names
+	headers = trial_entry_spreadsheet_headers()
+	
 	return render_to_response(
 		'add_from_csv_template.html', 
 		{
@@ -102,6 +91,7 @@ def add_trial_entry_csv_file(request):
 def add_trial_entry_csv_file_confirm(request):
 	message = None
 	form = None
+	headers = None
 	username_unique = None
 	
 	if request.method == 'POST': # If the form has been submitted...
@@ -113,7 +103,8 @@ def add_trial_entry_csv_file_confirm(request):
 				username_unique = request.POST['username_unique']
 			except:
 				username_unique = generate_unique_name()
-				
+			
+			form = None
 			message = "There was a problem with your submission. Please try again."
 		else:
 			username_unique = request.POST['username_unique']
@@ -136,8 +127,7 @@ def add_trial_entry_csv_file_confirm(request):
 					handle_csv.handle_file(csv_file, username_unique)
 				elif csv_json:
 					print csv_json
-					#hanlde_csv.hanlde_json(csv_json, username_unique)
-	
+					#handle_csv.hanlde_json(csv_json, username_unique)
 	
 	if form is None:
 		# create a blank upload form
@@ -146,27 +136,15 @@ def add_trial_entry_csv_file_confirm(request):
 			
 		form = variety_trials_forms.UploadCSVForm(initial={
 				'username_unique': username_unique,
-			})
-	
-	# Give the embedded spreadsheet it's column names
-	headers = []
-	for field in models.Trial_Entry._meta.fields:
-		if (field.get_internal_type() == 'ForeignKey' 
-				or field.get_internal_type() == 'ManyToManyField' ):
-			headers.append("%s_id" % (field.name))
-		else:
-			headers.append(field.name)
-	
-	ignore_fields = [
-			'pk',
-			'id'
-		]
-	for field in ignore_fields:
-		if field in headers:
-			headers.remove(field)
+			})			
+			
+		headers = trial_entry_spreadsheet_headers()
+	else:
+		# we entered this function with a valid form
+		form = None
 	
 	return render_to_response(
-		'add_from_csv_template.html', 
+		'add_from_csv_confirm.html', 
 		{
 			'form': form, 
 			'headers': headers,

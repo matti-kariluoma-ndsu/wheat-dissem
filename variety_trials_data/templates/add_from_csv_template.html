@@ -7,6 +7,7 @@
 </div>
 
 <div>
+{% if form %}
 	<h4>Instructions:</h4>
 	<p>There are two options:</p>
 	<ul>
@@ -17,7 +18,7 @@
 			<li> Enter your data. </li>
 			<li> Submit the completed file.</li>
 		</ol>
-		<li> Paste data into the Spreadsheet below<noscript>(Javascript required, you seem to have Javascript disabled)</noscript>.</li>
+		<li> Paste data into the Spreadsheet below<noscript> (Javascript is required; you seem to have Javascript disabled)</noscript>.</li>
 	</ul>
 </div>
 
@@ -46,6 +47,11 @@
 	</noscript>
 	<input type="button" id="variety_trials__spreadsheet_submit" style="display: none;" value="Submit" />
 </form>
+{% endif %}
+
+{% block confirmation %}
+{% endblock %}
+
 {% endblock %}
 
 {% block javascript_imports %}
@@ -99,15 +105,16 @@ var variety_trials__sheet_init_data = [];
 
 variety_trials__sheet.handsontable("loadData", variety_trials__sheet_init_data);
 
+// Set up an onclick function for the javascript submit button
 $('#variety_trials__spreadsheet_submit').click(function(event) {
+	// First, select a cell to commit whatever cell is highlighted atm
   setTimeout(function() {
       //timeout is needed because Handsontable normally deselects 
       //current cell when you click outside the table
       variety_trials__sheet.handsontable("selectCell", 0, 0);
   }, 10);
+  // Then, submit the form. 
   setTimeout(function() {
-      //timeout is needed because Handsontable normally deselects 
-      //current cell when you click outside the table
       $('#variety_trials__spreadsheet_form').submit();
   }, 20);
 });
