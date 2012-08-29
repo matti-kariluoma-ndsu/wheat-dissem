@@ -17,11 +17,7 @@ class ScopeConstants:
 class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(
 			max_length=5, 
-			required=True,
-			widget=forms.TextInput(attrs={
-					'autocomplete': "off",
-					'onkeyup': 'initSuggest(); return false;',
-				})
+			required=True
 		)
 	scope = forms.ChoiceField(
 			widget=forms.RadioSelect(),

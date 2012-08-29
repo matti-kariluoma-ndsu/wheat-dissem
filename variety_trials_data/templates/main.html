@@ -39,7 +39,7 @@ border:1px solid black;
 			<input type="submit" value="Submit" />
 		</form>
 		<form id="dynamic_form" style="display: none;">
-			Zipcode: <input id="js_zipcode" type="text" name="zipcode" /><br />
+			Zipcode: <input id="js_zipcode" type="text" name="zipcode" autocomplete="off" onkeyup="variety_trials_app.initSuggest(); return false;"/><br />
 			<div class="jsonSuggestResults" style="top: 494px; left: 8px; width: 410px;">
 			</div>
 			<input TYPE="submit" Value="Submit" onClick="variety_trials_app.makeTable(); return false;">
@@ -59,46 +59,6 @@ border:1px solid black;
 
 {% block javascript %}
 
-function main()
-{
-	//$('#dynamic_form').show();
-	//$('#dynamic_table').show();
-	//$('#static_form').hide();
-}
-
-main();
-
-function initSuggest()
-{
-	var input = $('input#id_zipcode')
-	var get_url = "/autocomplete/zipcode/"+input.val()+"/json/"
-	var entry1 = {
-    url: get_url,
-		dataType: "json",
-	}
-	
-	function processAjaxFunction(zipcodes) 
-	{
-		testData = {}
-		testData.city = []
-		for (i=0; i < zipcodes.length; i++)
-		{
-			zipcode_object = zipcodes[i];
-			//alert(JSON.stringify(zipcode_object));
-			testData.city.push({
-				text: String(zipcode_object.fields.zipcode),
-				extra: zipcode_object.fields.city + ", " + zipcode_object.fields.state
-				})
-		}
-		
-		
-		//testData.city=[{"text":"58102","extra":"Fargo,ND"}];
-		input.jsonSuggest(testData.city, {maxResults:20});
-	}
-	
-	jQuery.ajax(entry1).done(processAjaxFunction);
-}
-
 var variety_trials_app = {
 	entryList: [],
 	table: $('#debug'),
@@ -106,7 +66,7 @@ var variety_trials_app = {
 	cells: {},
 	rows: {},
 	columns: {},
-	
+	initSuggest: function() {},
 	makeTable: function(){
 		var zipcode=$('#js_zipcode').val()
 		variety_trials_app.locationAjax(zipcode)
@@ -259,6 +219,48 @@ var variety_trials_app = {
 	console.log(variety_trials_app.cells)
 	},
 }; 
+
+
+function main()
+{
+	/*
+	$('#dynamic_form').show();
+	$('#dynamic_table').show();
+	$('#static_form').hide();
+	variety_trials_app.initSuggest = function()
+		{
+			var input = $('input#js_zipcode')
+			var get_url = "/autocomplete/zipcode/"+input.val()+"/json/"
+			var entry1 = {
+				url: get_url,
+				dataType: "json",
+			}
+			
+			function processAjaxFunction(zipcodes) 
+			{
+				testData = {}
+				testData.city = []
+				for (i=0; i < zipcodes.length; i++)
+				{
+					zipcode_object = zipcodes[i];
+					//alert(JSON.stringify(zipcode_object));
+					testData.city.push({
+						text: String(zipcode_object.fields.zipcode),
+						extra: zipcode_object.fields.city + ", " + zipcode_object.fields.state
+						})
+				}
+				
+				
+				//testData.city=[{"text":"58102","extra":"Fargo,ND"}];
+				input.jsonSuggest(testData.city, {maxResults:20});
+			}
+			
+			jQuery.ajax(entry1).done(processAjaxFunction);
+		}
+	*/
+}
+
+main();
 
 {% endblock %}
 

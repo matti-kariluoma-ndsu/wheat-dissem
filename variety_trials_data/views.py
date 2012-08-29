@@ -9,7 +9,8 @@ from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
 from variety_trials_data.Page import Page
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Scope, LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
+from variety_trials_data.variety_trials_util import LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
+from variety_trials_data.variety_trials_util import get_locations
 import datetime
 try:
 	import simplejson as json # Python 2.5
