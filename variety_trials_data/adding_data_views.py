@@ -139,14 +139,20 @@ def add_trial_entry_csv_file_confirm(request):
 			})			
 			
 		headers = trial_entry_spreadsheet_headers()
+	
 	else:
-		# we entered this function with a valid form
+		# we entered this view with a valid form
 		form = None
+	
+	confirm_form = variety_trials_forms.UploadCSVForm(initial={
+			'username_unique': username_unique,
+		})		
 	
 	return render_to_response(
 		'add_from_csv_confirm.html', 
 		{
 			'form': form, 
+			'confirm_form': confirm_form,
 			'headers': headers,
 			'message': message,
 			'format_errors': {},

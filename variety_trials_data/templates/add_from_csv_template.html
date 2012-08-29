@@ -23,7 +23,6 @@
 </div>
 
 <form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/confirm/" method="POST">
-  {% csrf_token %}
   {% for field in form %}
     <div class="input_row">  
 		{% if field.name == 'csv_file' %}

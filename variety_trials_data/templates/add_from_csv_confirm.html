@@ -1,4 +1,18 @@
 {% extends "add_from_csv_template.html" %}  
 {% block confirmation %}
-<p>Hello!</p>
+{% if confirm_form %}
+<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/confirm/" method="POST">
+  {% for field in confirm_form %}
+    <div class="input_row">  
+			{% for error in field.errors %}
+			<div class="error">
+				{{error}}
+			</div>
+			{% endfor %}
+			{{ field.label_tag }}: {{ field }}
+    </div>
+  {% endfor %}
+	<input type="submit" value="Submit" />
+</form>
+{% endif %}
 {% endblock %}
