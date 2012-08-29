@@ -101,7 +101,7 @@ def handle_reference_field(reference_dict, field, data):
 
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 len_alphabet = len(alphabet)
-def letter(number):
+def column_number_to_letter(number):
 	"""
 	Transforms an integer into its spreadsheet column name
 	i.e. 1: A, 2: B, ..., 27: AA, ..., etc.
@@ -127,26 +127,48 @@ def handle_csv_file(uploaded_file):
 		print("!!!"+row+"!!!")
 	"""
 
-	insertion_dict = {} # column name: value to be written to database
-	reference_dict = {} # column name: all possible values currently in database
+	trial_entry_fields = {} # {column name: value to be written to database}
+	trial_entry_foreign_fields = {} # {column name: all possible values currently in database}
 
-	skip = True
-	skip_lines = 1
-	skip_count = 0
 
 	# Inspect our model, to grab the fields from it
 
 	for field in models.Trial_Entry._meta.fields:
 		if (field.get_internal_type() == 'ForeignKey' 
 				or field.get_internal_type() == 'ManyToManyField' ):
-			reference_dict["%s_id" % (field.name)] = field.rel.to.objects.all()
+			trial_entry_foreign_fields["%s_id" % (field.name)] = field.rel.to.objects.all()
 		else:
-			insertion_dict[field.name] = None
+			trial_entry_fields[field.name] = None
+	
+	def process_cell(column_number, column, headers, trial_entry_fields, trial_entry_foreign_fields):
+		try:
+			column_name = headers[column_number].strip()
+			#print "field: %s" % (name)
+			#Making objects to add to database.
+			
+			if column_name == "harvest_date_id":
+				possible_characters = ('/', ' ', '-', '.')
+				datesplit = re.split("[%s]" % ("".join(possible_characters)), column)
+				datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+				if not datelist:
+					d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
+					d.save()
+			
+			if column_name in trial_entry_fields and name not in trial_entry_foreign_fields:
+				trial_entry_fields[column_name] = column.strip()
+			elif column_name in trial_entry_foreign_fields.keys():
+				try:
+					trial_entry_fields[column_name] = handle_reference_field(trial_entry_foreign_fields, column_name, column.strip())
+				except ValidationError:
+					errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, column_number_to_letter(column_number), column.strip())
+			else:
+				errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
+		except IndexError:
+			errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, column_number_to_letter(column_number))
 	
 	# Now inspect the uploaded file and attempt to write it all to database
 	# TODO: Consider not save() -ing each line, maybe do batches of ~100?
-	skip = True
-	skip_lines = 2
+	header_line = 2
 	line_number = 0
 	headers = []
 	errors = {}
@@ -154,14 +176,14 @@ def handle_csv_file(uploaded_file):
 	
 	for line in uploaded_file:
 		line_number += 1
-		if (skip):
-			if (line_number + 1 > skip_lines):
-				headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
-				for i in range(len(headers)):
-					headers[i] = headers[i].replace('"','') # remove all double quotes
-					headers[i] = headers[i].replace("'",'') # remove all single quotes
-				#print headers
-				skip = False
+		if line_number < header_line:
+			continue
+		elif line_number == header_line:
+			headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
+			for i in range(len(headers)):
+				headers[i] = headers[i].replace('"','') # remove all double quotes
+				headers[i] = headers[i].replace("'",'') # remove all single quotes
+			#print headers
 		else:
 			column_number = 0
 			#print line
@@ -174,37 +196,14 @@ def handle_csv_file(uploaded_file):
 				#print "column: %s" % (column)
 				
 				if column.strip() != '':
-					try:
-						name = headers[column_number].strip()
-						#print "field: %s" % (name)
-						#Making objects to add to database.
-						
-						if name == "harvest_date_id":
-							possible_characters = ('/', ' ', '-', '.')
-							datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
-							datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-							if not datelist:
-								d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-								d.save()
-						
-						if name in insertion_dict.keys() and name not in reference_dict.keys():
-							insertion_dict[name] = column.strip()
-						else:
-							if name in reference_dict.keys():
-								try:
-									insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
-								except ValidationError:
-									errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
-							else:
-								errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
-					except IndexError:
-						errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
+					process_cell(column_number, column, headers, trial_entry_fields, trial_entry_foreign_fields)
+					
 				column_number += 1
+				
 			model_instance = models.Trial_Entry()
-			for name in insertion_dict.keys():
-				setattr(model_instance, name, insertion_dict[name])
-				#print "Writing %s as %s" % (name, insertion_dict[name])
-				insertion_dict[name] = None
+			for column_name in trial_entry_fields:
+				setattr(model_instance, name, trial_entry_fields[column_name])
+				#print "Writing %s as %s" % (name, insertion_dict[column_name])
 			model_instance.save() # ARE YOU BRAVE ENOUGH? 
 			models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
 			
@@ -291,11 +290,11 @@ def checking_for_data(uploaded_file):
 									try:
 										insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
 									except ValidationError:
-										errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
+										errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, column_number_to_letter((column_number), column.strip())
 								else:
 									errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
 						except IndexError:
-							errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
+							errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, column_number_to_letter((column_number))
 					column_number += 1
 					
 				if not errors:
