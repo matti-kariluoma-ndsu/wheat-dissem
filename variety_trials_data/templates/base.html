@@ -76,8 +76,9 @@
 <script>!window.jQuery && document.write('<script src="/static/js/jquery-1.7.2.min.js"><\/script>')</script>
 
 <!-- custom scripts -->
-<script language="JavaScript" src="/static/js/jquery.jsonSuggest.js"></script>
-<script language="JavaScript" src="/static/js/json2.js"></script>
+{% block javascript_imports %}
+{% endblock %}
+
 
 <script>
 	{% block javascript %}

@@ -44,13 +44,14 @@ urlpatterns = patterns('',
 		(r'^data/disease/id_(?P<id>[0-9]+)/json/', json_views.disease_json),
 		
 		(r'^add/$', views.howto_add_data),
-		(r'^add/trial_entry/', adding_data_views.add_trial_entry_csv_file), # page to upload a spreadsheet to
+		(r'^add/trial_entry/$', adding_data_views.add_trial_entry_csv_file), # page to upload a spreadsheet to
+		(r'^add/trial_entry/confirm/', adding_data_views.add_trial_entry_csv_file_confirm), # page to upload a spreadsheet to
+		(r'^add/trial_entry/review/', adding_data_views.add_trial_entry_csv_file_review), # page to upload a spreadsheet to
 		(r'^add/variety/', adding_data_views.add_variety), # page to variety
 		
 		(r'^add_new_variety/', adding_data_views.add_new_variety), # page to variety
 		(r'^edit_variety/', adding_data_views.edit_variety), # page to variety
 		(r'^edited_variety/', adding_data_views.edited_variety), # page to variety
-		(r'^add_trials_confirm/', adding_data_views.add_form_confirmation), # Page to confirmations
 		(r'^add_info/', adding_data_views.add_information), # Page to confirmations
 		(r'^add_data_variety_or_location/', adding_data_views.adding_to_database_confirm), # Page to adding to database
 		(r'^sucess/', adding_data_views.redirect_sucess), # Page to sucess

@@ -62,12 +62,20 @@ class SelectLocationsForm(SelectVarietiesForm):
 		widget=forms.SelectMultiple(attrs={'size': 20}),
 		queryset=models.Location.objects.all()
 		)
-		
-class SelectFieldForm(forms.Form):
-	locations = forms.CharField(max_length=5)
-	year_list = forms.CharField(max_length=5)
-	field = forms.CharField(max_length=5)
-	search_radius = forms.CharField(max_length=5)
 
 class UploadCSVForm(forms.Form):
-	csv_file  = forms.FileField()
+	csv_file = forms.FileField(
+			required=False
+		)
+	csv_json = forms.CharField(
+			required=False,
+			widget=forms.Textarea(attrs={
+					'style': 'display: none;'
+				})
+		)
+	username_unique = forms.CharField(
+			required=False,
+			widget=forms.TextInput(attrs={
+					'style': 'display: none;'
+				})
+		)

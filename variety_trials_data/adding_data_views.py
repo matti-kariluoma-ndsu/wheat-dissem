@@ -4,6 +4,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
+import random
+import time
 
 def history(request):	
 	history=models.Trial_Entry_History.objects.all()
@@ -35,27 +37,217 @@ def history_commit(request, id):
 	for entry in entries:
 		entry.deletable = False;
 		entry.save()
-			
+
+def generate_unique_name():
+	username = ''.join([random.choice('abcdef1234567890') for i in range(16)])
+	unixtime = str(repr(time.time())).replace('.','')
+	while len(unixtime) < 16:
+		unixtime = '%s%s' % (unixtime, '0')
+	return '%s%s' % (username, unixtime)
+
 def add_trial_entry_csv_file(request):
-	errors = {}
+	message = None
+	username_unique = None
 	
-	if request.method == 'POST': # If the form has been submitted...
+	if request.method == 'POST': # If another view has kicked us back here
 		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
-		if form.is_valid():
-			(success, errors) = handle_csv.checking_for_data(request.FILES['csv_file'])
-			if success:
-				# show entered data
-				return HttpResponseRedirect('/success/')
-			else:
-				form = variety_trials_forms.UploadCSVForm()
-	else:
-		form = variety_trials_forms.UploadCSVForm()
+		if not form.is_valid():
+			# try and reuse the username_unique
+			try:
+				username_unique = request.POST['username_unique']
+			except:
+				username_unique = generate_unique_name()
+				
+			message = "There was a problem with your submission. Please try again."
+		else:
+			username_unique = request.POST['username_unique']
+	
+
+	# create a blank upload form
+	if username_unique is None:
+		username_unique = generate_unique_name()
+		
+	form = variety_trials_forms.UploadCSVForm(initial={
+			'username_unique': username_unique,
+		})
+	
+	# Give the embedded spreadsheet it's column names
+	headers = []
+	for field in models.Trial_Entry._meta.fields:
+		if (field.get_internal_type() == 'ForeignKey' 
+				or field.get_internal_type() == 'ManyToManyField' ):
+			headers.append("%s_id" % (field.name))
+		else:
+			headers.append(field.name)
+	
+	ignore_fields = [
+			'pk',
+			'id',
+			'deletable'
+		]
+	for field in ignore_fields:
+		if field in headers:
+			headers.remove(field)
 	
 	return render_to_response(
 		'add_from_csv_template.html', 
 		{
 			'form': form, 
-			'format_errors': errors,
+			'headers': headers,
+			'message': message,
+		},
+		context_instance=RequestContext(request)
+	)
+	
+def add_trial_entry_csv_file_confirm(request):
+	message = None
+	form = None
+	username_unique = None
+	
+	if request.method == 'POST': # If the form has been submitted...
+		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
+		if not form.is_valid():
+			# try and reuse the username_unique
+			print form.errors
+			try:
+				username_unique = request.POST['username_unique']
+			except:
+				username_unique = generate_unique_name()
+				
+			message = "There was a problem with your submission. Please try again."
+		else:
+			username_unique = request.POST['username_unique']
+			
+			try:
+				csv_file = request.FILES['csv_file']
+			except:
+				csv_file = None
+			
+			try:
+				csv_json = request.POST['csv_json']
+			except:
+				csv_json = None
+				
+			if not csv_file and not csv_json:			
+				form = None
+			else:
+				# preprocess the users input
+				if csv_file:
+					handle_csv.handle_file(csv_file, username_unique)
+				elif csv_json:
+					print csv_json
+					#hanlde_csv.hanlde_json(csv_json, username_unique)
+	
+	
+	if form is None:
+		# create a blank upload form
+		if username_unique is None:
+			username_unique = generate_unique_name()
+			
+		form = variety_trials_forms.UploadCSVForm(initial={
+				'username_unique': username_unique,
+			})
+	
+	# Give the embedded spreadsheet it's column names
+	headers = []
+	for field in models.Trial_Entry._meta.fields:
+		if (field.get_internal_type() == 'ForeignKey' 
+				or field.get_internal_type() == 'ManyToManyField' ):
+			headers.append("%s_id" % (field.name))
+		else:
+			headers.append(field.name)
+	
+	ignore_fields = [
+			'pk',
+			'id'
+		]
+	for field in ignore_fields:
+		if field in headers:
+			headers.remove(field)
+	
+	return render_to_response(
+		'add_from_csv_template.html', 
+		{
+			'form': form, 
+			'headers': headers,
+			'message': message,
+			'format_errors': {},
+		},
+		context_instance=RequestContext(request)
+	)
+
+def add_trial_entry_csv_file_review(request):
+	message = None
+	form = None
+	username_unique = None
+	
+	if request.method == 'POST': # If the form has been submitted...
+		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
+		if not form.is_valid():
+			# try and reuse the username_unique
+			try:
+				username_unique = request.POST['username_unique']
+			except:
+				username_unique = generate_unique_name()
+				
+			message = "There was a problem with your submission. Please try again."
+		else:
+			username_unique = request.POST['username_unique']
+			
+			try:
+				csv_file = request.FILES['csv_file']
+			except:
+				csv_file = None
+			
+			try:
+				csv_json = request.POST['csv_json']
+			except:
+				csv_json = None
+				
+			if not csv_file and not csv_json:			
+				form = None
+			else:
+				# preprocess the users input
+				if csv_file:
+					handle_csv.handle_file(csv_file, username_unique)
+				elif csv_json:
+					hanlde_csv.hanlde_json(csv_json, username_unique)
+	
+	
+	if form is None:
+		# create a blank upload form
+		if username_unique is None:
+			username_unique = generate_unique_name()
+			
+		form = variety_trials_forms.UploadCSVForm(initial={
+				'username_unique': username_unique,
+			})
+	
+	# Give the embedded spreadsheet it's column names
+	headers = []
+	for field in models.Trial_Entry._meta.fields:
+		if (field.get_internal_type() == 'ForeignKey' 
+				or field.get_internal_type() == 'ManyToManyField' ):
+			headers.append("%s_id" % (field.name))
+		else:
+			headers.append(field.name)
+	
+	ignore_fields = [
+			'pk',
+			'id',
+			'deletable'
+		]
+	for field in ignore_fields:
+		if field in headers:
+			headers.remove(field)
+	
+	return render_to_response(
+		'add_from_csv_template.html', 
+		{
+			'form': form, 
+			'headers': headers,
+			'message': message,
+			'format_errors': {},
 		},
 		context_instance=RequestContext(request)
 	)
