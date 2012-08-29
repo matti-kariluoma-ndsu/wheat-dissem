@@ -74,7 +74,7 @@ class UploadCSVForm(forms.Form):
 				})
 		)
 	username_unique = forms.CharField(
-			
+			required=False,
 			widget=forms.TextInput(attrs={
 					'style': 'display: none;'
 				})
