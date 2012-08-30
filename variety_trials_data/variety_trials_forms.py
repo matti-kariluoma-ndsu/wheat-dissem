@@ -81,6 +81,21 @@ class UploadCSVForm(forms.Form):
 				})
 		)
 
+class SelectDateForm(forms.Form):
+	date = forms.ModelChoiceField(
+			queryset = models.Date.objects.all()
+		)
+
+class SelectLocationForm(forms.Form):
+	location = forms.ModelChoiceField(
+			queryset = models.Location.objects.all()
+		)
+		
+class SelectVarietyForm(forms.Form):
+	variety = forms.ModelChoiceField(
+			queryset = models.Variety.objects.all()
+		)
+
 class MultipleFormsFormSet(BaseFormSet):
 	def __init__(self, *args, **kwargs):
 		BaseFormSet.__init__(self, *args, **kwargs)

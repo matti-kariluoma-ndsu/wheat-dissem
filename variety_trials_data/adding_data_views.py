@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
+from django.core.cache import cache
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
@@ -91,7 +92,7 @@ def add_trial_entry_csv_file(request):
 def add_trial_entry_csv_file_confirm(request):
 	message = None
 	form = None
-	confirm_form = None
+	confirm_forms = []
 	headers = None
 	username_unique = None
 	
@@ -145,20 +146,32 @@ def add_trial_entry_csv_file_confirm(request):
 		headers = trial_entry_spreadsheet_headers()
 	
 	if trial_entries and user_to_confirm:
-		cache.set(username_unique, trial_entries, 600) # 600 seconds == 10 min
 		form = None # don't show the original form
-		#https://github.com/django/django/blob/master/django/forms/formsets.py
 		#http://collingrady.wordpress.com/2008/02/18/editing-multiple-objects-in-django-with-newforms/
-		confirm_form = variety_trials_forms.UploadCSVForm(initial={
-				'username_unique': username_unique,
-			})		
-		
-	
+		confirm_forms = []
+		field_to_form_lookup = {
+				models.Trial_Entry.plant_date.field : variety_trials_forms.SelectDateForm,
+				models.Trial_Entry.harvest_date.field : variety_trials_forms.SelectDateForm,
+				models.Trial_Entry.location.field : variety_trials_forms.SelectLocationForm,
+				models.Trial_Entry.variety.field : variety_trials_forms.SelectVarietyForm,
+			}
+
+		for (index, (field, user_input)) in enumerate(user_to_confirm):
+			if field in field_to_form_lookup:
+				newform = field_to_form_lookup[field](
+								prefix=str(index)
+							)
+				confirm_forms.append(
+						(user_input, newform)
+					)
+			cache.set(''.join([username_unique,'trial_entries']), trial_entries, 600) # 600 seconds == 10 min
+			cache.set(''.join([username_unique,'user_to_confirm']), user_to_confirm, 600) # 600 seconds == 10 min
+
 	return render_to_response(
 		'add_from_csv_confirm.html', 
 		{
 			'form': form, 
-			'confirm_form': confirm_form,
+			'confirm_forms': confirm_forms,
 			'headers': headers,
 			'message': message,
 			'format_errors': {},
