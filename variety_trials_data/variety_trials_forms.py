@@ -95,7 +95,13 @@ class SelectVarietyForm(forms.Form):
 	variety = forms.ModelChoiceField(
 			queryset = models.Variety.objects.all()
 		)
-
-class MultipleFormsFormSet(BaseFormSet):
-	def __init__(self, *args, **kwargs):
-		BaseFormSet.__init__(self, *args, **kwargs)
+		
+def make_model_field_form(name, field):
+	class ModelFieldForm(forms.Form):
+		pass
+	attrs = {
+			'value': field,
+		}
+	custom_class = type(name+"ModelFieldForm", (ModelFieldForm, ), attrs)
+	
+	return custom_class

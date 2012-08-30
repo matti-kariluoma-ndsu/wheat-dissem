@@ -88,11 +88,12 @@ def add_trial_entry_csv_file(request):
 		},
 		context_instance=RequestContext(request)
 	)
-	
+
 def add_trial_entry_csv_file_confirm(request):
 	message = None
 	form = None
 	confirm_forms = []
+	incorrect_data_forms = []
 	headers = None
 	username_unique = None
 	
@@ -161,12 +162,16 @@ def add_trial_entry_csv_file_confirm(request):
 				newform = field_to_form_lookup[field](
 								prefix=str(index)
 							)
-				
+				confirm_forms.append(
+						(user_input, newform)
+					)
 			else:
-				newform = 
-			confirm_forms.append(
-					(user_input, newform)
-				)
+				newform = variety_trials_forms.make_model_field_form(field.name, field.formfield())(
+						prefix=str(index)
+					)
+				incorrect_data_forms.append(
+						(user_input, newform)
+					)
 			cache.set('_'.join([username_unique,'trial_entries']), trial_entries, 600) # 600 seconds == 10 min
 			cache.set('_'.join([username_unique,'user_to_confirm']), user_to_confirm, 600) # 600 seconds == 10 min
 
@@ -175,6 +180,7 @@ def add_trial_entry_csv_file_confirm(request):
 		{
 			'form': form, 
 			'confirm_forms': confirm_forms,
+			'incorrect_data_forms': incorrect_data_forms,
 			'headers': headers,
 			'message': message,
 			'format_errors': {},

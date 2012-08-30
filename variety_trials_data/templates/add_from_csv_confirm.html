@@ -17,6 +17,20 @@
 		{% endfor %}
 		?</p>
 	{% endfor %}
+  {% for user_input, form in incorrect_data_forms %}
+		<p>You entered &quot;{{user_input}}&quot;, but that is not acceptable.
+		{% for field in form %}
+			<div class="input_row">  
+				{% for error in field.errors %}
+				<div class="error">
+					{{error}}
+				</div>
+				{% endfor %}
+				{{ field.label_tag }}: {{ field }}
+			</div>
+		{% endfor %}
+		</p>
+	{% endfor %}
 	<input type="submit" value="Submit" />
 </form>
 {% endif %}
