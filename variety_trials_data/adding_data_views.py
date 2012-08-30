@@ -125,12 +125,13 @@ def add_trial_entry_csv_file_confirm(request):
 			else:
 				# preprocess the users input
 				if csv_file:
-					cleaned_data = handle_csv.handle_file(csv_file, username_unique)
+					(headers, trial_entries, user_to_confirm) = handle_csv.handle_file(csv_file, username_unique)
 				elif csv_json:
-					cleaned_data = handle_csv.handle_json(csv_json, username_unique)
+					(headers, trial_entries, user_to_confirm) = handle_csv.handle_json(csv_json, username_unique)
 				else:
 					headers = []
-					cleaned_data = []
+					trial_entries = []
+					user_to_confirm = []
 			
 	if form is None:
 		# create a blank upload form
@@ -143,8 +144,11 @@ def add_trial_entry_csv_file_confirm(request):
 			
 		headers = trial_entry_spreadsheet_headers()
 	
-	if cleaned_data:
+	if trial_entries and user_to_confirm:
+		cache.set(username_unique, trial_entries, 600) # 600 seconds == 10 min
 		form = None # don't show the original form
+		#https://github.com/django/django/blob/master/django/forms/formsets.py
+		#http://collingrady.wordpress.com/2008/02/18/editing-multiple-objects-in-django-with-newforms/
 		confirm_form = variety_trials_forms.UploadCSVForm(initial={
 				'username_unique': username_unique,
 			})		

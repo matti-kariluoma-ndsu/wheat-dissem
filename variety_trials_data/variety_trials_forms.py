@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.formsets import BaseFormSet
 from variety_trials_data import models
 
 class ScopeConstants:
@@ -79,3 +80,7 @@ class UploadCSVForm(forms.Form):
 					'style': 'display: none;'
 				})
 		)
+
+class MultipleFormsFormSet(BaseFormSet):
+	def __init__(self, *args, **kwargs):
+		BaseFormSet.__init__(self, *args, **kwargs)
