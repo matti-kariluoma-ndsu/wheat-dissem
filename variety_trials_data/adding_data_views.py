@@ -161,11 +161,14 @@ def add_trial_entry_csv_file_confirm(request):
 				newform = field_to_form_lookup[field](
 								prefix=str(index)
 							)
-				confirm_forms.append(
-						(user_input, newform)
-					)
-			cache.set(''.join([username_unique,'trial_entries']), trial_entries, 600) # 600 seconds == 10 min
-			cache.set(''.join([username_unique,'user_to_confirm']), user_to_confirm, 600) # 600 seconds == 10 min
+				
+			else:
+				newform = 
+			confirm_forms.append(
+					(user_input, newform)
+				)
+			cache.set('_'.join([username_unique,'trial_entries']), trial_entries, 600) # 600 seconds == 10 min
+			cache.set('_'.join([username_unique,'user_to_confirm']), user_to_confirm, 600) # 600 seconds == 10 min
 
 	return render_to_response(
 		'add_from_csv_confirm.html', 
