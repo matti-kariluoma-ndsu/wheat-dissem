@@ -202,6 +202,25 @@ def handle_json(uploaded_data, username):
 			if fields: # if not empty
 				trial_entries.append(fields)
 	
+	user_confirmation = []
+	unsaved_model_instance = models.Trial_Entry()
+	for trial_entry in trial_entries:
+		for field in trial_entry:
+			if '%s_id' % field.name in trial_entry_foreign_fields:
+				user_confirmation.append((field, trial_entry[field]))
+			elif field.name in trial_entry_fields:
+				try:
+					field.clean(trial_entry[field], unsaved_model_instance)
+				except ValidationError: # The 'expected' exception if bad input
+					user_confirmation.append((field, trial_entry[field]))
+				except:
+					user_confirmation.append((field, trial_entry[field]))
+			else:
+				continue
+
+	# remove duplicates
+	user_confirmation = list(set(user_confirmation))
+	print user_confirmation
 	return (headers, trial_entries)
 
 def handle_file(uploaded_file, username):
