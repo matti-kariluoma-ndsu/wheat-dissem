@@ -125,12 +125,13 @@ def add_trial_entry_csv_file_confirm(request):
 			else:
 				# preprocess the users input
 				if csv_file:
-					cleaned_data = handle_csv.handle_file(csv_file, username_unique)
+					(headers, cleaned_data) = handle_csv.handle_file(csv_file, username_unique)
 				elif csv_json:
-					cleaned_data = handle_csv.handle_json(csv_json, username_unique)
+					(headers, cleaned_data) = handle_csv.handle_json(csv_json, username_unique)
 				else:
-					cleaned_data = None
-	
+					headers = []
+					cleaned_data = []
+			
 	if form is None:
 		# create a blank upload form
 		if username_unique is None:
@@ -147,6 +148,9 @@ def add_trial_entry_csv_file_confirm(request):
 		confirm_form = variety_trials_forms.UploadCSVForm(initial={
 				'username_unique': username_unique,
 			})		
+		for trial_entry in cleaned_data:
+			for field in trial_entry:
+				print '%s:\t %s' % (field.name, trial_entry[field])
 	
 	return render_to_response(
 		'add_from_csv_confirm.html', 

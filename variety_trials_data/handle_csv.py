@@ -129,8 +129,21 @@ def process_cell(line_number, column_number, cell, errors, column_name, trial_en
 	
 	return errors
 
-def process_row(row, trial_entry_fields, trial_entry_foreign_fields):
-	print row
+def process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields):
+	input_data = {}
+	if len(row) == len(headers):
+		for (index, column_name) in enumerate(headers):
+			if row[index]: # we are only dealing with strings
+				if column_name in trial_entry_fields:
+					field = trial_entry_fields[column_name]
+				elif column_name in trial_entry_foreign_fields:
+					field = trial_entry_foreign_fields[column_name]
+				else:
+					field = None
+				if field:
+					input_data[field] = row[index]
+	return input_data
+			
 
 def inspect_trial_entry():
 	trial_entry_fields = {} # {column name: field, ...}
@@ -155,6 +168,7 @@ def handle_json(uploaded_data, username):
 	except:
 		table = []
 	
+	trial_entries = []
 	for line in table:
 		if not headers:
 			try:
@@ -183,11 +197,12 @@ def handle_json(uploaded_data, username):
 				cell = cell.strip()
 				row.append(cell)
 				
-			process_row(row, trial_entry_fields, trial_entry_foreign_fields)
-				
-	print headers
+			fields = process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields)
+			
+			if fields: # if not empty
+				trial_entries.append(fields)
 	
-	return 1
+	return (headers, trial_entries)
 
 def handle_file(uploaded_file, username):
 	
@@ -195,6 +210,7 @@ def handle_file(uploaded_file, username):
 	csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
 	headers = []
 	
+	trial_entries = []
 	for line in uploaded_file:
 		if not headers:
 			maybe_headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
@@ -215,12 +231,14 @@ def handle_file(uploaded_file, username):
 				cell = cell.replace("'",'')
 				cell = cell.strip()
 				row.append(cell)
-			process_row(row, trial_entry_fields, trial_entry_foreign_fields)
-
-	print headers
+			fields = process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields)
 	
-	return 1
-		
+			if fields: # if not empty
+				trial_entries.append(fields)
+	
+	
+	return (headers, trial_entries)
+			
 def handle_csv_file(uploaded_file):
 	
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
