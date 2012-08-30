@@ -91,6 +91,7 @@ def add_trial_entry_csv_file(request):
 def add_trial_entry_csv_file_confirm(request):
 	message = None
 	form = None
+	confirm_form = None
 	headers = None
 	username_unique = None
 	
@@ -124,10 +125,11 @@ def add_trial_entry_csv_file_confirm(request):
 			else:
 				# preprocess the users input
 				if csv_file:
-					handle_csv.handle_file(csv_file, username_unique)
+					cleaned_data = handle_csv.handle_file(csv_file, username_unique)
 				elif csv_json:
-					print csv_json
-					#handle_csv.hanlde_json(csv_json, username_unique)
+					cleaned_data = handle_csv.handle_json(csv_json, username_unique)
+				else:
+					cleaned_data = None
 	
 	if form is None:
 		# create a blank upload form
@@ -140,13 +142,11 @@ def add_trial_entry_csv_file_confirm(request):
 			
 		headers = trial_entry_spreadsheet_headers()
 	
-	else:
-		# we entered this view with a valid form
-		form = None
-	
-	confirm_form = variety_trials_forms.UploadCSVForm(initial={
-			'username_unique': username_unique,
-		})		
+	if cleaned_data:
+		form = None # don't show the original form
+		confirm_form = variety_trials_forms.UploadCSVForm(initial={
+				'username_unique': username_unique,
+			})		
 	
 	return render_to_response(
 		'add_from_csv_confirm.html', 

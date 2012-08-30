@@ -1,12 +1,11 @@
-from variety_trials_data import models
 from django.core.exceptions import ValidationError
+from django.core.cache import cache
+from variety_trials_data import models
 from difflib import SequenceMatcher
 import re
 import time
 import json
 from datetime import date
-import glob
-import os
 
 class fuzzy_spellchecker():
 	""" Uses an internal dictionary to check whether a word has a close 
@@ -130,6 +129,98 @@ def process_cell(line_number, column_number, cell, errors, column_name, trial_en
 	
 	return errors
 
+def process_row(row, trial_entry_fields, trial_entry_foreign_fields):
+	print row
+
+def inspect_trial_entry():
+	trial_entry_fields = {} # {column name: field, ...}
+	trial_entry_foreign_fields = {} # {column name: field, ...}
+	
+	# Inspect our model, grab its fields
+	for field in models.Trial_Entry._meta.fields:
+		if (field.get_internal_type() == 'ForeignKey' 
+				or field.get_internal_type() == 'ManyToManyField' ):
+			trial_entry_foreign_fields["%s_id" % (field.name)] = field
+		else:
+			trial_entry_fields[field.name] = field
+
+	return (trial_entry_fields, trial_entry_foreign_fields)
+
+def handle_json(uploaded_data, username):
+	(trial_entry_fields, trial_entry_foreign_fields) = inspect_trial_entry()
+	headers = []
+	
+	try:
+		table = json.loads(uploaded_data)
+	except:
+		table = []
+	
+	for line in table:
+		if not headers:
+			try:
+				maybe_headers = list(line)
+			except:
+				maybe_headers = []
+			if maybe_headers == []:
+				break	
+			for field in maybe_headers:
+				if field not in trial_entry_fields and field not in trial_entry_foreign_fields and field:
+					headers = []
+					break
+				else:
+					if field:
+						headers.append(field)
+		else:
+			row = []
+			try:
+				json_row = list(line)
+			except:
+				json_row = []
+
+			for cell in json_row:
+				cell = cell.replace('"','')
+				cell = cell.replace("'",'')
+				cell = cell.strip()
+				row.append(cell)
+				
+			process_row(row, trial_entry_fields, trial_entry_foreign_fields)
+				
+	print headers
+	
+	return 1
+
+def handle_file(uploaded_file, username):
+	
+	(trial_entry_fields, trial_entry_foreign_fields) = inspect_trial_entry()
+	csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
+	headers = []
+	
+	for line in uploaded_file:
+		if not headers:
+			maybe_headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
+			for field in maybe_headers:
+				if field not in trial_entry_fields and field not in trial_entry_foreign_fields and field:
+					headers = []
+					break
+				else:
+					if field:
+						headers.append(field)
+		else:
+			row = []
+			csv_row = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
+			for cell in csv_row:
+				if cell == ',': # a special case caused by '^,|,$'
+					cell = ''
+				cell = cell.replace('"','')
+				cell = cell.replace("'",'')
+				cell = cell.strip()
+				row.append(cell)
+			process_row(row, trial_entry_fields, trial_entry_foreign_fields)
+
+	print headers
+	
+	return 1
+		
 def handle_csv_file(uploaded_file):
 	
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
