@@ -1,7 +1,7 @@
 {% extends "add_from_csv_template.html" %}  
 {% block confirmation %}
-{% if confirm_forms %}
-<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/confirm/" method="POST">
+{% if confirm_forms or incorrect_data_forms %}
+<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/review/" method="POST">
   {% for user_input, form in confirm_forms %}
 		<p>You entered &quot;{{user_input}}&quot;, did you mean:
 		{% for field in form %}
@@ -31,6 +31,7 @@
 		{% endfor %}
 		</p>
 	{% endfor %}
+	<input type='hidden' name='username_unique' value='{{username_unique}}' />
 	<input type="submit" value="Submit" />
 </form>
 {% endif %}

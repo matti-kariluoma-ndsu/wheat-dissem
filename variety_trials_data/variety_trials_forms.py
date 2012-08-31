@@ -82,17 +82,17 @@ class UploadCSVForm(forms.Form):
 		)
 
 class SelectDateForm(forms.Form):
-	date = forms.ModelChoiceField(
+	value = forms.ModelChoiceField(
 			queryset = models.Date.objects.all()
 		)
 
 class SelectLocationForm(forms.Form):
-	location = forms.ModelChoiceField(
+	value = forms.ModelChoiceField(
 			queryset = models.Location.objects.all()
 		)
 		
 class SelectVarietyForm(forms.Form):
-	variety = forms.ModelChoiceField(
+	value = forms.ModelChoiceField(
 			queryset = models.Variety.objects.all()
 		)
 		

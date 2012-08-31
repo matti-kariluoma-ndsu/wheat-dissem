@@ -89,6 +89,13 @@ def add_trial_entry_csv_file(request):
 		context_instance=RequestContext(request)
 	)
 
+field_to_form_lookup = {
+		models.Trial_Entry.plant_date.field : variety_trials_forms.SelectDateForm,
+		models.Trial_Entry.harvest_date.field : variety_trials_forms.SelectDateForm,
+		models.Trial_Entry.location.field : variety_trials_forms.SelectLocationForm,
+		models.Trial_Entry.variety.field : variety_trials_forms.SelectVarietyForm,
+	}
+
 def add_trial_entry_csv_file_confirm(request):
 	message = None
 	form = None
@@ -134,7 +141,7 @@ def add_trial_entry_csv_file_confirm(request):
 					headers = []
 					trial_entries = []
 					user_to_confirm = []
-			
+		
 	if form is None:
 		# create a blank upload form
 		if username_unique is None:
@@ -150,12 +157,6 @@ def add_trial_entry_csv_file_confirm(request):
 		form = None # don't show the original form
 		#http://collingrady.wordpress.com/2008/02/18/editing-multiple-objects-in-django-with-newforms/
 		confirm_forms = []
-		field_to_form_lookup = {
-				models.Trial_Entry.plant_date.field : variety_trials_forms.SelectDateForm,
-				models.Trial_Entry.harvest_date.field : variety_trials_forms.SelectDateForm,
-				models.Trial_Entry.location.field : variety_trials_forms.SelectLocationForm,
-				models.Trial_Entry.variety.field : variety_trials_forms.SelectVarietyForm,
-			}
 
 		for (index, (field, user_input)) in enumerate(user_to_confirm):
 			if field in field_to_form_lookup:
@@ -181,6 +182,7 @@ def add_trial_entry_csv_file_confirm(request):
 			'form': form, 
 			'confirm_forms': confirm_forms,
 			'incorrect_data_forms': incorrect_data_forms,
+			'username_unique': username_unique,
 			'headers': headers,
 			'message': message,
 			'format_errors': {},
@@ -191,67 +193,53 @@ def add_trial_entry_csv_file_confirm(request):
 def add_trial_entry_csv_file_review(request):
 	message = None
 	form = None
+	confirm_forms = []
+	incorrect_data_forms = []
+	headers = None
 	username_unique = None
 	
 	if request.method == 'POST': # If the form has been submitted...
-		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
-		if not form.is_valid():
-			# try and reuse the username_unique
-			try:
-				username_unique = request.POST['username_unique']
-			except:
-				username_unique = generate_unique_name()
-				
-			message = "There was a problem with your submission. Please try again."
-		else:
+		try:
 			username_unique = request.POST['username_unique']
+		except:
+			username_unique = None
+			message = "There was a problem with your submission. Please try again."
+		
+		if not username_unique:
+			return HttpResponseRedirect(HOME_URL+'/add/trial_entry/')
 			
-			try:
-				csv_file = request.FILES['csv_file']
-			except:
-				csv_file = None
-			
-			try:
-				csv_json = request.POST['csv_json']
-			except:
-				csv_json = None
-				
-			if not csv_file and not csv_json:			
-				form = None
+		trial_entries = cache.get('_'.join([username_unique,'trial_entries']))
+		user_to_confirm = cache.get('_'.join([username_unique,'user_to_confirm']))
+		
+		if not trial_entries or not user_to_confirm:
+			message = "Sorry, the server ate your data. Please start over."
+			username_unique = None
+			form = None
+		
+		for (index, (field, user_input)) in enumerate(user_to_confirm):
+			if field in field_to_form_lookup:
+				newform = field_to_form_lookup[field](
+								request.POST, prefix=str(index)
+							)
+				if newform.is_valid():
+					print newform.cleaned_data['value']
+				confirm_forms.append(
+						(user_input, newform)
+					)
 			else:
-				# preprocess the users input
-				if csv_file:
-					handle_csv.handle_file(csv_file, username_unique)
-				elif csv_json:
-					hanlde_csv.hanlde_json(csv_json, username_unique)
-	
-	
-	if form is None:
-		# create a blank upload form
-		if username_unique is None:
-			username_unique = generate_unique_name()
-			
-		form = variety_trials_forms.UploadCSVForm(initial={
-				'username_unique': username_unique,
-			})
-	
+				newform = variety_trials_forms.make_model_field_form(field.name, field.formfield())(
+						request.POST, prefix=str(index)
+					)
+				if newform.is_valid():
+					print newform.cleaned_data['value']
+				incorrect_data_forms.append(
+						(user_input, newform)
+					)
+			# write records to database
+			pass
+
 	# Give the embedded spreadsheet it's column names
-	headers = []
-	for field in models.Trial_Entry._meta.fields:
-		if (field.get_internal_type() == 'ForeignKey' 
-				or field.get_internal_type() == 'ManyToManyField' ):
-			headers.append("%s_id" % (field.name))
-		else:
-			headers.append(field.name)
-	
-	ignore_fields = [
-			'pk',
-			'id',
-			'deletable'
-		]
-	for field in ignore_fields:
-		if field in headers:
-			headers.remove(field)
+	headers = trial_entry_spreadsheet_headers()
 	
 	return render_to_response(
 		'add_from_csv_template.html', 
@@ -259,7 +247,6 @@ def add_trial_entry_csv_file_review(request):
 			'form': form, 
 			'headers': headers,
 			'message': message,
-			'format_errors': {},
 		},
 		context_instance=RequestContext(request)
 	)
