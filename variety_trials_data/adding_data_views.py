@@ -7,7 +7,11 @@ from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
 import random
 import time
-
+try:
+	import simplejson as json # Python 2.5
+except ImportError:
+	import json # Python 2.6
+	
 def history(request):	
 	history=models.Trial_Entry_History.objects.all()
 
@@ -100,25 +104,38 @@ def add_trial_entry_csv_file_confirm(request):
 	message = None
 	form = None
 	confirm_forms = []
-	incorrect_data_forms = []
-	headers = None
+	invalid_input_forms = []
+	headers = []
 	username_unique = None
 	
-	if request.method == 'POST': # If the form has been submitted...
-		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
-		if not form.is_valid():
-			# try and reuse the username_unique
-			print form.errors
-			try:
-				username_unique = request.POST['username_unique']
-			except:
-				username_unique = generate_unique_name()
-			
-			form = None
-			message = "There was a problem with your submission. Please try again."
-		else:
+	if request.method != 'POST':
+		return HttpResponseRedirect(HOME_URL+'/add/trial_entry/')
+	else:
+		try:
 			username_unique = request.POST['username_unique']
+		except:
+			username_unique = None
+			message = "There was a problem with your submission. Please try again."
+		
+		if not username_unique:
+			return HttpResponseRedirect(HOME_URL+'/add/trial_entry/')
+		
+		# If we are visiting this page for the nth time, n > 1
+		trial_entries_key = "%s_%s" % (username_unique, 'trial_entries')
+		user_to_confirm_key = "%s_%s" % (username_unique, 'user_to_confirm')
+		
+		try:
+			trial_entries = request.POST[trial_entries_cache_key]
+		except: 
+			trial_entries = []
 			
+		try:
+			user_to_confirm = request.POST[user_to_confirm_key]
+		except: 
+			user_to_confirm = []
+		
+		# else, this is the 1st visit
+		if not trial_entries or not user_to_confirm:
 			try:
 				csv_file = request.FILES['csv_file']
 			except:
@@ -131,8 +148,9 @@ def add_trial_entry_csv_file_confirm(request):
 				
 			if not csv_file and not csv_json:			
 				form = None
+				message = "The spreadsheet did not upload correctly. Please Try Again."
 			else:
-				# preprocess the users input
+				# preprocess the user's initial input
 				if csv_file:
 					(headers, trial_entries, user_to_confirm) = handle_csv.handle_file(csv_file, username_unique)
 				elif csv_json:
@@ -141,24 +159,14 @@ def add_trial_entry_csv_file_confirm(request):
 					headers = []
 					trial_entries = []
 					user_to_confirm = []
+		# Done processing POST
 		
-	if form is None:
-		# create a blank upload form
-		if username_unique is None:
-			username_unique = generate_unique_name()
-			
-		form = variety_trials_forms.UploadCSVForm(initial={
-				'username_unique': username_unique,
-			})			
-			
-		headers = trial_entry_spreadsheet_headers()
-	
 	if trial_entries and user_to_confirm:
 		form = None # don't show the original form
 		#http://collingrady.wordpress.com/2008/02/18/editing-multiple-objects-in-django-with-newforms/
 		confirm_forms = []
 
-		for (index, (field, user_input)) in enumerate(user_to_confirm):
+		for (index, (row_number, field, user_input)) in enumerate(user_to_confirm):
 			if field in field_to_form_lookup:
 				newform = field_to_form_lookup[field](
 								prefix=str(index)
@@ -170,19 +178,31 @@ def add_trial_entry_csv_file_confirm(request):
 				newform = variety_trials_forms.make_model_field_form(field.name, field.formfield())(
 						prefix=str(index)
 					)
-				incorrect_data_forms.append(
+				invalid_input_forms.append(
 						(user_input, newform)
 					)
-			cache.set('_'.join([username_unique,'trial_entries']), trial_entries, 600) # 600 seconds == 10 min
-			cache.set('_'.join([username_unique,'user_to_confirm']), user_to_confirm, 600) # 600 seconds == 10 min
+					
+		# convert the python Trial_Entry.field objects to strings
+		trial_entries_to_page = []
+		for row in trial_entries:
+			row_to_page = {}
+			for (field, value) in row.items():
+				row_to_page[field.name] = value
+			trial_entries_to_page.append(row_to_page)
+			
+		user_to_confirm_to_page = []
+		for (row_number, field, user_input) in user_to_confirm:
+			user_to_confirm_to_page.append(row_number, field.name, user_input)
 
 	return render_to_response(
 		'add_from_csv_confirm.html', 
 		{
 			'form': form, 
 			'confirm_forms': confirm_forms,
-			'incorrect_data_forms': incorrect_data_forms,
+			'invalid_input_forms': invalid_input_forms,
 			'username_unique': username_unique,
+			'trial_entries': json.dumps(trial_entries_to_page),
+			'user_to_confirm': json.dumps(user_to_confirm_to_page),
 			'headers': headers,
 			'message': message,
 			'format_errors': {},
@@ -194,7 +214,7 @@ def add_trial_entry_csv_file_review(request):
 	message = None
 	form = None
 	confirm_forms = []
-	incorrect_data_forms = []
+	invalid_input_forms = []
 	headers = None
 	username_unique = None
 	
@@ -230,7 +250,7 @@ def add_trial_entry_csv_file_review(request):
 						request.POST, prefix=str(index)
 					)
 				if newform.is_valid():
-					incorrect_data_forms.append(
+					invalid_input_forms.append(
 							(user_input, newform)
 						)
 			# write records to database

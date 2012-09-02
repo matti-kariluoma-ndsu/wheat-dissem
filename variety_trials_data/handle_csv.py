@@ -4,8 +4,11 @@ from variety_trials_data import models
 from difflib import SequenceMatcher
 import re
 import time
-import json
 from datetime import date
+try:
+	import simplejson as json # Python 2.5
+except ImportError:
+	import json # Python 2.6
 
 class fuzzy_spellchecker():
 	""" Uses an internal dictionary to check whether a word has a close 
@@ -175,12 +178,12 @@ def handle_json(uploaded_data, username):
 				maybe_headers = list(line)
 			except:
 				maybe_headers = []
-			if maybe_headers == []:
-				break	
+			if not maybe_headers:
+				continue	
 			for field in maybe_headers:
 				if field not in trial_entry_fields and field not in trial_entry_foreign_fields and field:
 					headers = []
-					break
+					continue
 				else:
 					if field:
 						headers.append(field)
@@ -203,25 +206,50 @@ def handle_json(uploaded_data, username):
 				trial_entries.append(fields)
 	
 	user_to_confirm = []
+	which_row = {}
 	unsaved_model_instance = models.Trial_Entry()
-	for trial_entry in trial_entries:
+	for (row_number, trial_entry) in enumerate(trial_entries):
 		for field in trial_entry:
 			if '%s_id' % field.name in trial_entry_foreign_fields:
-				user_to_confirm.append((field, trial_entry[field]))
+				key = (field, trial_entry[field])
+				user_to_confirm.append(key)
+				try:
+					rows = which_row[key]
+				except KeyError:
+					rows = which_row[key] = []
+				rows.append(row_number)
 			elif field.name in trial_entry_fields:
+				key = None
 				try:
 					field.clean(trial_entry[field], unsaved_model_instance)
 				except ValidationError: # The 'expected' exception if bad input
-					user_to_confirm.append((field, trial_entry[field]))
+					key = (field, trial_entry[field])
 				except:
-					user_to_confirm.append((field, trial_entry[field]))
+					key = (field, trial_entry[field])
+					
+				if key:
+					user_to_confirm.append(key)
+					try:
+						rows = which_row[key]
+					except KeyError:
+						rows = which_row[key] = []
+					rows.append(row_number)
 			else:
 				continue
 
 	# remove duplicates
 	user_to_confirm = list(set(user_to_confirm))
 	
-	return (headers, trial_entries, user_to_confirm)
+	user_to_confirm_with_row_numbers = []
+	for (field, value) in user_to_confirm:
+		try:
+			row_number = which_row[(field, value)][0]
+		except: # KeyError, IndexError
+			row_number = None
+		user_to_confirm_with_row_numbers.append(row_number, field, value)
+		
+	
+	return (headers, trial_entries, user_to_confirm_with_row_numbers)
 
 def handle_file(uploaded_file, username):
 	
