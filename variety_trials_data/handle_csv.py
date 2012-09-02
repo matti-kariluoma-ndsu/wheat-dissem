@@ -101,37 +101,6 @@ def handle_reference_field(reference_dict, field, data):
 		
 	return return_id
 
-alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-len_alphabet = len(alphabet)
-def column_number_to_letter(number):
-	"""
-	Transforms an integer into its spreadsheet column name
-	i.e. 1: A, 2: B, ..., 27: AA, ..., etc.
-	"""
-	j = int(number / (len_alphabet - 1)) - 1
-	
-	if j >= len_alphabet:
-		column_letter = str(number) # just bail if we get in trouble
-	elif j >= 0:
-		column_letter = "%s%s" % (alphabet[j % len_alphabet], alphabet[number % len_alphabet])
-	else:
-		column_letter = "%s" % (alphabet[number % len_alphabet])
-	return column_letter
-
-def process_cell(line_number, column_number, cell, errors, column_name, trial_entry_fields, trial_entry_foreign_fields):
-	if column_name:
-		if column_name in trial_entry_foreign_fields:
-			try:
-				trial_entry_fields[column_name] = handle_reference_field(trial_entry_foreign_fields, column_name, cell)
-			except ValidationError:
-				errors['Bad Cell'] = "Couldn't read the cell at Row: %d, Column: %s: \"%s\"" % (line_number, column_number_to_letter(column_number), cell)
-		elif column_name in trial_entry_fields:
-			trial_entry_fields[column_name] = cell
-		else:
-			errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
-	
-	return errors
-
 def process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields):
 	input_data = {}
 	if len(row) == len(headers):
@@ -162,7 +131,7 @@ def inspect_trial_entry():
 
 	return (trial_entry_fields, trial_entry_foreign_fields)
 
-def handle_json(uploaded_data, username):
+def handle_json(uploaded_data, username, name_to_field_lookup):
 	(trial_entry_fields, trial_entry_foreign_fields) = inspect_trial_entry()
 	headers = []
 	
@@ -221,6 +190,7 @@ def handle_json(uploaded_data, username):
 			elif fieldname in trial_entry_fields:
 				key = None
 				try:
+					field = name_to_field_lookup[fieldname]
 					field.clean(trial_entry[fieldname], unsaved_model_instance)
 				except ValidationError: # The 'expected' exception if bad input
 					key = (fieldname, trial_entry[fieldname])
@@ -251,7 +221,7 @@ def handle_json(uploaded_data, username):
 	
 	return (headers, trial_entries, user_to_confirm_with_row_numbers)
 
-def handle_file(uploaded_file, username):
+def handle_file(uploaded_file, username, name_to_field_lookup):
 	
 	(trial_entry_fields, trial_entry_foreign_fields) = inspect_trial_entry()
 	csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
@@ -284,26 +254,82 @@ def handle_file(uploaded_file, username):
 				trial_entries.append(fields)
 	
 	user_to_confirm = []
+	which_row = {}
 	unsaved_model_instance = models.Trial_Entry()
-	for trial_entry in trial_entries:
-		for field in trial_entry:
-			if '%s_id' % field.name in trial_entry_foreign_fields:
-				user_to_confirm.append((field, trial_entry[field]))
-			elif field.name in trial_entry_fields:
+	for (row_number, trial_entry) in enumerate(trial_entries):
+		for fieldname in trial_entry:
+			if '%s_id' % fieldname in trial_entry_foreign_fields:
+				key = (fieldname, trial_entry[fieldname])
+				user_to_confirm.append(key)
 				try:
-					field.clean(trial_entry[field], unsaved_model_instance)
+					rows = which_row[key]
+				except KeyError:
+					rows = which_row[key] = []
+				rows.append(row_number)
+			elif fieldname in trial_entry_fields:
+				key = None
+				try:
+					field = name_to_field_lookup[fieldname]
+					field.clean(trial_entry[fieldname], unsaved_model_instance)
 				except ValidationError: # The 'expected' exception if bad input
-					user_to_confirm.append((field, trial_entry[field]))
+					key = (fieldname, trial_entry[fieldname])
 				except:
-					user_to_confirm.append((field, trial_entry[field]))
+					key = (fieldname, trial_entry[fieldname])
+					
+				if key:
+					user_to_confirm.append(key)
+					try:
+						rows = which_row[key]
+					except KeyError:
+						rows = which_row[key] = []
+					rows.append(row_number)
 			else:
 				continue
 
 	# remove duplicates
 	user_to_confirm = list(set(user_to_confirm))
 	
-	return (headers, trial_entries, user_to_confirm)
-			
+	user_to_confirm_with_row_numbers = []
+	for (fieldname, value) in user_to_confirm:
+		try:
+			row_number = which_row[(fieldname, value)][0]
+		except: # KeyError, IndexError
+			row_number = None
+		user_to_confirm_with_row_numbers.append((row_number, fieldname, value))
+		
+	return (headers, trial_entries, user_to_confirm_with_row_numbers)
+
+alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+len_alphabet = len(alphabet)
+def column_number_to_letter(number):
+	"""
+	Transforms an integer into its spreadsheet column name
+	i.e. 1: A, 2: B, ..., 27: AA, ..., etc.
+	"""
+	j = int(number / (len_alphabet - 1)) - 1
+	
+	if j >= len_alphabet:
+		column_letter = str(number) # just bail if we get in trouble
+	elif j >= 0:
+		column_letter = "%s%s" % (alphabet[j % len_alphabet], alphabet[number % len_alphabet])
+	else:
+		column_letter = "%s" % (alphabet[number % len_alphabet])
+	return column_letter
+
+def process_cell(line_number, column_number, cell, errors, column_name, trial_entry_fields, trial_entry_foreign_fields):
+	if column_name:
+		if column_name in trial_entry_foreign_fields:
+			try:
+				trial_entry_fields[column_name] = handle_reference_field(trial_entry_foreign_fields, column_name, cell)
+			except ValidationError:
+				errors['Bad Cell'] = "Couldn't read the cell at Row: %d, Column: %s: \"%s\"" % (line_number, column_number_to_letter(column_number), cell)
+		elif column_name in trial_entry_fields:
+			trial_entry_fields[column_name] = cell
+		else:
+			errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
+	
+	return errors
+		
 def handle_csv_file(uploaded_file):
 	
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
