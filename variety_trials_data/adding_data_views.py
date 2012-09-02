@@ -208,8 +208,8 @@ def add_trial_entry_csv_file_review(request):
 		if not username_unique:
 			return HttpResponseRedirect(HOME_URL+'/add/trial_entry/')
 			
-		trial_entries = cache.get('_'.join([username_unique,'trial_entries']))
-		user_to_confirm = cache.get('_'.join([username_unique,'user_to_confirm']))
+		trial_entries = cache.get('_'.join([username_unique, 'trial_entries']))
+		user_to_confirm = cache.get('_'.join([username_unique, 'user_to_confirm']))
 		
 		if not trial_entries or not user_to_confirm:
 			message = "Sorry, the server ate your data. Please start over."
@@ -221,20 +221,18 @@ def add_trial_entry_csv_file_review(request):
 				newform = field_to_form_lookup[field](
 								request.POST, prefix=str(index)
 							)
-				if newform.is_valid():
-					print newform.cleaned_data['value']
-				confirm_forms.append(
-						(user_input, newform)
-					)
+				if newform.is_valid():					
+					confirm_forms.append(
+							(user_input, newform)
+						)
 			else:
 				newform = variety_trials_forms.make_model_field_form(field.name, field.formfield())(
 						request.POST, prefix=str(index)
 					)
 				if newform.is_valid():
-					print newform.cleaned_data['value']
-				incorrect_data_forms.append(
-						(user_input, newform)
-					)
+					incorrect_data_forms.append(
+							(user_input, newform)
+						)
 			# write records to database
 			pass
 

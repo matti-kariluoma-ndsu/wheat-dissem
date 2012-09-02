@@ -54,14 +54,15 @@
 {% endblock %}
 
 {% block javascript_imports %}
-<script src="/static/lib/bootstrap-typeahead.js"></script>
-<script src="/static/lib/jquery.autoresize.js"></script>
-<script src="/static/lib/jQuery-contextMenu/jquery.contextMenu.js"></script>
-<script src="/static/lib/jQuery-contextMenu/jquery.ui.position.js"></script>
-<script src="/static/js/json2.js"></script>
+<script src="/static/js/bootstrap-typeahead.js"></script>
+<script src="/static/js/jquery.autoresize.js"></script>
+<script src="/static/js/jquery.contextMenu.js"></script>
+<script src="/static/js/jquery.ui.position.js"></script>
+<script src="/static/js/json2.min.js"></script>
 <script src="/static/js/jquery.handsontable.js"></script>
+<script src="/static/js/variety_trials_handsontable.js"></script>
 
-<link rel="stylesheet" media="screen" href="/static/lib/jQuery-contextMenu/jquery.contextMenu.css">
+<link rel="stylesheet" media="screen" href="/static/css/jquery.contextMenu.css">
 <link rel="stylesheet" media="screen" href="/static/css/jquery.handsontable.css">
 
 {% endblock %}
@@ -71,51 +72,27 @@
 $('#variety_trials__container').show();
 $('#variety_trials__spreadsheet_submit').show();
 
-var variety_trials__sheet = $("#variety_trials__spreadsheet");
+var cols = {{headers|length}};
 var variety_trials__headers = [
 		{%for field in headers%}"{{field}}", {%endfor%} ""
-	]
+	];
+var spreasheet_container = "#variety_trials__spreadsheet"
+var output_container = "#id_csv_json"
 
-function variety_trials__update_form(changes)
-{
-	var rows = []
-	rows.push(variety_trials__headers);
-	var table = variety_trials__sheet.handsontable('getData');
-	var row;
-	for (i=0; i < table.length; i++)
-	{
-		row = table[i];
-		rows.push(row);
-	}
-	$('#id_csv_json').val(JSON.stringify(rows));
-}
-
-variety_trials__sheet.handsontable({
-	rows: 2,
-	cols: {{headers|length}},
-	minSpareRows: 1,
-	contextMenu: true,
-	rowHeaders: true,
-	colHeaders: variety_trials__headers,
-	onChange: variety_trials__update_form
-});
-
-var variety_trials__sheet_init_data = [];
-
-variety_trials__sheet.handsontable("loadData", variety_trials__sheet_init_data);
+variety_trials__init_handsontable(cols, variety_trials__headers, spreasheet_container);
 
 // Set up an onclick function for the javascript submit button
 $('#variety_trials__spreadsheet_submit').click(function(event) {
 	// First, select a cell to commit whatever cell is highlighted atm
-  setTimeout(function() {
-      //timeout is needed because Handsontable normally deselects 
-      //current cell when you click outside the table
-      variety_trials__sheet.handsontable("selectCell", 0, 0);
-  }, 10);
-  // Then, submit the form. 
-  setTimeout(function() {
-      $('#variety_trials__spreadsheet_form').submit();
-  }, 20);
+	setTimeout(function() {
+			//timeout is needed because Handsontable normally deselects 
+			//current cell when you click outside the table
+			$(spreasheet_container).handsontable("selectCell", 0, 0);
+	}, 10);
+	// Then, submit the form. 
+	setTimeout(function() {
+			$('#variety_trials__spreadsheet_form').submit();
+	}, 20);
 });
 
 {% endblock %}
