@@ -5,10 +5,24 @@
 	{{ message }}
 {% endif %}
 </div>
+<div>
+	<div class="variety_trials__spreadsheet_header">
+{% for header in headers %}
+		<div class="variety_trials__spreadsheet_{{header}}">{{header}}</div>
+{% endfor %}
+	</div>
+{% for row in trial_entries %}
+	<div class="variety_trials__spreadsheet_data">
+		{% for fieldname, value in row.items %}
+		<div class="variety_trials__spreadsheet_{{fieldname}}">{{value}}</div>
+		{% endfor %}
+	</div>
+{% endfor %}
+</div>
 {% if confirm_forms or invalid_input_forms %}
 <form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/confirm/" method="POST">
-  {% for user_input, form in confirm_forms %}
-		<p>You entered &quot;{{user_input}}&quot;, did you mean:
+  {% for row, user_input, form in confirm_forms %}
+		<p>In row {{row}} you entered &quot;{{user_input}}&quot;, did you mean:
 		{% for field in form %}
 			<div class="input_row">  
 				{% for error in field.errors %}
@@ -20,10 +34,10 @@
 				<a href = "#">Add New...</a>
 			</div>
 		{% endfor %}
-		?</p>
+		</p>
 	{% endfor %}
-  {% for user_input, form in invalid_input_forms %}
-		<p>You entered &quot;{{user_input}}&quot;, but that is not acceptable.
+  {% for row, user_input, form in invalid_input_forms %}
+		<p>In row {{row}} you entered &quot;{{user_input}}&quot; for {{form.prompt}}, which is not a valid value.
 		{% for field in form %}
 			<div class="input_row">  
 				{% for error in field.errors %}
@@ -38,8 +52,8 @@
 	{% endfor %}
 	<!-- User-state -->
 	<input type='hidden' name='username_unique' value='{{username_unique}}' />
-	<input type='hidden' name='trial_entries' value='{{trial_entries}}' />
-	<input type='hidden' name='user_to_confirm' value='{{user_to_confirm}}' />
+	<input type='hidden' name='trial_entries_json' value='{{trial_entries_json}}' />
+	<input type='hidden' name='user_to_confirm_json' value='{{user_to_confirm_json}}' />
 	<input type="submit" value="Submit" />
 </form>
 {% endif %}

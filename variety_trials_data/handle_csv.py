@@ -125,7 +125,7 @@ def inspect_trial_entry():
 	for field in models.Trial_Entry._meta.fields:
 		if (field.get_internal_type() == 'ForeignKey' 
 				or field.get_internal_type() == 'ManyToManyField' ):
-			trial_entry_foreign_fields["%s_id" % (field.name)] = field
+			trial_entry_foreign_fields[field.name] = field
 		else:
 			trial_entry_fields[field.name] = field
 
@@ -179,7 +179,7 @@ def handle_json(uploaded_data, username, name_to_field_lookup):
 	unsaved_model_instance = models.Trial_Entry()
 	for (row_number, trial_entry) in enumerate(trial_entries):
 		for fieldname in trial_entry:
-			if '%s_id' % fieldname in trial_entry_foreign_fields:
+			if fieldname in trial_entry_foreign_fields:
 				key = (fieldname, trial_entry[fieldname])
 				user_to_confirm.append(key)
 				try:
@@ -258,7 +258,7 @@ def handle_file(uploaded_file, username, name_to_field_lookup):
 	unsaved_model_instance = models.Trial_Entry()
 	for (row_number, trial_entry) in enumerate(trial_entries):
 		for fieldname in trial_entry:
-			if '%s_id' % fieldname in trial_entry_foreign_fields:
+			if fieldname in trial_entry_foreign_fields:
 				key = (fieldname, trial_entry[fieldname])
 				user_to_confirm.append(key)
 				try:

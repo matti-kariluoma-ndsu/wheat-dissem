@@ -104,6 +104,7 @@ def make_model_field_form(name, field):
 		pass
 	attrs = {
 			'value': field,
+			'prompt': name.replace('_', ' '),
 		}
 	custom_class = type(name+"ModelFieldForm", (ModelFieldForm, ), attrs)
 	

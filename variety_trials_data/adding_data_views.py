@@ -56,7 +56,7 @@ def trial_entry_spreadsheet_headers():
 	for field in models.Trial_Entry._meta.fields:
 		if (field.get_internal_type() == 'ForeignKey' 
 				or field.get_internal_type() == 'ManyToManyField' ):
-			headers.append("%s_id" % (field.name))
+			headers.append(field.name)
 		else:
 			headers.append(field.name)
 	
@@ -132,14 +132,14 @@ def add_trial_entry_csv_file_confirm(request):
 		
 		# If we are visiting this page for the nth time, n > 1
 		try:
-			trial_entries_json = request.POST['trial_entries']
+			trial_entries_json = request.POST['trial_entries_json']
 			# convert json representation back to python objects
 			trial_entries = json.loads(trial_entries_json)
 		except: 
 			trial_entries = []
 			
 		try:
-			user_to_confirm_json = request.POST['user_to_confirm']
+			user_to_confirm_json = request.POST['user_to_confirm_json']
 			# convert json representation back to python objects
 			user_to_confirm = json.loads(user_to_confirm_json)
 		except: 
@@ -172,6 +172,7 @@ def add_trial_entry_csv_file_confirm(request):
 					user_to_confirm = []
 		else: # Check for user corrections and validate them
 			for (index, (row_number, fieldname, user_input)) in enumerate(user_to_confirm):
+				row_number += 1 # for user sanity
 				try:
 					field = name_to_field_lookup[fieldname]
 				except:
@@ -183,7 +184,7 @@ def add_trial_entry_csv_file_confirm(request):
 									)
 						if newform.is_valid():					
 							confirm_forms.append(
-									(user_input, newform)
+									(row_number, user_input, newform)
 								)
 					else:
 						newform = variety_trials_forms.make_model_field_form(str(fieldname), field.formfield())(
@@ -191,7 +192,7 @@ def add_trial_entry_csv_file_confirm(request):
 							)
 						if newform.is_valid():
 							invalid_input_forms.append(
-									(user_input, newform)
+									(row_number, user_input, newform)
 								)
 			# write records to database
 			pass
@@ -205,6 +206,7 @@ def add_trial_entry_csv_file_confirm(request):
 	if not confirm_forms and not invalid_input_forms:
 		#http://collingrady.wordpress.com/2008/02/18/editing-multiple-objects-in-django-with-newforms/
 		for (index, (row_number, fieldname, user_input)) in enumerate(user_to_confirm):
+			row_number += 1 # for user sanity
 			try:
 				field = name_to_field_lookup[fieldname]
 			except:
@@ -215,14 +217,14 @@ def add_trial_entry_csv_file_confirm(request):
 									prefix=str(index)
 								)
 					confirm_forms.append(
-							(user_input, newform)
+							(row_number, user_input, newform)
 						)
 				else:
 					newform = variety_trials_forms.make_model_field_form(str(fieldname), field.formfield())(
 							prefix=str(index)
 						)
 					invalid_input_forms.append(
-							(user_input, newform)
+							(row_number, user_input, newform)
 						)
 	
 		
@@ -232,8 +234,10 @@ def add_trial_entry_csv_file_confirm(request):
 			'confirm_forms': confirm_forms,
 			'invalid_input_forms': invalid_input_forms,
 			'username_unique': username_unique,
-			'trial_entries': json.dumps(trial_entries),
-			'user_to_confirm': json.dumps(user_to_confirm),
+			'trial_entries': trial_entries,
+			'trial_entries_json': json.dumps(trial_entries),
+			'user_to_confirm': user_to_confirm,
+			'user_to_confirm_json': json.dumps(user_to_confirm),
 			'headers': headers,
 			'message': message,
 		},

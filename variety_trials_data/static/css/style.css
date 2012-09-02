@@ -174,3 +174,24 @@
 	padding-top: 1em;
 	padding-bottom: 1em;
 }
+
+.variety_trials__spreadsheet_header
+{
+	display: block;
+	font-weight: bold;
+}
+
+.variety_trials__spreadsheet_header div
+{
+	display: inline;
+}
+
+.variety_trials__spreadsheet_data
+{
+	display: block;
+}
+
+.variety_trials__spreadsheet_data div
+{
+	display: inline;
+}
