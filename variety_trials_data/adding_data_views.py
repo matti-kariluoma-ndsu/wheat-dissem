@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.cache import cache
+from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from variety_trials_data import handle_csv
@@ -71,7 +72,12 @@ def trial_entry_spreadsheet_headers():
 	return headers
 
 def add_trial_entry_csv_file(request):
-	message = None
+	
+	if request.method == 'GET':
+		try:
+			message = request.GET['message']
+		except:
+			message = None
 	
 	# create a blank upload form
 	username_unique = generate_unique_name()
@@ -100,9 +106,12 @@ field_to_form_lookup = {
 		models.Trial_Entry.variety.field : variety_trials_forms.SelectVarietyForm,
 	}
 
+name_to_field_lookup = dict([
+		(field.name, field) for field in models.Trial_Entry._meta.fields
+	])
+	
 def add_trial_entry_csv_file_confirm(request):
 	message = None
-	form = None
 	confirm_forms = []
 	invalid_input_forms = []
 	headers = []
@@ -111,6 +120,7 @@ def add_trial_entry_csv_file_confirm(request):
 	if request.method != 'POST':
 		return HttpResponseRedirect(HOME_URL+'/add/trial_entry/')
 	else:
+		#print request.POST
 		try:
 			username_unique = request.POST['username_unique']
 		except:
@@ -118,23 +128,24 @@ def add_trial_entry_csv_file_confirm(request):
 			message = "There was a problem with your submission. Please try again."
 		
 		if not username_unique:
-			return HttpResponseRedirect(HOME_URL+'/add/trial_entry/')
+			return HttpResponseRedirect(HOME_URL+'/add/trial_entry/?message=%s' % (message))
 		
 		# If we are visiting this page for the nth time, n > 1
-		trial_entries_key = "%s_%s" % (username_unique, 'trial_entries')
-		user_to_confirm_key = "%s_%s" % (username_unique, 'user_to_confirm')
-		
 		try:
-			trial_entries = request.POST[trial_entries_cache_key]
+			trial_entries_json = request.POST['trial_entries']
+			# convert json representation back to python objects
+			trial_entries = json.loads(trial_entries_json)
 		except: 
 			trial_entries = []
 			
 		try:
-			user_to_confirm = request.POST[user_to_confirm_key]
+			user_to_confirm_json = request.POST['user_to_confirm']
+			# convert json representation back to python objects
+			user_to_confirm = json.loads(user_to_confirm_json)
 		except: 
 			user_to_confirm = []
 		
-		# else, this is the 1st visit
+		# This is the 1st visit
 		if not trial_entries or not user_to_confirm:
 			try:
 				csv_file = request.FILES['csv_file']
@@ -147,8 +158,8 @@ def add_trial_entry_csv_file_confirm(request):
 				csv_json = None
 				
 			if not csv_file and not csv_json:			
-				form = None
 				message = "The spreadsheet did not upload correctly. Please Try Again."
+				return HttpResponseRedirect(HOME_URL+'/add/trial_entry/?message=%s' % (message))
 			else:
 				# preprocess the user's initial input
 				if csv_file:
@@ -159,53 +170,72 @@ def add_trial_entry_csv_file_confirm(request):
 					headers = []
 					trial_entries = []
 					user_to_confirm = []
+		else: # Check for user corrections and validate them
+			for (index, (row_number, fieldname, user_input)) in enumerate(user_to_confirm):
+				try:
+					field = name_to_field_lookup[fieldname]
+				except:
+					field = None
+				if field:
+					if field in field_to_form_lookup:
+						newform = field_to_form_lookup[field](
+										request.POST, prefix=str(index)
+									)
+						if newform.is_valid():					
+							confirm_forms.append(
+									(user_input, newform)
+								)
+					else:
+						newform = variety_trials_forms.make_model_field_form(str(fieldname), field.formfield())(
+								request.POST, prefix=str(index)
+							)
+						if newform.is_valid():
+							invalid_input_forms.append(
+									(user_input, newform)
+								)
+			# write records to database
+			pass
 		# Done processing POST
 		
-	if trial_entries and user_to_confirm:
-		form = None # don't show the original form
+	if not trial_entries or not user_to_confirm:
+		#TODO: this is the case if a user does not fill out an entire row
+		message = "Encountered a non-recoverable error during processing. Please try again."
+		return HttpResponseRedirect(HOME_URL+'/add/trial_entry/?message=%s' % (message))
+	
+	if not confirm_forms and not invalid_input_forms:
 		#http://collingrady.wordpress.com/2008/02/18/editing-multiple-objects-in-django-with-newforms/
-		confirm_forms = []
-
-		for (index, (row_number, field, user_input)) in enumerate(user_to_confirm):
-			if field in field_to_form_lookup:
-				newform = field_to_form_lookup[field](
-								prefix=str(index)
-							)
-				confirm_forms.append(
-						(user_input, newform)
-					)
-			else:
-				newform = variety_trials_forms.make_model_field_form(field.name, field.formfield())(
-						prefix=str(index)
-					)
-				invalid_input_forms.append(
-						(user_input, newform)
-					)
-					
-		# convert the python Trial_Entry.field objects to strings
-		trial_entries_to_page = []
-		for row in trial_entries:
-			row_to_page = {}
-			for (field, value) in row.items():
-				row_to_page[field.name] = value
-			trial_entries_to_page.append(row_to_page)
-			
-		user_to_confirm_to_page = []
-		for (row_number, field, user_input) in user_to_confirm:
-			user_to_confirm_to_page.append(row_number, field.name, user_input)
-
+		for (index, (row_number, fieldname, user_input)) in enumerate(user_to_confirm):
+			try:
+				field = name_to_field_lookup[fieldname]
+			except:
+				field = None
+			if field:
+				if field in field_to_form_lookup:
+					newform = field_to_form_lookup[field](
+									prefix=str(index)
+								)
+					confirm_forms.append(
+							(user_input, newform)
+						)
+				else:
+					newform = variety_trials_forms.make_model_field_form(str(fieldname), field.formfield())(
+							prefix=str(index)
+						)
+					invalid_input_forms.append(
+							(user_input, newform)
+						)
+	
+		
 	return render_to_response(
 		'add_from_csv_confirm.html', 
 		{
-			'form': form, 
 			'confirm_forms': confirm_forms,
 			'invalid_input_forms': invalid_input_forms,
 			'username_unique': username_unique,
-			'trial_entries': json.dumps(trial_entries_to_page),
-			'user_to_confirm': json.dumps(user_to_confirm_to_page),
+			'trial_entries': json.dumps(trial_entries),
+			'user_to_confirm': json.dumps(user_to_confirm),
 			'headers': headers,
 			'message': message,
-			'format_errors': {},
 		},
 		context_instance=RequestContext(request)
 	)

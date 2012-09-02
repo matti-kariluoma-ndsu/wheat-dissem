@@ -65,6 +65,9 @@ STATIC_ROOT = ''
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
+# URL prefix for all links, not automaticcally appended, though.
+HOME_URL = ''
+
 # Additional locations of static files
 STATICFILES_DIRS = (
 		'variety_trials_data/static/',

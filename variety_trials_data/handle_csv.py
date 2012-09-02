@@ -144,7 +144,7 @@ def process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields):
 				else:
 					field = None
 				if field:
-					input_data[field] = row[index]
+					input_data[field.name] = row[index]
 	return input_data
 			
 
@@ -209,23 +209,23 @@ def handle_json(uploaded_data, username):
 	which_row = {}
 	unsaved_model_instance = models.Trial_Entry()
 	for (row_number, trial_entry) in enumerate(trial_entries):
-		for field in trial_entry:
-			if '%s_id' % field.name in trial_entry_foreign_fields:
-				key = (field, trial_entry[field])
+		for fieldname in trial_entry:
+			if '%s_id' % fieldname in trial_entry_foreign_fields:
+				key = (fieldname, trial_entry[fieldname])
 				user_to_confirm.append(key)
 				try:
 					rows = which_row[key]
 				except KeyError:
 					rows = which_row[key] = []
 				rows.append(row_number)
-			elif field.name in trial_entry_fields:
+			elif fieldname in trial_entry_fields:
 				key = None
 				try:
-					field.clean(trial_entry[field], unsaved_model_instance)
+					field.clean(trial_entry[fieldname], unsaved_model_instance)
 				except ValidationError: # The 'expected' exception if bad input
-					key = (field, trial_entry[field])
+					key = (fieldname, trial_entry[fieldname])
 				except:
-					key = (field, trial_entry[field])
+					key = (fieldname, trial_entry[fieldname])
 					
 				if key:
 					user_to_confirm.append(key)
@@ -241,12 +241,12 @@ def handle_json(uploaded_data, username):
 	user_to_confirm = list(set(user_to_confirm))
 	
 	user_to_confirm_with_row_numbers = []
-	for (field, value) in user_to_confirm:
+	for (fieldname, value) in user_to_confirm:
 		try:
-			row_number = which_row[(field, value)][0]
+			row_number = which_row[(fieldname, value)][0]
 		except: # KeyError, IndexError
 			row_number = None
-		user_to_confirm_with_row_numbers.append(row_number, field, value)
+		user_to_confirm_with_row_numbers.append((row_number, fieldname, value))
 		
 	
 	return (headers, trial_entries, user_to_confirm_with_row_numbers)

@@ -1,6 +1,11 @@
-{% extends "add_from_csv_template.html" %}  
-{% block confirmation %}
-{% if confirm_forms or incorrect_data_forms %}
+{% extends "base.html" %}  
+{% block content %}
+<div class="variety_trials__error">
+{% if message %}
+	{{ message }}
+{% endif %}
+</div>
+{% if confirm_forms or invalid_input_forms %}
 <form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/confirm/" method="POST">
   {% for user_input, form in confirm_forms %}
 		<p>You entered &quot;{{user_input}}&quot;, did you mean:
@@ -11,7 +16,7 @@
 					{{error}}
 				</div>
 				{% endfor %}
-				{{ field.label_tag }}: {{ field }}
+				{{ form.prompt }}: {{ field }}
 				<a href = "#">Add New...</a>
 			</div>
 		{% endfor %}
@@ -31,7 +36,7 @@
 		{% endfor %}
 		</p>
 	{% endfor %}
-	<!-- User State Information -->
+	<!-- User-state -->
 	<input type='hidden' name='username_unique' value='{{username_unique}}' />
 	<input type='hidden' name='trial_entries' value='{{trial_entries}}' />
 	<input type='hidden' name='user_to_confirm' value='{{user_to_confirm}}' />

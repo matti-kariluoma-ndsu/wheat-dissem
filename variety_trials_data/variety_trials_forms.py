@@ -85,16 +85,19 @@ class SelectDateForm(forms.Form):
 	value = forms.ModelChoiceField(
 			queryset = models.Date.objects.all()
 		)
+	prompt = 'Date'
 
 class SelectLocationForm(forms.Form):
 	value = forms.ModelChoiceField(
 			queryset = models.Location.objects.all()
 		)
+	prompt = 'Location'
 		
 class SelectVarietyForm(forms.Form):
 	value = forms.ModelChoiceField(
 			queryset = models.Variety.objects.all()
 		)
+	prompt = 'Variety'
 		
 def make_model_field_form(name, field):
 	class ModelFieldForm(forms.Form):
