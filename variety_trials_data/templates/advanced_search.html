@@ -3,51 +3,282 @@
 <div>
 	<h1>Advanced Searching and Linking</h1>
 	<hr />
-	<p>This is the user manual for the GET parameters of the /view/ system.</p>
+	<p>The main website provides much of the functionality listed below, 
+	yet it's sometimes helpful to have fine-grained control over the 
+	query parameters. </p>
+	<p>This is especially so when one wants to publish a URL to a specific
+	query, either on a website or in an email.</p>
+	<div id="variety_trials__toc">
+		<p>Contents</p>
+		<ol>
+			<li><a href="#variety_trials__structure">URL Structure</a></li>
+			<li><a href="#variety_trials__generator">URL Generator</a></li>
+		</ol>
+	</div>
+	<p class="variety_trials__toc_header" id="variety_trials__structure">Url Structure</p>
 	<p>
-		<a href="#view">/view</a>
-		<a href="#year_range">/last_x_years</a>
-		<a href="#field">/bushels_acre</a>
-		<a href="#zipcode">/?zipcode=x</a>
-		<a href="#scope">&amp;SCOPE=x</a>
-		<a href="#not_location">&amp;not_location=1st+City+Name&amp;not_location=...</a>
-		<a href="#variety">&amp;variety=City+Name1&amp;variety=...</a>
-		<a href="#year_current">&amp;year=x</a>
+		<a href="#variety_trials__view">/view</a>
+		<a href="#variety_trials__year_range">/last_x_years</a>
+		<a href="#variety_trials__field">/bushels_acre</a>
+		<a href="#variety_trials__zipcode">/?zipcode=x</a>
+		<a href="#variety_trials__scope">&amp;SCOPE=x</a>
+		<a href="#variety_trials__not_location">&amp;not_location=1st+City+Name&amp;not_location=...</a>
+		<a href="#variety_trials__variety">&amp;variety=1st+Variety+Name&amp;variety=...</a>
+		<a href="#variety_trials__year_current">&amp;year=x</a>
 	</p>
 
-	<p id="view">
-		Hello.
+	<p id="variety_trials__view">
+		<b>/view</b>: The base URI of all view requests.
 	</p>
 	
-	<p id="year_range">
-		Hello.
+	<p id="variety_trials__year_range">
+		<b>/last_x_years</b> or <b>/year</b>: The range of years to consider. There are two types of query:
+		<ul>
+			<li><b>/last_x_years</b>
+				<ul>
+					<li>x: an integer greater than 0</li>
+					<li>Uses a range of years.</li>
+					<li>examples: /last_3_years /last_5_years /last_10_years</li>
+				</ul>
+			</li>
+			<li><b>/year</b>
+				<ul>
+					<li>year: a four-digit year</li>
+					<li>Sets the range to 3, showing data only for the given year and the two previous.</li>
+					<li>examples: /2011 /2010 </li>
+				</ul>
+			</li>
+		</ul>
 	</p>
 	
-	<p id="field">
-		Hello.
+	<p id="variety_trials__field">
+		<b>/field</b>: The type or measure of the data to view.
+		<ul>
+			<li>examples: /bushels_acre /protein_percent /test_weight</li>
+		</ul>
 	</p>
 	
-	<p id="zipcode">
-		Hello.
+	<p id="variety_trials__zipcode">
+		<b>/?zipcode=x</b>: The zipcode to &quot;center&quot; the query on.
+		<ul>
+			<li>x: the zipcode</li>
+			<li>example: /?zipcode=58102</li>
+		</ul>
 	</p>
 	
-	<p id="scope">
-		Hello.
+	<p id="variety_trials__scope">
+		<b>&amp;SCOPE=x</b>: The scope of the search from the given zipcode.
+		<ul>
+			<li>x: a single word describing the scope of the search. There are four values:
+				<ul>
+					<li>NEAR
+						<ul>
+							<li>Only uses a handful of nearby locations in the query.</li>
+						</ul>
+					</li>
+					<li>ND
+						<ul>
+							<li>Uses data from all of ND, without regard to the entered zipcode.</li>
+						</ul>
+					</li>
+					<li>MN
+						<ul>
+							<li>Uses data from all of MN, without regard to the entered zipcode.</li>
+						</ul>
+					</li>
+					<li>ALL
+						<ul>
+							<li>Uses all data in the database, without regard to the entered zipcode.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>example: &amp;SCOPE=NEAR</li>
+		</ul>
 	</p>
 	
-	<p id="not_location">
-		Hello.
+	<p id="variety_trials__not_location">
+		<b>&amp;not_location=1st+City+Name&amp;not_location=...</b>: Selects locations that should <b><i>not</i></b> be included in the query.
+		<ul>
+			<li>1st+City+Name: The name of the location to exclude.</li>
+			<li>Names are case-sensitive (&quot;minot&quot; is not the same as &quot;Minot&quot;).</li>
+			<li>Replace all spaces, apostrophes, etc. with the &quot;+&quot; character.</li>
+			<li>Multiple instances of this option can be used.</li>
+			<li>example: &amp;not_location=Langdon</li>
+			<li>example: &amp;not_location=Langdon&amp;not_location=Minot</li>
+			<li>example: &amp;not_location=Langdon&amp;not_location=Fergus+Falls</li>
+		</ul>
 	</p>
 	
-	<p id="variety">
-		Hello.
+	<p id="variety_trials__variety">
+		<b>&amp;variety=1st+Variety+Name&amp;variety=...</b>: When doing a head-to-head variety comparison, the varieties to compare are specified here.
+		<ul>
+			<li>1st+Variety+Name: The name of the variety for comparison.</li>
+			<li>Names are case-sensitive (&quot;faller&quot; is not the same as &quot;Faller&quot;).</li>
+			<li>Replace all spaces, apostrophes, etc. with the &quot;+&quot; character.</li>
+			<li>Multiple instances of this option can and must be used.</li>
+			<li>example: &amp;variety=Faller&amp;variety=Albany</li>
+			<li>example: &amp;variety=SY+Soren&amp;variety=Faller&amp;variety=Barlow</li>
+		</ul>
 	</p>
 	
-	<p id="year_current">
-		Hello.
+	<p id="variety_trials__year_current">
+		<b>&amp;year=x</b>: When viewing a range of years, selects the currently viewed year within that range.
+		<ul>
+			<li>x: the year to view</li>
+			<li>example: &amp;year=2010</li>
+		</ul>
 	</p>
-	
+	<p class="variety_trials__toc_header" id="variety_trials__generator">Url Generator</p>
+	<div>
+		{% for error in error_list %}
+		<p style='color: red'>{{ error }}</p>
+		{% endfor %}
+			<form action="/view/last_3_years/bushels_acre/" method="GET">
+				{% for field in form %}
+				<div id="id_form_inputs">
+					{{ field.errors }}
+					{{ field.label_tag }}: {{ field }}
+				</div>
+				{% endfor %}
+				<div id="static_form_controls">
+					<input type="submit" value="Submit" />
+				</div>
+				<div id="dynamic_form_controls" style="display: None;">
+					<div>
+						<label for="id_fieldname">Field</label>: 
+						<select name="variety" id="id_fieldname">
+						{% for fieldname in fieldnames %}
+							<option 
+							{% if fieldname == "bushels_acre" %}
+							selected
+							{% endif %}
+							value="{{fieldname}}">{{fieldname}}</option>
+						{% endfor %}
+						</select>
+					</div>
+					<div>
+						<label for="id_year_range_1">Year Range</label>:
+						<ul>
+							<li>
+								<label for="id_year_range_1">
+									<input checked="checked" type="radio" id="id_year_range_1" name="year_range" value="LAST"/>
+									/last_x_years
+								</label>
+								<ul>
+									<li style="list-style-type: none;"><label for="id_year_range_1_x" >x</label> : <input value="3" id="id_year_range_1_x" name="year_range_last_x" /></li>
+								</ul>
+							</li>
+							<li>
+								<label for="id_year_range_2">
+									<input id="id_year_range_2" type="radio" name="year_range" value="YEAR" />
+									/year
+								</label>
+								<ul>
+									<li style="list-style-type: none;"><label for="id_year_range_2_year" >year</label> : <input id="id_year_range_2_year" type="text" name="year_range_year" /></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+					<input type="button" value="Generate" onclick="variety_trials__generateUrl(); return false;"/>
+					<div>
+						<label for="id_generate_output" style="vertical-align: top;">Url</label> <span style="vertical-align: top;">:</span>
+						<textarea id="id_generate_output" rows="2" cols="80" readonly="true"></textarea>
+					</div>
+				</div>
+			</form>
+	</div>
+
 	<hr />
 </div>
 {% endblock %}
 
+{% block javascript %}
+	$('#static_form_controls').hide()
+	$('#dynamic_form_controls').show()
+	
+	
+	
+	function variety_trials__generateUrl()
+	{
+		/**
+		 * ReplaceAll by Fagner Brack (MIT Licensed)
+		 * Replaces all occurrences of a substring in a string
+		 */
+		// http://stackoverflow.com/questions/2390789/how-to-replace-all-points-in-a-string-in-javascript/9918856#9918856
+		String.prototype.replaceAll = function(token, newToken, ignoreCase) {
+				var str, i = -1, _token;
+				if((str = this.toString()) && typeof token === "string") {
+						_token = ignoreCase === true? token.toLowerCase() : undefined;
+						while((i = (
+								_token !== undefined? 
+										str.toLowerCase().indexOf(
+																_token, 
+																i >= 0? i + newToken.length : 0
+										) : str.indexOf(
+																token,
+																i >= 0? i + newToken.length : 0
+										)
+						)) !== -1 ) {
+								str = str.substring(0, i)
+												.concat(newToken)
+												.concat(str.substring(i + token.length));
+						}
+				}
+		return str;
+		};
+		
+		var url = "{{HOME_URL}}/view/"
+		
+		if ($('#id_year_range_1').attr('checked'))
+		{
+			url += "last_"
+			url += $('#id_year_range_1_x').val()
+			url += "_years/"
+		}
+		else
+		{
+			if ($('#id_year_range_2_year').val())
+			{
+				url += $('#id_year_range_2_year').val()
+			}
+			else
+			{
+				alert("You forgot to enter a year for 'Year Range'!")
+				url += "year"
+			}
+			url += "/"
+		}
+		
+		var field = "";
+		$("#id_fieldname option:selected").each(function () {
+					field += $(this).text();
+				});
+		url += field
+		
+		url += "/?zipcode="
+		url += $('#id_zipcode').val()
+		
+		url += "&scope="
+		url += $('#id_form_inputs :checked').val()
+		
+		var not_locations = ""
+		$("#id_not_location option:selected").each(function () {
+					not_locations += "&not_location="
+					not_locations += $(this).text();
+				});
+		url += not_locations.replaceAll(" ", "+")
+		
+		var varieties = ""
+		$("#id_variety option:selected").each(function () {
+					varieties += "&variety="
+					varieties += $(this).text();
+				});
+		url += varieties.replaceAll(" ", "+")
+
+		url += "&year="
+		url += $('#id_year').val()
+		
+		$('#id_generate_output').val(url)
+	}
+{% endblock %}

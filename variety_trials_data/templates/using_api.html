@@ -3,7 +3,92 @@
 <div>
 	<h1>Using the API</h1>
 	<hr />
-	<p>This is the user manual for the /data/ system.</p>
+	<p>All of the data used in this project is available through the following urls.</p>
+	
+	<p>The data is provided in the <a href="http://www.json.org/">JSON</a> format, 
+	and optionally follows the <a href="http://en.wikipedia.org/wiki/JSONP">JSONP</a> 
+	pattern with the HTTP GET parameter <span class="variety_trials__code">jsonp</span>
+	or <span class="variety_trials__code">callback</span>.</p>
+	
+	<div class="variety_trials__listing">
+		<ul>
+			<li>{{HOME_URL}}/data/trial_entry/id_(?P<id>[0-9]+)/json/
+				<ul>
+					<li>Returns the varietal trial entry for the given id number.</li>
+					<li>example: <a href="{{HOME_URL}}/data/trial_entry/id_1/json/">id=1</a></li>
+					<li>example: <a href="{{HOME_URL}}/data/trial_entry/id_1/json/?callback=processThis">id=1, callback=processThis</a></li>
+					<li>note: all other API calls support <span class="variety_trials__code">jsonp</span>
+					and <span class="variety_trials__code">callback</span>, but examples for the remainder
+					will be excluded for brevity.</li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/json/
+				<ul>
+					<li>Returns the varietal trial entries with locations near the given zipcode with dates within the last 3 years.</li>
+					<li>example: <a href="{{HOME_URL}}/data/trial_entry/near_zipcode_58102/last_3_years/json/">zipcode=58102</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/ids/json/
+				<ul>
+					<li>Returns only the ids for varietal trial entries with locations near the given zipcode with dates within the last 3 years.</li>
+					<li>example: <a href="{{HOME_URL}}/data/trial_entry/near_zipcode_58102/last_3_years/ids/json/">zipcode=58102</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/zipcode/id_(?P<id>[0-9]+)/json/
+				<ul>
+					<li>Returns the zipcode metadata, indexed by id number.</li>
+					<li>These data were <a href="http://creativecommons.org/licenses/by-sa/2.0/">provided</a>
+					by the <a href="http://cran.r-project.org/web/packages/zipcode/">CivicSpace US ZIP Code Database</a>.</li>
+					<li>example: <a href="{{HOME_URL}}/data/zipcode/id_1/json/">id=1</a></li>
+					<li>example: <a href="{{HOME_URL}}/data/zipcode/id_25962/json/">id=25962</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/zipcode/partial_zipcode_(?P<partial_zipcode>[0-9]+)/json/
+				<ul>
+					<li>Returns the zipcode metadatas for a zipcodes starting with the given digits.</li>
+					<li>example: <a href="{{HOME_URL}}/data/zipcode/partial_zipcode_581/json/">zipcode=581</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/location/id_(?P<id>[0-9]+)/json/
+			<ul>
+					<li>Returns the location entry for the given id number.</li>
+					<li>example: <a href="{{HOME_URL}}/data/location/id_2/json/">id=2</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/location/all/json/
+				<ul>
+					<li>Returns all location entries.</li>
+					<li>example: <a href="{{HOME_URL}}/data/location/all/json/">all</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/location/near_zipcode_(?P<zipcode>[0-9]+)/json/
+				<ul>
+					<li>Returns the location entries near the given zipcode, sorted by distance.</li>
+					<li>example: <a href="{{HOME_URL}}/data/location/near_zipcode_58102/json/">zipcode=58102</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/variety/id_(?P<id>[0-9]+)/json/
+				<ul>
+					<li>Returns the variety entry for the given id number.</li>
+					<li>example: <a href="{{HOME_URL}}/data/variety/id_2/json/">id=2</a></li>
+				</ul>
+			</li>
+			<li>{{HOME_URL}}/data/variety/all/json/
+				<ul>
+					<li>Returns all variety entries.</li>
+					<li>example: <a href="{{HOME_URL}}/data/variety/all/json/">all</a></li>
+				</ul>
+			</li>
+			<!--
+			<li>{{HOME_URL}}/data/disease/id_(?P<id>[0-9]+)/json/
+				<ul>
+					<li>Returns the trial entry for the given id number.</li>
+					<li>example: <a href="{{HOME_URL}}/data/disease/id_(?P<id>[0-9]+)/json/">ex.</a></li>
+				</ul>
+			</li>
+			-->
+		</ul>
+	</div>
 	<hr />
 </div>
 {% endblock %}

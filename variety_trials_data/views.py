@@ -34,10 +34,13 @@ def about(request):
 	)
 	
 def advanced_search(request):
+	form = variety_trials_forms.SelectLocationByZipcodeForm()
 	
 	return render_to_response(
 		'advanced_search.html', 
 		{ 
+			'form': form,
+			'fieldnames': [field.name for field in models.Trial_Entry._meta.fields],
 		},
 		context_instance=RequestContext(request)
 	)

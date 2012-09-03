@@ -51,7 +51,7 @@
 <!--[if (gt IE 9)|!(IE)]><!--> <body> <!--<![endif]-->
 
 <!-- begin html template -->
-<a href="/">Home</a>
+<a href="{{HOME_URL}}/">Start over</a>
 <div id="variety_trials__content" style="margin: 2em;">
 {% block content %}
 {% endblock %}
@@ -63,10 +63,11 @@
 		Grower's Association.
 	</p>
 	<ul>
-		<li><a href="/about/">About</a></li>
-		<li><a href="/view/">Advanced Search</a></li>
-		<li><a href="/data/">API</a></li>
-		<li><a href="/add/">Contribute New Data</a></li>
+		<li><a href="{{HOME_URL}}/">Main</a></li>
+		<li><a href="{{HOME_URL}}/about/">About</a></li>
+		<li><a href="{{HOME_URL}}/view/">Advanced Search</a></li>
+		<li><a href="{{HOME_URL}}/data/">API</a></li>
+		<li><a href="{{HOME_URL}}/add/">Contribute New Data</a></li>
 	</ul>
 </div>
 
