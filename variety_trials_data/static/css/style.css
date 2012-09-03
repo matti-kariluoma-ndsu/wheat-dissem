@@ -175,23 +175,32 @@
 	padding-bottom: 1em;
 }
 
-.variety_trials__spreadsheet_header
+.variety_trials__spreadsheet_table
 {
-	display: block;
-	font-weight: bold;
+	display: table;
+	
 }
 
-.variety_trials__spreadsheet_header div
+.variety_trials__spreadsheet_row
 {
-	display: inline;
+	display: table-row;
+
+}
+
+.variety_trials__spreadsheet_header
+{
+	font-weight: bold;
+	font-size: 0.75em;
+	
 }
 
 .variety_trials__spreadsheet_data
 {
-	display: block;
+	display: table-cell;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	padding: 3px;
+	font-size: 0.8em;
+	text-align: center;
 }
 
-.variety_trials__spreadsheet_data div
-{
-	display: inline;
-}

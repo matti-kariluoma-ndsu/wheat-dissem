@@ -82,22 +82,46 @@ class UploadCSVForm(forms.Form):
 		)
 
 class SelectDateForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		name = None
+		if 'name' in kwargs:
+			name = kwargs.pop('name')
+		super(forms.Form, self).__init__(*args, **kwargs)
+		if name:
+			self.prompt = name.replace('_', ' ')
+			
 	value = forms.ModelChoiceField(
 			queryset = models.Date.objects.all()
 		)
-	prompt = 'Date'
+	label = 'Date'
 
 class SelectLocationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		name = None
+		if 'name' in kwargs:
+			name = kwargs.pop('name')
+		super(forms.Form, self).__init__(*args, **kwargs)
+		if name:
+			self.prompt = name.replace('_', ' ')
+			
 	value = forms.ModelChoiceField(
 			queryset = models.Location.objects.all()
 		)
-	prompt = 'Location'
+	label = 'Location'
 		
 class SelectVarietyForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		name = None
+		if 'name' in kwargs:
+			name = kwargs.pop('name')
+		super(forms.Form, self).__init__(*args, **kwargs)
+		if name:
+			self.prompt = name.replace('_', ' ')
+			
 	value = forms.ModelChoiceField(
 			queryset = models.Variety.objects.all()
 		)
-	prompt = 'Variety'
+	label = 'Variety'
 		
 def make_model_field_form(name, field):
 	class ModelFieldForm(forms.Form):

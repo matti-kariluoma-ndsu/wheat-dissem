@@ -1,20 +1,28 @@
-{% extends "base.html" %}  
+{% extends "base.html" %} 
+{% load get_from_dict %}
+{% load django_math %}
 {% block content %}
 <div class="variety_trials__error">
 {% if message %}
 	{{ message }}
 {% endif %}
 </div>
-<div>
-	<div class="variety_trials__spreadsheet_header">
+<div class="variety_trials__spreadsheet_table">
+	<div class="variety_trials__spreadsheet_row variety_trials__spreadsheet_header">
+		<div class="variety_trials__spreadsheet_data variety_trials__spreadsheet_row_number"></div>
 {% for header in headers %}
-		<div class="variety_trials__spreadsheet_{{header}}">{{header}}</div>
+		<div class="variety_trials__spreadsheet_data variety_trials__spreadsheet_{{header}}">{{header}}</div>
 {% endfor %}
 	</div>
-{% for row in trial_entries %}
-	<div class="variety_trials__spreadsheet_data">
-		{% for fieldname, value in row.items %}
-		<div class="variety_trials__spreadsheet_{{fieldname}}">{{value}}</div>
+{% for index, row in trial_entries %}
+	<div class="variety_trials__spreadsheet_row {% cycle 'variety_trials__row_odd' 'variety_trials__row_even' %} ">
+		<div class="variety_trials__spreadsheet_data variety_trials__spreadsheet_row_number">{{index|add:1}}</div>
+		{% for header in headers %}
+			{% if header in row %}
+		<div class="variety_trials__spreadsheet_data variety_trials__spreadsheet_{{header}}">{{row|get_from_dict:header}}</div>
+			{% else %}
+		<div class="variety_trials__spreadsheet_data variety_trials__spreadsheet_{{header}}"></div>
+			{% endif %}
 		{% endfor %}
 	</div>
 {% endfor %}
@@ -22,7 +30,7 @@
 {% if confirm_forms or invalid_input_forms %}
 <form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/confirm/" method="POST">
   {% for row, user_input, form in confirm_forms %}
-		<p>In row {{row}} you entered &quot;{{user_input}}&quot;, did you mean:
+		<p>In row {{row}} you entered &quot;{{user_input}}&quot; for {{form.prompt}}, did you mean:
 		{% for field in form %}
 			<div class="input_row">  
 				{% for error in field.errors %}
@@ -30,7 +38,7 @@
 					{{error}}
 				</div>
 				{% endfor %}
-				{{ form.prompt }}: {{ field }}
+				{{ form.label }}: {{ field }}
 				<a href = "#">Add New...</a>
 			</div>
 		{% endfor %}

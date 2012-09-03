@@ -180,7 +180,7 @@ def add_trial_entry_csv_file_confirm(request):
 				if field:
 					if field in field_to_form_lookup:
 						newform = field_to_form_lookup[field](
-										request.POST, prefix=str(index)
+										request.POST, prefix=str(index), name=fieldname
 									)
 						if newform.is_valid():					
 							confirm_forms.append(
@@ -214,7 +214,7 @@ def add_trial_entry_csv_file_confirm(request):
 			if field:
 				if field in field_to_form_lookup:
 					newform = field_to_form_lookup[field](
-									prefix=str(index)
+									prefix=str(index), name=fieldname
 								)
 					confirm_forms.append(
 							(row_number, user_input, newform)
@@ -234,7 +234,7 @@ def add_trial_entry_csv_file_confirm(request):
 			'confirm_forms': confirm_forms,
 			'invalid_input_forms': invalid_input_forms,
 			'username_unique': username_unique,
-			'trial_entries': trial_entries,
+			'trial_entries': enumerate(trial_entries),
 			'trial_entries_json': json.dumps(trial_entries),
 			'user_to_confirm': user_to_confirm,
 			'user_to_confirm_json': json.dumps(user_to_confirm),
