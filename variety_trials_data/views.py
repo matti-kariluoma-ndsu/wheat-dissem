@@ -21,7 +21,6 @@ def index(request):
 		'main_ndsu.html', 
 		{ 
 			'zipcode_form': zipcode_form,
-			'curyear': curyear,
 			'home_url': HOME_URL,
 		},
 		context_instance=RequestContext(request)
