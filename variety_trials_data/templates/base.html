@@ -33,8 +33,12 @@
   <!-- For the less-enabled mobile browsers like Opera Mini -->
   <link rel="stylesheet" media="handheld" href="/static/css/handheld.css">
   <link rel="stylesheet" media="print" href="/static/css/print.css">
+  
+  <link rel="stylesheet" href="/static/js/jsonSuggest.css" type="text/css">
+  
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="/static/js/modernizr-1.5.min.js"></script>
+  
 
 </head>
 <body>
@@ -47,7 +51,7 @@
 <!--[if (gt IE 9)|!(IE)]><!--> <body> <!--<![endif]-->
 
 <!-- begin html template -->
-<a href="/">Home</a>
+<a href="{{HOME_URL}}/">Start over</a>
 <div id="variety_trials__content" style="margin: 2em;">
 {% block content %}
 {% endblock %}
@@ -55,23 +59,25 @@
 
 <div id="variety_trials__footer">
 	<p>
-		Brought to you by 
-		<a href="mailto:joel.ransom@ndsu.edu">Ransom</a>, 
-		<a href="mailto:wiers002@msu.edu">Wiersma</a>, &amp; 
-		<a href="mailto:matti.m.kariluoma@ndsu.edu">Kariluoma</a>.
+		This project is supported by NDSU, UMN, and the Minnesota Wheat 
+		Grower's Association.
 	</p>
 	<ul>
-		<li><a href="/about/">About</a></li>
-		<li><a href="/view/">Advanced Search</a></li>
-		<li><a href="/data/">API</a></li>
-		<li><a href="/add/">Contribute New Data</a></li>
+		<li><a href="{{HOME_URL}}/">Main</a></li>
+		<li><a href="{{HOME_URL}}/about/">About</a></li>
+		<li><a href="{{HOME_URL}}/view/">Advanced Search</a></li>
+		<li><a href="{{HOME_URL}}/data/">API</a></li>
+		<li><a href="{{HOME_URL}}/add/">Contribute New Data</a></li>
 	</ul>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script>!window.jQuery && document.write('<script src="/static/js/jquery-1.4.2.min.js"><\/script>')</script>
+<script>!window.jQuery && document.write('<script src="/static/js/jquery-1.7.2.min.js"><\/script>')</script>
 
 <!-- custom scripts -->
+{% block javascript_imports %}
+{% endblock %}
+
 
 <script>
 	{% block javascript %}

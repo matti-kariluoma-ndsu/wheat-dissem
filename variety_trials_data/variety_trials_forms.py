@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.formsets import BaseFormSet
 from variety_trials_data import models
 
 class ScopeConstants:
@@ -15,7 +16,10 @@ class ScopeConstants:
 			]
 
 class SelectLocationByZipcodeForm(forms.Form):
-	zipcode = forms.CharField(max_length=5, required=True)
+	zipcode = forms.CharField(
+			max_length=5, 
+			required=True
+		)
 	scope = forms.ChoiceField(
 			widget=forms.RadioSelect(),
 			choices=(
@@ -53,17 +57,79 @@ class SelectVarietiesForm(SelectLocationByZipcodeForm):
 			widget=forms.Select(),
 			queryset=models.Variety.objects.all()
                         )
+                        
 class SelectLocationsForm(SelectVarietiesForm):
 	locations = forms.ModelMultipleChoiceField(
 		widget=forms.SelectMultiple(attrs={'size': 20}),
 		queryset=models.Location.objects.all()
 		)
-		
-class SelectFieldForm(forms.Form):
-	locations = forms.CharField(max_length=5)
-	year_list = forms.CharField(max_length=5)
-	field = forms.CharField(max_length=5)
-	search_radius = forms.CharField(max_length=5)
 
 class UploadCSVForm(forms.Form):
-	csv_file  = forms.FileField()
+	csv_file = forms.FileField(
+			required=False
+		)
+	csv_json = forms.CharField(
+			required=False,
+			widget=forms.Textarea(attrs={
+					'style': 'display: none;'
+				})
+		)
+	username_unique = forms.CharField(
+			required=False,
+			widget=forms.TextInput(attrs={
+					'style': 'display: none;'
+				})
+		)
+
+class SelectDateForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		name = None
+		if 'name' in kwargs:
+			name = kwargs.pop('name')
+		super(forms.Form, self).__init__(*args, **kwargs)
+		if name:
+			self.prompt = name.replace('_', ' ')
+			
+	value = forms.ModelChoiceField(
+			queryset = models.Date.objects.all()
+		)
+	label = 'Date'
+
+class SelectLocationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		name = None
+		if 'name' in kwargs:
+			name = kwargs.pop('name')
+		super(forms.Form, self).__init__(*args, **kwargs)
+		if name:
+			self.prompt = name.replace('_', ' ')
+			
+	value = forms.ModelChoiceField(
+			queryset = models.Location.objects.all()
+		)
+	label = 'Location'
+		
+class SelectVarietyForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		name = None
+		if 'name' in kwargs:
+			name = kwargs.pop('name')
+		super(forms.Form, self).__init__(*args, **kwargs)
+		if name:
+			self.prompt = name.replace('_', ' ')
+			
+	value = forms.ModelChoiceField(
+			queryset = models.Variety.objects.all()
+		)
+	label = 'Variety'
+		
+def make_model_field_form(name, field):
+	class ModelFieldForm(forms.Form):
+		pass
+	attrs = {
+			'value': field,
+			'prompt': name.replace('_', ' '),
+		}
+	custom_class = type(name+"ModelFieldForm", (ModelFieldForm, ), attrs)
+	
+	return custom_class

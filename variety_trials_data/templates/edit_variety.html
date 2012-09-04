@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+
+   <form action="/edited_variety/" method="post"> 
+
+  			<table>
+<tr>
+<td>*Enter the Variety Name:</td>
+<td><input type="text" name="varietyname" value="{{entered_variety_data}}"/><br /> </td>
+</tr>
+
+<tr>
+<td>Enter the description url :</td>
+<td><input type="text" name="description_url" value="{{description_url}}" /></td>
+</tr>
+
+<tr>
+<td>Enter the picture url :</td>
+<td><input type="text" name="picture_url" value="{{picture_url}}" /></td>
+</tr>
+
+<tr>
+<td>Enter the agent origin :</td>
+<td><input type="text" name="agent_origin" value="{{agent_origin}}"/></td>
+</tr>
+
+<tr>
+<td>Enter the year released :</td>
+<td><input type="text" name="year_released" value="{{year_released}}" /></td>
+</tr>
+
+<tr>
+<td>Enter the straw length :</td>
+<td><input type="text" name="straw_length" value="{{straw_length}}"/></td>
+</tr>
+
+<tr>
+<td>Enter the maturity :</td>
+<td><input type="text" name="maturity" value="{{description_url}}" /></td>
+</tr>
+
+<tr>
+<td>Enter the grain color :</td>
+<td><input type="text" name="grain_color" value="{{grain_color}}"/></td>
+</tr>
+
+<tr>
+<td>Enter the seed color :</td>
+<td><input type="text" name="seed_color" value="{{seed_color}}" /></td>
+</tr>
+
+<tr>
+<td>Enter the beard :</td>
+<td><input type="text" name="beard" value="{{beard}}" /></td>
+</tr>
+
+<tr>
+<td>Enter the wiltr :</td>
+<td><input type="text" name="wilt" value="{{wilt}}" /></td>
+</tr>
+
+
+</table>
+
+    <input type="submit" value="Submit" />    
+    
+ </form>   
+
+
+{% endblock %}

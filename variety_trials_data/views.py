@@ -1,33 +1,22 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from django.forms.models import inlineformset_factory
-from django.http import HttpResponseRedirect, HttpResponse, QueryDict
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.http import urlencode
-from django.core import serializers
 from django.core.cache import cache
 from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
-from variety_trials_data import handle_csv
 from variety_trials_data.Page import Page
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from variety_trials_data.variety_trials_util import Locations_from_Zipcode_x_Scope, LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
+from variety_trials_data.variety_trials_util import LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
+from variety_trials_data.variety_trials_util import get_locations
 import datetime
-try:
-	import simplejson as json # Python 2.5
-except ImportError:
-	import json # Python 2.6
 
 ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
 
-
-def index(request, abtest=None):
+def index(request):
 	zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
-	# TODO: don't pass a curyear, instead have main.html point
-	# to an intelligent url such as /view/last_3_years/bushels_acre/?...
-	curyear = datetime.date.today().year - 1
 	
-
 	return render_to_response(
 		'main_ndsu.html', 
 		{ 
@@ -37,71 +26,67 @@ def index(request, abtest=None):
 		},
 		context_instance=RequestContext(request)
 	)
+	
+def about(request):
+	
+	return render_to_response(
+		'about.html', 
+		{ 
+		},
+		context_instance=RequestContext(request)
+	)
+	
+def advanced_search(request):
+	form = variety_trials_forms.SelectLocationByZipcodeForm()
+	
+	return render_to_response(
+		'advanced_search.html', 
+		{ 
+			'form': form,
+			'fieldnames': [field.name for field in models.Trial_Entry._meta.fields],
+		},
+		context_instance=RequestContext(request)
+	)
 
+def howto_api(request):
+	
+	return render_to_response(
+		'using_api.html', 
+		{ 
+		},
+		context_instance=RequestContext(request)
+	)
+	
+def howto_add_data(request):
+	
+	return render_to_response(
+		'adding_data.html', 
+		{ 
+		},
+		context_instance=RequestContext(request)
+	)
+	
 def variety_info(request, variety_name):
-	variety=models.Variety.objects.filter(name=variety_name)[0]
-	index = variety.id
-	name=variety.name
-	description_url = variety.description_url
-	picture_url=variety.picture_url
-	agent_origin=variety.agent_origin
-	year_released=variety.year_released
-	straw_length=variety.straw_length
-	maturity=variety.maturity
-	grain_color=variety.grain_color
-	beard=variety.beard
-	wilt=variety.wilt
-
+	try:
+		variety = models.Variety.objects.filter(name=variety_name).get()
+		message = None
+	except models.Variety.DoesNotExist:
+		variety = None
+		message = " ".join([
+				ERROR_MESSAGE, 
+				"Variety '%s' not found." % (variety_name),
+				"Try replacing any special characters (spaces, apostrophes, etc.) with '+'.",
+				"Variety names are case-sensitive."
+			])
 
 	return render_to_response(
 		'variety_info.html', 
 		{ 
-			'index': index,
-			'variety_name': variety_name,
-			'year_released' : year_released,
-			'description_url' : description_url,
-			'picture_url' : picture_url,
-			'agent_origin' : agent_origin,
-			'straw_length' : straw_length,
-			'maturity' : maturity,
-			'grain_color' : grain_color,
-			'beard' : beard,
-			# 'diseases' : diseases,
-			'wilt' : wilt
+			'variety': variety,
+			'message': message,
 		},
 		context_instance=RequestContext(request)
 	)
-	
-def history(request):	
-	history=models.Trial_Entry_History.objects.all()
-
-	return render_to_response(
-		'history.html', 
-		{ 
-			'history': history,
-		},
-		context_instance=RequestContext(request)
-	)
-	
-def history_delete(request, delete):	
-	history=models.Trial_Entry_History.objects.filter(id = delete)
-	for element in history:
-		trial_Entry=models.Trial_Entry.objects.filter(id = element.trial_entry.id)
-		trial_Entry.delete()
-	
-	return render_to_response(
-		'history.html', 
-		{ 
-			'history': history,
-		},
-		context_instance=RequestContext(request)
-	)
-
-def history_commit(request, id):  
-	entries = models.Trial_Entry_History.objects.filter(id = id)
-	for entry in entries:
-		entry.deletable = False;
-		entry.save()
 
 # TODO: does this belong in the DB?
 unit_blurbs = {
@@ -121,16 +106,6 @@ unit_blurbs = {
 			'The average weight of each bushel.'
 		]
 }
-
-def get_locations(zipcode, scope=variety_trials_forms.ScopeConstants.near):
-	cache_key = '%s%s' % (zipcode, scope)
-	# retrieve from cache, if absent, add to cache.
-	locations = cache.get(cache_key)
-	if locations is None:
-		locations = Locations_from_Zipcode_x_Scope(zipcode, scope).fetch()
-		cache.set(cache_key, locations, 300) # expires in 300 seconds (5 minutes)
-		
-	return locations
 
 def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None, locations=None, year_range=3):
 	if request.method != 'GET':
@@ -401,126 +376,6 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 					locations=locations, 
 					year_range=year_range
 				)
-	
-				
-def add_trial_entry_csv_file(request):
-	
-	errors = {} 
-	# a dictionary, keys are strings (source of error), values are strings (message)
-	
-	if request.method == 'POST': # If the form has been submitted...
-		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
-		if form.is_valid():
-			success, errors = handle_csv.checking_for_data(request.FILES['csv_file'])
-			if success:
-				return HttpResponseRedirect('/success/')
-			else:
-				form = variety_trials_forms.UploadCSVForm()
-	else:	
-		form = variety_trials_forms.UploadCSVForm()
-	#print errors
-	return render_to_response(
-		'add_from_csv_template.html', 
-		{'form': form, 'format_errors': errors},
-		context_instance=RequestContext(request)
-	)
-
-def add_form_confirmation(request):
-	
-	errors = {} 
-	givenvalues = {}
-	# a dictionary, keys are strings (source of error), values are strings (message)
-	
-	if request.method == 'POST': # If the form has been submitted...
-		form = variety_trials_forms.UploadCSVForm(request.GET, request.FILES)
-		if form.is_valid():
-			success, errors = handle_csv.checking_for_data(request.FILES['csv_file'])
-			if not errors:
-				return HttpResponseRedirect("/sucess/")
-			else:
-				form = variety_trials_forms.UploadCSVForm()
-				return render_to_response(
-					'add_form_confirmation.html', 
-					{'form': form, 'format_errors': errors,},
-					context_instance=RequestContext(request)
-				)
-	else:	
-		form = variety_trials_forms.UploadCSVForm()
-	
-def add_information(request):
-	
-	errors = {}
-	givendetail = []
-	details = [] 
-	# a dictionary, keys are strings (source of error), values are strings (message)
-	
-	if request.method == 'POST': # If the form has been submitted...
-		errors = request.POST.getlist("chkError")
-		#givendetail = variety_trials_forms.checking_for_data.givenval
-		for l in errors:
-			split_l = l.split(' ')
-			if len(split_l) > 1:
-				details.append(split_l[0]+" "+split_l[1]+" "+split_l[2])
-				
-				
-		#print details					
-		for detail in details:
-			if detail =='Problem with variety' or detail =='Problem with location':
-				return render_to_response(
-					'add_information.html', 
-					{'format_errors': details ,'error_num':errors},
-					context_instance=RequestContext(request)
-				)
-	
-def adding_to_database_confirm(request):
-	#List for Varieties
-	entered_variety_data = []
-	description_url = []
-	picture_url = []
-	agent_origin = []
-	year_released = []
-	straw_length = []
-	maturity = []
-	grain_color = [] 
-	seed_color = []
-	beard = []
-	wilt = []
-	diseases = []
-	susceptibility = []
-	#Lists for Location data 
-	entered_location_data = []
-	extracted_zip = [] 
-	errorcheck = []
-	# a dictionary, keys are strings (source of error), values are strings (message)
-	
-	if request.method == 'POST': # If the form has been submitted...
-	
-		entered_variety_data=request.POST.getlist("varietyname")
-		description_url= request.POST.getlist("description_url")
-		picture_url=request.POST.getlist("picture_url")
-		agent_origin=request.POST.getlist("agent_origin")
-		year_released=request.POST.getlist("year_released")
-		straw_length=request.POST.getlist("straw_length")
-		maturity=request.POST.getlist("maturity")
-		grain_color=request.POST.getlist("grain_color")
-		seed_color=request.POST.getlist("seed_color")
-		beard=request.POST.getlist("beard")
-		wilt=request.POST.getlist("wilt")
-		diseases=request.POST.getlist("diseases")
-		susceptibility=request.POST.getlist("susceptibility")
-		entered_location_data=request.POST.getlist("location")
-		extracted_zip=request.POST.getlist("zipcode")
-		
-		
-		errorcheck= handle_csv.adding_to_database(entered_variety_data, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip)
-		
-		return HttpResponseRedirect("/sucess/")
-
-def redirect_sucess(request):
-
-	return render_to_response(
-		'success.html'
-	)
 
 def inspect(request):
 	
@@ -577,82 +432,6 @@ def inspect(request):
 		'masterList':masterList
 		}
 	)
-	
-def trial_entry_json(request, id):
-	v = models.Trial_Entry.objects.filter(pk=id)
-	response = HttpResponse()
-	needed_fields = (
-		'pk',
-		'model',
-		'variety',
-		'location',
-		'name',
-		'bushels_acre',
-		'protein_percent',
-		'test_weight'
-		)
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(v,fields=needed_fields, stream=response)
-	
-	return response
-	
-def zipcode_json(request, id):
-	z = models.Zipcode.objects.filter(pk=id)
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(z, stream=response)
-	return response
-	
-def zipcode_near_json(request, zipcode):
-	locations = Locations_from_Zipcode_x_Radius(
-					zipcode, None
-				).fetch()
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(locations, stream=response)
-	return response
-	
-def location_json(request, id):
-	l = models.Location.objects.filter(pk=id)
-	response = HttpResponse()
-	needed_fields=(
-		'name',
-	)
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(l, fields=needed_fields, stream=response)
-	return response
-	
-def variety_json(request, id):
-	v = models.Variety.objects.filter(pk=id)
-	response = HttpResponse()
-	needed_fields=(
-		'name',
-	)
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(v, fields=needed_fields, stream=response)
-	return response
-	
-def disease_json(request, id):
-	d = models.Disease_Entry.objects.filter(pk=id)
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(d, stream=response)
-	return response
-
-def variety_json_all(request):
-	varieties = models.Variety.objects.all()
-	response = HttpResponse()
-	
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(varieties, stream=response)
-	return response	
-
-def location_json_all(request):
-	locations = models.Location.objects.all()
-	response = HttpResponse()
-	json_serializer = serializers.get_serializer("json")()
-	json_serializer.serialize(locations, stream=response)
-	return response		
 
 def debug(request):
 	return render_to_response(
@@ -660,29 +439,7 @@ def debug(request):
 		{}
 		)
 
-def trial_entry_id_json(request, zipcode):
-	min_year=2009
-	max_year=2011
-	list=[]
-	try:
-		locations = Locations_from_Zipcode_x_Radius(zipcode,"ALL").fetch()
-	except models.Zipcode.DoesNotExist:
-		locations=models.Location.objects.all()
-	
-	d=models.Trial_Entry.objects.select_related(depth=3).filter(
-				location__in=locations
-			).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
-				)
-			)
-	for trial in d:
-		list.append(trial.pk)
-			
-			
 
-	response = HttpResponse()
-	# json_serializer = serializers.get_serializer("json")()
-	json.dump(list, response)
-	return response
+
+
 

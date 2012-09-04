@@ -1,12 +1,14 @@
-from variety_trials_data import models
 from django.core.exceptions import ValidationError
+from django.core.cache import cache
+from variety_trials_data import models
 from difflib import SequenceMatcher
 import re
 import time
-import json
 from datetime import date
-import glob
-import os
+try:
+	import simplejson as json # Python 2.5
+except ImportError:
+	import json # Python 2.6
 
 class fuzzy_spellchecker():
 	""" Uses an internal dictionary to check whether a word has a close 
@@ -99,9 +101,207 @@ def handle_reference_field(reference_dict, field, data):
 		
 	return return_id
 
+def process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields):
+	input_data = {}
+	if len(row) == len(headers):
+		for (index, column_name) in enumerate(headers):
+			if row[index]: # we are only dealing with strings
+				if column_name in trial_entry_fields:
+					field = trial_entry_fields[column_name]
+				elif column_name in trial_entry_foreign_fields:
+					field = trial_entry_foreign_fields[column_name]
+				else:
+					field = None
+				if field:
+					input_data[field.name] = row[index]
+	return input_data
+			
+
+def inspect_trial_entry():
+	trial_entry_fields = {} # {column name: field, ...}
+	trial_entry_foreign_fields = {} # {column name: field, ...}
+	
+	# Inspect our model, grab its fields
+	for field in models.Trial_Entry._meta.fields:
+		if (field.get_internal_type() == 'ForeignKey' 
+				or field.get_internal_type() == 'ManyToManyField' ):
+			trial_entry_foreign_fields[field.name] = field
+		else:
+			trial_entry_fields[field.name] = field
+
+	return (trial_entry_fields, trial_entry_foreign_fields)
+
+def handle_json(uploaded_data, username, name_to_field_lookup):
+	(trial_entry_fields, trial_entry_foreign_fields) = inspect_trial_entry()
+	headers = []
+	
+	try:
+		table = json.loads(uploaded_data)
+	except:
+		table = []
+	
+	trial_entries = []
+	for line in table:
+		if not headers:
+			try:
+				maybe_headers = list(line)
+			except:
+				maybe_headers = []
+			if not maybe_headers:
+				continue	
+			for field in maybe_headers:
+				if field not in trial_entry_fields and field not in trial_entry_foreign_fields and field:
+					headers = []
+					continue
+				else:
+					if field:
+						headers.append(field)
+		else:
+			row = []
+			try:
+				json_row = list(line)
+			except:
+				json_row = []
+
+			for cell in json_row:
+				cell = cell.replace('"','')
+				cell = cell.replace("'",'')
+				cell = cell.strip()
+				row.append(cell)
+				
+			fields = process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields)
+			
+			if fields: # if not empty
+				trial_entries.append(fields)
+	
+	user_to_confirm = []
+	which_row = {}
+	unsaved_model_instance = models.Trial_Entry()
+	for (row_number, trial_entry) in enumerate(trial_entries):
+		for fieldname in trial_entry:
+			if fieldname in trial_entry_foreign_fields:
+				key = (fieldname, trial_entry[fieldname])
+				user_to_confirm.append(key)
+				try:
+					rows = which_row[key]
+				except KeyError:
+					rows = which_row[key] = []
+				rows.append(row_number)
+			elif fieldname in trial_entry_fields:
+				key = None
+				try:
+					field = name_to_field_lookup[fieldname]
+					field.clean(trial_entry[fieldname], unsaved_model_instance)
+				except ValidationError: # The 'expected' exception if bad input
+					key = (fieldname, trial_entry[fieldname])
+				except:
+					key = (fieldname, trial_entry[fieldname])
+					
+				if key:
+					user_to_confirm.append(key)
+					try:
+						rows = which_row[key]
+					except KeyError:
+						rows = which_row[key] = []
+					rows.append(row_number)
+			else:
+				continue
+
+	# remove duplicates
+	user_to_confirm = list(set(user_to_confirm))
+	
+	user_to_confirm_with_row_numbers = []
+	for (fieldname, value) in user_to_confirm:
+		try:
+			row_number = which_row[(fieldname, value)][0]
+		except: # KeyError, IndexError
+			row_number = None
+		user_to_confirm_with_row_numbers.append((row_number, fieldname, value))
+		
+	
+	return (headers, trial_entries, user_to_confirm_with_row_numbers)
+
+def handle_file(uploaded_file, username, name_to_field_lookup):
+	
+	(trial_entry_fields, trial_entry_foreign_fields) = inspect_trial_entry()
+	csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
+	headers = []
+	
+	trial_entries = []
+	for line in uploaded_file:
+		if not headers:
+			maybe_headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
+			for field in maybe_headers:
+				if field not in trial_entry_fields and field not in trial_entry_foreign_fields and field:
+					headers = []
+					break
+				else:
+					if field:
+						headers.append(field)
+		else:
+			row = []
+			csv_row = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
+			for cell in csv_row:
+				if cell == ',': # a special case caused by '^,|,$'
+					cell = ''
+				cell = cell.replace('"','')
+				cell = cell.replace("'",'')
+				cell = cell.strip()
+				row.append(cell)
+			fields = process_row(row, headers, trial_entry_fields, trial_entry_foreign_fields)
+	
+			if fields: # if not empty
+				trial_entries.append(fields)
+	
+	user_to_confirm = []
+	which_row = {}
+	unsaved_model_instance = models.Trial_Entry()
+	for (row_number, trial_entry) in enumerate(trial_entries):
+		for fieldname in trial_entry:
+			if fieldname in trial_entry_foreign_fields:
+				key = (fieldname, trial_entry[fieldname])
+				user_to_confirm.append(key)
+				try:
+					rows = which_row[key]
+				except KeyError:
+					rows = which_row[key] = []
+				rows.append(row_number)
+			elif fieldname in trial_entry_fields:
+				key = None
+				try:
+					field = name_to_field_lookup[fieldname]
+					field.clean(trial_entry[fieldname], unsaved_model_instance)
+				except ValidationError: # The 'expected' exception if bad input
+					key = (fieldname, trial_entry[fieldname])
+				except:
+					key = (fieldname, trial_entry[fieldname])
+					
+				if key:
+					user_to_confirm.append(key)
+					try:
+						rows = which_row[key]
+					except KeyError:
+						rows = which_row[key] = []
+					rows.append(row_number)
+			else:
+				continue
+
+	# remove duplicates
+	user_to_confirm = list(set(user_to_confirm))
+	
+	user_to_confirm_with_row_numbers = []
+	for (fieldname, value) in user_to_confirm:
+		try:
+			row_number = which_row[(fieldname, value)][0]
+		except: # KeyError, IndexError
+			row_number = None
+		user_to_confirm_with_row_numbers.append((row_number, fieldname, value))
+		
+	return (headers, trial_entries, user_to_confirm_with_row_numbers)
+
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 len_alphabet = len(alphabet)
-def letter(number):
+def column_number_to_letter(number):
 	"""
 	Transforms an integer into its spreadsheet column name
 	i.e. 1: A, 2: B, ..., 27: AA, ..., etc.
@@ -116,6 +316,20 @@ def letter(number):
 		column_letter = "%s" % (alphabet[number % len_alphabet])
 	return column_letter
 
+def process_cell(line_number, column_number, cell, errors, column_name, trial_entry_fields, trial_entry_foreign_fields):
+	if column_name:
+		if column_name in trial_entry_foreign_fields:
+			try:
+				trial_entry_fields[column_name] = handle_reference_field(trial_entry_foreign_fields, column_name, cell)
+			except ValidationError:
+				errors['Bad Cell'] = "Couldn't read the cell at Row: %d, Column: %s: \"%s\"" % (line_number, column_number_to_letter(column_number), cell)
+		elif column_name in trial_entry_fields:
+			trial_entry_fields[column_name] = cell
+		else:
+			errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
+	
+	return errors
+		
 def handle_csv_file(uploaded_file):
 	
 	#reader = csv.reader(open(uploaded_file), dialect='excel')
@@ -127,297 +341,67 @@ def handle_csv_file(uploaded_file):
 		print("!!!"+row+"!!!")
 	"""
 
-	insertion_dict = {} # column name: value to be written to database
-	reference_dict = {} # column name: all possible values currently in database
+	trial_entry_fields = {} # {column name: value to be written to database}
+	trial_entry_foreign_fields = {} # {column name: all possible values currently in database}
 
-	skip = True
-	skip_lines = 1
-	skip_count = 0
 
 	# Inspect our model, to grab the fields from it
 
 	for field in models.Trial_Entry._meta.fields:
 		if (field.get_internal_type() == 'ForeignKey' 
 				or field.get_internal_type() == 'ManyToManyField' ):
-			reference_dict["%s_id" % (field.name)] = field.rel.to.objects.all()
+			trial_entry_foreign_fields["%s_id" % (field.name)] = field.rel.to.objects.all()
 		else:
-			insertion_dict[field.name] = None
+			trial_entry_fields[field.name] = None
 	
 	# Now inspect the uploaded file and attempt to write it all to database
 	# TODO: Consider not save() -ing each line, maybe do batches of ~100?
-	skip = True
-	skip_lines = 2
+	header_line = 2
 	line_number = 0
 	headers = []
 	errors = {}
+	error_extra = 'Extra Data'
+	errors[error_extra] = []
 	csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
 	
 	for line in uploaded_file:
 		line_number += 1
-		if (skip):
-			if (line_number + 1 > skip_lines):
-				headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
-				for i in range(len(headers)):
-					headers[i] = headers[i].replace('"','') # remove all double quotes
-					headers[i] = headers[i].replace("'",'') # remove all single quotes
-				#print headers
-				skip = False
+		if line_number < header_line:
+			continue
+		elif line_number == header_line:
+			headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
+			for i in range(len(headers)):
+				headers[i] = headers[i].replace('"','') # remove all double quotes
+				headers[i] = headers[i].replace("'",'') # remove all single quotes
+			#print headers
 		else:
 			column_number = 0
 			#print line
 			#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
-			for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
-				if column == ',': # a special case caused by '^,|,$'
-					column = ''
-				column = column.replace('"','')
-				column = column.replace("'",'')
+			for cell in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
+				if cell == ',': # a special case caused by '^,|,$'
+					cell = ''
+				cell = cell.replace('"','')
+				cell = cell.replace("'",'')
 				#print "column: %s" % (column)
+				cell = cell.strip()
 				
-				if column.strip() != '':
+				if cell != '':
 					try:
-						name = headers[column_number].strip()
+						column_name = headers[column_number].strip()
 						#print "field: %s" % (name)
-						#Making objects to add to database.
-						
-						if name == "harvest_date_id":
-							possible_characters = ('/', ' ', '-', '.')
-							datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
-							datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-							if not datelist:
-								d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-								d.save()
-						
-						if name in insertion_dict.keys() and name not in reference_dict.keys():
-							insertion_dict[name] = column.strip()
-						else:
-							if name in reference_dict.keys():
-								try:
-									insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
-								except ValidationError:
-									errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
-							else:
-								errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
 					except IndexError:
-						errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
+						column_name = None
+						errors[error_extra].append("Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, column_number_to_letter(column_number)))
+					errors = process_cell(line_number, column_number, cell, errors, column_name, trial_entry_fields, trial_entry_foreign_fields)
+					
 				column_number += 1
+				
 			model_instance = models.Trial_Entry()
-			for name in insertion_dict.keys():
-				setattr(model_instance, name, insertion_dict[name])
-				#print "Writing %s as %s" % (name, insertion_dict[name])
-				insertion_dict[name] = None
+			for column_name in trial_entry_fields:
+				setattr(model_instance, column_name, trial_entry_fields[column_name])
+				#print "Writing %s as %s" % (name, insertion_dict[column_name])
 			model_instance.save() # ARE YOU BRAVE ENOUGH? 
-			models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
+			#models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
 			
 	return (False, errors)
-	
-def checking_for_data(uploaded_file):
-		
-		insertion_dict = {}
-		reference_dict = {}
-		error_counter = 1
-		file_counter = 1
-		skip = True
-		skip_lines = 1
-		skip_count = 0
-
-		# Inspect our model, to grab the fields from it
-
-		for field in models.Trial_Entry._meta.fields:
-			if (field.get_internal_type() == 'ForeignKey' 
-					or field.get_internal_type() == 'ManyToManyField' ):
-				reference_dict["%s_id" % (field.name)] = field.rel.to.objects.all()
-			else:
-				insertion_dict[field.name] = None
-	
-		skip = True
-		skip_lines = 2
-		line_number = 0
-		headers = []
-		errors = {}
-		givenval = {}
-		csv_field = re.compile("'(?:[^']|'')*'|[^,]{1,}|^,|,$") # searches for csv fields
-		
-		for line in uploaded_file:
-			line_number += 1
-			if (skip):
-				if (line_number + 1 > skip_lines):
-					headers = csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))) # assume the headers are the second row
-					for i in range(len(headers)):
-						headers[i] = headers[i].replace('"','') # remove all double quotes
-						headers[i] = headers[i].replace("'",'') # remove all single quotes
-					skip = False
-			else:
-				column_number = 0
-				#print line
-				#print csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" )))
-				for column in csv_field.findall(re.sub(',(?=,)', ',""', str(line).replace( '"' , "'" ))):
-					if column == ',': # a special case caused by '^,|,$'
-						column = ''
-					column = column.replace('"','')
-					column = column.replace("'",'')
-					#print "column: %s" % (column)
-					
-					if column.strip() != '':
-						try:
-							name = headers[column_number].strip()
-							column = column.strip()
-							#Checking for objects on database.
-							givenval[name] = (str(column))
-							
-							if name == "harvest_date_id":
-								possible_characters = ('/', ' ', '-', '.')
-								datesplit=re.split("[%s]" % ("".join(possible_characters)), column)
-								datelist = models.Date.objects.all().filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-								if not datelist:
-									errors["Problem with harvest %s"%error_counter] = "  Are you sure about the given details? %s"%(column)
-									error_counter=error_counter+1
-									
-							if name == "location_id":
-								locationlist = models.Location.objects.all().filter (name=str(column))
-								if not locationlist:
-									errors["Problem with location %s"%error_counter] = "  Are you sure about the given details? %s"%(column)
-									error_counter=error_counter+1
-							if name == "variety_id":
-								varietylist = models.Variety.objects.all().filter (name=str(column))
-								
-								if not varietylist:
-									errors["Problem with variety %s"%error_counter] = "  Are you sure about the given details? %s"%(column)								
-									error_counter=error_counter+1
-																		
-							if name in insertion_dict.keys() and name not in reference_dict.keys():
-								insertion_dict[name] = column.strip()
-							else:
-								if name in reference_dict.keys():
-									try:
-										insertion_dict[name] = handle_reference_field(reference_dict, name, column.strip())
-									except ValidationError:
-										errors['Bad Date'] = "Couldn't read a badly formatted date on Row: %d, Column: %s: \"%s\"" % (line_number, letter(column_number), column.strip())
-								else:
-									errors['Malformed CSV File'] = "Heading name \"%s\" not found in database." % name
-						except IndexError:
-							errors['Extra Data'] = "Found more data columns than there are headings. Row: %d, Column: %s" % (line_number, letter(column_number))
-					column_number += 1
-					
-				if not errors:
-					model_instance = models.Trial_Entry()
-					for name in insertion_dict.keys():
-						
-						setattr(model_instance, name, insertion_dict[name])
-						#print "Writing %s as %s" % (name, insertion_dict[name])
-						insertion_dict[name] = None
-					model_instance.save() # ARE YOU BRAVE ENOUGH? 
-					models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
-
-				else:
-					json.dump(givenval,open(str(file_counter)+".txt",'w'))
-					file_counter=file_counter+1
-					#print givenval
-				
-		return (False, errors)
-
-def adding_to_database(varietyname, description_url, picture_url, agent_origin, year_released, straw_length, maturity, grain_color, seed_color, beard, wilt, diseases, susceptibility, entered_location_data, extracted_zip):
-	numberoffiles=0
-	#os.chdir("/tmp")
-	for files in glob.glob("*.txt"):
-		#print files
-		numberoffiles=numberoffiles+1
-	
-  #left with calculating the number of files and deleting them in the end.
-    
-	data = None		
-	possible_characters = ('/', ' ', '-', '.')
-	for h in range(1,numberoffiles):
-		k=0
-		#print h
-		f = open(str(h)+".txt", 'r')
-		data = json.load(f)
-		#saving verified inputs to the database
-		for l in range(len(varietyname)):
-			#checking onece more!
-			varietylist = models.Variety.objects.all().filter (name=varietyname[l])
-			#saving the new variety
-			if not varietylist:
-				d = models.Variety(
-					name=varietyname[l],
-					description_url = description_url[l]
-					,agent_origin=agent_origin[l],
-					year_released=year_released[l],
-					straw_length=straw_length[l],
-					maturity=maturity[l][l],
-					grain_color=grain_color[l],
-					seed_color=seed_color[l], 
-					beard=beard[l],
-					wilt=wilt[l]
-					  )
-				d.save()
-		'''
-		for i in range(len(entered_location_data)):
-			s = models.Location( 
-				name = entered_location_data[i][i],
-				zipcode = extracted_zip[i][i],
-				)
-			s.save()
-		'''
-			
-		model_instance = models.Trial_Entry()
-		for name in data.keys():
-			if name == 'plant_date_id':
-				datesplit=re.split("[%s]" % ("".join(possible_characters)), data[name])
-				datelist = models.Date.objects.filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-				if not datelist:
-					ins_d = models.Date(date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-					ins_d.save()
-				
-				datelist = models.Date.objects.filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-						
-				dateid = 1
-				for element in datelist:
-					dateid = element.id
-				setattr(model_instance, name,dateid)
-			elif name == 'harvest_date_id':
-				datesplit=re.split("[%s]" % ("".join(possible_characters)), data[name])
-				datelist = models.Date.objects.filter (date=date(int(datesplit[2]), int(datesplit[0]),int(datesplit[1])))
-			
-				forgineid = 1
-				for element in datelist:
-					forgineid = element.id
-				setattr(model_instance, name,forgineid)
-			elif name == 'location_id':
-				#print entered_location_data[k]
-				locationlist = models.Zipcode.objects.all().filter (city=str(entered_location_data[k]),zipcode = extracted_zip[k])
-				locationid = 1
-				for element in locationlist:
-					locationid = element.id
-				
-				#print locationid
-				setattr(model_instance, name, locationid)
-				k=k+1
-			elif name == 'variety_id':
-				#print data[name]
-				varietylist = models.Variety.objects.all().filter (name=data[name])
-				varietyid = 1
-				for element in varietylist:
-					varietyid = element.id
-				setattr(model_instance, name,varietyid)	
-			else:
-				setattr(model_instance, name, data[name])
-			
-			#print "Writing %s as %s" % (name, data[name])
-			data[name] = None
-		
-		
-		
-		model_instance.save() # ARE YOU BRAVE ENOUGH? 
-		
-		models.Trial_Entry_History(
-			trial_entry=model_instance,
-			username="asdasd",
-			created_date = date.today()
-		).save()
-		f.close()
-	
-	#for filetitle in glob.glob("*.txt"):
-		 #os.remove("/home/kalith/summerjob/wheat-dissem/"+str(filetitle))
-		
-	
-	return(False,data)

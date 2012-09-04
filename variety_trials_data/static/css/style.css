@@ -17,6 +17,11 @@
 	width: 70px;
 }
 
+.variety_trials__row_centered td
+{
+	text-align: center;
+}
+
 .variety_trials__row_even 
 {
   background-color: #FFF;
@@ -93,4 +98,153 @@
 	display: inline;
 	padding-left: 1em;
 
+}
+
+.variety_trials__detail
+{
+	border: 1px solid black;
+	padding: 0.5em;
+}
+
+.variety_trials__detail tr th
+{
+	text-align: right;
+	padding-right: 0.5em;
+	border-right: 1px solid black;
+}
+
+.variety_trials__detail tr td
+{
+	text-align: left;
+	padding-left: 0.5em;
+}
+
+.variety_trials__inspect
+{
+	border: 1px solid black;
+	display: inline-block;
+	padding: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.variety_trials__inspect p
+{
+	margin-top: 0em;
+	border-bottom: 1px solid black;
+}
+
+.variety_trials__inspect ul li
+{
+	list-style-type: none;
+}
+
+.variety_trials__two_column
+{
+	float:left;
+	width:100%;
+	position: relative;
+	right: 50%;
+}
+
+.variety_trials__two_column div ul li
+{
+	list-style-type: none;
+}
+
+.variety_trials__two_column_left
+{
+	float: left;
+	width: 46%;
+	position: relative;
+	left: 52%;
+	overflow: hidden;
+}
+
+.variety_trials__two_column_right
+{
+	float:left;
+	width: 46%;
+	position: relative;
+	left: 56%;
+	overflow: hidden;
+}
+
+.variety_trials__error
+{
+	color: red;
+}
+
+#variety_trials__container
+{
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+
+.variety_trials__spreadsheet_table
+{
+	display: table;
+	
+}
+
+.variety_trials__spreadsheet_row
+{
+	display: table-row;
+
+}
+
+.variety_trials__spreadsheet_header
+{
+	font-weight: bold;
+	font-size: 0.75em;
+	
+}
+
+.variety_trials__spreadsheet_data
+{
+	display: table-cell;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	padding: 3px;
+	font-size: 0.8em;
+	text-align: center;
+}
+
+.variety_trials__code
+{
+	font-family: "Lucida Console", Monaco, monospace;
+	font-size: 0.8em;
+	display: inline;
+}
+
+.variety_trials__listing ul li
+{
+	
+	padding-bottom: 0.75em;
+}
+
+.variety_trials__listing ul li ul li
+{
+	list-style-type: none;
+	padding-bottom: 0em;
+}
+
+#variety_trials__toc 
+{
+	display: inline-block;
+	padding: 0.5em;
+	border: 1px solid black;
+}
+
+#variety_trials__toc p
+{
+	font-weight: bold;
+	text-align: center;
+	margin-top: 0em;
+}
+
+.variety_trials__toc_header
+{
+	font-weight: bold;
+	font-size: 1.25em;
+	border-bottom: 1px solid black;
 }
