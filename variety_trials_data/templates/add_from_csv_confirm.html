@@ -28,7 +28,7 @@
 {% endfor %}
 </div>
 {% if confirm_forms or invalid_input_forms %}
-<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="/add/trial_entry/confirm/" method="POST">
+<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="{{HOME_URL}}/add/trial_entry/confirm/" method="POST">
   {% for row, user_input, form in confirm_forms %}
 		<p>In row {{row}} you entered &quot;{{user_input}}&quot; for {{form.prompt}}, did you mean:
 		{% for field in form %}

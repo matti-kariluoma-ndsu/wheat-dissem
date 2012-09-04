@@ -19,6 +19,7 @@ def history(request):
 	return render_to_response(
 		'history.html', 
 		{ 
+			'home_url': HOME_URL,
 			'history': history,
 		},
 		context_instance=RequestContext(request)
@@ -33,6 +34,7 @@ def history_delete(request, delete):
 	return render_to_response(
 		'history.html', 
 		{ 
+			'home_url': HOME_URL,
 			'history': history,
 		},
 		context_instance=RequestContext(request)
@@ -92,6 +94,7 @@ def add_trial_entry_csv_file(request):
 	return render_to_response(
 		'add_from_csv_template.html', 
 		{
+			'home_url': HOME_URL,
 			'form': form, 
 			'headers': headers,
 			'message': message,
@@ -231,6 +234,7 @@ def add_trial_entry_csv_file_confirm(request):
 	return render_to_response(
 		'add_from_csv_confirm.html', 
 		{
+			'home_url': HOME_URL,
 			'confirm_forms': confirm_forms,
 			'invalid_input_forms': invalid_input_forms,
 			'username_unique': username_unique,

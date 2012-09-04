@@ -176,5 +176,4 @@ CACHES = {
     }
 }
 
-HOME_URL = '/'
 

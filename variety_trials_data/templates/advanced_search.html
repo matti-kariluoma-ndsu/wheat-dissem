@@ -134,7 +134,7 @@
 		{% for error in error_list %}
 		<p style='color: red'>{{ error }}</p>
 		{% endfor %}
-			<form action="/view/last_3_years/bushels_acre/" method="GET">
+			<form action="{{HOME_URL}}/view/last_3_years/bushels_acre/" method="GET">
 				{% for field in form %}
 				<div id="id_form_inputs">
 					{{ field.errors }}

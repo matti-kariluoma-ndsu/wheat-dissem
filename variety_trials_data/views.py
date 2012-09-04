@@ -31,6 +31,7 @@ def about(request):
 	return render_to_response(
 		'about.html', 
 		{ 
+			'home_url': HOME_URL,
 		},
 		context_instance=RequestContext(request)
 	)
@@ -41,6 +42,7 @@ def advanced_search(request):
 	return render_to_response(
 		'advanced_search.html', 
 		{ 
+			'home_url': HOME_URL,
 			'form': form,
 			'fieldnames': [field.name for field in models.Trial_Entry._meta.fields],
 		},
@@ -51,7 +53,8 @@ def howto_api(request):
 	
 	return render_to_response(
 		'using_api.html', 
-		{ 
+		{
+			'home_url': HOME_URL,
 		},
 		context_instance=RequestContext(request)
 	)
@@ -61,6 +64,7 @@ def howto_add_data(request):
 	return render_to_response(
 		'adding_data.html', 
 		{ 
+			'home_url': HOME_URL,
 		},
 		context_instance=RequestContext(request)
 	)
@@ -81,6 +85,7 @@ def variety_info(request, variety_name):
 	return render_to_response(
 		'variety_info.html', 
 		{ 
+			'home_url': HOME_URL,
 			'variety': variety,
 			'message': message,
 		},
@@ -246,6 +251,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					response = render_to_response(
 						'tabbed_view_table_ndsu.html',
 						{
+							'home_url': HOME_URL,
 							'hidden_zipcode_form': hidden_zipcode_form,
 							'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
 							'zipcode': zipcode,
@@ -277,6 +283,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				response = render_to_response(
 						'tabbed_view_table_ndsu.html',
 						{
+							'home_url': HOME_URL,
 							'hidden_zipcode_form': hidden_zipcode_form,
 							'zipcode_get_string': '?%s' % (urlencode( [('zipcode', zipcode)] )),
 							'zipcode': zipcode,
@@ -428,14 +435,17 @@ def inspect(request):
 	return render_to_response(
 		'inspect.html',
 		{
-		'masterList':masterList
+			'home_url': HOME_URL,
+			'masterList':masterList,
 		}
 	)
 
 def debug(request):
 	return render_to_response(
-		'debug.html',
-		{}
+			'debug.html',
+			{
+				'home_url': HOME_URL,
+			}
 		)
 
 
