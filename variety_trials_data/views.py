@@ -150,7 +150,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					return render_to_response(
 						'main.html', 
 						{
-							'zipcode_form': zipcode_form,
+							'zipcode_form': zipcode_radius_form,
 							'curyear': datetime.date.today().year,
 							'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
 						},
@@ -342,7 +342,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 				return render_to_response(
 					'main.html', 
 					{
-						'zipcode_form': zipcode_form,
+						'zipcode_form': zipcode_radius_form,
 						'curyear': datetime.date.today().year,
 						'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
 					},
