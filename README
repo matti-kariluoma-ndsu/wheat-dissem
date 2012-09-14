@@ -12,39 +12,24 @@ Prerequisites:
   Verify Django is installed correctly:
    $ python -c  "import django; print django.get_version()"
    # should print the version number and exit w/o errors
-   # Apr 2011: Verified the project is compatible with Django 1.3
- Full Django Serializer:
-  http://code.google.com/p/wadofstuff/wiki/DjangoFullSerializers
-  Download: (http://wadofstuff.googlecode.com/files/wadofstuff-django-serializers-1.1.0.tar.gz)
-  Install:
-		$ tar xzf wadofstuff-django-serializers-1.1.0.tar.gz
-		$ cd wadofstuff-django-serializers-1.1.0
-		$ sudo python setup.py install
+   # Sep 2012: Verified the project is compatible with Django 1.4
  
 Install to a fresh machine w/apache (Ubuntu/Debian syntax):
 NOTE: Ensure a previous version of Django is not installed; run 
  $ python -c  "import django; print django.get_version()"
 If so, remove it before continuing.
 
- $ sudo apt-get install git-{arch,svn,cvs,daemon-run} sqlite3 \
+ $ sudo apt-get install git sqlite3 \
      python-{sqlite,flup,psycopg2,rpy2,scipy} subversion apache2 \
      libapache2-mod-wsgi 
  $ git clone http://github.com/matti-kariluoma-ndsu/wheat-dissem.git
  $ cd wheat-dissem
  $ cat README # this file you are currently reading
- $ wget -O django-1.3.tar.gz http://djangoproject.com/download/1.3/tarball/
- $ tar xzf django-1.3.tar.gz
- $ cd Django-1.3
+ $ wget -O django-1.4.tar.gz http://djangoproject.com/download/1.4/tarball/
+ $ tar xzf django-1.4.tar.gz
+ $ cd Django-1.4
  $ sudo python setup.py install # should install to /usr/local/lib/python-*
  $ cd ..
- $ wget http://wadofstuff.googlecode.com/files/wadofstuff-django-serializers-1.1.0.tar.gz
- $ tar xzf wadofstuff-django-serializers-1.1.0.tar.gz
- $ cd wadofstuff-django-serializers-1.1.0
- $ sudo python setup.py install
- $ cd ..
- $ echo 'install.packages("agricolae")' | sudo R --vanilla CMD BATCH /dev/stdin /dev/stdout
- $ tar xzf mattikariluomandsuwheatdissem2011.tar.gz
- $ sudo R --vanilla CMD INSTALL mattikariluomandsuwheatdissem2011/
  $ cat apache/httpd.conf >> /etc/apache2/httpd.conf # then fix any conflicts
  $ sudo /etc/init.d/apache2 reload # or restart
 
