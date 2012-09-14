@@ -2,19 +2,14 @@
       "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-  <title>NDSU</title>
+  <title>Variety Trial Selection Tool</title>
   <meta name="generator" content="Amaya, see http://www.w3.org/Amaya/">
-  <meta name="description" content="Wheat variety trials online data directory.">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta content="This site provides access to Variety Trial Results from all NDSU Research Extension Centers." name="description" />
   <meta name="author" content="M. Kariluoma, N. Kramer">
 
-  <!--  Mobile Viewport Fix
-        j.mp/mobileviewport & davidbcalhoun.com/2010/viewport-metatag 
-  device-width : Occupy full width of the screen in its current orientation
-  initial-scale = 1.0 retains dimensions instead of zooming out if page height > device height
-  maximum-scale = 1.0 retains dimensions instead of zooming in if page width < device width
-  -->
-  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+	<meta name="viewport" content="width=device-width; initial-scale=0.6666; maximum-scale=1.0; minimum-scale=0.6666" />
 
   <!-- Place favicon.ico and apple-touch-icon.png in the root of your domain and delete these references -->
   <link rel="shortcut icon" href="/static/img/favicon.ico">
@@ -28,257 +23,302 @@
  
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="/static/js/modernizr-1.5.min.js"></script>
-	<style type="text/css">
-	@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/NDSUAgTheme/base-cachekey6984.css);
-	</style>
-	<style type="text/css">
-	@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/NDSUAgTheme/resourcendsuagcms.theme.stylesheetsmain-cachekey1524.css);
-	</style>
-	
-
+		
+	<style type="text/css" media="screen">@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/authoring-cachekey8508.css);</style>
+	<style type="text/css">@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/print-cachekey9689.css);</style>
+	<style type="text/css" media="screen">@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/resourcecollective.flowplayer.cssflowplayer-cachekey2860.css);</style>
+	<style type="text/css">@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/slideshow-cachekey5383.css);</style>
+	<style type="text/css" media="screen">@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/++resource++plone.app.discussion.stylesheets/discussion.css);</style>
+	<style type="text/css" media="all">@import url(http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/ploneCustom-cachekey6583.css);</style>
+	<link rel="kss-base-url" href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/" />
+	<link rel="stylesheet" type="text/css" media="screen" href="http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/resourcetinymce.stylesheetstinymce-cachekey2969.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/resourcendsuagcms.theme.stylesheetsmain-cachekey2964.css" />
+	<link rel="stylesheet" type="text/css" media="print" href="http://www.ag.ndsu.edu/varietytrials/portal_css/Sunburst%20Theme/resourcendsuagcms.theme.stylesheetsprint-cachekey3706.css" />
+	<link rel="kinetic-stylesheet" type="text/css" href="http://www.ag.ndsu.edu/varietytrials/portal_kss/Sunburst%20Theme/resourcetinymce.ksstinymce-cachekey0996.kss" />
+	<link rel="kinetic-stylesheet" type="text/css" href="http://www.ag.ndsu.edu/varietytrials/portal_kss/Sunburst%20Theme/at-cachekey3259.kss" />
+	<link rel="shortcut icon" type="image/x-icon" href="http://www.ag.ndsu.edu/varietytrials/++resource++ndsuagcms.theme.images/favicon.ico" />
+	<link rel="home" href="http://www.ag.ndsu.edu/varietytrials" title="Front page" />
+	<link rel="contents" href="http://www.ag.ndsu.edu/varietytrials/sitemap" title="Site Map" />
+	<link rel="alternate" href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/RSS" title="RSS 1.0" type="application/rss+xml" />
+	<link rel="search" href="http://www.ag.ndsu.edu/varietytrials/search_form" title="Search this site" />
+	<link rel="alternate" href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/atom.xml" title="Atom 2005" type="application/atom+xml" />
+	<link rel="alternate" href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/feed.rdf" title="RDF 1.0" type="application/rdf+xml" />
+	<link rel="alternate" href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/feed11.rdf" title="RDF 1.1" type="application/rdf+xml" />
+	<link rel="alternate" href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/rss.xml" title="RSS 1.0" type="application/rss+xml" />
+	<link rel="alternate" href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/itunes.xml" title="RSS 2.0" type="application/rss+xml" />
+	<!-- leave this here so it can be removed by rules.xml -->
+	<link rel="stylesheet" href="http://www.ag.ndsu.edu/assets/css/three-cols.css" />
+	<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+	</script>
+			<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js">
+	</script>
+		<![endif]-->
+	<base href="http://www.ag.ndsu.edu/varietytrials/variety-trial-results/" />
+	<link rel="shortcut icon" type="image/x-icon" href="http://www.ag.ndsu.edu/varietytrials/++resource++ndsuagcms.theme.images/favicon.ico" />
 </head>
 
-<body >
-
-<div id="visual-portal-wrapper">
-	
-	<div id="portal-top">
-		<div id="portal-header">
-			<a href="http://www.ndsu.edu/" title="North Dakota State University's Home Page" >
-				<img src="http://www.ag.ndsu.edu/varietytrials/++resource++ndsuagcms.theme.images/ndsu_logo1.gif">
-			</a>
-			<a style="float: right;" href="http://www.ndsu.edu/" title="North Dakota State University's Home Page">
-				<img src="http://www.ag.ndsu.edu/varietytrials/++resource++ndsuagcms.theme.images/ndsu_logo2.gif">
-			</a>
-		</div>
-		
-		<table id="ndsu-header">
-			<tbody>
-				<tr>
-					<td id="ndsu-leftheader">
-						<ul id="portal-siteactions">
-							<li id="siteaction-sitemap"></li>
-							<li id="siteaction-accessibility">
-								<a title="Accessibility" accesskey="0" href="http://www.ag.ndsu.edu/varietytrials/accessibility-info">Accessibility</a>
-							</li>
-							<li id="siteaction-contact"></li>
-						</ul>
-						<div id="portal-searchbox">
-							<form style="white-space: nowrap;">
-								<label class="hiddenStructure" for="searchGadget">Search Site</label>
-								<div class="LSBox">
-								<input type="hidden" value="018281009562415871852:jpqauwrs0sa" name="cx">
-								<input type="hidden" value="FORID:10" name="cof">
-								<input type="hidden" value="UTF-8" name="ie">
-								<input id="searchGadget" class="inputLabel" type="text" accesskey="4" size="16" name="q" style="background: url("http://www.google.com/cse/intl/en/images/google_custom_search_watermark.gif") no-repeat scroll left center rgb(255, 255, 255);" autocomplete="off">
-								<input class="searchButton" type="submit" value=" " name="sa">
-								</div>
-								<input type="hidden" name="siteurl" value="www.ag.ndsu.edu/varietytrials/spring-wheat">
-							</form>
-							<script src="http://www.google.com/cse/brand?form=cse-search-box&lang=en" type="text/javascript"></script>
-						</div>
-						<div style="clear: both;"></div>
-					</td>
-					<td id="ndsu-rightheader">
-						<div id="bannerlink" style="background-image:  url('http://www.ag.ndsu.edu/varietytrials/++resource++ndsuagcms.theme.images/site-header.jpg');">
-							<a href="http://www.ag.ndsu.edu/varietytrials">
-							<div id="site-title">
-								<p>Variety Trial Results</p>
-							</div>
-							</a>
-						</div>
-						<div id="portal-breadcrumbs" style="clear: both; text-transform: none;">
-							You are here:
-							<a title="NDSU" href="http://www.ndsu.edu/">NDSU</a>
-							/
-							<a title="NDSU Agriculture" href="http://www.ag.ndsu.edu/">Agriculture</a>
-							/
-							<a title="NDSU Agriculture Extension" href="http://www.ag.ndsu.edu/varietytrials">Extension</a>
-							/
-							<a title="NDSU Agriculture Extension" href="{{HOME_URL}}/">Spring Wheat Variety Trial Tool</a>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+<body class="template-atct_topic_view portaltype-topic section-variety-trials icons-on" dir="ltr">
+<!-- header area -->
+<header>
+	<div id="top_bar_container">
+	<div id="top_bar">
+	<h1>
+	<a href="http://www.ndsu.edu/" title="North Dakota State University">
+	<span class="visuallyhidden">North Dakota State University</span>
+	<img src="/assets/images/ndsu-print.png" alt=" " title="" height="33" width="309" />
+	</a>
+	</h1>
+	<ul id="ndsu-links">
+	<li>
+	<a href="http://www.ndsu.edu/ndsu/about/" title="NDSU at a glance">About NDSU</a>
+	</li>
+	<li>
+	<a href="http://www.ndsu.edu/majors/" title="Academic programs (majors)">Academics</a>
+	</li>
+	<li>
+	<a href="http://www.ndsu.edu/admission/" title="Office of Admission">Admission</a>
+	</li>
+	<li>
+	<a href="http://www.gobison.com/" rel="external" title="Bison Athletics">Athletics</a>
+	</li>
+	</ul>
+	<br class="clear" />
 	</div>
-	
-	<table id="portal-columns">
-		<tbody>
-			<tr>
-				<td id="portal-column-one">
-					<div class="visualPadding">
-						<div id="portletwrapper-706c6f6e652e6c656674636f6c756d6e0a636f6e746578740a2f6d6973632d73697465730a6e617669676174696f6e" class="portletWrapper kssattr-portlethash-706c6f6e652e6c656674636f6c756d6e0a636f6e746578740a2f6d6973632d73697465730a6e617669676174696f6e">
-						<dl class="portlet portletNavigationTree">
-						<dt class="portletHeader">
+	<!--/top_bar-->
+	</div>
+	<!--top_bar_container-->
+</header>
+
+<div id="container" role="main">
+	<div id="univservices">
+		<div class="contentwrapper">
+			<h2 id="bannerwords">
+				<a href="http://www.ag.ndsu.edu/varietytrials">Variety Trial Results</a>
+			</h2>
+			<div id="widgets">
+				<p id="textresize">
+				<a title="Accessibility" accesskey="0" href="accessibility-info">Accessibility</a>
+				</p>
+				<div id="portal-searchbox">
+						<form action="http://www.ag.ndsu.edu/varietytrials/gsearch" id="cse-search-box">
+
+							<label for="searchGadget" class="hiddenStructure">Search Site</label>
+
+							<div class="LSBox">
+								<input type="hidden" name="cx" value="018281009562415871852:jpqauwrs0sa" />
+								<input type="hidden" name="cof" value="FORID:10" />
+								<input type="hidden" name="ie" value="UTF-8" />
+								<input type="text" name="q" size="16" id="searchGadget" class="inputLabel" accesskey="4" />
+								<input type="submit" name="sa" value=" " class="searchButton" />
+							</div>
+						</form>
+						<script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&amp;lang=en">
+						</script>
+				</div>
+			</div>
+			<!--/widgets-->
+		</div>
+		<!--/contentwrapper-->
+		<br class="clear" />
+	</div>
+	<!--/univservices-->
+	<div id="typo3content">
+		<div class="contentwrapper">
+			<div id="breadcrumbs">
+				<span id="breadcrumbs-ndsu">
+				<a title="NDSU" href="http://www.ndsu.edu/">NDSU</a>
+				<span class="breadcrumbSeparator"> &#8250; </span>
+				</span>
+				<span id="breadcrumbs-varietytrials">
+				<a href="http://www.ag.ndsu.edu/varietytrials">Variety Trial Results</a>
+				<span class="breadcrumbSeparator"> &#8250; </span>
+				</span>
+				<span id="breadcrumbs-home">
+				<a href="{{HOME_URL}}/">Spring Wheat Variety Trial Tool</a>
+				</span>
+			</div>
+			<!--/breadcrumbs-->
+			<div class="clear">
+			</div>
+			<!-- left-hand sidebar -->
+			<div id="sitenav">
+				<div id="portletwrapper-706c6f6e652e6c656674636f6c756d6e0a636f6e746578740a2f6d6973632d73697465730a6e617669676174696f6e" class="portletWrapper kssattr-portlethash-706c6f6e652e6c656674636f6c756d6e0a636f6e746578740a2f6d6973632d73697465730a6e617669676174696f6e">
+
+					<dl class="portlet portletNavigationTree">
+						<dt class="portletHeader hiddenStructure">
+						</dt>
 						<dd class="portletItem lastItem">
 						<!--
-						<ul class="navTree navTreeLevel0">
-						<li class="navTreeItem navTreeTopNode">
-							<div>
-							<a class="" title="" href="http://www.ag.ndsu.edu/varietytrials">
-							<img width="16" height="16" alt="" src="http://www.ag.ndsu.edu/varietytrials/folder_icon.gif">
-							Variety Trial Results
-							</a>
-							</div>
-						</li>
-						<li class="navTreeItem navTreeTopNode">
-						...
-						</li>
-						</ul>
-						-->
-						{% block navigation %}
-						{% endblock %}
-						<span class="portletBottomLeft"></span>
-						<span class="portletBottomRight"></span>
-						</dd>
-						</dl>
-						</div>
-					</div>
-				</td>
-				<!--<td id="portal-column-content" rowspan="2">-->
-				<td id="portal-column-content" rowspan="4">
-					<div class="django_content">
-						{% block content %}
-						{% endblock %}
-					</div>
-					<div id="variety_trials__footer">
-						<p>
-							This project is supported by NDSU, UMN, and the Minnesota 
-							Wheat Research and Promotion Council. <!-- and SBAR -->
-						</p>
-						<ul>
-							<li><a href="{{HOME_URL}}/">Main</a></li>
-							<li><a href="{{HOME_URL}}/about/">About</a></li>
-							<li><a href="{{HOME_URL}}/view/">Advanced Search</a></li>
-							<li><a href="{{HOME_URL}}/data/">API</a></li>
-							<li><a href="{{HOME_URL}}/add/">Contribute New Data</a></li>
-						</ul>
-					</div>
-				</td>
-				<!--
-				<td id="portal-column-two" rowspan="2">
-					<div class="visualPadding">
-						<div id="portletwrapper-706c6f6e652e7269676874636f6c756d6e0a636f6e746578740a2f6d6973632d73697465732f766172696574792d747269616c732f737072696e672d77686561740a747269616c2d726573756c74732d7075626c69636174696f6e73" class="portletWrapper kssattr-portlethash-706c6f6e652e7269676874636f6c756d6e0a636f6e746578740a2f6d6973632d73697465732f766172696574792d747269616c732f737072696e672d77686561740a747269616c2d726573756c74732d7075626c69636174696f6e73">
-							<dl class="portlet portletStaticText portlet-static-trial-results-publications">
-								<dt class="portletHeader">
-									<span class="portletTopLeft"></span>
-									<span> Trial Results Publications </span>
-									<span class="portletTopRight"></span>
-								</dt>
-								<dd class="portletItem odd">
-								
-									<p>
-										<a class="external-link" href="http://www.ag.ndsu.edu/pubs/plantsci/smgrains/a574.pdf">Trial Results - Hard Red Spring Wheat - North Dakota (A574) </a>
-									</p>
-									
-									<span class="portletBottomLeft"></span>
-									<span class="portletBottomRight"></span>
-								</dd>
-							</dl>
-						</div>
-						
-						<div id="portletwrapper-706c6f6e652e7269676874636f6c756d6e0a636f6e746578740a2f6d6973632d73697465732f766172696574792d747269616c732f737072696e672d77686561740a726573756c74732d62792d74797065" class="portletWrapper kssattr-portlethash-706c6f6e652e7269676874636f6c756d6e0a636f6e746578740a2f6d6973632d73697465732f766172696574792d747269616c732f737072696e672d77686561740a726573756c74732d62792d74797065">
-							<dl class="portlet portletStaticText portlet-static-results-by-type">
-								<dt class="portletHeader">
-									<span class="portletTopLeft"></span>
-									<span> Results by Type </span>
-									<span class="portletTopRight"></span>
-								</dt>
-								<dd class="portletItem odd">
-								
-									<p>
-										<a class="internal-link" href="spring-wheat/disease" title="Disease">
-										<strong>Disease</strong>
-										</a>
-									</p>
-									
-									<span class="portletBottomLeft"></span>
-									<span class="portletBottomRight"></span>
-								</dd>
-							</dl>
-						</div>
-						
-						<div id="portletwrapper-706c6f6e652e7269676874636f6c756d6e0a636f6e746578740a2f6d6973632d73697465732f766172696574792d747269616c732f737072696e672d77686561740a726573756c74732d62792d736f75726365" class="portletWrapper kssattr-portlethash-706c6f6e652e7269676874636f6c756d6e0a636f6e746578740a2f6d6973632d73697465732f766172696574792d747269616c732f737072696e672d77686561740a726573756c74732d62792d736f75726365">
-							<dl class="portlet portletStaticText portlet-static-results-by-source">
-								<dt class="portletHeader">
-									<span class="portletTopLeft"></span>
-									<span> Results by Source </span>
-									<span class="portletTopRight"></span>
-								</dt>
-								<dd class="portletItem odd">
-									
-									<p>
-										<a class="internal-link" href="spring-wheat/carrington-rec" title="Carrington REC">
-										<strong>Carrington REC</strong>
-										</a>
-									</p>
-									
-									<span class="portletBottomLeft"></span>
-									<span class="portletBottomRight"></span>
-								</dd>
-							</dl>
-						</div>
-					</div>
-				</td>
-				-->
-			</tr>
-		</tbody>
-	</table>
-	
+							<ul class="navTree navTreeLevel0">
+								<li class="navTreeItem navTreeTopNode navTreeCurrentNode">
+								<div>
+									 <a href="http://www.ag.ndsu.edu/varietytrials" class="contenttype-plone-site navTreeCurrentItem" title="">
+									 
+									 Variety Trial Results
+									 </a>
+								</div>
 
-	
-	<div id="portal-footer">
-		<div id="ndsu-footer-nav">
+						</li>
+						-->
+							{% block navigation %}
+							{% endblock %}
+						</dd>
+					</dl>
+				</div>
+			</div>
+			<!-- main content area -->
+			<div id="mainborder">
+				<div id="main">
+					<div id="viewlet-above-content">    
+						<div id="portlets-above" class="row">
+						</div>
+					</div>
+					<div class="">
+						<dl class="portalMessage info" id="kssPortalMessage" style="display:none">
+							<dt>Info</dt>
+							<dd></dd>
+						</dl>
+						<div id="content">
+							<div class="django_content">
+								{% block content %}
+								{% endblock %}
+							</div>
+							<div id="variety_trials__footer">
+								<p>
+									This project is supported by NDSU, UMN, and the Minnesota 
+									Wheat Research and Promotion Council. <!-- and SBAR -->
+								</p>
+								<ul>
+									<li><a href="{{HOME_URL}}/">Main</a></li>
+									<li><a href="{{HOME_URL}}/about/">About</a></li>
+									<li><a href="{{HOME_URL}}/view/">Advanced Search</a></li>
+									<li><a href="{{HOME_URL}}/data/">API</a></li>
+									<li><a href="{{HOME_URL}}/add/">Contribute New Data</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="agcms-clear">
+				</div>
+				<div id="creative-commons">
+					<div class="cc-image">
+						<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/" rel="license">
+						<img src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" alt="Creative Commons License" />
+						</a>
+					</div>
+					<div class="cc-text">
+					Feel free to use and share this content, but please do so under the conditions of our <a class="external-link" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a> license and our <a href="/agcomm/creative-commons">Rules for Use</a>. Thanks.
+					</div>
+					<br class="clear" />
+				</div>
+			</div>
+			<!--/mainborder-->
+			<div class="agcms-clear">
+			</div>
+		</div>
+		<!--/contentwrapper-->
+	</div>
+	<!--/typo3content-->
+</div>
+
+<footer>
+<div id="sflgru">
+	<p>Student Focused. Land Grant. Research Institution.</p>
+</div>
+<div id="navfooter">
+	<ul>
+		<li>
+		<a href="http://www.ndsu.edu/ndsu/maps/CampusMap_2pg.pdf" title="Map">Map</a>
+		</li>
+						<li>
+		<a href="http://www.ndsu.edu/jobs/" title="Employment opportunities at NDSU">Employment</a>
+		</li>
+						<li>
+		<a href="http://www.ndsu.edu/phonebook/" title="Directories">Phone/Email Directory</a>
 		<ul>
-			<li>
-				<a title="North Dakota State University's Main Page" href="http://www.ndsu.edu/">NDSU</a>
-				:
-			</li>
-			<li>
-				<a title="NDSU on-line directory/phonebook" href="http://www.ndsu.edu/phonebook/">Phonebook</a>
-				:
-			</li>
-			<li>
-				<a title="Search" href="http://www.ag.ndsu.edu/varietytrials/gsearch"> Search</a>
-			</li>
-		</ul>
-		</div>
-	</div>
-	<div id="portal-colophon">
-		<div class="colophonWrapper"></div>
-	</div>
+		<li>
+		<a href="http://www.ndsu.edu/phonebook/" title="Student, staff, faculty directory">People search</a>
+		</li>
+
+								<li>
+		<a href="http://www.ndsu.edu/ndsu/main/directory/" title="Department directory">Department search</a>
+		</li>
+							</ul>
+		</li>
+						<li>
+		<a href="http://www.ag.ndsu.edu/ndsuag/gsearch" title="Search">Search</a>
+		</li>
+						<li>
+		<a href="privacy" title="Privacy">Privacy</a>
+		</li>
+						<li>
+		<span class="forcejustify"> &#160;</span>
+		</li>
+	</ul>
+</div>
+<!--/navfooter-->
+<div id="typo3footers">
 	<div id="ndsu-siteinfo">
-		<div id="ndsuftr1">
-			<p>Last updated: Mar 25, 2012 12:30 pm</p>
-			<p>
-			<p>
+		<div id="contact">
+				<address>
+					<p>
+						<a href="http://www.ag.ndsu.edu/extension" title="Link to Agriculture and University Extension" class="external-link">NDSU Extension Service</a>
+					</p>
+					
+						
+							<p>Phone: (701) 231-8944</p>
+						
+						
+							<p>NDSU Dept. 7000</p>
+
+						
+						
+							<p>315 Morrill Hall, P.O. Box 6050</p>
+						
+						
+							<p>Fargo, ND 58108-6050</p>
+						
+					
+					
+					<p>
+						Site Manager: <a href="mailto:Robert.Bertsch@ndsu.edu" title="NDSU link" class="mail-link">Bob Bertsch</a>
+					<br />
+					</p>
+				</address>
 		</div>
-		<div id="ndsuftr2">
-			<span>
-			<a class="external-link" title="Link to Agriculture and University Extension" href="http://www.ag.ndsu.edu/extension">NDSU Extension Service</a>
-			<br>
-			</span>
-			<address>
-			<p>
-			Phone: (701) 231-8944
-			<br>
-			NDSU Dept. 7000
-			<br>
-			315 Morrill Hall, P.O. Box 6050
-			<br>
-			Fargo, ND 58108-6050
-			<br>
-			</p>
-			</address>
+
+		<div id="lastupdate">
+				Last updated: Sep 23, 2009 11:51 am
+				
+				<!--
+				<p tal:define="my_host request/BASE1 | request/HTTP_HOST | nothing" tal:content="my_host" />
+				<p tal:define="my_host request/BASE1 | nothing" tal:content="my_host" />
+				-->
 		</div>
+		<br class="clear" />
 	</div>
 </div>
+<!--/typo3footers-->
+</footer>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script>!window.jQuery && document.write('<script src="/static/js/jquery-1.7.2.min.js"><\/script>')</script>
 
+<script type="text/javascript" src="http://www.ag.ndsu.edu/varietytrials/portal_javascripts/Sunburst%20Theme/jquery-cachekey8041.js">
+</script>
+<script type="text/javascript" src="http://www.ag.ndsu.edu/varietytrials/portal_javascripts/Sunburst%20Theme/resourcekukit-cachekey5885.js">
+</script>
+<script type="text/javascript" src="http://www.ag.ndsu.edu/varietytrials/portal_javascripts/Sunburst%20Theme/resourcecollective.flowplayerflowplayer.min-cachekey0105.js">
+</script>
+<script type="text/javascript" src="http://www.ag.ndsu.edu/varietytrials/portal_javascripts/Sunburst%20Theme/jquery-cycle-cachekey8464.js">
+</script>
+<script type="text/javascript" src="http://www.ag.ndsu.edu/varietytrials/portal_javascripts/Sunburst%20Theme/resourceplone.app.discussion.javascriptscomments-cachekey3298.js">
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=ndsuext">
+</script>
 <!-- custom scripts -->
 {% block javascript_imports %}
 {% endblock %}
