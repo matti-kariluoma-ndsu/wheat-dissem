@@ -324,7 +324,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			try:
 				locations = get_locations(zipcode, scope)
 			except models.Zipcode.DoesNotExist:
-				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(initial={
 						'scope': scope,
 					})
 				# TODO: return to main page and show error
