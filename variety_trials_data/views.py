@@ -136,7 +136,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				try:
 					locations = get_locations(zipcode, scope)
 				except models.Zipcode.DoesNotExist:
-					zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeRadiusForm(initial={
+					zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(initial={
 							#'radius': zipcode_radius_form.cleaned_data['search_radius'],
 						})
 					# TODO: return to main page and show error
