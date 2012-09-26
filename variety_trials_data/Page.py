@@ -352,7 +352,7 @@ class LSD_Row(Row):
 						try:
 							delete_column[c] += 1
 						except KeyError:
-							delete_column[c] = 0
+							delete_column[c] = 1
 			for index in delete_column:
 				if delete_column[index] == column_length:
 					delete_columns.append(index)
