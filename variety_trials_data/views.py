@@ -16,12 +16,16 @@ import datetime
 ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
 
 def index(request):
-	if 'error' in request.GET and request.GET['error'] == 'zipcode':
+	if 'error' in request.GET:
 		#zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
 		zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
-		zipcode_form._errors = ErrorDict() # new errors
+		if zipcode_form._errors is None:
+			zipcode_form._errors = ErrorDict()
 		errors = zipcode_form._errors['zipcode'] = ErrorList() # errors for field 'zipcode'
-		errors.append(u"Please enter your zipcode.")
+		if request.GET['error'] == 'no_zipcode':
+			errors.append(u"Please enter your zipcode.")
+		elif request.GET['error'] == 'bad_zipcode':
+			errors.append(u"Sorry, that zipcode didn't match any records.")
 	else:
 		zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
 	
@@ -130,7 +134,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			# TODO: Have this view point to / , and if successful redirect them
 			#   to the proper view with the URL filled out
 			# OR: Have a zipcode form on the /view/year/field/ page
-			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=zipcode'))
+			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=no_zipcode'))
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			scope = zipcode_radius_form.cleaned_data['scope']
@@ -154,16 +158,8 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(initial={
 							#'radius': zipcode_radius_form.cleaned_data['search_radius'],
 						})
-					# TODO: return to main page and show error
-					return render_to_response(
-						'main.html', 
-						{
-							'zipcode_form': zipcode_radius_form,
-							'curyear': datetime.date.today().year,
-							'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
-						},
-						context_instance=RequestContext(request)
-					) 
+					# TODO: repopulate form
+					return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=bad_zipcode'))
 			
 			not_location_objects = models.Location.objects.filter(name__in=not_locations)
 			
@@ -335,7 +331,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			# TODO: Have this view point to / , and if successful redirect them
 			#   to the proper view with the URL filled out
 			# OR: Have a zipcode form on the /view/year/field/ page
-			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=zipcode'))
+			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=no_zipcode'))
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			scope = zipcode_radius_form.cleaned_data['scope']
@@ -346,16 +342,8 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(initial={
 						'scope': scope,
 					})
-				# TODO: return to main page and show error
-				return render_to_response(
-					'main.html', 
-					{
-						'zipcode_form': zipcode_radius_form,
-						'curyear': datetime.date.today().year,
-						'error_list': ['Sorry, the zipcode: "' + zipcode + '" doesn\'t match any records']
-					},
-					context_instance=RequestContext(request)
-				)
+				# TODO: repopulate form
+				return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=bad_zipcode'))
 			
 			result = 0;
 			curyear = datetime.date.today().year
