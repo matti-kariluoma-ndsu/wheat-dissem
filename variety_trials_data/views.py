@@ -134,7 +134,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			# TODO: Have this view point to / , and if successful redirect them
 			#   to the proper view with the URL filled out
 			# OR: Have a zipcode form on the /view/year/field/ page
-			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=no_zipcode'))
+			return HttpResponseRedirect("%s%s" % (HOME_URL, '/?error=no_zipcode'))
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			scope = zipcode_radius_form.cleaned_data['scope']
@@ -159,7 +159,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 							#'radius': zipcode_radius_form.cleaned_data['search_radius'],
 						})
 					# TODO: repopulate form
-					return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=bad_zipcode'))
+					return HttpResponseRedirect("%s%s" % (HOME_URL, '/?error=bad_zipcode'))
 			
 			not_location_objects = models.Location.objects.filter(name__in=not_locations)
 			
@@ -331,7 +331,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			# TODO: Have this view point to / , and if successful redirect them
 			#   to the proper view with the URL filled out
 			# OR: Have a zipcode form on the /view/year/field/ page
-			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=no_zipcode'))
+			return HttpResponseRedirect("%s%s" % (HOME_URL, '/?error=no_zipcode'))
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			scope = zipcode_radius_form.cleaned_data['scope']
@@ -343,7 +343,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 						'scope': scope,
 					})
 				# TODO: repopulate form
-				return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=bad_zipcode'))
+				return HttpResponseRedirect("%s%s" % (HOME_URL, '/?error=bad_zipcode'))
 			
 			result = 0;
 			curyear = datetime.date.today().year
