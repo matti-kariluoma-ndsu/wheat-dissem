@@ -24,7 +24,7 @@
 			{% else %}
 			<div class="variety_trials__hidden_input" style="display: none;">
 			{% endif %}
-				{{ field.errors }}
+				<span style='color: red'>{{ field.errors }}</span>
 				{{ field.label_tag }}: {{ field }}
 			</div>
 			{% endfor %}

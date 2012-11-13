@@ -3,6 +3,7 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.http import urlencode
 from django.core.cache import cache
+from django.forms.util import ErrorDict, ErrorList
 from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
@@ -15,7 +16,14 @@ import datetime
 ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
 
 def index(request):
-	zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
+	if 'error' in request.GET and request.GET['error'] == 'zipcode':
+		#zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
+		zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
+		zipcode_form._errors = ErrorDict() # new errors
+		errors = zipcode_form._errors['zipcode'] = ErrorList() # errors for field 'zipcode'
+		errors.append(u"Please enter your zipcode.")
+	else:
+		zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
 	
 	return render_to_response(
 		'main_ndsu.html', 
@@ -115,14 +123,14 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 	if request.method != 'GET':
 		# Redirect to home if they try to POST
 		# TODO: what is the behavior of HEAD?
-		return HttpResponseRedirect('/')
+		return HttpResponseRedirect(HOME_URL)
 	else:
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
 		if not zipcode_radius_form.is_valid():
 			# TODO: Have this view point to / , and if successful redirect them
 			#   to the proper view with the URL filled out
 			# OR: Have a zipcode form on the /view/year/field/ page
-			return HttpResponseRedirect('/')
+			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=zipcode'))
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			scope = zipcode_radius_form.cleaned_data['scope']
@@ -320,14 +328,14 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 	if request.method != 'GET':
 		# Redirect to home if they try to POST
 		# TODO: what is the behavior of HEAD?
-		return HttpResponseRedirect('/')
+		return HttpResponseRedirect(HOME_URL)
 	else:
 		zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
 		if not zipcode_radius_form.is_valid():
 			# TODO: Have this view point to / , and if successful redirect them
 			#   to the proper view with the URL filled out
 			# OR: Have a zipcode form on the /view/year/field/ page
-			return HttpResponseRedirect('/')
+			return HttpResponseRedirect("%s%s" % (HOME_URL, '?error=zipcode'))
 		else:
 			zipcode = zipcode_radius_form.cleaned_data['zipcode']
 			scope = zipcode_radius_form.cleaned_data['scope']

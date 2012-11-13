@@ -228,7 +228,9 @@
 		return str;
 		};
 		
-		var url = "{{HOME_URL}}/view/"
+		var url = "http://" 
+		url += window.location.hostname
+		url += "{{home_url}}/view/"
 		
 		if ($('#id_year_range_1').attr('checked'))
 		{
