@@ -274,7 +274,6 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 							'years': years,
 							'blurbs' : unit_blurbs,
 							'curfield' : fieldname,
-							'home_url' : HOME_URL,
 						},
 						context_instance=RequestContext(request)
 					)
@@ -306,7 +305,6 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 							'years': years,
 							'blurbs' : unit_blurbs,
 							'curfield' : fieldname,
-							'home_url' : HOME_URL,
 						},
 						context_instance=RequestContext(request)
 					)
