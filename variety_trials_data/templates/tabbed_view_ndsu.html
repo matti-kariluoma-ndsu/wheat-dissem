@@ -4,7 +4,7 @@
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_location_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">	
+		<form name="{{fieldname}}_location_form" action="{{home_url}}/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">	
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -19,7 +19,7 @@
 <div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-		<form name="{{yearname}}_location_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">	
+		<form name="{{yearname}}_location_form" action="{{home_url}}/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">	
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -40,7 +40,7 @@
 <div class="variety_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_variety_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">	
+		<form name="{{fieldname}}_variety_form" action="{{home_url}}/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">	
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -55,7 +55,7 @@
 <div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-		<form name="{{yearname}}_variety_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
+		<form name="{{yearname}}_variety_form" action="{{home_url}}/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
 			{% for field in locations_form %}
 			<div class="input row">
 				{{ field.errors }}
@@ -77,7 +77,7 @@
 <ul class="navTree navTreeLevel0">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<li class="navTreeItem navTreeTopNode">
-		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{curyear}}/{{fieldname}}/">
+		<a onclick="document['{{fieldname}}_location_form'].submit(); return false" class="tab" href="{{home_url}}/view/{{view}}/{{curyear}}/{{fieldname}}/">
 		{% if fieldname == curfield %}
 			* {{blurb_list.0}}
 		{% else %}
@@ -91,7 +91,7 @@
 <ul class="navTree navTreeLevel0">
 	{% for yearname in years %}
 	<li class="navTreeItem navTreeTopNode">
-		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="/view/{{view}}/{{yearname}}/{{curfield}}/">
+		<a onclick="document['{{yearname}}_location_form'].submit(); return false" class="tab" href="{{home_url}}/view/{{view}}/{{yearname}}/{{curfield}}/">
 		{% if yearname == curyear %}
 			* {{yearname}}
 		{% else %}
@@ -179,7 +179,8 @@
 				{% if datalist.0 == element %}
 				<form>
 					<div class='ColumnToLeft'>
-						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> <a href='/view/info/{{element.0}}/'>{{element.0}}</a>
+						<input class="variety_checkbox" type="checkbox" name="{{ element.0 }}" value="{{ element.1 }}" onclick="unselect_variety({{element.1}})" /> 
+						<a href='{{home_url}}/view/info/{{element.0}}/'>{{element.0}}</a>
 					</div>
 				</form>
 				{% else %}

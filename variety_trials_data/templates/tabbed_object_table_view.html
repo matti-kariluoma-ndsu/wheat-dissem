@@ -11,7 +11,7 @@
 		{% if fieldname == curfield %}
 			* 
 		{% endif %}
-			<a href="/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">{{fieldname}}</a>
+			<a href="{{home_url}}/view/{{year_url_bit}}/{{fieldname}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">{{fieldname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -23,7 +23,7 @@
 		{% if yearname == curyear %}
 			*
 		{% endif %}
-			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}">{{yearname}}</a>
+			<a href="{{home_url}}/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{yearname|get_urlencode:'year'}}">{{yearname}}</a>
 		</p>
 	{% endfor %}
 	</div>
@@ -31,12 +31,12 @@
 	<div>
 		<div>
 			{% if varieties|length > 0 %}
-			<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{curyear|get_urlencode:'year'}}">Clear head-to-head comparison</a>
+			<a href="{{home_url}}/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{curyear|get_urlencode:'year'}}">Clear head-to-head comparison</a>
 			{% endif %}
 		</div>
 		<div>
 			{% if curyear != maxyear %}
-			<a href="/view/{{curyear}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}">Rebalance the table for this year</a>
+			<a href="{{home_url}}/view/{{curyear}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}">Rebalance the table for this year</a>
 			{% endif %}
 		</div>
 		<div>
@@ -51,7 +51,7 @@
 		<table>
 		<thead>
 		</thead>
-		<form action="/view/{{year_url_bit}}/{{curfield}}/" method="GET">
+		<form action="{{home_url}}/view/{{year_url_bit}}/{{curfield}}/" method="GET">
 		<div style="display: none;">
 			{% for field in hidden_zipcode_form %}
 			{{ field.label_tag }}: {{ field }}
@@ -71,7 +71,7 @@
 			{% if location.id == -1 %}
 				<p>{{column.get_site_years}} site-years</p>
 			{% else %}
-				<a href="/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
+				<a href="{{home_url}}/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
 			{% endif %}
 			</th>
 		{% endfor %}
@@ -93,7 +93,7 @@
 					name="variety"
 					value="{{variety.name}}"/>
 				<label for="id_{{variety.name}}">
-					<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+					<a href='{{home_url}}/view/info/{{variety.name}}/'>{{variety.name}}</a>
 				</label>
 			</th>
 		{% endif %}
@@ -132,7 +132,7 @@
 					name="variety"
 					value="{{variety.name}}"/>
 				<label for="id_{{variety.name}}">
-					<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+					<a href='{{home_url}}/view/info/{{variety.name}}/'>{{variety.name}}</a>
 				</label>
 			</th>
 		{% endif %}

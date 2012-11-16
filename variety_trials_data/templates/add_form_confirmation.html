@@ -18,7 +18,7 @@
 
 <div class="error">
 
-<form enctype="multipart/form-data" action="/add_info/" method="post">
+<form enctype="multipart/form-data" action="{{home_url}}/add_info/" method="post">
 {% for error_source, error_msg in format_errors.items%}
   {% csrf_token %}
   

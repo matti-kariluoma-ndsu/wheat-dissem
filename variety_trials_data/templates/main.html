@@ -15,7 +15,7 @@
 	{% for error in error_list %}
 	<p style='color: red'>{{ error }}</p>
 	{% endfor %}
-		<form id="static_form" action="/view/last_3_years/bushels_acre/" method="GET">
+		<form id="static_form" action="{{home_url}}/view/last_3_years/bushels_acre/" method="GET">
 			{% for field in zipcode_form %}
 			{% if field.name == 'zipcode' %}
 			<div id='variety_trials__zipcode_input'>
@@ -50,9 +50,9 @@
 {% endblock %}
 
 {% block javascript_imports %}
-<script language="JavaScript" src="/static/js/jquery.jsonSuggest.js"></script>
-<script language="JavaScript" src="/static/js/json2.min.js"></script>
-<script language="JavaScript" src="/static/js/variety_trials_app.js"></script>
+<script language="JavaScript" src="{{home_url}}/static/js/jquery.jsonSuggest.js"></script>
+<script language="JavaScript" src="{{home_url}}/static/js/json2.min.js"></script>
+<script language="JavaScript" src="{{home_url}}/static/js/variety_trials_app.js"></script>
 {% endblock %}
 
 {% block javascript %}

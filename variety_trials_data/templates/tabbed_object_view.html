@@ -5,7 +5,7 @@
 <div class="location_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_location_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
+		<form name="{{fieldname}}_location_form" action="{{home_url}}/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
 			
 			{% for field in locations_form %}
 			<div class="input row">
@@ -21,7 +21,7 @@
 <div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-		<form name="{{yearname}}_location_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
+		<form name="{{yearname}}_location_form" action="{{home_url}}/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
 			
 			{% for field in locations_form %}
 			<div class="input row">
@@ -43,7 +43,7 @@
 <div class="variety_form units">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<div class="{{fieldname}}" style="display:none">
-		<form name="{{fieldname}}_variety_form" action="/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
+		<form name="{{fieldname}}_variety_form" action="{{home_url}}/view/{{view}}/{{curyear}}/{{fieldname}}/" method="GET">
 			
 			{% for field in locations_form %}
 			<div class="input row">
@@ -59,7 +59,7 @@
 <div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
 	{% for yearname in years %}
 	<div style="display:none">
-		<form name="{{yearname}}_variety_form" action="/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
+		<form name="{{yearname}}_variety_form" action="{{home_url}}/view/{{view}}/{{yearname}}/{{curfield}}/" method="GET">
 			
 			{% for field in locations_form %}
 			<div class="input row">
@@ -85,9 +85,9 @@
 		<p>	
 		
 		{% if fieldname == curfield %}
-			* <a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
+			* <a href="{{home_url}}/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
 		{% else %}
-			<a href="/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
+			<a href="{{home_url}}/view/{{view}}/{{curyear}}/{{fieldname}}/{{variety_get_string}}{{location_get_string}}">{{fieldname}}</a>
 		{% endif %}
 		
 		</p>
@@ -101,9 +101,9 @@
 		<p>
 		
 		{% if yearname == curyear %}
-			* <a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
+			* <a href="{{home_url}}/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
 		{% else %}
-			<a href="/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
+			<a href="{{home_url}}/view/{{view}}/{{yearname}}/{{curfield}}/{{variety_get_string}}{{location_get_string}}">{{yearname}}</a>
 		{% endif %}
 		
 		</p>
@@ -161,7 +161,7 @@
 				<div class='ColumnToLeft'>
 					<form>
 						<input class="variety_checkbox" type="checkbox" name="{{ variety.name }}" value="{{variety.id}}" onclick="unselect_variety({{variety.id}})"> 
-							<a href='/view/info/{{variety.name}}/'>{{variety.name}}</a>
+							<a href='{{home_url}}/view/info/{{variety.name}}/'>{{variety.name}}</a>
 						</input>
 					</form>
 				</div>

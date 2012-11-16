@@ -15,7 +15,7 @@
 		<li> Upload a Spreadsheet:</li>
 		<ol>
 			<!--TODO: auto generate this file from the model-->
-			<li> Download the spreadsheet <a href="/static/csv/ndsu_hard_red_spring_wheat_template.csv">template file</a> (300K). </li>
+			<li> Download the spreadsheet <a href="{{home_url}}/static/csv/ndsu_hard_red_spring_wheat_template.csv">template file</a> (300K). </li>
 			<li> Enter your data. </li>
 			<li> Submit the completed file.</li>
 		</ol>
@@ -53,16 +53,16 @@
 {% endblock %}
 
 {% block javascript_imports %}
-<script src="/static/js/bootstrap-typeahead.js"></script>
-<script src="/static/js/jquery.autoresize.js"></script>
-<script src="/static/js/jquery.contextMenu.js"></script>
-<script src="/static/js/jquery.ui.position.js"></script>
-<script src="/static/js/json2.min.js"></script>
-<script src="/static/js/jquery.handsontable.js"></script>
-<script src="/static/js/variety_trials_handsontable.js"></script>
+<script src="{{home_url}}/static/js/bootstrap-typeahead.js"></script>
+<script src="{{home_url}}/static/js/jquery.autoresize.js"></script>
+<script src="{{home_url}}/static/js/jquery.contextMenu.js"></script>
+<script src="{{home_url}}/static/js/jquery.ui.position.js"></script>
+<script src="{{home_url}}/static/js/json2.min.js"></script>
+<script src="{{home_url}}/static/js/jquery.handsontable.js"></script>
+<script src="{{home_url}}/static/js/variety_trials_handsontable.js"></script>
 
-<link rel="stylesheet" media="screen" href="/static/css/jquery.contextMenu.css">
-<link rel="stylesheet" media="screen" href="/static/css/jquery.handsontable.css">
+<link rel="stylesheet" media="screen" href="{{home_url}}/static/css/jquery.contextMenu.css">
+<link rel="stylesheet" media="screen" href="{{home_url}}/static/css/jquery.handsontable.css">
 
 {% endblock %}
 

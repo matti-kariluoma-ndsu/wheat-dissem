@@ -253,4 +253,8 @@ def add_variety(request):
 
 	return render_to_response(
 		'add_v.html'
+		{
+			'home_url': HOME_URL,
+		},
+		context_instance=RequestContext(request)
 	)

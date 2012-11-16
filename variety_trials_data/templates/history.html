@@ -27,7 +27,7 @@ td
 <table>
 	{% for element in history %}
 	<tr>
-				<td><a href = "/view/delete/{{element.id}}">X</a></td>
+				<td><a href = "{{home_url}}/view/delete/{{element.id}}">X</a></td>
 				<td> {{element.username}} </td>
 				<td> {{element.created_date}} </td>
 				<td> {{element}} </td>
