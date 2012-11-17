@@ -1,6 +1,7 @@
 from django import forms
 from django.forms.formsets import BaseFormSet
 from variety_trials_data import models
+import datetime
 
 class ScopeConstants:
 	near = 'NEAR'
@@ -30,7 +31,11 @@ class SelectLocationByZipcodeForm(forms.Form):
 				),
 			initial=ScopeConstants.near
 		)
-	year = forms.CharField(max_length=4, required=False)
+	year = forms.CharField(
+			max_length=4, 
+			required=False,
+			initial=datetime.date.today().year
+		)
 	not_location = forms.MultipleChoiceField(
 			required=False,
 			choices=[(location.name, location.name) for location in models.Location.objects.all()]
