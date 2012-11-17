@@ -104,8 +104,7 @@ class Trial_Entry(models.Model):
 	harvest_date         = models.ForeignKey(Date, related_name='harvest_date')
 	location             = models.ForeignKey(Location)
 	variety              = models.ForeignKey(Variety)
-	hidden               = models.BooleanField(default=True)
-
+	hidden               = models.BooleanField(default=True) # psql> alter table variety_trials_data_trial_entry rename column deletable to hidden;
 	def __unicode__(self):
 		return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.date.year)
 		

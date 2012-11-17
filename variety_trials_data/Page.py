@@ -728,6 +728,8 @@ class Page:
 					location=loc
 				).filter(
 					harvest_date__in=this_year_dates
+				).filter(
+					hidden=False
 				).count() > 0:
 					locations_with_data.append(loc)
 			if len(locations_with_data) >= number_locations:
@@ -739,6 +741,8 @@ class Page:
 				location__in=locations_with_data
 			).filter(
 				harvest_date__in=all_dates
+			).filter(
+				hidden=False
 			)
 				
 		if len(variety_names) > 0:

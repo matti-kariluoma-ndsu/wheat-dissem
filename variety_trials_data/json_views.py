@@ -130,6 +130,8 @@ def trial_entry_near_ids_json(request, zipcode):
 				harvest_date__in=models.Date.objects.filter(
 					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
 				)
+			).filter(
+				hidden=False
 			)
 	for trial in d:
 		list.append(trial.pk)
@@ -175,6 +177,8 @@ def trial_entry_near_json(request, zipcode):
 				harvest_date__in=models.Date.objects.filter(
 					date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
 				)
+			).filter(
+				hidden=False
 			)
 
 	fields = (

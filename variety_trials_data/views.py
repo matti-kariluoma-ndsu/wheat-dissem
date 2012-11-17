@@ -345,7 +345,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			
 			result = 0;
 			curyear = datetime.date.today().year
-			while result < 1:
+			while result < 1 and curyear > 1900:
 				result = models.Trial_Entry.objects.filter(
 						location__in = locations
 					).filter(
@@ -355,6 +355,8 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 										datetime.date(curyear,12,31)
 									)
 							)
+					).filter(
+						hidden=False
 					).count()
 				if result < 1: 
 					curyear = curyear - 1
@@ -408,6 +410,8 @@ def inspect(request):
 	for entry in models.Trial_Entry.objects.select_related(depth=3).filter(
 			harvest_date__in=models.Date.objects.filter(
 				date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
+			).filter(
+				hidden=False
 			)
 		):
 		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
