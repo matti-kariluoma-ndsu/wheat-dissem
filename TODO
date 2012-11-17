@@ -228,3 +228,10 @@ need to use the urlencode filter when making /view/variety/name/ links
 First conferences are in the first week of Dec
 
 Can we make the list of other varieties a two or three column affair? is that confusing?
+
+On the www.ag server:
+p = m.Trial_Entry.objects.filter(location=m.Location.objects.filter(name="Casselton")).filter(harvest_date__in=m.Date.objects.filter( date__range=(datetime.date(max_year,1,1), datetime.date(max_year,12,31))))
+p = m.Trial_Entry.objects.filter(location=m.Location.objects.filter(name="Prosper")).filter(harvest_date__in=m.Date.objects.filter( date__range=(datetime.date(max_year,1,1), datetime.date(max_year,12,31))))
+for e in p:
+	e.hidden = True
+	e.save()
