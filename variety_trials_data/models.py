@@ -104,7 +104,7 @@ class Trial_Entry(models.Model):
 	harvest_date         = models.ForeignKey(Date, related_name='harvest_date')
 	location             = models.ForeignKey(Location)
 	variety              = models.ForeignKey(Variety)
-	deletable            = models.BooleanField(editable=False, default=True) # new entries have deletable = True, and a one-way operation is exposed to set deletable = False
+	hidden               = models.BooleanField(default=True)
 
 	def __unicode__(self):
 		return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.date.year)
@@ -118,9 +118,9 @@ class Trial_Entry_History(models.Model):
 			trial = str(self.trial_entry)
 		except ObjectDoesNotExist:
 			trial = str("none")
-		return trial +" by "+str(self.username)+" at "+str(self.created_date.year)
+		return trial +" by "+str(self.username)+" on "+str(self.created_date)
 
-# Now add custom forms to populate these data:
+# Custom forms to populate these data:
 class VarietyForm(ModelForm):
 	class Meta:
 		model = Variety
