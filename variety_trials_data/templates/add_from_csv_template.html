@@ -135,7 +135,7 @@ $('#variety_trials__input_option_enter > h4').click(function(event)
 			$('#variety_trials__input_option_upload > div').slideUp();
 			$('#variety_trials__input_option_enter > div').slideToggle();
 			
-			// redraw, otherwise the leftmost column is garbled
+			// redraw, otherwise the first column header is garbled
 			$(spreasheet_container).handsontable('render');
 			
 			// prevents links from being followed, etc.
