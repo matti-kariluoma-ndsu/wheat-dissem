@@ -1,8 +1,23 @@
 {% extends "base_ag_ndsu.html" %}
 {% load django_math %}
 {% load get_urlencode %}
-{% block navigation %}
 
+{% block breadcrumbs %}
+<!--
+<span class="breadcrumbSeparator"> &#8250; </span>
+</span>
+<span id="breadcrumbs-level1">
+	<a href="{{home_url}}/view/">Advanced Search</a>
+</span>
+-->
+<span class="breadcrumbSeparator"> &#8250; </span>
+</span>
+<span id="breadcrumbs-level2">
+	<a href="{{home_url}}/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{variety_get_string}}{{year_get_string}}">Search Results</a>
+</span>
+{% endblock %}
+
+{% block navigation %}
 <ul class="navTree navTreeLevel0">
 	{% for fieldname, blurb_list in blurbs.items %}
 	<li class="navTreeItem navTreeTopNode">
@@ -26,11 +41,12 @@
 	</li>
 	{% endfor %}
 </ul>
-
-
 {% endblock %}
 
 {% block content %}
+<h1>Search Results</h1>
+<hr class="variety_trials__override" />
+
 <div>
 {% if page == None %}
 <p>{{ message }}</p>
