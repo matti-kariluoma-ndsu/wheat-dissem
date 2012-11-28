@@ -3,6 +3,23 @@
 	list-style-type: none;
 }
 
+div.variety_trials__input_option 
+{
+	border-radius: 1em;
+	padding: 1em;
+	/* color-scheme inspired by http://www.github.com */
+	background-color: rgb(234, 234, 234);
+	color: rgc(51, 51, 51);
+	margin-bottom: 1em;
+}
+
+.variety_trials__input_option h4
+{
+	padding-bottom: 0.5em;
+	border-bottom: 1px rgb(200,200,200) solid;
+	cursor: pointer;
+}
+
 .variety_trials__input_row 
 {
 	display: table-row;

@@ -7,51 +7,61 @@
 </div>
 
 <div>
-{% if form %}
-<div>
-	<h4>Instructions:</h4>
-	<p>There are two options:</p>
-	<ul>
-		<li> Upload a Spreadsheet:</li>
-		<ol>
-			<!--TODO: auto generate this file from the model-->
-			<li> Download the spreadsheet <a href="{{home_url}}/static/csv/ndsu_hard_red_spring_wheat_template.csv">template file</a> (300K). </li>
-			<li> Enter your data. </li>
-			<li> Submit the completed file.</li>
-		</ol>
-		
-		
-		<li> Paste data into the Spreadsheet below<noscript> (Javascript is required; you seem to have Javascript disabled)</noscript>.</li>
-	</ul>
-
-
-</div>
-
-<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="{{home_url}}/add/trial_entry/confirm/" method="POST">
-  {% for field in form %}
-    <div class="input_row">  
-		{% if field.name == 'csv_file' %}
-			{% for error in field.errors %}
-			<div class="error">
-				{{error}}
-			</div>
-			{% endfor %}
-			{{ field.label_tag }}: {{ field }}
-		{% else %}
-			{{ field }}
-		{% endif %}
-    </div>
-  {% endfor %}
-	
-	<div id="variety_trials__container" class="input_row" style="display: none;">
-		<label for="variety_trials__spreadsheet">Spreadsheet</label>: <div id="variety_trials__spreadsheet" class="dataTable"></div>
+	<div>
+		<h4>Instructions</h4>
+		<p>Choose one of the options below to upload your data:</p>
 	</div>
-	<noscript>
-	<input type="submit" value="Submit" />
-	</noscript>
-	<input type="button" id="variety_trials__spreadsheet_submit" style="display: none;" value="Submit" />
-</form>
-{% endif %}
+	
+	<div id='variety_trials__input_option_upload' class="variety_trials__input_option">
+			<h4>Upload a Spreadsheet</h4>
+			<div>
+				<ol>
+					<!--TODO: auto generate this file from the model-->
+					<li> Download the spreadsheet <a href="{{home_url}}/static/csv/ndsu_hard_red_spring_wheat_template.csv">template file</a> (300K). </li>
+					<li> Enter your data. </li>
+					<li> Submit the completed file.</li>
+				</ol>
+				<form id="variety_trials__upload_form" enctype="multipart/form-data" action="{{home_url}}/add/trial_entry/confirm/" method="POST">
+				{% for field in form %}
+					<div class="input_row">  
+					{% if field.name == 'csv_file' %}
+						{% for error in field.errors %}
+						<div class="error">
+							{{error}}
+						</div>
+						{% endfor %}
+						
+						{{ field.label_tag }}: {{ field }}
+					{% else %}
+						{{ field }}
+					{% endif %}
+					</div>
+				{% endfor %}	
+					<input type="submit" value="Submit" />
+				</form>
+			</div>
+	</div>
+	
+	<div id='variety_trials__input_option_enter' class="variety_trials__input_option">
+		<h4>Enter Data</h4>
+		<div>
+			<ol>
+				<li>Paste data into the Spreadsheet below.</li>
+				<noscript>
+				<li><b>(Javascript is required; you seem to have Javascript disabled)</b></li>
+				</noscript>
+			</ol>
+			<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="{{home_url}}/add/trial_entry/confirm/" method="POST">
+				<div id="variety_trials__container" class="input_row" style="display: none;">
+					<label for="variety_trials__spreadsheet">Spreadsheet</label>: <div id="variety_trials__spreadsheet" class="dataTable"></div>
+				</div>
+				<input type="button" id="variety_trials__spreadsheet_submit" style="display: none;" value="Submit" />
+			</form>
+		</div>
+	</div>
+
+	
+
 </div>
 
 {% endblock %}
@@ -71,6 +81,36 @@
 {% endblock %}
 
 {% block javascript%}
+
+$('#variety_trials__input_option_upload > div').hide();
+$('#variety_trials__input_option_enter > div').hide();
+
+// Set up onclick event for the headers
+$('#variety_trials__input_option_upload > h4').click(function(event) 
+		{
+			// prevents links from being followed, etc.
+			event.preventDefault();
+			
+			$('#variety_trials__input_option_enter > div').slideUp();
+			$('#variety_trials__input_option_upload > div').slideToggle();
+			
+			// prevents links from being followed, etc.
+			return false;
+		}
+	);
+
+$('#variety_trials__input_option_enter > h4').click(function(event) 
+		{
+			// prevents links from being followed, etc.
+			event.preventDefault();
+			
+			$('#variety_trials__input_option_upload > div').slideUp();
+			$('#variety_trials__input_option_enter > div').slideToggle();
+			
+			// prevents links from being followed, etc.
+			return false;
+		}
+	);
 
 $('#variety_trials__container').show();
 $('#variety_trials__spreadsheet_submit').show();

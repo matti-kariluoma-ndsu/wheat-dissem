@@ -7,6 +7,7 @@
 	{{ message }}
 {% endif %}
 </div>
+
 <div class="variety_trials__spreadsheet_table">
 	<div class="variety_trials__spreadsheet_row variety_trials__spreadsheet_header">
 		<div class="variety_trials__spreadsheet_data variety_trials__spreadsheet_row_number"></div>
@@ -65,4 +66,44 @@
 	<input type="submit" value="Submit" />
 </form>
 {% endif %}
+
+{% comment %}
+http://stackoverflow.com/questions/501719/dynamically-adding-a-form-to-a-django-formset-with-ajax/669982#669982
+
+<h3>My Services</h3>
+{{ serviceFormset.management_form }}
+{% for form in serviceFormset.forms %}
+    <div class='table'>
+    <table class='no_error'>
+        {{ form.as_table }}
+    </table>
+    </div>
+{% endfor %}
+<input type="button" value="Add More" id="add_more">
+<script>
+    $('#add_more').click(function() {
+        cloneMore('div.table:last', 'service');
+    });
+</script>
+
+
+function cloneMore(selector, type) {
+    var newElement = $(selector).clone(true);
+    var total = $('#id_' + type + '-TOTAL_FORMS').val();
+    newElement.find(':input').each(function() {
+        var name = $(this).attr('name').replace('-' + (total-1) + '-','-' + total + '-');
+        var id = 'id_' + name;
+        $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+    });
+    newElement.find('label').each(function() {
+        var newFor = $(this).attr('for').replace('-' + (total-1) + '-','-' + total + '-');
+        $(this).attr('for', newFor);
+    });
+    total++;
+    $('#id_' + type + '-TOTAL_FORMS').val(total);
+    $(selector).after(newElement);
+}
+
+{% endcomment %}
+
 {% endblock %}

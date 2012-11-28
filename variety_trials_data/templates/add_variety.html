@@ -2,8 +2,11 @@
 
 {% block content %}
 <div class="variety_trials__error">
-	{{message}}
+{% if message %}
+	{{ message }}
+{% endif %}
 </div>
+
 <form action="#" method="post">
 	{% for field in form %}
 	<div class="variety_trials__input_row">
