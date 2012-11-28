@@ -1,8 +1,17 @@
 {% extends "base_ag_ndsu.html" %}
+
+{% block breadcrumbs %}
+<span class="breadcrumbSeparator"> &#8250; </span>
+</span>
+<span id="breadcrumbs-level1">
+	<a href="{{home_url}}/data/">API</a>
+</span>
+{% endblock %}
+
 {% block content %}
 <div>
 	<h1>Using the API</h1>
-	<hr />
+	<hr class="variety_trials__override" />
 	<p>All of the data used in this project is available through the following urls.</p>
 	
 	<p>The data is provided in the <a href="http://www.json.org/">JSON</a> format, 

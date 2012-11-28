@@ -3,6 +3,12 @@
 	list-style-type: none;
 }
 
+hr.variety_trials__override
+{
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
 div.variety_trials__input_option 
 {
 	border-radius: 1em;

@@ -1,7 +1,15 @@
 {% extends "base_ag_ndsu.html" %}
+{% block breadcrumbs %}
+<span class="breadcrumbSeparator"> &#8250; </span>
+</span>
+<span id="breadcrumbs-level1">
+	<a href="{{home_url}}/about/">About</a>
+</span>
+{% endblock %}
+
 {% block content %}
 <h1>About Us</h1>
-<hr />
+<hr class="variety_trials__override" />
 <div class="variety_trials__two_column">
 	<div class="variety_trials__two_column_left">
 		<ul> 
