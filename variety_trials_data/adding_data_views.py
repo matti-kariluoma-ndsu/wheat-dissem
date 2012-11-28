@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.cache import cache
+from django.forms.models import inlineformset_factory
 from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
@@ -249,12 +250,72 @@ def add_trial_entry_csv_file_confirm(request):
 	)
 
 def add_variety(request):
+	DiseaseFormset = inlineformset_factory(models.Variety, models.Disease_Entry)
 	
+	if request.method == 'POST': # If the form has been submitted...
+		message = "Add failed"
+		form = models.VarietyForm(request.POST)
+		if form.is_valid():
+			new_variety = form.save()
+			formset = DiseaseFormset(request.POST, instance=new_variety)
+			if formset.is_valid():
+				formset.save()
+			message = "Add successful"
+	else:
+		message = ""
+		form = models.VarietyForm()
+		formset = DiseaseFormset()
+
+		return render_to_response(
+				'add_variety.html',
+				{
+					'home_url': HOME_URL,
+					'form': form,
+					'formset': formset,
+					'message': message
+				},
+				context_instance=RequestContext(request)
+			)
+
+def add_trial_entry(request):
+	if request.method == 'POST': # If the form has been submitted...
+		message = "Add failed"
+		form = models.Trial_EntryForm(request.POST)
+		if form.is_valid():
+			new_trial = form.save()
+			message = "Add successful"
+	else:
+		message = ""
+		form = models.Trial_EntryForm()
 
 	return render_to_response(
-		'add_v.html',
-		{
-			'home_url': HOME_URL,
-		},
-		context_instance=RequestContext(request)
-	)
+			'add_trial.html',
+			{
+				'home_url': HOME_URL,
+				'form': form,
+				'message': message
+			},
+			context_instance=RequestContext(request)
+		)
+
+def add_location(request):
+	if request.method == 'POST': # If the form has been submitted...
+		message = "Add failed"
+		form = models.Trial_EntryForm(request.POST)
+		if form.is_valid():
+			new_location = form.save()
+			message = "Add successful"
+	else:
+		message = ""
+		form = models.LocationForm()
+
+	return render_to_response(
+			'add_location.html',
+			{
+				'home_url': HOME_URL,
+				'form': form,
+				'message': message
+			},
+			context_instance=RequestContext(request)
+		)
+

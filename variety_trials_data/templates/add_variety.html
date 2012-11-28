@@ -1,0 +1,36 @@
+{% extends "base_ag_ndsu.html" %}
+
+{% block content %}
+<div class="variety_trials__error">
+	{{message}}
+</div>
+<form action="#" method="post">
+	{% for field in form %}
+	<div class="variety_trials__input_row">
+		{% for error in field.errors %}
+		<div class="variety_trials__error">
+			{{error}}
+		</div>
+		{% endfor %}
+		{{ field.label_tag }} {{ field }}
+	</div>
+	{% endfor %}
+{% comment %}
+	{{ formset.management_form }}
+	{% for form in formset.forms %}
+		{% for field in form %}
+	<div class="variety_trials__input_row">
+		{% for error in field.errors %}
+		<div class="variety_trials__error">
+			{{error}}
+		</div>
+		{% endfor %}
+		{{ field.label_tag }} {{ field }}
+	</div>
+		{% endfor %}
+	{% endfor %}
+{% endcomment %}
+	<input type="submit" value="Submit" />
+</form>
+
+{% endblock %}

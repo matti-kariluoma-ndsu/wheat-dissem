@@ -129,3 +129,9 @@ class VarietyForm(ModelForm):
 class Trial_EntryForm(ModelForm):
 	class Meta:
 		model = Trial_Entry
+		# don't allow the user to effect `hidden'
+		exclude = ('hidden',)
+		
+class LocationForm(ModelForm):
+	class Meta:
+		model = Location

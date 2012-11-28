@@ -3,6 +3,21 @@
 	list-style-type: none;
 }
 
+.variety_trials__input_row 
+{
+	display: table-row;
+}
+
+.variety_trials__input_row label, input
+{
+	display: table-cell;
+}
+
+.variety_trials__input_row label
+{
+	padding-right: 1em;
+}
+
 .variety_trials__row th
 {
 	text-align: left;
