@@ -40,16 +40,17 @@
 				</ol>
 				<form id="variety_trials__upload_form" enctype="multipart/form-data" action="{{home_url}}/add/trial_entry/confirm/" method="POST">
 				{% for field in form %}
-					<div class="input_row">  
-					{% if field.name == 'csv_file' %}
-						{% for error in field.errors %}
+					{% for error in field.errors %}
 						<div class="error">
 							{{error}}
 						</div>
-						{% endfor %}
+					{% endfor %}
+					<div class="input_row">  
+					{% if field.name != 'csv_json' %}	
+						{% if field.name == csv_file %}
+							{{ field.label_tag }}:
+						{% endif %}
 						
-						{{ field.label_tag }}: {{ field }}
-					{% else %}
 						{{ field }}
 					{% endif %}
 					</div>
@@ -60,7 +61,7 @@
 	</div>
 	
 	<div id='variety_trials__input_option_enter' class="variety_trials__input_option">
-		<h4>Enter Data</h4>
+		<h4>Enter Data with the Online Spreadsheet</h4>
 		<div>
 			<ol>
 				<li>Paste data into the Spreadsheet below.</li>
@@ -69,11 +70,19 @@
 				</noscript>
 			</ol>
 			<form id="variety_trials__spreadsheet_form" enctype="multipart/form-data" action="{{home_url}}/add/trial_entry/confirm/" method="POST">
-				<div id="variety_trials__container" class="input_row" style="display: none;">
-					<label for="variety_trials__spreadsheet">Spreadsheet</label>: <div id="variety_trials__spreadsheet" class="dataTable"></div>
-				</div>
-				<input type="button" id="variety_trials__spreadsheet_submit" style="display: none;" value="Submit" />
+				{% for field in form %}
+					<div class="input_row">  
+					{% if field.name != 'csv_file' %}
+						{{ field }}
+					{% endif %}
+					</div>
+				{% endfor %}	
 			</form>
+			
+			<div id="variety_trials__container" class="input_row" style="display: none;">
+				<div id="variety_trials__spreadsheet"></div>
+			</div>
+			<input type="button" id="variety_trials__spreadsheet_submit" style="display: none;" value="Submit" />
 		</div>
 	</div>
 
@@ -84,11 +93,6 @@
 {% endblock %}
 
 {% block javascript_imports %}
-<script src="{{home_url}}/static/js/bootstrap-typeahead.js"></script>
-<script src="{{home_url}}/static/js/jquery.autoresize.js"></script>
-<script src="{{home_url}}/static/js/jquery.contextMenu.js"></script>
-<script src="{{home_url}}/static/js/jquery.ui.position.js"></script>
-<script src="{{home_url}}/static/js/json2.min.js"></script>
 <script src="{{home_url}}/static/js/jquery.handsontable.js"></script>
 <script src="{{home_url}}/static/js/variety_trials_handsontable.js"></script>
 
@@ -98,6 +102,13 @@
 {% endblock %}
 
 {% block javascript%}
+
+var cols = {{headers|length}};
+var variety_trials__headers = [
+		{%for field in headers%}"{{field}}", {%endfor%} ""
+	];
+var spreasheet_container = "#variety_trials__spreadsheet"
+var output_container = "#id_csv_json"
 
 $('#variety_trials__input_option_upload > div').hide();
 $('#variety_trials__input_option_enter > div').hide();
@@ -124,6 +135,9 @@ $('#variety_trials__input_option_enter > h4').click(function(event)
 			$('#variety_trials__input_option_upload > div').slideUp();
 			$('#variety_trials__input_option_enter > div').slideToggle();
 			
+			// redraw, otherwise the leftmost column is garbled
+			$(spreasheet_container).handsontable('render');
+			
 			// prevents links from being followed, etc.
 			return false;
 		}
@@ -132,14 +146,13 @@ $('#variety_trials__input_option_enter > h4').click(function(event)
 $('#variety_trials__container').show();
 $('#variety_trials__spreadsheet_submit').show();
 
-var cols = {{headers|length}};
-var variety_trials__headers = [
-		{%for field in headers%}"{{field}}", {%endfor%} ""
-	];
-var spreasheet_container = "#variety_trials__spreadsheet"
-var output_container = "#id_csv_json"
-
 variety_trials__init_handsontable(cols, variety_trials__headers, spreasheet_container, output_container);
+
+// HACK
+// if we try and set this style _before_ calling handsontable(), it will be overwritten with the value 'hidden'
+$(spreasheet_container).css('overflow', 'scroll');
+
+
 
 // Set up an onclick function for the javascript submit button
 $('#variety_trials__spreadsheet_submit').click(function(event) {

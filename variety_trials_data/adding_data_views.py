@@ -52,7 +52,7 @@ def generate_unique_name():
 	unixtime = str(repr(time.time())).replace('.','')
 	while len(unixtime) < 16:
 		unixtime = '%s%s' % (unixtime, '0')
-	return '%s%s' % (username, unixtime)
+	return '%s.%s' % (username, unixtime)
 
 def trial_entry_spreadsheet_headers():
 	headers = []
@@ -66,7 +66,7 @@ def trial_entry_spreadsheet_headers():
 	ignore_fields = [
 			'pk',
 			'id',
-			'deletable'
+			'hidden'
 		]
 	for field in ignore_fields:
 		if field in headers:
@@ -82,12 +82,19 @@ def add_trial_entry_csv_file(request):
 		except:
 			message = None
 	
-	# create a blank upload form
+	# create a new (bound) upload form
 	username_unique = generate_unique_name()
 		
-	form = variety_trials_forms.UploadCSVForm(initial={
-			'username_unique': username_unique,
-		})
+	# note the arg dictionary, not the kwarg initial=dict()
+	# this creates a bound form, while intial= creates an unbound
+	#
+	# https://docs.djangoproject.com/en/1.4/ref/forms/api/#dynamic-initial-values
+	# http://stackoverflow.com/questions/936376/prepopulate-django-non-model-form/936405#936405
+	form = variety_trials_forms.UploadCSVForm(
+			{
+				'username_unique': username_unique,
+			}
+		)
 	
 	# Give the embedded spreadsheet it's column names
 	headers = trial_entry_spreadsheet_headers()
@@ -262,7 +269,7 @@ def add_variety(request):
 				formset.save()
 			message = "Add successful"
 	else:
-		message = ""
+		message = None
 		form = models.VarietyForm()
 		formset = DiseaseFormset()
 
@@ -285,7 +292,7 @@ def add_trial_entry(request):
 			new_trial = form.save()
 			message = "Add successful"
 	else:
-		message = ""
+		message = None
 		form = models.Trial_EntryForm()
 
 	return render_to_response(
@@ -306,7 +313,7 @@ def add_location(request):
 			new_location = form.save()
 			message = "Add successful"
 	else:
-		message = ""
+		message = None
 		form = models.LocationForm()
 
 	return render_to_response(

@@ -19,8 +19,8 @@ function variety_trials__init_handsontable(column_length, headers, input_contain
 	}
 	
 	variety_trials__sheet.handsontable({
-		rows: 2,
-		cols: column_length,
+		startRows: 2,
+		startCols: column_length,
 		minSpareRows: 1,
 		contextMenu: true,
 		rowHeaders: true,
@@ -28,8 +28,4 @@ function variety_trials__init_handsontable(column_length, headers, input_contain
 		onChange: variety_trials__update_form
 	});
 
-
-	var variety_trials__sheet_init_data = [];
-
-	variety_trials__sheet.handsontable("loadData", variety_trials__sheet_init_data);
 }

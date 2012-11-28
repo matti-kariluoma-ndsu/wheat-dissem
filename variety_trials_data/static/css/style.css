@@ -3,6 +3,17 @@
 	list-style-type: none;
 }
 
+#variety_trials__spreadsheet div table
+{
+	/* The following declaration is a work-around for the ndsu ag styleseets. */
+	background-color: transparent;
+}
+#variety_trials__spreadsheet div
+{
+	/* The following declaration is a work-around for the ndsu ag styleseets. */
+	max-width: none;
+}
+
 hr.variety_trials__override
 {
 	margin-top: 1em;
@@ -22,6 +33,7 @@ div.variety_trials__input_option
 .variety_trials__input_option h4
 {
 	padding-bottom: 0.5em;
+	margin-top: 0em;
 	border-bottom: 1px rgb(200,200,200) solid;
 	cursor: pointer;
 }
