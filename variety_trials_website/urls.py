@@ -46,9 +46,12 @@ urlpatterns = patterns('',
 		(r'^add/$', views.howto_add_data),
 		(r'^add/trial_entries/$', adding_data_views.add_trial_entry_csv_file), # page to upload a spreadsheet to
 		(r'^add/trial_entries/confirm/', adding_data_views.add_trial_entry_csv_file_confirm), # page to upload a spreadsheet to
-		(r'^add/variety/', adding_data_views.add_variety), 
-		(r'^add/location/', adding_data_views.add_location),
 		(r'^add/trial_entry/', adding_data_views.add_trial_entry),
+		(r'^add/date/', adding_data_views.add_date),
+		(r'^add/location/', adding_data_views.add_location),
+		(r'^add/variety/', adding_data_views.add_variety), 
+		
+		
 		
 		(r'^add/history/', adding_data_views.history), # defaults to location-based view
 		(r'^add/history/delete/(?P<delete>[0-9]+)/', adding_data_views.history_delete), # defaults to location-based view

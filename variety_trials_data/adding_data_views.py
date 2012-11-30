@@ -3,6 +3,7 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.cache import cache
 from django.forms.models import inlineformset_factory
+from django.forms.formsets import formset_factory
 from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
@@ -285,18 +286,42 @@ def add_variety(request):
 			)
 
 def add_trial_entry(request):
+	Trial_EntryFormSet = formset_factory(models.Trial_EntryForm, extra=2)
+	
 	if request.method == 'POST': # If the form has been submitted...
 		message = "Add failed"
-		form = models.Trial_EntryForm(request.POST)
-		if form.is_valid():
-			new_trial = form.save()
+		formset = Trial_EntryFormSet(request.POST)
+		if formset.is_valid():
+			for form in formset:
+				new_trial = form.save()
 			message = "Add successful"
 	else:
 		message = None
-		form = models.Trial_EntryForm()
+		formset = Trial_EntryFormSet()
 
 	return render_to_response(
 			'add_trial.html',
+			{
+				'home_url': HOME_URL,
+				'formset': formset,
+				'message': message
+			},
+			context_instance=RequestContext(request)
+		)
+
+def add_date(request):
+	if request.method == 'POST': # If the form has been submitted...
+		message = "Add failed"
+		form = models.DateForm(request.POST)
+		if form.is_valid():
+			new_location = form.save()
+			message = "Add successful"
+	else:
+		message = None
+		form = models.DateForm()
+
+	return render_to_response(
+			'add_location.html',
 			{
 				'home_url': HOME_URL,
 				'form': form,
@@ -308,7 +333,7 @@ def add_trial_entry(request):
 def add_location(request):
 	if request.method == 'POST': # If the form has been submitted...
 		message = "Add failed"
-		form = models.Trial_EntryForm(request.POST)
+		form = models.LocationForm(request.POST)
 		if form.is_valid():
 			new_location = form.save()
 			message = "Add successful"

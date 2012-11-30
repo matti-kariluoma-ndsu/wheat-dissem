@@ -135,3 +135,7 @@ class Trial_EntryForm(ModelForm):
 class LocationForm(ModelForm):
 	class Meta:
 		model = Location
+		
+class DateForm(ModelForm):
+	class Meta:
+		model = Date
