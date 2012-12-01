@@ -1,25 +1,28 @@
-.variety_trials__hidden
-{
-	display: none;
-}
-
 #variety_trials__scope_input li
 {
 	list-style-type: none;
 }
 
-a#variety_trials__add_trial_entry_form
+.variety_trials__hidden
+{
+	display: none;
+}
+
+.variety_trials__add
 {
 	text-align: center;
-	display: block;
-	margin: auto;
 	border-radius: 1em;
-	padding: 1em;
 	/* color-scheme inspired by http://www.github.com */
 	background-color: rgb(234, 234, 234);
-	color: rgc(51, 51, 51);
-	margin-top: 1em;
-	margin-bottom: 1em;
+	color: rgc(51, 51, 51);	
+	padding: 0em;
+}
+
+a#variety_trials__add_trial_entry_form
+{
+	display: block;
+	margin: auto;
+	padding: 1em;
 }
 
 #variety_trials__trial_entry_empty_form
@@ -327,3 +330,5 @@ div.variety_trials__input_option
 	font-size: 1.25em;
 	border-bottom: 1px solid black;
 }
+
+

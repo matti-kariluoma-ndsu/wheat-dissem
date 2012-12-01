@@ -27,6 +27,7 @@
 <form action="#" method="post">
 	{{formset.management_form }}
 	<div id="variety_trials__trial_entry_forms">
+		<!-- blank, template form -->
 		<div class="variety_trials__trial_entry_form" id="variety_trials__trial_entry_empty_form">
 			<hr class="variety_trials__override" />
 			{% for field in formset.empty_form %}
@@ -36,22 +37,51 @@
 					{{error}}
 				</div>
 				{% endfor %}
-				{{ field.label_tag }} {{ field }} 
+				{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
 				
 				{% if field.name == 'location' %}
-				<a target="_blank" href="{{home_url}}/add/location/">(+) Add New Location</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/location/">(+) Add New Location</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_location">Add New Location</a>  
+				</div>
 				{% elif field.name == 'variety' %}
-				<a target="_blank" href="{{home_url}}/add/variety/">(+) Add New Variety</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/variety/">(+) Add New Variety</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_variety">Add New Variety</a>  
+				</div>
 				{% elif field.name == 'plant_date' %}
-				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_plant_date">Add New Date</a>  
+				</div>
 				{% elif field.name == 'harvest_date' %}
-				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_harvest_date">Add New Date</a>  
+				</div>
 				{% endif %}
 				
-				<span class="variety_trials__help_text">{{field.help_text}}</span>
 			</div>
 			{% endfor %}
 		</div>
+	
+	<!-- User's forms -->
 	{% for form in formset %}
 		<div class="variety_trials__trial_entry_form">
 			<hr class="variety_trials__override" />
@@ -62,19 +92,46 @@
 					{{error}}
 				</div>
 				{% endfor %}
-				{{ field.label_tag }} {{ field }}
+				{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
 				
 				{% if field.name == 'location' %}
-				<a target="_blank" href="{{home_url}}/add/location/">(+) Add New Location</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/location/">(+) Add New Location</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/location/" class="variety_trials__add" id="variety_trials__add_location">Add New Location</a>  
+				</div>
 				{% elif field.name == 'variety' %}
-				<a target="_blank" href="{{home_url}}/add/variety/">(+) Add New Variety</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/variety/">(+) Add New Variety</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/variety/" class="variety_trials__add" id="variety_trials__add_variety">Add New Variety</a>  
+				</div>
 				{% elif field.name == 'plant_date' %}
-				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/date/" class="variety_trials__add" id="variety_trials__add_plant_date">Add New Date</a>  
+				</div>
 				{% elif field.name == 'harvest_date' %}
-				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				<noscript>
+				<div>
+					<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				</div>
+				</noscript>
+				<div class="variety_trials__hidden">
+					<a href="{{home_url}}/add/date/" class="variety_trials__add" id="variety_trials__add_harvest_date">Add New Date</a>  
+				</div>
 				{% endif %}
 				
-				<span class="variety_trials__help_text">{{field.help_text}}</span>
 			</div>
 		{% endfor %}
 		</div>
@@ -82,7 +139,7 @@
 
 	</div>
 	<div class="variety_trials__hidden">
-		<a href="#" id="variety_trials__add_trial_entry_form">Add Another Form</a>  
+		<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_trial_entry_form">Add Another Form</a>  
 	</div>
 	<input type="submit" value="Submit" />
 </form>
@@ -90,7 +147,7 @@
 {% endblock %}
 
 {% block javascript_imports %}
-<link rel="stylesheet" media="screen" href="{{home_url}}/static/css/jquery-ui.css">
+<link rel="stylesheet" href="{{home_url}}/static/css/jquery-ui.css">
 {% endblock %}
 
 {% block javascript%}
@@ -103,11 +160,37 @@ $('#variety_trials__add_trial_entry_form').click(
 		function(event) 
 		{
 			event.preventDefault();
-			form_count++;
-			var new_form = $('#variety_trials__trial_entry_empty_form').clone().hide();
-			$('#variety_trials__trial_entry_forms').append(new_form);
-			new_form.slideDown();
 			
+			var new_div_inputs = $('#variety_trials__trial_entry_empty_form').clone().hide();
+			new_div_inputs.removeAttr('id');
+			
+			new_div_inputs.children('div').children('label').each(
+				function(index, Element)
+				{
+					var value = $(Element).attr('for');
+					value = value.replace('__prefix__', form_count);
+					$(Element).attr('for', value);
+				}
+			);
+			
+			new_div_inputs.children('div').children('input').each(
+				function(index, Element)
+				{
+					var id = $(Element).attr('id');
+					var name = $(Element).attr('name');
+					
+					id = id.replace('__prefix__', form_count);
+					name = name.replace('__prefix__', form_count);
+					
+					$(Element).attr('id', id);
+					$(Element).attr('name', name);
+				}
+			);
+			
+			$('#variety_trials__trial_entry_forms').append(new_div_inputs);
+			new_div_inputs.slideDown();
+			
+			form_count++;
 			$('#id_form-TOTAL_FORMS').val(form_count);
 			return false;
 		}
