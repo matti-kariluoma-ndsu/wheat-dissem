@@ -1,4 +1,5 @@
 {% extends "base_ag_ndsu.html" %}
+{% load escape_quotes_strip_newlines %}
 {% block breadcrumbs %}
 <span class="breadcrumbSeparator"> &#8250; </span>
 </span>
@@ -24,20 +25,67 @@
 
 
 <form action="#" method="post">
-{{formset.management_form }}
-{% for form in formset %}
-	<hr class="variety_trials__override" />
-	{% for field in form %}
-	<div class="variety_trials__input_row">
-		{% for error in field.errors %}
-		<div class="variety_trials__error">
-			{{error}}
+	{{formset.management_form }}
+	<div id="variety_trials__trial_entry_forms">
+		<div class="variety_trials__trial_entry_form" id="variety_trials__trial_entry_empty_form">
+			<hr class="variety_trials__override" />
+			{% for field in formset.empty_form %}
+			<div class="variety_trials__input_row">
+				{% for error in field.errors %}
+				<div class="variety_trials__error">
+					{{error}}
+				</div>
+				{% endfor %}
+				{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+			</div>
+			{% endfor %}
 		</div>
+	{% for form in formset %}
+		<div class="variety_trials__trial_entry_form">
+			<hr class="variety_trials__override" />
+			{% for field in form %}
+			<div class="variety_trials__input_row">
+				{% for error in field.errors %}
+				<div class="variety_trials__error">
+					{{error}}
+				</div>
+				{% endfor %}
+				{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+			</div>
 		{% endfor %}
-		{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
-	</div>
+		</div>
 	{% endfor %}
-{% endfor %}
+
+	</div>
+	<div class="variety_trials__hidden">
+		<a href="#" id="variety_trials__add_trial_entry_form">Add Another Form</a>  
+	</div>
 	<input type="submit" value="Submit" />
 </form>
+ 
+{% endblock %}
+
+{% block javascript_imports %}
+<link rel="stylesheet" media="screen" href="{{home_url}}/static/css/jquery-ui.css">
+{% endblock %}
+
+{% block javascript%}
+
+$('.variety_trials__hidden').show();
+// http://stackoverflow.com/questions/2353710/how-would-you-make-a-dynamic-formset-in-django 
+
+var form_count = {{formset.total_form_count}};
+$('#variety_trials__add_trial_entry_form').click(
+		function(event) 
+		{
+			event.preventDefault();
+			form_count++;
+			var new_form = $('#variety_trials__trial_entry_empty_form').clone().hide();
+			$('#variety_trials__trial_entry_forms').append(new_form);
+			new_form.slideDown();
+			
+			$('#id_form-TOTAL_FORMS').val(form_count);
+			return false;
+		}
+	);
 {% endblock %}

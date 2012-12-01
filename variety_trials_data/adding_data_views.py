@@ -285,7 +285,7 @@ def add_variety(request):
 				context_instance=RequestContext(request)
 			)
 
-Trial_EntryFormSet = formset_factory(models.Trial_EntryForm, extra=2)
+Trial_EntryFormSet = formset_factory(models.Trial_EntryForm, extra=1)
 def add_trial_entry(request):	
 	if request.method == 'POST': # If the form has been submitted...
 		message = "Add failed"
