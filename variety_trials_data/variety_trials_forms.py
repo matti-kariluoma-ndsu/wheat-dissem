@@ -19,7 +19,8 @@ class ScopeConstants:
 class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(
 			max_length=5, 
-			required=True
+			required=True,
+			help_text=''
 		)
 	scope = forms.ChoiceField(
 			widget=forms.RadioSelect(),
@@ -29,45 +30,25 @@ class SelectLocationByZipcodeForm(forms.Form):
 					(ScopeConstants.mn,	'All of MN'),
 					(ScopeConstants.all,	'All Locations')
 				),
-			initial=ScopeConstants.near
+			initial=ScopeConstants.near,
+			help_text=''
 		)
 	year = forms.CharField(
 			max_length=4, 
 			required=False,
-			initial=datetime.date.today().year
+			initial=datetime.date.today().year,
+			help_text='Format: "YYYY" Select which year'+"'"+'s results to view.'
 		)
 	not_location = forms.MultipleChoiceField(
 			required=False,
-			choices=[(location.name, location.name) for location in models.Location.objects.all()]
+			choices=[(location.name, location.name) for location in models.Location.objects.all()],
+			help_text='Select locations to exclude from the query.'
 			)
 	variety = forms.MultipleChoiceField(
 			required=False,
-			choices=[(variety.name, variety.name) for variety in models.Variety.objects.all()]
+			choices=[(variety.name, variety.name) for variety in models.Variety.objects.all()],
+			help_text='Select varieties to compare head-to-head.'
 			)
-		
-class SelectVarietiesForm(SelectLocationByZipcodeForm):
-	varieties = forms.ModelMultipleChoiceField(
-			widget=forms.Select(),
-			queryset=models.Variety.objects.all()
-                        )
-	varieties_1 = forms.ModelMultipleChoiceField(
-			widget=forms.Select(),
-			queryset=models.Variety.objects.all()
-                        )
-	varieties_2 = forms.ModelMultipleChoiceField(
-			widget=forms.Select(),
-			queryset=models.Variety.objects.all()
-                        )
-	varieties_3 = forms.ModelMultipleChoiceField(
-			widget=forms.Select(),
-			queryset=models.Variety.objects.all()
-                        )
-                        
-class SelectLocationsForm(SelectVarietiesForm):
-	locations = forms.ModelMultipleChoiceField(
-		widget=forms.SelectMultiple(attrs={'size': 20}),
-		queryset=models.Location.objects.all()
-		)
 
 class UploadCSVForm(forms.Form):
 	csv_file = forms.FileField(
