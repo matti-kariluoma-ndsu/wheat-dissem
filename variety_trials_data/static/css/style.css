@@ -3,6 +3,12 @@
 	list-style-type: none;
 }
 
+.variety_trials__help_text
+{
+	color: grey;
+	padding-left: 1em;
+}
+
 #variety_trials__spreadsheet div table
 {
 	/* The following declaration is a work-around for the ndsu ag styleseets. */
@@ -89,7 +95,6 @@ div.variety_trials__input_option
 	padding-right: 0.2em;
 	border-right: 1px dotted #666;
 	width: 70px;
-	
 	background-color: #CCC;
 }
 

@@ -70,7 +70,7 @@ class Location(models.Model):
 		return self.name
 
 class Date(models.Model):
-	date	= models.DateField()
+	date	= models.DateField(help_text='Format: MM/DD/YYYY')
 	
 	def __unicode__(self):
 		return str(self.date)

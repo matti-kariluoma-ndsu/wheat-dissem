@@ -285,9 +285,8 @@ def add_variety(request):
 				context_instance=RequestContext(request)
 			)
 
-def add_trial_entry(request):
-	Trial_EntryFormSet = formset_factory(models.Trial_EntryForm, extra=2)
-	
+Trial_EntryFormSet = formset_factory(models.Trial_EntryForm, extra=2)
+def add_trial_entry(request):	
 	if request.method == 'POST': # If the form has been submitted...
 		message = "Add failed"
 		formset = Trial_EntryFormSet(request.POST)
@@ -321,7 +320,7 @@ def add_date(request):
 		form = models.DateForm()
 
 	return render_to_response(
-			'add_location.html',
+			'add_date.html',
 			{
 				'home_url': HOME_URL,
 				'form': form,

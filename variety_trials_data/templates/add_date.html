@@ -30,10 +30,20 @@
 			{{error}}
 		</div>
 		{% endfor %}
-		{{ field.label_tag }} {{ field }}
+		{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
 	</div>
 	{% endfor %}
 	<input type="submit" value="Submit" />
 </form>
 
+{% endblock %}
+
+{% block javascript_imports %}
+<script src="{{home_url}}/static/js/jquery-ui.js"></script>
+
+<link rel="stylesheet" media="screen" href="{{home_url}}/static/css/jquery-ui.css">
+{% endblock %}
+
+{% block javascript%}
+$('#id_date').datepicker();
 {% endblock %}
