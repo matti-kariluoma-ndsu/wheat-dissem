@@ -36,7 +36,19 @@
 					{{error}}
 				</div>
 				{% endfor %}
-				{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+				{{ field.label_tag }} {{ field }} 
+				
+				{% if field.name == 'location' %}
+				<a target="_blank" href="{{home_url}}/add/location/">(+) Add New Location</a>
+				{% elif field.name == 'variety' %}
+				<a target="_blank" href="{{home_url}}/add/variety/">(+) Add New Variety</a>
+				{% elif field.name == 'plant_date' %}
+				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				{% elif field.name == 'harvest_date' %}
+				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				{% endif %}
+				
+				<span class="variety_trials__help_text">{{field.help_text}}</span>
 			</div>
 			{% endfor %}
 		</div>
@@ -50,7 +62,19 @@
 					{{error}}
 				</div>
 				{% endfor %}
-				{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+				{{ field.label_tag }} {{ field }}
+				
+				{% if field.name == 'location' %}
+				<a target="_blank" href="{{home_url}}/add/location/">(+) Add New Location</a>
+				{% elif field.name == 'variety' %}
+				<a target="_blank" href="{{home_url}}/add/variety/">(+) Add New Variety</a>
+				{% elif field.name == 'plant_date' %}
+				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				{% elif field.name == 'harvest_date' %}
+				<a target="_blank" href="{{home_url}}/add/date/">(+) Add New Date</a>
+				{% endif %}
+				
+				<span class="variety_trials__help_text">{{field.help_text}}</span>
 			</div>
 		{% endfor %}
 		</div>
