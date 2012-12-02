@@ -233,9 +233,7 @@ $('a.variety_trials__add_location').click(
 			var new_div_inputs = $('#variety_trials__location_empty_form').clone();
 			new_div_inputs.removeAttr('id');
 			
-			var submit_button = new_div_inputs.children('.variety_trials__location_form_button');
-			
-			submit_button.click(
+			new_div_inputs.children('.variety_trials__location_form_button').click(
 					function(event)
 					{
 						event.preventDefault();
@@ -244,13 +242,13 @@ $('a.variety_trials__add_location').click(
 					}
 				);
 			
-			new_div_inputs.children('input').keypress(
+			new_div_inputs.children('div').children('input').keypress(
 					function(event) 
 					{
 						if(event.which == 13) 
 						{
 							$(this).blur();
-							submit_button.focus().click();
+							$(this).parent().parent().children('.variety_trials__location_form_button').focus().click();
 						}
 					}
 				);
