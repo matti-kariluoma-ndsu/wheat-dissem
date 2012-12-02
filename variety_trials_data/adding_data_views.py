@@ -257,9 +257,8 @@ def add_trial_entry_csv_file_confirm(request):
 		context_instance=RequestContext(request)
 	)
 
+DiseaseFormset = inlineformset_factory(models.Variety, models.Disease_Entry)
 def add_variety(request):
-	DiseaseFormset = inlineformset_factory(models.Variety, models.Disease_Entry)
-	
 	if request.method == 'POST': # If the form has been submitted...
 		message = "Add failed"
 		form = models.VarietyForm(request.POST)
@@ -297,13 +296,21 @@ def add_trial_entry(request):
 	else:
 		message = None
 		formset = Trial_EntryFormSet()
-
+	
+	date_empty_form = models.DateForm()
+	location_empty_form = models.LocationForm()
+	variety_empty_form = models.VarietyForm()
+	#disease_empty_formset = DiseaseFormset()
+	
 	return render_to_response(
 			'add_trial.html',
 			{
 				'home_url': HOME_URL,
 				'formset': formset,
-				'message': message
+				'message': message,
+				'date_empty_form': date_empty_form,
+				'location_empty_form': location_empty_form,
+				'variety_empty_form': variety_empty_form
 			},
 			context_instance=RequestContext(request)
 		)

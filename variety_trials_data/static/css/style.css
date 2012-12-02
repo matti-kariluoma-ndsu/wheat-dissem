@@ -30,6 +30,14 @@ a#variety_trials__add_trial_entry_form
 	display: none;
 }
 
+#variety_trials__date_empty_form, 
+#variety_trials__location_empty_form, 
+#variety_trials__variety_empty_form,
+#variety_trials__location_form_popup
+{
+	display: none;
+}
+
 .variety_trials__help_text
 {
 	color: grey;

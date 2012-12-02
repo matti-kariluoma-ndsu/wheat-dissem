@@ -23,6 +23,36 @@
 {% endif %}
 </div>
 
+<!-- Empty forms for use with the Javascript & Add date/location/variety buttons -->
+<div id="variety_trials__location_form_popup">
+</div>
+
+<div style="display: none;">
+	<div class="variety_trials__date_form" id="variety_trials__date_empty_form">
+	{% for field in date_empty_form %}
+		<div class="variety_trials__input_row">
+			{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+		</div>
+	{% endfor %}
+		<input class='variety_trials__date_form_button' type='button' value="Submit">
+	</div>
+	<div class="variety_trials__location_form" id="variety_trials__location_empty_form">
+	{% for field in location_empty_form %}
+		<div class="variety_trials__input_row">
+			{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+		</div>
+	{% endfor %}
+		<input class='variety_trials__location_form_button' type='button' value="Submit">
+	</div>
+	<div class="variety_trials__variety_form" id="variety_trials__variety_empty_form">
+	{% for field in variety_empty_form %}
+		<div class="variety_trials__input_row">
+			{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+		</div>
+	{% endfor %}
+		<input class='variety_trials__variety_form_button' type='button' value="Submit">
+	</div>
+</div>
 
 <form action="#" method="post">
 	{{formset.management_form }}
@@ -101,7 +131,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/location/" class="variety_trials__add" id="variety_trials__add_location">Add New Location</a>  
+					<a href="{{home_url}}/add/location/" class="variety_trials__add variety_trials__add_location" >Add New Location</a>  
 				</div>
 				{% elif field.name == 'variety' %}
 				<noscript>
@@ -110,7 +140,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/variety/" class="variety_trials__add" id="variety_trials__add_variety">Add New Variety</a>  
+					<a href="{{home_url}}/add/variety/" class="variety_trials__add variety_trials__add_variety">Add New Variety</a>  
 				</div>
 				{% elif field.name == 'plant_date' %}
 				<noscript>
@@ -119,7 +149,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/date/" class="variety_trials__add" id="variety_trials__add_plant_date">Add New Date</a>  
+					<a href="{{home_url}}/add/date/" class="variety_trials__add variety_trials__add_plant_date">Add New Date</a>  
 				</div>
 				{% elif field.name == 'harvest_date' %}
 				<noscript>
@@ -128,7 +158,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/date/" class="variety_trials__add" id="variety_trials__add_harvest_date">Add New Date</a>  
+					<a href="{{home_url}}/add/date/" class="variety_trials__add variety_trials__add_harvest_date">Add New Date</a>  
 				</div>
 				{% endif %}
 				
@@ -193,6 +223,63 @@ $('#variety_trials__add_trial_entry_form').click(
 			form_count++;
 			$('#id_form-TOTAL_FORMS').val(form_count);
 			return false;
+		}
+	);
+	
+$('a.variety_trials__add_location').click(
+		function(event) 
+		{
+			event.preventDefault();
+			var new_div_inputs = $('#variety_trials__location_empty_form').clone();
+			new_div_inputs.removeAttr('id');
+			
+			var submit_button = new_div_inputs.children('.variety_trials__location_form_button');
+			
+			submit_button.click(
+					function(event)
+					{
+						event.preventDefault();
+						alert('Submit that form!');
+						return false;
+					}
+				);
+			
+			new_div_inputs.children('input').keypress(
+					function(event) 
+					{
+						if(event.which == 13) 
+						{
+							$(this).blur();
+							submit_button.focus().click();
+						}
+					}
+				);
+			
+			$('#variety_trials__location_form_popup').append(new_div_inputs);
+			$('#variety_trials__location_form_popup').slideDown();
+			
+			return false;
+		}
+	);
+	
+$('a.variety_trials__add_variety').click(
+		function(event) 
+		{
+			event.preventDefault();
+		}
+	);
+	
+$('a.variety_trials__add_plant_date').click(
+		function(event) 
+		{
+			event.preventDefault();
+		}
+	);
+	
+$('a.variety_trials__add_harvest_date').click(
+		function(event) 
+		{
+			event.preventDefault();
 		}
 	);
 {% endblock %}
