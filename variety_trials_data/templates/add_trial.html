@@ -24,7 +24,11 @@
 </div>
 
 <!-- Empty forms for use with the Javascript & Add date/location/variety buttons -->
+<div id="variety_trials__date_form_popup">
+</div>
 <div id="variety_trials__location_form_popup">
+</div>
+<div id="variety_trials__variety_form_popup">
 </div>
 
 <div style="display: none;">
@@ -76,7 +80,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_location">Add New Location</a>  
+					<a href="{{home_url}}/add/location/" class="variety_trials__add variety_trials__add_location" >Add New Location</a>  
 				</div>
 				{% elif field.name == 'variety' %}
 				<noscript>
@@ -85,7 +89,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_variety">Add New Variety</a>  
+					<a href="{{home_url}}/add/variety/" class="variety_trials__add variety_trials__add_variety">Add New Variety</a>  
 				</div>
 				{% elif field.name == 'plant_date' %}
 				<noscript>
@@ -94,7 +98,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_plant_date">Add New Date</a>  
+					<a href="{{home_url}}/add/date/" class="variety_trials__add variety_trials__add_plant_date">Add New Date</a>  
 				</div>
 				{% elif field.name == 'harvest_date' %}
 				<noscript>
@@ -103,7 +107,7 @@
 				</div>
 				</noscript>
 				<div class="variety_trials__hidden">
-					<a href="{{home_url}}/add/trial_entry/" class="variety_trials__add" id="variety_trials__add_harvest_date">Add New Date</a>  
+					<a href="{{home_url}}/add/date/" class="variety_trials__add variety_trials__add_harvest_date">Add New Date</a>  
 				</div>
 				{% endif %}
 				
@@ -225,36 +229,46 @@ $('#variety_trials__add_trial_entry_form').click(
 			return false;
 		}
 	);
+
+function variety_trials_create_popup_form(empty_form_id, submit_button, popup_div_id)
+{
+	var new_div_inputs = $(empty_form_id).clone();
+	new_div_inputs.removeAttr('id');
 	
+	new_div_inputs.children(submit_button).click(
+			function(event)
+			{
+				event.preventDefault();
+				alert('Submit that form!');
+				return false;
+			}
+		);
+	
+	new_div_inputs.children('div').children('input').keypress(
+			function(event) 
+			{
+				if(event.which == 13) 
+				{
+					$(this).blur();
+					$(this).parent().parent().children(submit_button).focus().click();
+				}
+			}
+		);
+	
+	$(popup_div_id).append(new_div_inputs);
+	$(popup_div_id).slideDown();
+}
+
 $('a.variety_trials__add_location').click(
 		function(event) 
 		{
 			event.preventDefault();
-			var new_div_inputs = $('#variety_trials__location_empty_form').clone();
-			new_div_inputs.removeAttr('id');
 			
-			new_div_inputs.children('.variety_trials__location_form_button').click(
-					function(event)
-					{
-						event.preventDefault();
-						alert('Submit that form!');
-						return false;
-					}
-				);
-			
-			new_div_inputs.children('div').children('input').keypress(
-					function(event) 
-					{
-						if(event.which == 13) 
-						{
-							$(this).blur();
-							$(this).parent().parent().children('.variety_trials__location_form_button').focus().click();
-						}
-					}
-				);
-			
-			$('#variety_trials__location_form_popup').append(new_div_inputs);
-			$('#variety_trials__location_form_popup').slideDown();
+			variety_trials_create_popup_form(
+					'#variety_trials__location_empty_form',
+					'.variety_trials__location_form_button',
+					'#variety_trials__location_form_popup'
+				)
 			
 			return false;
 		}
@@ -264,6 +278,14 @@ $('a.variety_trials__add_variety').click(
 		function(event) 
 		{
 			event.preventDefault();
+			
+			variety_trials_create_popup_form(
+					'#variety_trials__variety_empty_form',
+					'.variety_trials__variety_form_button',
+					'#variety_trials__variety_form_popup'
+				)
+			
+			return false;
 		}
 	);
 	
@@ -271,6 +293,14 @@ $('a.variety_trials__add_plant_date').click(
 		function(event) 
 		{
 			event.preventDefault();
+			
+			variety_trials_create_popup_form(
+					'#variety_trials__date_empty_form',
+					'.variety_trials__date_form_button',
+					'#variety_trials__date_form_popup'
+				)
+			
+			return false;
 		}
 	);
 	
@@ -278,6 +308,14 @@ $('a.variety_trials__add_harvest_date').click(
 		function(event) 
 		{
 			event.preventDefault();
+			
+			variety_trials_create_popup_form(
+					'#variety_trials__date_empty_form',
+					'.variety_trials__date_form_button',
+					'#variety_trials__date_form_popup'
+				)
+			
+			return false;
 		}
 	);
 {% endblock %}
