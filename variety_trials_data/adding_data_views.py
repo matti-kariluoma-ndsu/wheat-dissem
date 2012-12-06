@@ -130,7 +130,7 @@ def add_trial_entry_csv_file_confirm(request):
 	username_unique = None
 	
 	if request.method != 'POST':
-		return HttpResponseRedirect(HOME_URL+'/add/trial_entry/')
+		return HttpResponseRedirect(HOME_URL+'/add/trial_entries/')
 	else:
 		#print request.POST
 		try:
@@ -140,7 +140,7 @@ def add_trial_entry_csv_file_confirm(request):
 			message = "There was a problem with your submission. Please try again."
 		
 		if not username_unique:
-			return HttpResponseRedirect(HOME_URL+'/add/trial_entry/?message=%s' % (message))
+			return HttpResponseRedirect(HOME_URL+'/add/trial_entries/?message=%s' % (message))
 		
 		# If we are visiting this page for the nth time, n > 1
 		try:
@@ -171,7 +171,7 @@ def add_trial_entry_csv_file_confirm(request):
 				
 			if not csv_file and not csv_json:			
 				message = "The spreadsheet did not upload correctly. Please Try Again."
-				return HttpResponseRedirect(HOME_URL+'/add/trial_entry/?message=%s' % (message))
+				return HttpResponseRedirect(HOME_URL+'/add/trial_entries/?message=%s' % (message))
 			else:
 				# preprocess the user's initial input
 				if csv_file:
@@ -213,7 +213,7 @@ def add_trial_entry_csv_file_confirm(request):
 	if not trial_entries or not user_to_confirm:
 		#TODO: this is the case if a user does not fill out an entire row
 		message = "Encountered a non-recoverable error during processing. Please try again."
-		return HttpResponseRedirect(HOME_URL+'/add/trial_entry/?message=%s' % (message))
+		return HttpResponseRedirect(HOME_URL+'/add/trial_entries/?message=%s' % (message))
 	
 	if not confirm_forms and not invalid_input_forms:
 		#http://collingrady.wordpress.com/2008/02/18/editing-multiple-objects-in-django-with-newforms/
