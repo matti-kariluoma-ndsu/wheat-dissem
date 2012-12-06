@@ -60,5 +60,8 @@ To populate a table in the testing (sqlite) db:
   $ sqlite> .import import.list your_table
   $ sqlite> .exit
 
+To add the lines from these files into psql:
+	$ psql> \copy variety_trials_data_location from 'your_filename' with delimiter ';'
+
 NOTE: Did a chmod a+w {variety_trials_website/, variety_trials_website/sqlite.db} , will need
 to be undone when we move on from sqlite.
