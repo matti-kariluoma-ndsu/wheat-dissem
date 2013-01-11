@@ -235,3 +235,23 @@ p = m.Trial_Entry.objects.filter(location=m.Location.objects.filter(name="Prospe
 for e in p:
 	e.hidden = True
 	e.save()
+
+2013 Jan 11 Meeting:
+* Check that /n=8/ locations are used to build a table, and more are grabbed failing that.
+* css is broken, again!
+** consider copying them to local? (how to realize the originals changed?)
+*** can we do the same trick for local jquery load?
+* 56716 -- Walsh County shows up 2x.
+* 2012 LSDs not displayed... entered? tried 56716 & 58102
+* Send R-script to Dr. Wiersma, detailing the multi-year LSD calculation. Use data from 55108
+* Limit to /n=3/ tables.
+* Move head-head back to the main page/whereever, off of the query results page
+* Add disclaimer - vis. "you may use this data provided you reproduce it in its entirety"
+* ensure the contribute system is disabled
+* Self
+** Advanced search
+*** More advanced queries can be dreamt up? More powerful interaction with the URL generator?
+*** CSV download of results?
+** More flexible data entry - consider other crops, i.e. alfalpha is not measured in bushels_acre.
+
+* Email updates _every_ Friday
