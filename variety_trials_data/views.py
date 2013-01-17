@@ -232,11 +232,11 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear) as error:
 					page = None
 					message = " ".join([ERROR_MESSAGE, error.message])
-					#raise
+					raise
 				except:
 					page = None
 					message = ERROR_MESSAGE
-					#raise
+					raise
 					
 				
 			"""
@@ -274,6 +274,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 							'years': years,
 							'blurbs' : unit_blurbs,
 							'curfield' : fieldname,
+							'show_appendix_tables': False,
 						},
 						context_instance=RequestContext(request)
 					)
@@ -305,6 +306,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 							'years': years,
 							'blurbs' : unit_blurbs,
 							'curfield' : fieldname,
+							'show_appendix_tables': False,
 						},
 						context_instance=RequestContext(request)
 					)
@@ -359,7 +361,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 						hidden=False
 					).count()
 				if result < 1: 
-					curyear = curyear - 1
+					curyear -= 1
 				
 			try:
 				year_range = int(year_range)
@@ -408,12 +410,12 @@ def inspect(request):
 				masterDict[year]["rows"][v.name][l.id]=" "
 	
 	for entry in models.Trial_Entry.objects.select_related(depth=3).filter(
-			harvest_date__in=models.Date.objects.filter(
-				date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
+				harvest_date__in=models.Date.objects.filter(
+					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
+				)
 			).filter(
 				hidden=False
-			)
-		):
+			):
 		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
 
 	masterList=dict()

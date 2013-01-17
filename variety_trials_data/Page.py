@@ -627,7 +627,23 @@ class Table:
 				sorted_column_tuples.append( (column, location) )
 				
 			return sorted_column_tuples
-			
+		
+		def get_site_years(self):
+			site_years = {} # i.e. {1: 8, 2: 12, 3: 16}
+			for location in self.visible_locations:
+				column = self.get_column(location)
+				if isinstance(column, Aggregate_Column):
+					# init variable if None
+					if column.site_years == None:
+						for cell in column:
+							if cell.site_years > column.site_years:
+								column.site_years = cell.site_years
+					site_years[len(column.years_range)] = column.site_years 
+			result = []
+			for key in sorted(site_years.keys()):
+				result.append(site_years[key])
+			return tuple(result) # i.e. (8, 12, 16)
+		
 		def set_defaults(self, year, fieldname):
 			for cell in self.cells.values():
 				cell.year = year
@@ -754,8 +770,11 @@ class Page:
 				
 		return (locations_with_data, result)
 	
-	def __init__(self, locations, number_locations, not_locations, default_year, year_range, default_fieldname, lsd_probability, break_into_subtables=False, varieties=[]):
-		self.tables = []	
+	def __init__(self, locations, number_locations, not_locations, 
+			default_year, year_range, default_fieldname, lsd_probability, 
+			break_into_subtables=False, varieties=[], show_appendix_tables=False,
+			number_of_tables=3):
+		self.tables = []
 		decomposition = self.decomposition = {}# {year: {variety: {location: bool, ...}, ...}, ...}
 		self.clear()
 		cells = {} # variety: {location: Cell() }
@@ -852,7 +871,6 @@ class Page:
 				for location in cells[variety]:
 					cell = cells[variety][location]
 					table.add_cell(variety, location, cell)
-			
 		
 		# {Add,add to} appendix tables
 		if len(self.appendix_tables) > 0:
@@ -860,13 +878,17 @@ class Page:
 		else:
 			table = Appendix_Table(locations, visible_locations, lsd_probability)
 			self.appendix_tables.append(table)
-			
+		
 		for variety in models.Variety.objects.all():
 			if variety not in cells:
 				table.add_cell(variety)
 		
+		for extra_table in self.extra_tables:
+			for variety in extra_table.rows.keys():
+				table.add_cell(variety)
+
 		self.tables.extend(self.data_tables)
-		self.tables.extend(self.appendix_tables)
+		self.tables.extend(self.appendix_tables) # why do we do this?
 		
 		# Decorate the tables
 		for table in self.tables:
@@ -887,7 +909,13 @@ class Page:
 				table.columns[location_key] = column
 				for row in table.rows.values():
 					cell = Aggregate_Cell(default_year, default_fieldname, row, column, decomposition, table.visible_locations)
-					table.add_cell(row.variety, location_key, cell)				
+					table.add_cell(row.variety, location_key, cell)
+					
+		# sort descending by site-years tuple, i.e. (8, 12, 16)
+		self.data_tables = sorted(self.data_tables, key=lambda (table): table.get_site_years(), reverse=True)
+		# truncate number of tables
+		self.extra_tables = self.data_tables[number_of_tables:]
+		self.data_tables = self.data_tables[:number_of_tables]
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:
@@ -898,6 +926,7 @@ class Page:
 			table.clear()
 		self.tables = []	
 		self.data_tables = []	
+		self.extra_tables = []	
 		self.appendix_tables = []	
 		for year in self.decomposition:
 			for variety in self.decomposition[year]:

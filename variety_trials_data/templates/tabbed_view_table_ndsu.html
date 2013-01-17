@@ -130,19 +130,20 @@
 		</tr>
 	{% endfor %}
 {% endfor %}
-{% if page.appendix_tables|length != 0 %}
+{% if show_appendix_tables %}
+	{% if page.appendix_tables|length != 0 %}
 	<tr>
 		<td colspan="777">We have data available for other varieties (for a head-to-head comparison): </td>
 	</tr>
-{% endif %}
-{% for table in page.appendix_tables %}
-{% for variety, row in table.sorted_rows %}
-		{% if variety.name == "LSD" %}
+	{% endif %}
+	{% for table in page.appendix_tables %}
+		{% for variety, row in table.sorted_rows %}
+			{% if variety.name == "LSD" %}
 		<tr class="variety_trials__LSD_row">
 			<th>
 				<input type="submit" value="Compare Selected"/>
 			</th>
-		{% else %}
+			{% else %}
 		<tr class="variety_trials__row {% cycle 'variety_trials__row_odd' 'variety_trials__row_even' %}">
 			<th>
 				<input
@@ -155,10 +156,11 @@
 					<a href='{{home_url}}/view/info/{{variety.name}}/'>{{variety.name}}</a>
 				</label>
 			</th>
-		{% endif %}
+			{% endif %}
 		</tr>
+		{% endfor %}
 	{% endfor %}
-{% endfor %}
+{% endif %}
 	</tbody>
 		</form>
 		<tfoot>
