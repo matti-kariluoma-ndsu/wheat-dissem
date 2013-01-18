@@ -152,49 +152,49 @@
 				<div id="static_form_controls">
 					<input type="submit" value="Submit" />
 				</div>
-				<div id="dynamic_form_controls" style="display: None;">
-					<div>
-						<label for="id_fieldname">Field</label>: 
-						<select name="variety" id="id_fieldname">
-						{% for fieldname in fieldnames %}
-							<option 
-							{% if fieldname == "bushels_acre" %}
-							selected
-							{% endif %}
-							value="{{fieldname}}">{{fieldname}}</option>
-						{% endfor %}
-						</select>
-					</div>
-					<div>
-						<label for="id_year_range_1">Year Range</label>:
-						<ul>
-							<li>
-								<label for="id_year_range_1">
-									<input checked="checked" type="radio" id="id_year_range_1" name="year_range" value="LAST"/>
-									/last_x_years
-								</label>
-								<ul>
-									<li style="list-style-type: none;"><label for="id_year_range_1_x" >x</label> : <input value="3" id="id_year_range_1_x" name="year_range_last_x" /></li>
-								</ul>
-							</li>
-							<li>
-								<label for="id_year_range_2">
-									<input id="id_year_range_2" type="radio" name="year_range" value="YEAR" />
-									/year
-								</label>
-								<ul>
-									<li style="list-style-type: none;"><label for="id_year_range_2_year" >year</label> : <input id="id_year_range_2_year" type="text" name="year_range_year" /></li>
-								</ul>
-							</li>
-						</ul>
-					</div>
-					<input type="button" value="Generate" onclick="variety_trials__generateUrl(); return false;"/>
-					<div>
-						<label for="id_generate_output" style="vertical-align: top;">Url</label> <span style="vertical-align: top;">:</span>
-						<textarea id="id_generate_output" rows="2" cols="80" readonly="true"></textarea>
-					</div>
-				</div>
 			</form>
+			<div id="dynamic_form_controls" style="display: None;">
+				<div>
+					<label for="id_fieldname">Field</label>: 
+					<select name="variety" id="id_fieldname">
+					{% for fieldname in fieldnames %}
+						<option 
+						{% if fieldname == "bushels_acre" %}
+						selected
+						{% endif %}
+						value="{{fieldname}}">{{fieldname}}</option>
+					{% endfor %}
+					</select>
+				</div>
+				<div>
+					<label for="id_year_range_1">Year Range</label>:
+					<ul>
+						<li>
+							<label for="id_year_range_1">
+								<input checked="checked" type="radio" id="id_year_range_1" name="year_range" value="LAST"/>
+								/last_x_years
+							</label>
+							<ul>
+								<li style="list-style-type: none;"><label for="id_year_range_1_x" >x</label> : <input value="3" id="id_year_range_1_x" name="year_range_last_x" /></li>
+							</ul>
+						</li>
+						<li>
+							<label for="id_year_range_2">
+								<input id="id_year_range_2" type="radio" name="year_range" value="YEAR" />
+								/year
+							</label>
+							<ul>
+								<li style="list-style-type: none;"><label for="id_year_range_2_year" >year</label> : <input id="id_year_range_2_year" type="text" name="year_range_year" /></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<input type="button" value="Generate" onclick="variety_trials__generateUrl(); return false;"/>
+				<div>
+					<label for="id_generate_output" style="vertical-align: top;">Url</label> <span style="vertical-align: top;">:</span>
+					<textarea id="id_generate_output" rows="2" cols="80" readonly="true"></textarea>
+				</div>
+			</div>
 	</div>
 
 	<hr />
