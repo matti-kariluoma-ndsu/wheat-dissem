@@ -31,7 +31,7 @@ def history_delete(request, delete):
 	history=models.Trial_Entry_History.objects.filter(id = delete)
 	for element in history:
 		trial_Entry=models.Trial_Entry.objects.filter(id = element.trial_entry.id)
-		trial_Entry.delete()
+		#trial_Entry.delete()
 	
 	return render_to_response(
 		'history.html', 
@@ -46,7 +46,7 @@ def history_commit(request, id):
 	entries = models.Trial_Entry_History.objects.filter(id = id)
 	for entry in entries:
 		entry.deletable = False;
-		entry.save()
+		#entry.save()
 
 def generate_unique_name():
 	username = ''.join([random.choice('abcdef1234567890') for i in range(16)])
@@ -263,10 +263,11 @@ def add_variety(request):
 		message = "Add failed"
 		form = models.VarietyForm(request.POST)
 		if form.is_valid():
-			new_variety = form.save()
+			#new_variety = form.save()
 			formset = DiseaseFormset(request.POST, instance=new_variety)
 			if formset.is_valid():
-				formset.save()
+				pass
+				#formset.save()
 			message = "Add successful"
 	else:
 		message = None
@@ -291,7 +292,8 @@ def add_trial_entry(request):
 		formset = Trial_EntryFormSet(request.POST)
 		if formset.is_valid():
 			for form in formset:
-				new_trial = form.save()
+				pass
+				#new_trial = form.save()
 			message = "Add successful"
 	else:
 		message = None
@@ -320,7 +322,7 @@ def add_date(request):
 		message = "Add failed"
 		form = models.DateForm(request.POST)
 		if form.is_valid():
-			new_location = form.save()
+			#new_location = form.save()
 			message = "Add successful"
 	else:
 		message = None
@@ -341,7 +343,7 @@ def add_location(request):
 		message = "Add failed"
 		form = models.LocationForm(request.POST)
 		if form.is_valid():
-			new_location = form.save()
+			#new_location = form.save()
 			message = "Add successful"
 	else:
 		message = None

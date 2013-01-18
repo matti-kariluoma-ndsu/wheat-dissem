@@ -170,7 +170,7 @@ class LSD_Row(Row):
 				if lsd is None:
 					lsd = real_cell.get(cell.year, "lsd_10")
 				if lsd is None:
-					lsd = real_cell.get(cell, "lsd_05")
+					lsd = real_cell.get(cell.year, "lsd_05")
 			return lsd
 		else:
 			return cell
