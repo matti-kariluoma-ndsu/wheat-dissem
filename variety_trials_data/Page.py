@@ -773,7 +773,7 @@ class Page:
 	def __init__(self, locations, number_locations, not_locations, 
 			default_year, year_range, default_fieldname, lsd_probability, 
 			break_into_subtables=False, varieties=[], show_appendix_tables=False,
-			number_of_tables=3):
+			number_of_tables=3, all_varieties_in_subtables=True):
 		self.tables = []
 		decomposition = self.decomposition = {}# {year: {variety: {location: bool, ...}, ...}, ...}
 		self.clear()
@@ -889,6 +889,18 @@ class Page:
 
 		self.tables.extend(self.data_tables)
 		self.tables.extend(self.appendix_tables) # why do we do this?
+		
+		# add data from higher-order tables to lower-order ones (ordering is by site-years)
+		# TODO: would like to do this after truncating tables, but we need
+		# TODO: to decorate first. If we do this after decoration, we need to be more careful
+		if all_varieties_in_subtables:
+			prev_table = None
+			for table in self.data_tables:
+				if prev_table is None:
+					prev_table = table
+				else:
+					for ((variety, location), cell) in prev_table.cells.items():
+						table.add_cell(variety, location, cell)
 		
 		# Decorate the tables
 		for table in self.tables:

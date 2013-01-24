@@ -249,6 +249,7 @@ need to use the urlencode filter when making /view/variety/name/ links
 * link /view/available/ to the contribute(?) section
 
 * Include upper tables in each following table.
+** Highlight new entries?
 * Protein percent in Park River seems to be wrong
 ** http://www.ag.ndsu.edu/varietyselectiontool/view/last_3_years/protein_percent/?zipcode=58103&scope=NEAR&&variety=Brick&variety=Faller&variety=Forefront&variety=Glenn&year=2012
 * Enter modified data
