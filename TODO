@@ -247,3 +247,6 @@ need to use the urlencode filter when making /view/variety/name/ links
 ** http://www.ars-grin.gov/cgi-bin/npgs/acc/display.pl?1813821
 
 * link /view/available/ to the contribute(?) section
+
+* Protein percent in Park River seems to be wrong
+** http://www.ag.ndsu.edu/varietyselectiontool/view/last_3_years/protein_percent/?zipcode=58103&scope=NEAR&&variety=Brick&variety=Faller&variety=Forefront&variety=Glenn&year=2012
