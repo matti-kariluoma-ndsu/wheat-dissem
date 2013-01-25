@@ -250,11 +250,7 @@ need to use the urlencode filter when making /view/variety/name/ links
 
 * Include upper tables in each following table.
 ** Highlight new entries?
-* Protein percent in Park River seems to be wrong
-** http://www.ag.ndsu.edu/varietyselectiontool/view/last_3_years/protein_percent/?zipcode=58103&scope=NEAR&&variety=Brick&variety=Faller&variety=Forefront&variety=Glenn&year=2012
-* Enter modified data
-* Answer this:
-**  We have not uploaded the intensively managed trials in the database yet, correct?
+** Aggregate Cell is being a problem. All of the code makes to many assumptions on visible_location etc. Need a new class of column to denote "do not aggregate"
 
 * PAGE RELOAD IS NONDETERMINISTIC
 ** reloading zipcode=58102 causes these to show up:
