@@ -1,6 +1,6 @@
 # Django settings for variety_trials_website project.
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -12,7 +12,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'sqlite.db',                      # Or path to database file if using sqlite3.
+        'NAME': '/var/www/wheat/sqlite.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -170,9 +170,9 @@ CACHES = {
     'default': {
         #'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         #'LOCATION': '127.0.0.1:11211',
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/tmp/wheat_dissem_cache',
-        'TIMEOUT': 300,
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        #'LOCATION': '/tmp/wheat_dissem_cache',
+        #'TIMEOUT': 300,
     }
 }
 
