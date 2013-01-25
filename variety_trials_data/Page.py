@@ -773,7 +773,7 @@ class Page:
 	def __init__(self, locations, number_locations, not_locations, 
 			default_year, year_range, default_fieldname, lsd_probability, 
 			break_into_subtables=False, varieties=[], show_appendix_tables=False,
-			number_of_tables=3, all_varieties_in_subtables=True):
+			number_of_tables=3, all_varieties_in_subtables=False):
 		self.tables = []
 		decomposition = self.decomposition = {}# {year: {variety: {location: bool, ...}, ...}, ...}
 		self.clear()
@@ -890,18 +890,6 @@ class Page:
 		self.tables.extend(self.data_tables)
 		self.tables.extend(self.appendix_tables) # why do we do this?
 		
-		# add data from higher-order tables to lower-order ones (ordering is by site-years)
-		# TODO: would like to do this after truncating tables, but we need
-		# TODO: to decorate first. If we do this after decoration, we need to be more careful
-		if all_varieties_in_subtables:
-			prev_table = None
-			for table in self.data_tables:
-				if prev_table is None:
-					prev_table = table
-				else:
-					for ((variety, location), cell) in prev_table.cells.items():
-						table.add_cell(variety, location, cell)
-		
 		# Decorate the tables
 		for table in self.tables:
 			## Add LSD rows
@@ -913,7 +901,7 @@ class Page:
 				table.add_cell(variety_key, column.location, cell)
 			## Add aggregate columns
 			for year_num in sorted(range(year_range), reverse=True):
-				year_num = year_num + 1 # we want 1-indexed, not 0-indexed
+				year_num = year_num + 1 # star counting from 1, not 0
 				location_key = Fake_Location("%s-yr" % (year_num))
 				table.locations.insert(0, location_key)
 				table.visible_locations.insert(0, location_key)
@@ -923,11 +911,33 @@ class Page:
 					cell = Aggregate_Cell(default_year, default_fieldname, row, column, decomposition, table.visible_locations)
 					table.add_cell(row.variety, location_key, cell)
 					
-		# sort descending by site-years tuple, i.e. (8, 12, 16)
+		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
 		self.data_tables = sorted(self.data_tables, key=lambda (table): table.get_site_years(), reverse=True)
 		# truncate number of tables
 		self.extra_tables = self.data_tables[number_of_tables:]
 		self.data_tables = self.data_tables[:number_of_tables]
+		
+		# add data from higher-order tables to lower-order ones (ordering is by site-years)
+		if all_varieties_in_subtables:
+			prev_table = None
+			for table in self.data_tables:
+				if prev_table is None:
+					prev_table = table
+					continue
+				for ((variety, location), cell) in prev_table.cells.items():
+					# continue if a decorative element
+					if isinstance(location, Fake_Location) or isinstance(variety, Fake_Variety):
+						continue
+					# if we have no data, insert a blank cell
+					try:
+						column = table.columns[location]
+						c = column.members[0]
+					except (KeyError, IndexError) as error:
+						c = None
+					if c is None or c.get(default_year, default_fieldname) is None:
+						table.add_cell(variety, location, Cell(default_year, default_fieldname))
+					else:
+						table.add_cell(variety, location, cell)
 		
 	def set_defaults(self, year, fieldname):
 		for table in self.tables:

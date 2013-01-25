@@ -255,3 +255,12 @@ need to use the urlencode filter when making /view/variety/name/ links
 * Enter modified data
 * Answer this:
 **  We have not uploaded the intensively managed trials in the database yet, correct?
+
+* PAGE RELOAD IS NONDETERMINISTIC
+** reloading zipcode=58102 causes these to show up:
+*** (8, 13, 18) (always)
+*** (7, 12, 17) (mostly)
+*** (7, 10, 11) (sometimes)
+*** (6, 10, 15) (other times)
+** setting number_tables to 4 causes stranger behavior; I managed to get between 2-4 tables.
+** is DummyCache to blame?
