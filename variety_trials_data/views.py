@@ -7,10 +7,9 @@ from django.forms.util import ErrorDict, ErrorList
 from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
-from variety_trials_data.Page import Page
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from variety_trials_data.variety_trials_util import LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
-from variety_trials_data.variety_trials_util import get_locations
+from variety_trials_data.Page import LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
+from variety_trials_data.variety_trials_util import get_page, get_locations
 import datetime
 
 ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
@@ -150,19 +149,6 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					'year': yearname,
 					}
 				)
-			
-			if locations is None:
-				try:
-					locations = get_locations(zipcode, scope)
-				except models.Zipcode.DoesNotExist:
-					zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(initial={
-							#'radius': zipcode_radius_form.cleaned_data['search_radius'],
-						})
-					# TODO: repopulate form
-					return HttpResponseRedirect("%s%s" % (HOME_URL, '/?error=bad_zipcode'))
-			
-			not_location_objects = models.Location.objects.filter(name__in=not_locations)
-			
 			try:
 				maxyear = int(startyear)
 			except ValueError:
@@ -180,63 +166,35 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			if year_url_bit is None:
 				year_url_bit = startyear
 			
-			for field in models.Trial_Entry._meta.fields:
-				if field.name == fieldname:
-					break;
-			
 			if years is None:
 				years = [maxyear - diff for diff in range(year_range)]
 			
-			lsd_probability = 0.05
-			
-			break_into_subtables = False
-			number_locations = len(locations)
-			if len(varieties) == 0:
-				break_into_subtables = True
-				#if scope != variety_trials_forms.ScopeConstants.all:
-				if scope == variety_trials_forms.ScopeConstants.near:
-					number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
-				
-			cache_key = '%s%s%s%s%s%s%s' % (
-					[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
-					number_locations,
-					year_url_bit,
-					year_range, 
-					lsd_probability, 
-					break_into_subtables, 
-					sorted(varieties)
-				)
-			cache_key = cache_key.replace(' ','')
-				
-			#print cache_key
-			page = cache.get(cache_key)
-			if page is not None:
-				for table in page.data_tables:
-					table.set_defaults(curyear, fieldname)
-					table.mask_locations(not_location_objects)
-			else:
-
-				try:
-					page = Page(
-								locations,
-								number_locations,
-								not_location_objects,
-								curyear, 
-								year_range, 
-								fieldname, 
-								lsd_probability, 
-								break_into_subtables=break_into_subtables, 
-								varieties=varieties
-							)
-					cache.set(cache_key, page, 300) # expires after 300 seconds (5 minutes)
-				except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear) as error:
-					page = None
-					message = " ".join([ERROR_MESSAGE, error.message])
-					#raise
-				except:
-					page = None
-					message = ERROR_MESSAGE
-					#raise
+			try:
+				page = get_page(
+						zipcode, 
+						scope, 
+						curyear, 
+						fieldname,
+						year_url_bit,
+						not_locations=not_locations, 
+						varieties=varieties, 
+						year_range=year_range, 
+						locations=locations
+					)
+			except models.Zipcode.DoesNotExist:
+				zipcode_radius_form = variety_trials_forms.SelectLocationByZipcodeForm(initial={
+						#'radius': zipcode_radius_form.cleaned_data['search_radius'],
+					})
+				# TODO: repopulate form
+				return HttpResponseRedirect("%s%s" % (HOME_URL, '/?error=bad_zipcode'))
+			except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear) as error:
+				page = None
+				message = " ".join([ERROR_MESSAGE, error.message])
+				raise
+			except:
+				page = None
+				message = ERROR_MESSAGE
+				raise
 					
 				
 			"""

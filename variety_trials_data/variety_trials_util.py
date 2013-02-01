@@ -1,25 +1,8 @@
 from django.core.cache import cache
 from variety_trials_data import models
+from variety_trials_data.Page import Page
 from variety_trials_data.variety_trials_forms import ScopeConstants
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt
-
-class LSDProbabilityOutOfRange(Exception):
-	def __init__(self, message=None):
-		if not message:
-			message = "The alpha-value for the LSD calculation was out of range."
-		Exception.__init__(self, message)
-
-class TooFewDegreesOfFreedom(Exception):
-	def __init__(self, message=None):
-		if not message:
-			message = "Could not calculate the LSD, too few degrees of freedom in the input."
-		Exception.__init__(self, message)
-		
-class NotEnoughDataInYear(Exception):
-	def __init__(self, message=None):
-		if not message:
-			message = "The selected year does not have any data for viewing."
-		Exception.__init__(self, message)
 
 class Locations_from_Zipcode_x_Scope:
 	"""
@@ -122,3 +105,60 @@ def get_locations(zipcode, scope=ScopeConstants.near):
 		cache.set(cache_key, locations, 300) # expires in 300 seconds (5 minutes)
 		
 	return locations
+
+def get_page(zipcode, scope, curyear, fieldname, year_url_bit, not_locations=[], varieties=[], year_range=3, locations=None):
+	page = None
+	
+	if locations is None:
+		# may throw models.Zipcode.DoesNotExist
+		locations = get_locations(zipcode, scope)
+			
+	not_location_objects = models.Location.objects.filter(name__in=not_locations)
+	
+	for field in models.Trial_Entry._meta.fields:
+		if field.name == fieldname:
+			break;
+	
+	lsd_probability = 0.05
+	break_into_subtables = False
+	
+	number_locations = len(locations)
+	if len(varieties) == 0:
+		break_into_subtables = True
+		#if scope != variety_trials_forms.ScopeConstants.all:
+		if scope == ScopeConstants.near:
+			number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
+	
+	cache_key = '%s%s%s%s%s%s%s' % (
+			[l.pk for l in sorted(locations, key=lambda location: location.pk)], 
+			number_locations,
+			year_url_bit,
+			year_range, 
+			lsd_probability, 
+			break_into_subtables, 
+			sorted(varieties)
+		)
+	cache_key = cache_key.replace(' ','')
+		
+	#print cache_key
+	page = cache.get(cache_key)
+	if page is not None:
+		for table in page.data_tables:
+			table.set_defaults(curyear, fieldname)
+			table.mask_locations(not_location_objects)
+	else:
+		# may throw LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
+		page = Page(
+						locations,
+						number_locations,
+						not_location_objects,
+						curyear, 
+						year_range, 
+						fieldname, 
+						lsd_probability, 
+						break_into_subtables=break_into_subtables, 
+						varieties=varieties
+					)
+		cache.set(cache_key, page, 300) # expires after 300 seconds (5 minutes)
+
+	return page
