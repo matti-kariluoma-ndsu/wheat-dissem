@@ -737,7 +737,7 @@ class Table:
 			row = [unicode(year)]
 			for (column, location) in self.sorted_visible_columns():
 				row.append(unicode(location))
-			table.append(unciode(" ").join(row))
+			table.append(unicode(" ").join(row))
 			for (variety, row) in self.sorted_rows():
 				table.append(unicode(row))
 			tables.append(unicode("\n").join(table))

@@ -260,3 +260,12 @@ need to use the urlencode filter when making /view/variety/name/ links
 *** (6, 10, 15) (other times)
 ** setting number_tables to 4 causes stranger behavior; I managed to get between 2-4 tables.
 ** is DummyCache to blame?
+
+** Found extraneous data point; has been deleted from sqlite & psql.
+t = models.Trial_Entry.objects.filter(location__name="Fergus Falls").filter(harvest_date__in=all_dates).filter(variety__name="Edge").filter(hidden=False)
+>>> t[0].bushels_acre
+Decimal('73.9')
+>>> t[1].bushels_acre
+Decimal('68.1')
+>>> t[0].delete()
+
