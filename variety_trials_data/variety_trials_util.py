@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from variety_trials_data import models
-from variety_trials_data.Page import Page
+from variety_trials_data.page import Page
 from variety_trials_data.variety_trials_forms import ScopeConstants
 from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt
 
