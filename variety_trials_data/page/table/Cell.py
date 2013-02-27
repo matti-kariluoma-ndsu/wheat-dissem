@@ -72,6 +72,7 @@ class Cell:
 			unicode_repr = unicode(str(unicode_repr))
 		return unicode_repr
 
+
 class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is based upon its row
