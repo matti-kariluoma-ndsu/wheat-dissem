@@ -1,15 +1,44 @@
+#!/usr/bin/env python
+# coding: ascii
+
+"""
+Cell contains a list of trial_entry that have the same variety and 
+location.
+"""
+
+class TrialNotMatched(Exception):
+	def __init__(self, message=None):
+		if not message:
+			message = "Attempted to add a trial with a mismatched variety or location."
+		Exception.__init__(self, message)
+
+class ExtraneousTrial(Exception):
+	def __init__(self, location, variety, year, fieldname):
+		message = '''More than one trial found for the given parameters:
+	location: \t"%s"
+	variety:  \t"%s"
+	year:     \t"%s"
+	fieldname:\t"%s"\n''' % (location, variety, year, fieldname)
+		Exception.__init__(self, message)
+
 class Cell:
 	"""
 	Helper class; Cells for our Table class.
 	"""
 	
-	def __init__(self, trial, year, fieldname):
+	def __init__(self, variety, location, default_year, default_fieldname):
 		self.clear()
-		self.year = year
-		self.fieldname = fieldname
+		self.variety = variety
+		self.location = location
+		self.year = default_year
+		self.fieldname = default_fieldname
 	
 	def __unicode__(self):
-		value = self.get_rounded(self.year, self.fieldname)
+		try:
+			value = self.get_rounded(self.year, self.fieldname)
+		except ExtraneousTrial:
+			value = None
+			
 		if value is None:
 			unicode_repr = unicode('--')
 		else:
@@ -18,6 +47,15 @@ class Cell:
 		
 	def __str__(self):
 		return str(unicode(self))
+	
+	def append(self, trial):
+		if trial.variety != self.variety or trial.location != self.location:
+			raise TrialNotMatched()
+		self.members.append(trial)
+	
+	def extend(self, trials):
+		for trial in trials:
+			self.append(trial)
 	
 	def get(self, year, fieldname):
 		this_year = []
@@ -28,7 +66,7 @@ class Cell:
 		if not this_year:
 			return None
 		if len(this_year) > 1:
-			print 'error'
+			raise ExtraneousTrial(self.location, self.variety, year, fieldname)
 		
 		entry = this_year[0]
 		try:
@@ -45,6 +83,8 @@ class Cell:
 		return value
 	
 	def clear(self):
+		self.variety = None
+		self.location = None
 		self.year = 0
 		self.fieldname = "no_field"
 		self.members = []
@@ -53,7 +93,7 @@ class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is dependent upon its row
 	"""
-	def __init__(self, year, fieldname, row):
+	def __init__(self):
 		self.clear()
 		Cell.__init__(self, year, fieldname)
 		self.row = row

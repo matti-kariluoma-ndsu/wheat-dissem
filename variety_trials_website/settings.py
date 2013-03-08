@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: ascii
+
 # Django settings for variety_trials_website project.
 
 DEBUG = True

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: ascii
+
 from django import forms
 from django.forms.formsets import BaseFormSet
 from variety_trials_data import models

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: ascii
+
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "variety_trials_website.settings")

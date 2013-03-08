@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: ascii
+
 import models
 from django.contrib import admin
 

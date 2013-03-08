@@ -1,3 +1,36 @@
+#!/usr/bin/env python
+# coding: ascii
+
+"""
+Page contains a collection of models.trial_entry, organized as
+cells -> rows, columns -> tables. Each of these objects has
+a list-like interface:
+	for table in page
+	for row in table
+	for row in table.rows()
+	for column in table.columns()
+	for cell in row
+	for cell in column
+	page.append(table)
+	page.extend(tables)
+	table.append(cell)
+	table.extend(cells)
+	row.append(cell)
+	row.extend(cells)
+	column.append(cell)
+	column.extend(cells)
+	cell.append(trial_entry)
+	cell.extend(trial_entries)
+	table_copy = Table(table)
+	row_copy = Row(row)
+	column_copy = Column(column)
+
+In addition:
+	row = table.row(variety)
+	column = table.column(location)
+
+"""
+
 from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
 from variety_trials_data.page.table.Table import Table
@@ -25,7 +58,7 @@ class NotEnoughDataInYear(Exception):
 		Exception.__init__(self, message)
 
 class Page:
-	def get_entries(self, min_year, max_year, locations, number_locations, variety_names):
+	def _get_entries(self, min_year, max_year, locations, number_locations, variety_names):
 		"""
 		First calls multiple count() calls to the database, and deletes
 		locations from the page that contain no data.
@@ -84,15 +117,8 @@ class Page:
 				
 		return (locations_with_data, result)
 	
-	def __init__(self, locations, number_locations, not_locations, 
-			default_year, year_range, default_fieldname, lsd_probability, 
-			break_into_subtables=False, varieties=[], show_appendix_tables=False,
-			number_of_tables=3, all_varieties_in_subtables=False):
-		self.tables = []
-		decomposition = self.decomposition = {}# {year: {variety: {location: bool, ...}, ...}, ...}
-		self.clear()
-		cells = {} # variety: {location: Cell() }
-		(locations, entries) = self.get_entries(
+	def _process_entries(self, default_year, year_range, locations, number_locations, varieties):
+		(locations, entries) = self._get_entries(
 				default_year - year_range, 
 				default_year, 
 				locations, 
@@ -105,38 +131,40 @@ class Page:
 			variety = entry.variety
 			location = entry.location
 			try:
-				cell = cells[variety][location]
+				cell = self.cells[variety][location]
 			except KeyError:
 				try:
-					d = cells[variety]
+					d = self.cells[variety]
 				except KeyError:
-					d = cells[variety] = {}
+					d = self.cells[variety] = {}
 				cell = d[location] = Cell(default_year, default_fieldname)
 					
 			cell.append(entry)
 			
 			try:
-				d = decomposition[year][variety]
+				d = self.is_data_present[year][variety]
 			except KeyError:
 				try:
-					d = decomposition[year][variety] = dict([(l, False) for l in locations])
+					d = self.is_data_present[year][variety] = dict([(l, False) for l in locations])
 				except KeyError:
-					decomposition[year] = {}
-					d = decomposition[year][variety] = dict([(l, False) for l in locations])
+					self.is_data_present[year] = {}
+					d = self.is_data_present[year][variety] = dict([(l, False) for l in locations])
 					
 			try:
 				d[location] = True
 			except KeyError:
 				pass
-		
-		if default_year not in decomposition:
-			years = decomposition.keys()
+			
+		# ensure we have enough data for this year
+		if default_year not in self.is_data_present:
+			years = self.is_data_present.keys()
 			if len(years) > 0:
 				default_year = sorted(years, reverse=True)[0]
+				self.set_defaults(default_year, default_fieldname)
 			else:
 				raise NotEnoughDataInYear("Not enough data in year %s" % (default_year))
-		
-		# hide user's deselections.
+	
+	def _mask_locations(self, locations):
 		visible_locations = list(locations) # make a copy
 		
 		if len(not_locations) > 0:
@@ -147,15 +175,45 @@ class Page:
 					
 			for index in sorted(delete_these, reverse=True):
 				visible_locations.pop(index)
+				
+		return visible_locations
+	
+	def _make_appendix(self):
+		table = Appendix_Table(self)
+		for variety in models.Variety.objects.all():
+			if variety not in self.cells:
+				table.rows.append(variety)		
+		self._tables.append(table)
+	
+	def _copy_rows_to_remaining_tables(self):
+		try:
+			prev_table = self._tables[0]
+		except IndexError:
+			return
+			
+		for table in self:
+			for row in prev_table:
+				# continue if a decorative element
+				if isinstance(row.variety, Fake_Variety):
+					continue
+				table.rows.append(Row(row))
+
+	def __init__(self, locations, number_locations, not_locations, 
+			default_year, year_range, default_fieldname, lsd_probability, 
+			break_into_subtables=False, varieties=[], show_appendix_tables=False,
+			number_of_tables=3, all_varieties_in_subtables=False):
+		self._tables = []
+		self.clear()
 		
-		#
-		## Make tables from cells
-		#
+		# populate self.cells and self.is_data_present
+		self._process_entries(default_year, year_range, locations, number_locations, varieties)
+				
+		# Make tables from self.cells
 		if break_into_subtables:
 			# Sort/split the tables
 			
 			# Sort the varieties by number of locations they appear in.
-			variety_order = sorted(decomposition[default_year], key = lambda variety: decomposition[default_year][variety], reverse=True)
+			variety_order = sorted(self.is_data_present[default_year], key = lambda variety: self.is_data_present[default_year][variety], reverse=True)
 			
 			if len(variety_order) < 1:
 				break_into_subtables = False
@@ -164,48 +222,33 @@ class Page:
 				
 				# Move balanced varieties to their own tables
 				table = Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
-				self.data_tables.append(table)
+				self.append(table)
 				for variety in variety_order:
-					if not isinstance(table, Appendix_Table) and decomposition[default_year][variety] != decomposition[default_year][prev]:
+					if not isinstance(table, Appendix_Table) and self.is_data_present[default_year][variety] != self.is_data_present[default_year][prev]:
 						prev = variety
-						if len([location for location in decomposition[default_year][prev] if decomposition[default_year][prev][location]]) >= len(visible_locations) / 2:
+						if len([location for location in self.is_data_present[default_year][prev] if self.is_data_present[default_year][prev][location]]) >= len(visible_locations) / 2:
 							table = Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
-							self.data_tables.append(table)
+							self.append(table)
 						else:
 							table = Appendix_Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
-							self.appendix_tables.append(table)
+							self.append(table)
 					
-					for (location, cell) in cells[variety].items():
+					for (location, cell) in self.cells[variety].items():
 						table.add_cell(variety, location, cell)
 		
 		if not break_into_subtables:
 			table = Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
-			self.data_tables.append(table)
-			for variety in cells:
-				for location in cells[variety]:
-					cell = cells[variety][location]
+			self.append(table)
+			for variety in self.cells:
+				for location in self.cells[variety]:
+					cell = self.cells[variety][location]
 					table.add_cell(variety, location, cell)
 		
-		# {Add,add to} appendix tables
-		if len(self.appendix_tables) > 0:
-			table = self.appendix_tables[-1] # grab the last one
-		else:
-			table = Appendix_Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
-			self.appendix_tables.append(table)
 		
-		for variety in models.Variety.objects.all():
-			if variety not in cells:
-				table.add_cell(variety)
-		
-		for extra_table in self.extra_tables:
-			for variety in extra_table.rows.keys():
-				table.add_cell(variety)
-
-		self.tables.extend(self.data_tables)
-		self.tables.extend(self.appendix_tables) # why do we do this?
+		self._make_appendix()
 		
 		# Decorate the tables
-		for table in self.tables:
+		for table in self._tables:
 			## Add LSD rows
 			variety_key = Fake_Variety("LSD")
 			row = LSD_Row(variety_key, table)
@@ -222,7 +265,7 @@ class Page:
 				column = Aggregate_Column(location_key, year_num)
 				table.columns[location_key] = column
 				for row in table.rows.values():
-					cell = Aggregate_Cell(default_year, default_fieldname, row, column, decomposition, table.visible_locations)
+					cell = Aggregate_Cell(default_year, default_fieldname, row, column, self.is_data_present, table.visible_locations)
 					table.add_cell(row.variety, location_key, cell)
 					
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
@@ -233,40 +276,41 @@ class Page:
 		
 		# add data from higher-order tables to lower-order ones (ordering is by site-years)
 		if all_varieties_in_subtables:
-			prev_table = None
-			for table in self.data_tables:
-				if prev_table is None:
-					prev_table = table
-					continue
-				for ((variety, location), cell) in prev_table.cells.items():
-					# continue if a decorative element
-					if isinstance(location, Fake_Location) or isinstance(variety, Fake_Variety):
-						continue
-					# if we have no data, insert a blank cell
-					try:
-						column = table.columns[location]
-						c = column.members[0]
-					except (KeyError, IndexError) as error:
-						c = None
-					if c is None or c.get(default_year, default_fieldname) is None:
-						table.add_cell(variety, location, Cell(default_year, default_fieldname))
-					else:
-						table.add_cell(variety, location, cell)
+			self._copy_rows_to_remaining_tables()
+	
+	def __unicode__(self):
+		return unicode("page")
+	
+	def __str__(self):
+		return str(unicode(self))
+	
+	def __iter__(self):
+		return self
 		
+	def next(self):
+		table = None
+		return table
+	
+	def append(self, table):
+		table.page = self
+		self._tables.append(table)
+		
+	def extend(self, tables):
+		for table in tables:
+			self.append(table)
+	
+	def tables():
+		return self
+	
 	def set_defaults(self, year, fieldname):
-		for table in self.tables:
-			table.set_defaults(year, fieldname)
+		for variety in self.self.cells:
+			for cell in self.self.cells[variety].values():
+				cell.set_defaults(year, fieldname)
 			
 	def clear(self):
-		for table in self.tables:
+		for table in self._tables:
 			table.clear()
-		self.tables = []	
-		self.data_tables = []	
-		self.extra_tables = []	
-		self.appendix_tables = []	
-		for year in self.decomposition:
-			for variety in self.decomposition[year]:
-				self.decomposition[year][variety] = {}
-			self.decomposition[year] = {}
-		self.decomposition = {} # {year: {variety: {location: bool, ...}, ...}, ...}
-
+		self._tables = []	
+		self.is_data_present = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		self.cells = {} # variety: {location: Cell() }
+ 
