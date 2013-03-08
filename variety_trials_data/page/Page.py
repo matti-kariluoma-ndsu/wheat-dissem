@@ -203,6 +203,7 @@ class Page:
 			break_into_subtables=False, varieties=[], show_appendix_tables=False,
 			number_of_tables=3, all_varieties_in_subtables=False):
 		self._tables = []
+		self.cells = {}
 		self.clear()
 		
 		# populate self.cells and self.is_data_present
@@ -248,7 +249,7 @@ class Page:
 		self._make_appendix()
 		
 		# Decorate the tables
-		for table in self._tables:
+		for table in self:
 			## Add LSD rows
 			variety_key = Fake_Variety("LSD")
 			row = LSD_Row(variety_key, table)
@@ -310,7 +311,10 @@ class Page:
 	def clear(self):
 		for table in self._tables:
 			table.clear()
-		self._tables = []	
-		self.is_data_present = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		self._tables = []
+		for cell in [self.cells[variety][location] for variety in self.cells for location in self.cells[variety]]:
+			cell.clear()
 		self.cells = {} # variety: {location: Cell() }
+		self.is_data_present = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		
  
