@@ -106,7 +106,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	# 'variety_trials_data.redirect_middleware.RedirectFallbackMiddleware',
+		# 'variety_trials_data.redirect_middleware.RedirectFallbackMiddleware',
 )
 
 ROOT_URLCONF = 'variety_trials_website.urls'
