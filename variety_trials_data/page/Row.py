@@ -14,6 +14,12 @@ class Fake_Variety:
 		self.name = name
 		self.id = -1
 		self.pk = -1
+		
+	def __unicode__(self):
+		return unicode(self.name)
+		
+	def __str__(self):
+		return str(unicode(self))
 
 class Row:
 	"""
@@ -26,9 +32,13 @@ class Row:
 			self.extend([cell for cell in row])
 		
 	def __unicode__(self):
-		row = [unicode(self.variety)]
+		header = unicode(self.variety)
+		if len(header) > 7:
+			row = [unicode('%s\t' % header)]
+		else:
+			row = [unicode('%s\t\t' % header)]
 		row.extend([unicode(cell) for cell in self])
-		return unicode(" ").join(row)
+		return unicode("\t").join(row)
 	
 	def __str__(self):
 		return str(unicode(self))

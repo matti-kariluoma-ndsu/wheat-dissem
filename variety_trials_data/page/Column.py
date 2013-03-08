@@ -15,6 +15,12 @@ class Fake_Location:
 		self.id = -1
 		self.pk = -1
 		
+	def __unicode__(self):
+		return unicode(self.name)
+		
+	def __str__(self):
+		return str(unicode(self))
+		
 class Column:
 	"""
 	Contains references to each Cell in this column.
@@ -26,9 +32,14 @@ class Column:
 			self.extend([cell for cell in column])
 	
 	def __unicode__(self):
-		column = [unicode(self.location)]
+		header = unicode(self.location)
+		if len(header) > 7:
+			column = [unicode('%s\t' % header)]
+		else:
+			column = [unicode('%s\t\t' % header)]
+		column = [unicode('%s\t\t' % self.location)]
 		column.extend([unicode(cell) for cell in self])
-		return unicode(" ").join(column)
+		return unicode("\t").join(column)
 		
 	def __str__(self):
 		return str(unicode(self))
