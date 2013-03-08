@@ -51,7 +51,7 @@ class Cell:
 	def append(self, trial):
 		if trial.variety != self.variety or trial.location != self.location:
 			raise TrialNotMatched()
-		self.members.append(trial)
+		self._members.append(trial)
 	
 	def extend(self, trials):
 		for trial in trials:
@@ -59,7 +59,7 @@ class Cell:
 	
 	def get(self, year, fieldname):
 		this_year = []
-		for entry in self.members:
+		for entry in self._members:
 			if entry.harvest_date.date.year == year:
 				this_year.append(entry)
 				
@@ -87,7 +87,7 @@ class Cell:
 		self.location = None
 		self.year = 0
 		self.fieldname = "no_field"
-		self.members = []
+		self._members = []
 
 class Aggregate_Cell(Cell):
 	"""

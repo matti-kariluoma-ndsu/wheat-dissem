@@ -28,9 +28,11 @@ class Table:
 	
 	# Probability is required for creating the LSD row
 	def __init__(self, table=None):
+		self._rows = {} 
+		self._columns = {} 
 		self.clear()
 		if table:
-			self.extend([cell for cell in row for row in table])
+			self.extend([cell for row in table for cell in row])
 				
 	def __unicode__(self):
 		return unicode("table")
@@ -81,7 +83,11 @@ class Table:
 	
 	def clear(self):
 		self.page = None
+		for row in self._rows.values():
+			row.clear()
 		self._rows = {} # variety: Row(), ...
+		for column in self._columns.values():
+			column.clear()
 		self._columns = {} # location: Column(), ...
 		
 class Appendix_Table(Table):
