@@ -44,19 +44,35 @@ class Table:
 		self.index = 0
 		if self.iter_rows:
 			self.iter_dict = self._rows
-			self.iter_order = self.table.row_order
+			self.iter_order = self.page.row_order
+			self.iter_skip = []
+			self.iter_show_missing = False
 		else:
 			self.iter_dict = self._cols
-			self.iter_order = self.table.column_order
+			self.iter_order = self.page.column_order
+			self.iter_skip = self.masked_locations
+			self.iter_show_missing = True
 		return self
 		
 	def next(self):
 		try:
-			cell = self.iter_dict[self.iter_order[self.index]]
+			key = self.iter_order[self.index]
 			self.index += 1
 		except IndexError:
 			self.iter_rows = True # reset state
 			raise StopIteration
+			
+		if key in self.iter_skip:
+			cell = None
+		else:
+			try:
+				cell = self.iter_dict[key]
+			except KeyError:
+				cell = None
+				
+		if cell is None and not self.iter_show_missing:
+			return self.next()
+		
 		return cell
 	
 	def rows(self):
@@ -97,6 +113,7 @@ class Table:
 	def clear(self):
 		self.page = None
 		self.iter_rows = True
+		self.masked_locations = []
 		for row in self._rows.values():
 			row.clear()
 		self._rows = {} # variety: Row(), ...
