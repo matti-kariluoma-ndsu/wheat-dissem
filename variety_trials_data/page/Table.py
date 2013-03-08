@@ -41,17 +41,30 @@ class Table:
 		return str(unicode(self))
 		
 	def __iter__(self):
+		self.index = 0
+		if self.iter_rows:
+			self.iter_dict = self._rows
+			self.iter_order = self.table.row_order
+		else:
+			self.iter_dict = self._cols
+			self.iter_order = self.table.column_order
 		return self
 		
 	def next(self):
-		cell = None
+		try:
+			cell = self.iter_dict[self.iter_order[self.index]]
+			self.index += 1
+		except IndexError:
+			self.iter_rows = True # reset state
+			raise StopIteration
 		return cell
 	
 	def rows(self):
+		self.iter_rows = True
 		return self
 		
 	def columns(self):
-		# change iter behavior
+		self.iter_rows = False
 		return self
 	
 	def row(self, variety):
@@ -83,6 +96,7 @@ class Table:
 	
 	def clear(self):
 		self.page = None
+		self.iter_rows = True
 		for row in self._rows.values():
 			row.clear()
 		self._rows = {} # variety: Row(), ...
@@ -91,12 +105,10 @@ class Table:
 		self._columns = {} # location: Column(), ...
 		
 class Appendix_Table(Table):
-	def __init__(self, page):
+	def __init__(self, table=None):
 		"""
-		location: a Location (or Fake_Location) object
-		year_num: an integer denoting the number of years to go back for averaging i.e. 3
 		"""
-		Table.__init__(self, page)
+		Table.__init__(self, table)
 	
 	def columns(self):
 		return []

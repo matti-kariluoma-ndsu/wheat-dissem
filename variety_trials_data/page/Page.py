@@ -36,7 +36,7 @@ from variety_trials_data import models
 from variety_trials_data.page.Table import Table
 from variety_trials_data.page.Row import Row
 from variety_trials_data.page.Column import Column
-from variety_trials_data.page.Cell import Cell, Aggregate_Cell
+from variety_trials_data.page.Cell import Cell, Aggregate_Cell, Empty_Cell
 import datetime
 
 class LSDProbabilityOutOfRange(Exception):
@@ -137,7 +137,7 @@ class Page:
 					d = self.cells[variety]
 				except KeyError:
 					d = self.cells[variety] = {}
-				cell = d[location] = Cell(default_year, default_fieldname)
+				cell = d[location] = Cell(variety, location, default_year, default_fieldname)
 					
 			cell.append(entry)
 			
@@ -164,26 +164,30 @@ class Page:
 			else:
 				raise NotEnoughDataInYear("Not enough data in year %s" % (default_year))
 	
-	def _mask_locations(self, locations):
-		visible_locations = list(locations) # make a copy
+	def _mask_locations(self, locations, not_locations):
+		"""
+		locations was externally sorted, so we need to maintain its order.
+		We also need to remove any entry in not_locations from locations.
+		"""
+		self.column_order = list(locations) # make a copy
 		
 		if len(not_locations) > 0:
 			delete_these = []
-			for (index, location) in enumerate(visible_locations):
+			for (index, location) in enumerate(self.column_order):
 				if location in not_locations:
 					delete_these.append(index)
 					
 			for index in sorted(delete_these, reverse=True):
-				visible_locations.pop(index)
-				
-		return visible_locations
+				self.column_order.pop(index)
 	
 	def _make_appendix(self):
-		table = Appendix_Table(self)
+		table = Appendix_Table()
+		location = Fake_Location("empty")
+		# do not add this location to self.column_order, we want it to be invisible
 		for variety in models.Variety.objects.all():
 			if variety not in self.cells:
-				table.rows.append(variety)		
-		self._tables.append(table)
+				table.append(Empty_Cell(variety, location))		
+		self.append(table)
 	
 	def _copy_rows_to_remaining_tables(self):
 		try:
@@ -196,7 +200,7 @@ class Page:
 				# continue if a decorative element
 				if isinstance(row.variety, Fake_Variety):
 					continue
-				table.rows.append(Row(row))
+				table.append([cell for cell in row])
 
 	def __init__(self, locations, number_locations, not_locations, 
 			default_year, year_range, default_fieldname, lsd_probability, 
@@ -208,7 +212,13 @@ class Page:
 		
 		# populate self.cells and self.is_data_present
 		self._process_entries(default_year, year_range, locations, number_locations, varieties)
-				
+		
+		# populate self.row_order
+		self.row_order = sorted(list(self.cells.keys())) # sorted alphanumeric
+		
+		# populate self.column_order
+		self._mask_locations(locations, not_locations) # sorted by distance
+		
 		# Make tables from self.cells
 		if break_into_subtables:
 			# Sort/split the tables
@@ -222,28 +232,29 @@ class Page:
 				prev = variety_order[0]
 				
 				# Move balanced varieties to their own tables
-				table = Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
+				table = Table()
 				self.append(table)
 				for variety in variety_order:
-					if not isinstance(table, Appendix_Table) and self.is_data_present[default_year][variety] != self.is_data_present[default_year][prev]:
+					if self.is_data_present[default_year][variety] != self.is_data_present[default_year][prev]:
 						prev = variety
-						if len([location for location in self.is_data_present[default_year][prev] if self.is_data_present[default_year][prev][location]]) >= len(visible_locations) / 2:
-							table = Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
+						if len([location for location in self.is_data_present[default_year][prev] if self.is_data_present[default_year][prev][location]]) >= 4: #len(visible_locations) / 2:
+							table = Table()
 							self.append(table)
 						else:
-							table = Appendix_Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
+							table = Appendix_Table()
 							self.append(table)
 					
-					for (location, cell) in self.cells[variety].items():
-						table.add_cell(variety, location, cell)
+					for location in self.cells[variety]:
+						cell = self.cells[variety][location]
+						table.append(cell)
 		
 		if not break_into_subtables:
-			table = Table(locations, visible_locations, lsd_probability, default_year, default_year - year_range, default_fieldname)
+			table = Table()
 			self.append(table)
 			for variety in self.cells:
 				for location in self.cells[variety]:
 					cell = self.cells[variety][location]
-					table.add_cell(variety, location, cell)
+					table.append(cell)
 		
 		
 		self._make_appendix()
@@ -251,29 +262,19 @@ class Page:
 		# Decorate the tables
 		for table in self:
 			## Add LSD rows
-			variety_key = Fake_Variety("LSD")
-			row = LSD_Row(variety_key, table)
-			table.rows[variety_key] = row
-			for column in table.columns.values():
-				cell = Cell(default_year, default_fieldname)
-				table.add_cell(variety_key, column.location, cell)
-			## Add aggregate columns
+			variety = Fake_Variety("LSD")
+			for column in table.columns():
+				table.append(Cell(variety, column.location, default_year, default_fieldname))
+			## Add n-yr columns
 			for year_num in sorted(range(year_range), reverse=True):
 				year_num = year_num + 1 # star counting from 1, not 0
-				location_key = Fake_Location("%s-yr" % (year_num))
-				table.locations.insert(0, location_key)
-				table.visible_locations.insert(0, location_key)
-				column = Aggregate_Column(location_key, year_num)
-				table.columns[location_key] = column
-				for row in table.rows.values():
-					cell = Aggregate_Cell(default_year, default_fieldname, row, column, self.is_data_present, table.visible_locations)
-					table.add_cell(row.variety, location_key, cell)
+				location = Fake_Location("%s-yr" % (year_num))
+				for row in table.rows():
+					table.append(Aggregate_Cell(row.variety, location, default_year, default_fieldname))
+					
 					
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
 		self.data_tables = sorted(self.data_tables, key=lambda (table): table.get_site_years(), reverse=True)
-		# truncate number of tables
-		self.extra_tables = self.data_tables[number_of_tables:]
-		self.data_tables = self.data_tables[:number_of_tables]
 		
 		# add data from higher-order tables to lower-order ones (ordering is by site-years)
 		if all_varieties_in_subtables:
@@ -286,10 +287,15 @@ class Page:
 		return str(unicode(self))
 	
 	def __iter__(self):
+		self.index = 0
 		return self
 		
 	def next(self):
-		table = None
+		try:
+			table = self._tables[self.index]
+			self.index += 1
+		except IndexError:
+			raise StopIteration
 		return table
 	
 	def append(self, table):
@@ -316,5 +322,7 @@ class Page:
 			cell.clear()
 		self.cells = {} # variety: {location: Cell() }
 		self.is_data_present = {} # {year: {variety: {location: bool, ...}, ...}, ...}
+		self.row_order = [] # [variety, ...]
+		self.column_order = [] # [location, ...]
 		
  

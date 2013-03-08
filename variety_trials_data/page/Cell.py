@@ -13,12 +13,12 @@ class TrialNotMatched(Exception):
 		Exception.__init__(self, message)
 
 class ExtraneousTrial(Exception):
-	def __init__(self, location, variety, year, fieldname):
+	def __init__(self, variety, location, year, fieldname):
 		message = '''More than one trial found for the given parameters:
-	location: \t"%s"
 	variety:  \t"%s"
+	location: \t"%s"
 	year:     \t"%s"
-	fieldname:\t"%s"\n''' % (location, variety, year, fieldname)
+	fieldname:\t"%s"\n''' % (variety, location, year, fieldname)
 		Exception.__init__(self, message)
 
 class Cell:
@@ -66,7 +66,7 @@ class Cell:
 		if not this_year:
 			return None
 		if len(this_year) > 1:
-			raise ExtraneousTrial(self.location, self.variety, year, fieldname)
+			raise ExtraneousTrial(self.variety, self.location, year, fieldname)
 		
 		entry = this_year[0]
 		try:
@@ -93,11 +93,19 @@ class Aggregate_Cell(Cell):
 	"""
 	A cell whose value is dependent upon its row
 	"""
-	def __init__(self):
-		self.clear()
-		Cell.__init__(self, year, fieldname)
-		self.row = row
+	def __init__(self, variety, location, default_year, default_fieldname):
+		Cell.__init__(self, variety, location, default_year, default_fieldname)
 		
 	def clear(self):
 		Cell.clear(self)
-		self.row = None
+
+class Empty_Cell(Cell):
+	"""
+	A cell who has no value, is invisible, etc. Used to generate the rows
+	in Appendix_Table.
+	"""
+	def __init__(self, variety, location, default_year=0, default_fieldname=""):
+		Cell.__init__(self, variety, location, default_year, default_fieldname)
+		
+	def clear(self):
+		Cell.clear(self)
