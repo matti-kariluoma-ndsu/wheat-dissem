@@ -35,13 +35,26 @@ class Column:
 		
 	def __iter__(self):
 		self.index = 0
+		self.iter_dict = self._cells
+		self.iter_order = self.table.page.row_order
+		#self.iter_skip = []
+		#self.iter_show_missing = False
 		return self
-	
+		
 	def next(self):
-		if self.index == len(self._cells):
+		try:
+			key = self.iter_order[self.index]
+			self.index += 1
+		except IndexError:
 			raise StopIteration
-		cell = self._cells[self.index]
-		self.index = self.index + 1
+		try:
+			cell = self.iter_dict[key]
+		except KeyError:
+			cell = None	
+			
+		if cell is None: #and not self.iter_show_missing:
+			return self.next()
+		
 		return cell
 	
 	def append(self, cell):

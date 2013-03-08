@@ -124,7 +124,7 @@
 		{% endif %}
 		{% for cell in row %}
 			<td>
-			{{ cell }}
+			{{ cell|default_if_none:'--' }}
 			</td>
 		{% endfor %}
 		</tr>

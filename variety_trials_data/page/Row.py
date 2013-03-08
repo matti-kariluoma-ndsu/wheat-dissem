@@ -34,28 +34,28 @@ class Row:
 		return str(unicode(self))
 		
 	def __iter__(self):
-		if self.key_order is None:
-			self.keys = self._cells.keys()
-		else:
-			self.keys = self.key_order
-		self.key_index = 0
+		self.index = 0
+		self.iter_dict = self._cells
+		self.iter_order = self.table.page.column_order
+		self.iter_skip = self.table.masked_locations
+		#self.iter_show_missing = True
 		return self
 		
 	def next(self):
-		if self.key_index == len(self.keys):
-			raise StopIteration
-			
 		try:
-			key = self.keys[self.key_index]
+			key = self.iter_order[self.index]
+			self.index += 1
 		except IndexError:
 			raise StopIteration
-		
-		try:
-			cell = self._cells[key]
-		except KeyError:
+			
+		if key in self.iter_skip:
 			cell = None
-
-		self.key_index = self.key_index + 1
+		else:
+			try:
+				cell = self.iter_dict[key]
+			except KeyError:
+				cell = None
+		
 		return cell
 	
 	def append(self, cell):
