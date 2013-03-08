@@ -33,9 +33,9 @@ In addition:
 
 from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
-from variety_trials_data.page.Table import Table
-from variety_trials_data.page.Row import Row
-from variety_trials_data.page.Column import Column
+from variety_trials_data.page.Table import Table, Appendix_Table
+from variety_trials_data.page.Row import Row, Fake_Variety
+from variety_trials_data.page.Column import Column, Fake_Location
 from variety_trials_data.page.Cell import Cell, Aggregate_Cell, Empty_Cell
 import datetime
 
@@ -117,7 +117,7 @@ class Page:
 				
 		return (locations_with_data, result)
 	
-	def _process_entries(self, default_year, year_range, locations, number_locations, varieties):
+	def _process_entries(self, default_year, year_range, default_fieldname, locations, number_locations, varieties):
 		(locations, entries) = self._get_entries(
 				default_year - year_range, 
 				default_year, 
@@ -211,7 +211,7 @@ class Page:
 		self.clear()
 		
 		# populate self.cells and self.is_data_present
-		self._process_entries(default_year, year_range, locations, number_locations, varieties)
+		self._process_entries(default_year, year_range, default_fieldname, locations, number_locations, varieties)
 		
 		# populate self.row_order
 		self.row_order = sorted(list(self.cells.keys())) # sorted alphanumeric
@@ -256,15 +256,12 @@ class Page:
 					cell = self.cells[variety][location]
 					table.append(cell)
 		
-		
-		self._make_appendix()
-		
 		# Decorate the tables
 		for table in self:
 			## Add LSD rows
 			variety = Fake_Variety("LSD")
-			for column in table.columns():
-				table.append(Cell(variety, column.location, default_year, default_fieldname))
+			for location in self.column_order:
+				table.append(Cell(variety, location, default_year, default_fieldname))
 			## Add n-yr columns
 			for year_num in sorted(range(year_range), reverse=True):
 				year_num = year_num + 1 # star counting from 1, not 0
@@ -274,7 +271,9 @@ class Page:
 					
 					
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
-		self.data_tables = sorted(self.data_tables, key=lambda (table): table.get_site_years(), reverse=True)
+		self._tables = sorted(self._tables, key=lambda (table): table.site_years(), reverse=True)
+		
+		self._make_appendix()
 		
 		# add data from higher-order tables to lower-order ones (ordering is by site-years)
 		if all_varieties_in_subtables:

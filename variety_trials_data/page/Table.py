@@ -48,7 +48,7 @@ class Table:
 			self.iter_skip = []
 			self.iter_show_missing = False
 		else:
-			self.iter_dict = self._cols
+			self.iter_dict = self._columns
 			self.iter_order = self.page.column_order
 			self.iter_skip = self.masked_locations
 			self.iter_show_missing = True
@@ -63,17 +63,17 @@ class Table:
 			raise StopIteration
 			
 		if key in self.iter_skip:
-			cell = None
+			collection = None
 		else:
 			try:
-				cell = self.iter_dict[key]
+				collection = self.iter_dict[key]
 			except KeyError:
-				cell = None
+				collection = None
 				
-		if cell is None and not self.iter_show_missing:
+		if collection is None and not self.iter_show_missing:
 			return self.next()
 		
-		return cell
+		return collection
 	
 	def rows(self):
 		self.iter_rows = True
