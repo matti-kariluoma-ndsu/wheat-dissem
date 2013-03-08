@@ -1,11 +1,29 @@
+#!/usr/bin/env python
+# coding: ascii
+
+"""
+Column contains a list of cells and has a list-like interface:
+	for cell in column
+	column.append(cell)
+	column.extend(cells)
+	column_copy = Column(column)
+"""
+
+class Fake_Location:
+	def __init__(self, name):
+		self.name = name
+		self.id = -1
+		self.pk = -1
+		
 class Column:
 	"""
 	Contains references to each Cell in this column.
+	The ordering of the cells comes from the page, through table.
 	"""
-	def __init__(self, location, page):
+	def __init__(self, column=None)
 		self.clear()
-		self.location = location
-		self.page = page
+		if column:
+			self.extend([cell for cell in column])
 	
 	def __unicode__(self):
 		column = [unicode(self.location)]
@@ -20,42 +38,32 @@ class Column:
 		return self
 	
 	def next(self):
-		if self.index == len(self.members):
+		if self.index == len(self._cells):
 			raise StopIteration
-		cell = self.members[self.index]
+		cell = self._cells[self.index]
 		self.index = self.index + 1
 		return cell
 	
-	def append(self, value):
-		self.members.append(value)
+	def append(self, cell):
+		if self.location is None:
+			self.location = cell.location
+		self._cells[cell.variety] = cell
+	
+	def extend(self, cells):
+		if self.location is None:
+			try:
+				cell = cells[0]
+			except IndexError:
+				return
+			self.location = cell.location
+		for cell in cells:
+			self._cells[cell.variety] = cell
 		
 	def clear(self):
-		self.members = []
-		self.index = 0
-		self.site_years = 8
+		self._cells = {} # variety: cell
 		self.location = None
-		self.page = None
+		self.table = None
 
-class Fake_Location:
-	def __init__(self, name):
-		self.name = name
-		self.id = -1
-		self.pk = -1
 
-class Aggregate_Column(Column):
-	"""
-	A column whose cells' value is determined by other cells in its row
-	"""
-	def __init__(self, location, years_back):
-		"""
-		location: a Location (or Fake_Location) object
-		year_num: an integer denoting the number of years to go back for averaging i.e. 3
-		"""
-		Column.__init__(self, location)
-		self.years_back = years_back
-		
-	def clear(self):
-		Column.clear(self)
-		years_back = 1
 
 

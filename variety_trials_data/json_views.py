@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: ascii
+
 from django.core import serializers
 from django.http import HttpResponse
 from variety_trials_data import models

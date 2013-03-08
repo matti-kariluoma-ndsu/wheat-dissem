@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: ascii
+
 from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from variety_trials_data import models

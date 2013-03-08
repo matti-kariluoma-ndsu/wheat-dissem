@@ -1,15 +1,30 @@
-from math import pi, sin, cos, asin, atan2, degrees, radians, sqrt, exp
-from scipy.special import erfinv
+#!/usr/bin/env python
+# coding: ascii
+
+"""
+Row contains a list of cells, and has a list-like interface:
+	for cell in row
+	row.append(cell)
+	row.extend(cells)
+	row_copy = Row(row)
+"""
+
+class Fake_Variety:
+	def __init__(self, name):
+		self.name = name
+		self.id = -1
+		self.pk = -1
 
 class Row:
 	"""
 	Contains references to each Cell in this row.
+	The ordering of the cells comes from the page, through table.
 	"""
-	def __init__(self, variety):
-		self.variety = variety
-		self.members = {}
+	def __init__(self, row=None):
 		self.clear()
-	
+		if row:
+			self.extend([cell for cell in row])
+		
 	def __unicode__(self):
 		row = [unicode(self.variety)]
 		row.extend([unicode(cell) for cell in self])
@@ -20,7 +35,7 @@ class Row:
 		
 	def __iter__(self):
 		if self.key_order is None:
-			self.keys = self.members.keys()
+			self.keys = self._cells.keys()
 		else:
 			self.keys = self.key_order
 		self.key_index = 0
@@ -36,40 +51,31 @@ class Row:
 			raise StopIteration
 		
 		try:
-			cell = self.members[key]
+			cell = self._cells[key]
 		except KeyError:
 			cell = None
 
 		self.key_index = self.key_index + 1
 		return cell
 	
-	def append(self, value):
-		try:
-			self.members[value.column.location] = value
-		except AttributeError:
-			col = self.members[None] = value
+	def append(self, cell):
+		if self.variety is None:
+			self.variety = cell.variety
+		self._cells[cell.location] = cell
+	
+	def extend(self, cells):
+		if self.variety is None:
+			try:
+				cell = cells[0]
+			except IndexError:
+				return
+			self.variety = cell.variety
+		for cell in cells:
+			self._cells[cell.location] = cell
 	
 	def clear(self):
-		self.members = {}
-		self.key_order = None
-		self.keys = None
-		self.key_index = 0
-		self.value_index = 0
-		
-class Fake_Variety:
-	def __init__(self, name):
-		self.name = name
-		self.id = -1
-		self.pk = -1
-
-class LSD_Row(Row):
-	"""
-	A row that keeps track of which Table it belongs to.
-	"""
-	def __init__(self, variety, table):
-		Row.__init__(self, variety)
-		self.table = table
-	
-	def clear(self):
-		Row.clear(self)
+		self._cells = {} # location: cell
+		self.variety = None
 		self.table = None
+		
+
