@@ -118,7 +118,7 @@ class Page:
 		return (locations_with_data, result)
 	
 	def _process_entries(self, default_year, year_range, default_fieldname, locations, number_locations, varieties):
-		(locations, entries) = self._get_entries(
+		(locations_with_data, entries) = self._get_entries(
 				default_year - year_range, 
 				default_year, 
 				locations, 
@@ -145,10 +145,10 @@ class Page:
 				d = self.is_data_present[year][variety]
 			except KeyError:
 				try:
-					d = self.is_data_present[year][variety] = dict([(l, False) for l in locations])
+					d = self.is_data_present[year][variety] = dict([(l, False) for l in locations_with_data])
 				except KeyError:
 					self.is_data_present[year] = {}
-					d = self.is_data_present[year][variety] = dict([(l, False) for l in locations])
+					d = self.is_data_present[year][variety] = dict([(l, False) for l in locations_with_data])
 					
 			try:
 				d[location] = True
@@ -163,22 +163,24 @@ class Page:
 				self.set_defaults(default_year, default_fieldname)
 			else:
 				raise NotEnoughDataInYear("Not enough data in year %s" % (default_year))
+		
+		return locations_with_data
 	
-	def _mask_locations(self, locations, not_locations):
+	def _mask_locations(self, locations, not_locations, locations_with_data):
 		"""
 		locations was externally sorted, so we need to maintain its order.
 		We also need to remove any entry in not_locations from locations.
 		"""
 		self.column_order = list(locations) # make a copy
-		
-		if len(not_locations) > 0:
-			delete_these = []
-			for (index, location) in enumerate(self.column_order):
-				if location in not_locations:
-					delete_these.append(index)
-					
-			for index in sorted(delete_these, reverse=True):
-				self.column_order.pop(index)
+		delete_these = []
+		for (index, location) in enumerate(self.column_order):
+			if location in not_locations:
+				delete_these.append(index)
+			elif location not in locations_with_data:
+				delete_these.append(index)
+				
+		for index in sorted(delete_these, reverse=True):
+			self.column_order.pop(index)
 	
 	def _make_appendix(self):
 		table = Appendix_Table()
@@ -211,13 +213,13 @@ class Page:
 		self.clear()
 		
 		# populate self.cells and self.is_data_present
-		self._process_entries(default_year, year_range, default_fieldname, locations, number_locations, varieties)
+		locations_with_data = self._process_entries(default_year, year_range, default_fieldname, locations, number_locations, varieties)
 		
 		# populate self.row_order
-		self.row_order = sorted(list(self.cells.keys())) # sorted alphanumeric
+		self.row_order = sorted(list(self.cells.keys()), key=lambda variety: variety.name) # sorted alphanumeric
 		
 		# populate self.column_order
-		self._mask_locations(locations, not_locations) # sorted by distance
+		self._mask_locations(locations, not_locations, locations_with_data) # sorted by distance
 		
 		# Make tables from self.cells
 		if break_into_subtables:
@@ -257,15 +259,20 @@ class Page:
 					table.append(cell)
 		
 		# Decorate the tables
+		variety = Fake_Variety("LSD")
+		self.row_order.append(variety) # displays at end of table
+		fake_locations = []
+		for year_num in sorted(range(year_range), reverse=True):
+			year_num = year_num + 1 # star counting from 1, not 0
+			location = Fake_Location("%s-yr" % (year_num))
+			self.column_order.insert(0, location) # prepend to list
+			fake_locations.append(location)
 		for table in self:
 			## Add LSD rows
-			variety = Fake_Variety("LSD")
 			for location in self.column_order:
-				table.append(Cell(variety, location, default_year, default_fieldname))
+				table.append(Aggregate_Cell(variety, location, default_year, default_fieldname))
 			## Add n-yr columns
-			for year_num in sorted(range(year_range), reverse=True):
-				year_num = year_num + 1 # star counting from 1, not 0
-				location = Fake_Location("%s-yr" % (year_num))
+			for location in fake_locations:
 				for row in table.rows():
 					table.append(Aggregate_Cell(row.variety, location, default_year, default_fieldname))
 					
