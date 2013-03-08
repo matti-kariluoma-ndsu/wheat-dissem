@@ -16,9 +16,9 @@ In addition:
 	column = table.column(location)
 """
 
-from variety_trials_data.page.table.Row import Row, LSD_Row
-from variety_trials_data.page.table.Column import Column, Aggregate_Column
-from variety_trials_data.page.table.Cell import Cell, Aggregate_Cell
+from variety_trials_data.page.Row import Row
+from variety_trials_data.page.Column import Column
+from variety_trials_data.page.Cell import Cell, Aggregate_Cell
 
 class Table:
 	"""
