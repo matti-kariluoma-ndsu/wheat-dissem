@@ -35,7 +35,9 @@ class Table:
 			self.extend([cell for row in table for cell in row])
 				
 	def __unicode__(self):
-		return unicode("table")
+		table = [unicode(self.site_years())]
+		table.extend([unicode(row) for row in self])
+		return unicode("\n").join(table)
 	
 	def __str__(self):
 		return str(unicode(self))

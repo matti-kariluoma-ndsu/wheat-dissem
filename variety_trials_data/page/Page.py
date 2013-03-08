@@ -117,10 +117,10 @@ class Page:
 				
 		return (locations_with_data, result)
 	
-	def _process_entries(self, default_year, year_range, default_fieldname, locations, number_locations, varieties):
+	def _process_entries(self, year_range, locations, number_locations, varieties):
 		(locations_with_data, entries) = self._get_entries(
-				default_year - year_range, 
-				default_year, 
+				self.year - year_range, 
+				self.year, 
 				locations, 
 				number_locations, 
 				varieties
@@ -137,7 +137,7 @@ class Page:
 					d = self.cells[variety]
 				except KeyError:
 					d = self.cells[variety] = {}
-				cell = d[location] = Cell(variety, location, default_year, default_fieldname)
+				cell = d[location] = Cell(variety, location, self.year, self.fieldname)
 					
 			cell.append(entry)
 			
@@ -156,13 +156,13 @@ class Page:
 				pass
 			
 		# ensure we have enough data for this year
-		if default_year not in self.is_data_present:
+		if self.year not in self.is_data_present:
 			years = self.is_data_present.keys()
 			if len(years) > 0:
-				default_year = sorted(years, reverse=True)[0]
-				self.set_defaults(default_year, default_fieldname)
+				self.year = sorted(years, reverse=True)[0]
+				self.set_defaults(self.year, self.fieldname)
 			else:
-				raise NotEnoughDataInYear("Not enough data in year %s" % (default_year))
+				raise NotEnoughDataInYear("Not enough data in year %s" % (self.year))
 		
 		return locations_with_data
 	
@@ -211,9 +211,11 @@ class Page:
 		self._tables = []
 		self.cells = {}
 		self.clear()
+		self.year = default_year
+		self.fieldname = default_fieldname
 		
 		# populate self.cells and self.is_data_present
-		locations_with_data = self._process_entries(default_year, year_range, default_fieldname, locations, number_locations, varieties)
+		locations_with_data = self._process_entries(year_range, locations, number_locations, varieties)
 		
 		# populate self.row_order
 		self.row_order = sorted(list(self.cells.keys()), key=lambda variety: variety.name) # sorted alphanumeric
@@ -226,7 +228,7 @@ class Page:
 			# Sort/split the tables
 			
 			# Sort the varieties by number of locations they appear in.
-			variety_order = sorted(self.is_data_present[default_year], key = lambda variety: self.is_data_present[default_year][variety], reverse=True)
+			variety_order = sorted(self.is_data_present[self.year], key = lambda variety: self.is_data_present[self.year][variety], reverse=True)
 			
 			if len(variety_order) < 1:
 				break_into_subtables = False
@@ -237,9 +239,9 @@ class Page:
 				table = Table()
 				self.append(table)
 				for variety in variety_order:
-					if self.is_data_present[default_year][variety] != self.is_data_present[default_year][prev]:
+					if self.is_data_present[self.year][variety] != self.is_data_present[self.year][prev]:
 						prev = variety
-						if len([location for location in self.is_data_present[default_year][prev] if self.is_data_present[default_year][prev][location]]) >= 4: #len(visible_locations) / 2:
+						if len([location for location in self.is_data_present[self.year][prev] if self.is_data_present[self.year][prev][location]]) >= 4: #len(visible_locations) / 2:
 							table = Table()
 							self.append(table)
 						else:
@@ -270,11 +272,11 @@ class Page:
 		for table in self:
 			## Add LSD rows
 			for location in self.column_order:
-				table.append(Aggregate_Cell(variety, location, default_year, default_fieldname))
+				table.append(Aggregate_Cell(variety, location, self.year, self.fieldname))
 			## Add n-yr columns
 			for location in fake_locations:
 				for row in table.rows():
-					table.append(Aggregate_Cell(row.variety, location, default_year, default_fieldname))
+					table.append(Aggregate_Cell(row.variety, location, self.year, self.fieldname))
 					
 					
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
@@ -287,7 +289,10 @@ class Page:
 			self._copy_rows_to_remaining_tables()
 	
 	def __unicode__(self):
-		return unicode("page")
+		header = u'%s\t\t\t%s' % (unicode(self.year), u' '.join([unicode(location.name).replace(u' ', u'_') for location in self.column_order]))
+		page = [header]
+		page.extend([unicode(table) for table in self])
+		return unicode("\n\n").join(page)
 	
 	def __str__(self):
 		return str(unicode(self))
@@ -326,6 +331,8 @@ class Page:
 		self._tables = []
 		for cell in [self.cells[variety][location] for variety in self.cells for location in self.cells[variety]]:
 			cell.clear()
+		self.year = 0
+		self.fieldname = "no_field"
 		self.cells = {} # variety: {location: Cell() }
 		self.is_data_present = {} # {year: {variety: {location: bool, ...}, ...}, ...}
 		self.row_order = [] # [variety, ...]
