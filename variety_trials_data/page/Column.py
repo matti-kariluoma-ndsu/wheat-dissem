@@ -20,7 +20,7 @@ class Column:
 	Contains references to each Cell in this column.
 	The ordering of the cells comes from the page, through table.
 	"""
-	def __init__(self, column=None)
+	def __init__(self, column=None):
 		self.clear()
 		if column:
 			self.extend([cell for cell in column])
