@@ -189,6 +189,7 @@ class Page:
 		for variety in models.Variety.objects.all():
 			if variety not in self.cells:
 				table.append(Empty_Cell(variety, location))		
+		## TODO: for variety in self.dropped_tables: table.append(Empty_Cell(variety, location))
 		self.append(table)
 	
 	def _add_aggregate_and_lsd_cells(self, year_range):
