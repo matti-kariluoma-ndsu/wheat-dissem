@@ -196,9 +196,8 @@ class Page:
 		variety = Fake_Variety("LSD")
 		self.row_order.append(variety) # displays at end of table
 		fake_locations = []
-		for years_back in sorted(range(year_range), reverse=True):
-			years_back += 1 # start counting from 1, not 0
-			location = Fake_Location("%s-yr" % (years_back))
+		for years_back in sorted(range(year_range), reverse=True): 
+			location = Fake_Location("%s-yr" % (years_back + 1)) # start counting from 1, not 0
 			self.column_order.insert(0, location) # prepend to list
 			fake_locations.append((years_back, location))
 			
@@ -214,6 +213,12 @@ class Page:
 					else:
 						table.append(LSD_Aggregate_Cell(row.variety, location, self.year, self.fieldname))
 				table.column(location).years_back = years_back
+				try:
+					site_years = table.site_years[years_back] # here, we use years_back as an index
+				except IndexError:
+					site_years = None
+				table.column(location).site_years = site_years 
+	
 	def _copy_rows_to_remaining_tables(self):
 		try:
 			prev_table = self._tables[0]
@@ -264,12 +269,23 @@ class Page:
 				for variety in variety_order:
 					if self.is_data_present[self.year][variety] != self.is_data_present[self.year][prev]:
 						prev = variety
-						if len([location for location in self.is_data_present[self.year][prev] if self.is_data_present[self.year][prev][location]]) >= 4: #len(visible_locations) / 2:
+						if len( [location for location 
+									in self.is_data_present[self.year][variety] 
+									if self.is_data_present[self.year][variety][location]]
+								) >= len(self.column_order) / 2:
 							table = Table()
 							self.append(table)
 						else:
 							table = Appendix_Table()
 							self.append(table)
+						# populate site_years
+						site_years = []
+						for years_back in range(year_range):
+							try:
+								site_years.append(len(filter(None, self.is_data_present[self.year - years_back][variety])))
+							except KeyError:
+								break	
+						table.site_years = tuple(site_years)
 					
 					for location in self.cells[variety]:
 						cell = self.cells[variety][location]
@@ -287,7 +303,7 @@ class Page:
 		self._add_aggregate_and_lsd_cells(year_range)
 					
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
-		self._tables = sorted(self._tables, key=lambda (table): table.site_years(), reverse=True)
+		self._tables = sorted(self._tables, key=lambda (table): table.site_years, reverse=True)
 		
 		self._make_appendix()
 		

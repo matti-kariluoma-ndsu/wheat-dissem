@@ -93,7 +93,7 @@
 		{% for column in table.columns %}
 			<th>
 				<h4>{{ column.location.name }}</h4>
-			{% if column.location.id == -1 %}
+			{% if column.location.id == -1 and column.site_years %}
 				<p>{{column.site_years}} site-years</p>
 			{% else %}
 				<a href="{{home_url}}/view/{{year_url_bit}}/{{curfield}}/{{zipcode_get_string}}{{scope_get_string}}{{not_location_get_string}}{{column.location.name|get_urlencode:'not_location'}}{{variety_get_string}}{{year_get_string}}">(x)</a>
