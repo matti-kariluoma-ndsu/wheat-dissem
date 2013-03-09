@@ -10,6 +10,9 @@ Row contains a list of cells, and has a list-like interface:
 """
 
 class Fake_Variety:
+	"""
+	Creates a simulacrum of models.Variety
+	"""
 	def __init__(self, name):
 		self.name = name
 		self.id = -1
@@ -87,5 +90,13 @@ class Row:
 		self._cells = {} # location: cell
 		self.variety = None
 		self.table = None
-		
 
+class Aggregate_Row(Row):
+	"""
+	A row containing aggregate_cells.
+	"""
+	def __init__(self, row=None):
+		Row.__init__(self, row)
+	
+	def clear(self):
+		Row.clear(self)

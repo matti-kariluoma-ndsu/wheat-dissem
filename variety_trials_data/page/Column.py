@@ -10,6 +10,9 @@ Column contains a list of cells and has a list-like interface:
 """
 
 class Fake_Location:
+	"""
+	Creates a simulacrum of models.Location
+	"""
 	def __init__(self, name):
 		self.name = name
 		self.id = -1
@@ -88,6 +91,21 @@ class Column:
 		self.location = None
 		self.table = None
 
+class Aggregate_Column(Column):
+	"""
+	A column who contains all aggregate_cells, which in turn are used
+	to calculate the running average for a variety.
+	"""
+	def __init__(self, column=None):
+		Column.__init__(self, column)
+		
+	def site_years(self):
+		return self.years_back
+	
+	def clear(self):
+		Column.clear(self)
+		self.years_back = 0
+		
 
 
 
