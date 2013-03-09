@@ -199,13 +199,14 @@ class Page:
 		for years_back in sorted(range(year_range), reverse=True): 
 			location = Fake_Location("%s-yr" % (years_back + 1)) # start counting from 1, not 0
 			self.column_order.insert(0, location) # prepend to list
-			fake_locations.append((years_back, location))
+			fake_locations.insert(0, (years_back, location)) # reverse the order again
 			
 		for table in self:
 			## Add LSD rows
 			for location in self.column_order:
 				table.append(LSD_Cell(variety, location, self.year, self.fieldname))
 			## Add n-yr columns
+			years_back_sum = 0
 			for (years_back, location) in fake_locations:
 				for row in table.rows():
 					if not isinstance(row.variety, Fake_Variety):
@@ -216,8 +217,9 @@ class Page:
 				try:
 					site_years = table.site_years[years_back] # here, we use years_back as an index
 				except IndexError:
-					site_years = None
-				table.column(location).site_years = site_years 
+					site_years = 0
+				years_back_sum += site_years
+				table.column(location).site_years = years_back_sum
 	
 	def _copy_rows_to_remaining_tables(self):
 		try:
@@ -238,12 +240,11 @@ class Page:
 		site_years = []
 		for years_back in range(year_range):
 			try:
-				site_years.append(len(filter(None, self.is_data_present[self.year - years_back][variety])))
+				site_year = len(filter(None, self.is_data_present[self.year - years_back][variety].values()))
 			except KeyError:
-				break	
-		print variety
-		print site_years
-		table.site_years = (8,13,16)#tuple(site_years)
+				site_year = 0
+			site_years.append(site_year)
+		table.site_years = tuple(site_years)
 		return table
 
 	def __init__(self, locations, number_locations, not_locations, 
@@ -258,10 +259,6 @@ class Page:
 		
 		# populate self.cells and self.is_data_present
 		locations_with_data = self._process_entries(year_range, locations, number_locations, varieties)
-		
-		for year in self.is_data_present:
-			for variety in self.is_data_present[year]:
-				print '%s %s'  % (year, variety)
 		
 		# populate self.row_order
 		self.row_order = sorted(list(self.cells.keys()), key=lambda variety: variety.name) # sorted alphanumeric
@@ -286,14 +283,8 @@ class Page:
 				for variety in variety_order:
 					if self.is_data_present[self.year][variety] != self.is_data_present[self.year][prev]:
 						prev = variety
-						if len( [location for location 
-									in self.is_data_present[self.year][variety] 
-									if self.is_data_present[self.year][variety][location]]
-								) >= len(self.column_order) / 2:
-							table = self._init_table(Table(), variety, year_range)
-						else:
-							table = self._init_table(Appendix_Table(), variety, year_range)
-					
+						table = self._init_table(Table(), variety, year_range)
+
 					for location in self.cells[variety]:
 						cell = self.cells[variety][location]
 						table.append(cell)
