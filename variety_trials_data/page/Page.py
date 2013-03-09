@@ -259,6 +259,10 @@ class Page:
 		# populate self.cells and self.is_data_present
 		locations_with_data = self._process_entries(year_range, locations, number_locations, varieties)
 		
+		for year in self.is_data_present:
+			for variety in self.is_data_present[year]:
+				print '%s %s'  % (year, variety)
+		
 		# populate self.row_order
 		self.row_order = sorted(list(self.cells.keys()), key=lambda variety: variety.name) # sorted alphanumeric
 		
