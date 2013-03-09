@@ -226,9 +226,7 @@ class Page:
 					if cell is not None:
 						clone_me = cell
 						break
-				cell = LSD_Cell(clone_me)
-				cell.location = location
-				cell.variety = variety
+				cell = LSD_Cell(variety, location, self.year, self.fieldname, clone_me)
 				table.append(cell)
 			## Add n-yr columns
 			years_back_sum = 0
