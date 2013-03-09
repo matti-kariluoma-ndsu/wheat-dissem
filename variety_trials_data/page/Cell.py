@@ -21,6 +21,15 @@ class ExtraneousTrial(Exception):
 	fieldname:\t"%s"\n''' % (variety, location, year, fieldname)
 		Exception.__init__(self, message)
 
+class UnbalancedData(Exception):
+	def __init__(self, variety, location, year, fieldname):
+		message = '''Could not compute an aggregate value for cell with:
+	variety:  \t"%s"
+	location: \t"%s"
+	year:     \t"%s"
+	fieldname:\t"%s"\n''' % (variety, location, year, fieldname)
+		Exception.__init__(self, message)
+
 class Cell:
 	"""
 	Helper class; Cells for our Table class.
@@ -37,6 +46,8 @@ class Cell:
 		try:
 			value = self.get_rounded(self.year, self.fieldname)
 		except ExtraneousTrial:
+			value = None
+		except UnbalancedData:
 			value = None
 			
 		if value is None:
@@ -88,19 +99,6 @@ class Cell:
 		self.year = 0
 		self.fieldname = "no_field"
 		self._members = []
-
-class Aggregate_Cell(Cell):
-	"""
-	A cell whose value is dependent upon its row
-	"""
-	def __init__(self, variety, location, default_year, default_fieldname):
-		Cell.__init__(self, variety, location, default_year, default_fieldname)
-	
-	def __unicode__(self):
-		return u'mean'
-	
-	def clear(self):
-		Cell.clear(self)
 		
 class LSD_Cell(Cell):
 	"""
@@ -125,6 +123,60 @@ class LSD_Cell(Cell):
 	
 	def clear(self):
 		Cell.clear(self)
+
+class Aggregate_Cell(Cell):
+	"""
+	A cell whose value is dependent upon its row
+	"""
+	def __init__(self, variety, location, default_year, default_fieldname):
+		Cell.__init__(self, variety, location, default_year, default_fieldname)
+	
+	def __unicode__(self):
+		return unicode(self.table.column(self.location).site_years)
+	
+	def get(self, year, fieldname):
+		return None
+		print '%s %s %s %s\n' % (self.location, self.variety, year, fieldname)
+		if (year in self.precalculated_value and	
+				fieldname in self.precalculated_value[year] and	
+				self.precalculated_value[year][fieldname] is not None):
+			return self.precalculated_value[year][fieldname]
+		else:
+			values = []
+			#print self.table.column(self.location).years_back
+			print [unicode(cell) for cell in self.table.row(self.variety) if not isinstance(cell, Aggregate_Cell)]
+			for cell in self.table.row(self.variety):
+				if isinstance(cell, Aggregate_Cell) or cell is None: # We should not find any other type of cell
+					continue
+				else:
+					#print range(self.table.column(self.location).years_back + 1)
+					for years_back in range(self.table.column(self.location).years_back + 1):
+						try:
+							value = cell.get(year - years_back, fieldname)
+						except ExtraneousTrial:
+							value = None
+						
+						if value is not None:
+							values.append(value)
+						else:
+							raise UnbalancedData(self.location, self.variety, year, fieldname)
+						
+		if not values:
+			raise UnbalancedData(self.location, self.variety, year, fieldname)
+		else:
+			value = sum(values) / len(values)			
+			try:
+				self.precalculated_value[year][fieldname] = value
+			except KeyError:
+				self.precalculated_value[year] = {}
+				self.precalculated_value[year][fieldname] = value
+		print value
+		return value
+						
+	def clear(self):
+		Cell.clear(self)
+		self.precalculated_value = {}
+		self.table = None
 		
 class LSD_Aggregate_Cell(Aggregate_Cell):
 	"""
@@ -138,6 +190,7 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 	
 	def clear(self):
 		Aggregate_Cell.clear(self)
+		self.table = None
 
 class Empty_Cell(Cell):
 	"""

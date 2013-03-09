@@ -219,9 +219,13 @@ class Page:
 			for (years_back, location) in fake_locations:
 				for row in table.rows():
 					if not isinstance(row.variety, Fake_Variety):
-						table.append(Aggregate_Cell(row.variety, location, self.year, self.fieldname))
+						cell = Aggregate_Cell(row.variety, location, self.year, self.fieldname)
+						cell.table = table
+						table.append(cell)
 					else:
-						table.append(LSD_Aggregate_Cell(row.variety, location, self.year, self.fieldname))
+						cell = LSD_Aggregate_Cell(row.variety, location, self.year, self.fieldname)
+						cell.table = table
+						table.append(cell)
 				table.column(location).years_back = years_back
 				try:
 					site_years = table.site_years[years_back] # here, we use years_back as an index
