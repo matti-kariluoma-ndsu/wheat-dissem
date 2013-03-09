@@ -1,0 +1,14 @@
+from variety_trials_data import models
+forman = models.Location.objects.filter(name="Forman")[0]
+finley = models.Location.objects.filter(name="Finley")[0]
+forman_t = models.Trial_Entry.objects.filter(location=forman)
+finley_t = models.Trial_Entry.objects.filter(location=finley)
+for t in finley_t.exclude(planting_method_tags=None):
+	t.hidden = True
+	t.save()
+for t in forman_t.filter(planting_method_tags="fungicide"):
+	t.hidden = True
+	t.save()
+for t in forman_t.filter(planting_method_tags="direct, fungicide"):
+	t.hidden = True
+	t.save()
