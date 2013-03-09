@@ -103,6 +103,7 @@ class Aggregate_Column(Column):
 		Column.clear(self)
 		self.site_years = 0 # number of locations x years that are used in this column's cell computation
 		self.years_back = 0 # number of years in the past that we should be calculating
+		self.balanced_criteria = {} # year: [location, ...]
 		
 
 
