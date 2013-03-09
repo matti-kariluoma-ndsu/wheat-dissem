@@ -14,4 +14,3 @@ application = get_wsgi_application()
 # Example use of WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
 # application = HelloWorldApplication(application)
-
