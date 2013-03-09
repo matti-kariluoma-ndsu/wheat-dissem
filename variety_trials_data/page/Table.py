@@ -35,7 +35,7 @@ class Table:
 			self.extend([cell for row in table for cell in row])
 				
 	def __unicode__(self):
-		table = [unicode(self.site_years())]
+		table = [unicode(self.site_years)]
 		table.extend([unicode(row) for row in self])
 		return unicode("\n").join(table)
 	
@@ -115,9 +115,6 @@ class Table:
 		for cell in cells:
 			self.append(cell)
 	
-	def site_years(self):
-		return tuple([8,12,16]) # i.e. (8, 12, 16)
-	
 	def clear(self):
 		self.page = None
 		self.iter_rows = True
@@ -128,6 +125,7 @@ class Table:
 		for column in self._columns.values():
 			column.clear()
 		self._columns = {} # location: Column(), ...
+		self.site_years = () # a tuple, one for each aggregate column.
 		
 class Appendix_Table(Table):
 	def __init__(self, table=None):

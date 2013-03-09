@@ -98,13 +98,11 @@ class Aggregate_Column(Column):
 	"""
 	def __init__(self, column=None):
 		Column.__init__(self, column)
-		
-	def site_years(self):
-		return self.years_back
 	
 	def clear(self):
 		Column.clear(self)
-		self.years_back = 0
+		self.site_years = 0 # number of locations x years that are used in this column's cell computation
+		self.years_back = 0 # number of years in the past that we should be calculating
 		
 
 
