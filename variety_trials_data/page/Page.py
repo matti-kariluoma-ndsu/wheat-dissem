@@ -192,6 +192,22 @@ class Page:
 		## TODO: for variety in self.dropped_tables: table.append(Empty_Cell(variety, location))
 		self.append(table)
 	
+	def _find_exemplar_variety(self, table, year_range):
+		best_score = 0
+		for variety in [row.variety for row in table]:
+			score = 0
+			for years_diff in range(year_range):
+				year = self.year - years_diff
+				try:
+					locations = filter(None, self.is_data_present[year][variety])
+				except KeyError:
+					locations = []
+				score += len(locations)
+			if score > best_score:
+				exemplar_variety = variety
+				best_score = score
+		return exemplar_variety
+	
 	def _add_aggregate_and_lsd_cells(self, year_range):
 		# create fake varieties, locations
 		variety = Fake_Variety("LSD")
@@ -216,9 +232,12 @@ class Page:
 				table.append(cell)
 			## Add n-yr columns
 			years_back_sum = 0
+			exemplar_variety = self._find_exemplar_variety(table, year_range)
 			for (years_back, location) in fake_locations:
+				tables_varieties = [] # need to go through these and find the "most balanced"
 				for row in table.rows():
 					if not isinstance(row.variety, Fake_Variety):
+						tables_varieties.append(row.variety)
 						cell = Aggregate_Cell(row.variety, location, self.year, self.fieldname)
 						cell.table = table
 						table.append(cell)
@@ -226,13 +245,21 @@ class Page:
 						cell = LSD_Aggregate_Cell(row.variety, location, self.year, self.fieldname)
 						cell.table = table
 						table.append(cell)
-				table.column(location).years_back = years_back
+				column = table.column(location)
+				column.years_back = years_back
+				for years_diff in range(years_back + 1):
+					year = self.year - years_diff
+					try:
+						locations = [location for location in self.is_data_present[year][exemplar_variety] if self.is_data_present[year][exemplar_variety][location]]
+					except KeyError:
+						locations = []
+					column.balanced_criteria[year] = locations
 				try:
 					site_years = table.site_years[years_back] # here, we use years_back as an index
 				except IndexError:
 					site_years = 0
 				years_back_sum += site_years
-				table.column(location).site_years = years_back_sum
+				column.site_years = years_back_sum
 	
 	def _copy_rows_to_remaining_tables(self):
 		try:

@@ -131,38 +131,29 @@ class Aggregate_Cell(Cell):
 	def __init__(self, variety, location, default_year, default_fieldname):
 		Cell.__init__(self, variety, location, default_year, default_fieldname)
 	
-	def __unicode__(self):
-		return unicode(self.table.column(self.location).site_years)
-	
 	def get(self, year, fieldname):
-		return None
-		print '%s %s %s %s\n' % (self.location, self.variety, year, fieldname)
 		if (year in self.precalculated_value and	
 				fieldname in self.precalculated_value[year] and	
 				self.precalculated_value[year][fieldname] is not None):
 			return self.precalculated_value[year][fieldname]
 		else:
 			values = []
-			#print self.table.column(self.location).years_back
-			print [unicode(cell) for cell in self.table.row(self.variety) if not isinstance(cell, Aggregate_Cell)]
-			for cell in self.table.row(self.variety):
-				if isinstance(cell, Aggregate_Cell) or cell is None: # We should not find any other type of cell
+			for cell in self.table.row(self.variety)._cells.values(): # can't iterate through the row while something else is iterating, must use backchannel ... why?
+				if isinstance(cell, Aggregate_Cell): # Shouldn't see any other types
 					continue
-				else:
-					#print range(self.table.column(self.location).years_back + 1)
-					for years_back in range(self.table.column(self.location).years_back + 1):
+				for years_diff in range(self.table.column(self.location).years_back + 1):
+					cur_year = year - years_diff
+					if cell.location in self.table.column(self.location).balanced_criteria[cur_year]:
 						try:
-							value = cell.get(year - years_back, fieldname)
+							value = cell.get(cur_year, fieldname)
 						except ExtraneousTrial:
 							value = None
-						
-						if value is not None:
-							values.append(value)
-						else:
+						if value is None:
 							raise UnbalancedData(self.location, self.variety, year, fieldname)
-						
+						values.append(value)
+			
 		if not values:
-			raise UnbalancedData(self.location, self.variety, year, fieldname)
+			value = None
 		else:
 			value = sum(values) / len(values)			
 			try:
@@ -170,7 +161,6 @@ class Aggregate_Cell(Cell):
 			except KeyError:
 				self.precalculated_value[year] = {}
 				self.precalculated_value[year][fieldname] = value
-		print value
 		return value
 						
 	def clear(self):
