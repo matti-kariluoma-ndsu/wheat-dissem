@@ -107,11 +107,21 @@ class LSD_Cell(Cell):
 	A cell whose value is dependant on the location and year of the trial.
 	Displays the LSD for those varieties at that location.
 	"""
-	def __init__(self, variety, location, default_year, default_fieldname):
-		Cell.__init__(self, variety, location, default_year, default_fieldname)
+	def __init__(self, cell=None):
+		if cell:
+			Cell.__init__(self, cell.variety, cell.location, cell.year, cell.fieldname)
+			self.extend(cell._members)
+		else:
+			self.clear()
 	
-	def __unicode__(self):
-		return u'lsd'
+	def get(self, year, fieldname):
+		lsd_fieldnames = ['lsd_05', 'hsd_10', 'lsd_10'] # ordered by predictive power
+		for lsd_fieldname in lsd_fieldnames:
+			self.fieldname = lsd_fieldname
+			value = Cell.get(self, year, lsd_fieldname)
+			if value is not None:
+				break
+		return value
 	
 	def clear(self):
 		Cell.clear(self)

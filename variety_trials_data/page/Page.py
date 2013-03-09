@@ -205,7 +205,15 @@ class Page:
 		for table in self:
 			## Add LSD rows
 			for location in self.column_order:
-				table.append(LSD_Cell(variety, location, self.year, self.fieldname))
+				clone_me = None
+				for cell in table.column(location): # assumes this isn't an Aggregate_Column
+					if cell is not None:
+						clone_me = cell
+						break
+				cell = LSD_Cell(clone_me)
+				cell.location = location
+				cell.variety = variety
+				table.append(cell)
 			## Add n-yr columns
 			years_back_sum = 0
 			for (years_back, location) in fake_locations:
