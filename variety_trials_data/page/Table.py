@@ -16,8 +16,8 @@ In addition:
 	column = table.column(location)
 """
 
-from variety_trials_data.page.Row import Row
-from variety_trials_data.page.Column import Column
+from variety_trials_data.page.Row import Row, Aggregate_Row, Fake_Variety
+from variety_trials_data.page.Column import Column, Aggregate_Column, Fake_Location
 from variety_trials_data.page.Cell import Cell, Aggregate_Cell
 
 class Table:
@@ -89,7 +89,10 @@ class Table:
 		try:
 			row = self._rows[variety]
 		except KeyError:
-			row = self._rows[variety] = Row()
+			if not isinstance(variety, Fake_Variety):
+				row = self._rows[variety] = Row()
+			else:
+				row = self._rows[variety] = Aggregate_Row()
 			row.table = self
 		return row
 		
@@ -97,7 +100,10 @@ class Table:
 		try:
 			column = self._columns[location]
 		except KeyError:
-			column = self._columns[location] = Column()
+			if not isinstance(location, Fake_Location):
+				column = self._columns[location] = Column()
+			else:
+				column = self._columns[location] = Aggregate_Column()
 			column.table = self
 		return column
 	

@@ -95,9 +95,39 @@ class Aggregate_Cell(Cell):
 	"""
 	def __init__(self, variety, location, default_year, default_fieldname):
 		Cell.__init__(self, variety, location, default_year, default_fieldname)
-		
+	
+	def __unicode__(self):
+		return u'mean'
+	
 	def clear(self):
 		Cell.clear(self)
+		
+class LSD_Cell(Cell):
+	"""
+	A cell whose value is dependant on the location and year of the trial.
+	Displays the LSD for those varieties at that location.
+	"""
+	def __init__(self, variety, location, default_year, default_fieldname):
+		Cell.__init__(self, variety, location, default_year, default_fieldname)
+	
+	def __unicode__(self):
+		return u'lsd'
+	
+	def clear(self):
+		Cell.clear(self)
+		
+class LSD_Aggregate_Cell(Aggregate_Cell):
+	"""
+	Displays the LSD for Aggregate cells in it's column.
+	"""
+	def __init__(self, variety, location, default_year, default_fieldname):
+		Aggregate_Cell.__init__(self, variety, location, default_year, default_fieldname)
+	
+	def __unicode__(self):
+		return u'lsds'
+	
+	def clear(self):
+		Aggregate_Cell.clear(self)
 
 class Empty_Cell(Cell):
 	"""

@@ -34,9 +34,9 @@ In addition:
 from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
 from variety_trials_data.page.Table import Table, Appendix_Table
-from variety_trials_data.page.Row import Row, Fake_Variety
-from variety_trials_data.page.Column import Column, Fake_Location
-from variety_trials_data.page.Cell import Cell, Aggregate_Cell, Empty_Cell
+from variety_trials_data.page.Row import Row, Aggregate_Row, Fake_Variety
+from variety_trials_data.page.Column import Column, Aggregate_Column, Fake_Location
+from variety_trials_data.page.Cell import Cell, Aggregate_Cell, Empty_Cell, LSD_Aggregate_Cell, LSD_Cell
 import datetime
 
 class LSDProbabilityOutOfRange(Exception):
@@ -191,6 +191,29 @@ class Page:
 				table.append(Empty_Cell(variety, location))		
 		self.append(table)
 	
+	def _add_aggregate_and_lsd_cells(self, year_range):
+		# create fake varieties, locations
+		variety = Fake_Variety("LSD")
+		self.row_order.append(variety) # displays at end of table
+		fake_locations = []
+		for years_back in sorted(range(year_range), reverse=True):
+			years_back += 1 # start counting from 1, not 0
+			location = Fake_Location("%s-yr" % (years_back))
+			self.column_order.insert(0, location) # prepend to list
+			fake_locations.append((years_back, location))
+			
+		for table in self:
+			## Add LSD rows
+			for location in self.column_order:
+				table.append(LSD_Cell(variety, location, self.year, self.fieldname))
+			## Add n-yr columns
+			for (years_back, location) in fake_locations:
+				for row in table.rows():
+					if not isinstance(row.variety, Fake_Variety):
+						table.append(Aggregate_Cell(row.variety, location, self.year, self.fieldname))
+					else:
+						table.append(LSD_Aggregate_Cell(row.variety, location, self.year, self.fieldname))
+				table.column(location).years_back = years_back
 	def _copy_rows_to_remaining_tables(self):
 		try:
 			prev_table = self._tables[0]
@@ -261,23 +284,7 @@ class Page:
 					table.append(cell)
 		
 		# Decorate the tables
-		variety = Fake_Variety("LSD")
-		self.row_order.append(variety) # displays at end of table
-		fake_locations = []
-		for year_num in sorted(range(year_range), reverse=True):
-			year_num = year_num + 1 # star counting from 1, not 0
-			location = Fake_Location("%s-yr" % (year_num))
-			self.column_order.insert(0, location) # prepend to list
-			fake_locations.append(location)
-		for table in self:
-			## Add LSD rows
-			for location in self.column_order:
-				table.append(Aggregate_Cell(variety, location, self.year, self.fieldname))
-			## Add n-yr columns
-			for location in fake_locations:
-				for row in table.rows():
-					table.append(Aggregate_Cell(row.variety, location, self.year, self.fieldname))
-					
+		self._add_aggregate_and_lsd_cells(year_range)
 					
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
 		self._tables = sorted(self._tables, key=lambda (table): table.site_years(), reverse=True)
