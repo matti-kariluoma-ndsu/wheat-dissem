@@ -232,6 +232,20 @@ class Page:
 					continue
 				table.append([cell for cell in row])
 
+	def _init_table(self, table, variety, year_range):
+		self.append(table)
+		# populate site_years
+		site_years = []
+		for years_back in range(year_range):
+			try:
+				site_years.append(len(filter(None, self.is_data_present[self.year - years_back][variety])))
+			except KeyError:
+				break	
+		print variety
+		print site_years
+		table.site_years = (8,13,16)#tuple(site_years)
+		return table
+
 	def __init__(self, locations, number_locations, not_locations, 
 			default_year, year_range, default_fieldname, lsd_probability, 
 			break_into_subtables=False, varieties=[], show_appendix_tables=False,
@@ -264,8 +278,7 @@ class Page:
 				prev = variety_order[0]
 				
 				# Move balanced varieties to their own tables
-				table = Table()
-				self.append(table)
+				table = self._init_table(Table(), prev, year_range)
 				for variety in variety_order:
 					if self.is_data_present[self.year][variety] != self.is_data_present[self.year][prev]:
 						prev = variety
@@ -273,21 +286,9 @@ class Page:
 									in self.is_data_present[self.year][variety] 
 									if self.is_data_present[self.year][variety][location]]
 								) >= len(self.column_order) / 2:
-							table = Table()
-							self.append(table)
+							table = self._init_table(Table(), variety, year_range)
 						else:
-							table = Appendix_Table()
-							self.append(table)
-						# populate site_years
-						site_years = []
-						for years_back in range(year_range):
-							try:
-								site_years.append(len(filter(None, self.is_data_present[self.year - years_back][variety])))
-							except KeyError:
-								break	
-						print variety
-						print site_years
-						table.site_years = (8,13,16)#tuple(site_years)
+							table = self._init_table(Appendix_Table(), variety, year_range)
 					
 					for location in self.cells[variety]:
 						cell = self.cells[variety][location]
