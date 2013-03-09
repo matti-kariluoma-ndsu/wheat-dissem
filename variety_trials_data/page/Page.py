@@ -285,7 +285,9 @@ class Page:
 								site_years.append(len(filter(None, self.is_data_present[self.year - years_back][variety])))
 							except KeyError:
 								break	
-						table.site_years = tuple(site_years)
+						print variety
+						print site_years
+						table.site_years = (8,13,16)#tuple(site_years)
 					
 					for location in self.cells[variety]:
 						cell = self.cells[variety][location]
