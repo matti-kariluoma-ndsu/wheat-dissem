@@ -8,7 +8,7 @@ Provides mechanisms to calculate the LSD, usually for multiple trials.
 from math import sqrt, pi, exp
 from scipy.special import erfinv
 import os, sys, signal, tempfile
-from subprocess import Popen, STDOUT, PIPE, check_output, CalledProcessError
+from subprocess import Popen, STDOUT, PIPE, check_output, call, CalledProcessError
 
 class LSDProbabilityOutOfRange(Exception):
 	def __init__(self, message=None):
@@ -158,17 +158,21 @@ class LSD_Calculator():
 		for row in response_to_treatments:
 			trt.extend(row)
 		
-		f = tempfile.NamedTemporaryFile(delete=False)
-		f.write('yield <- c(%s)\n' % ','.join([str(t) for t in trt]))
-		f.write('Varieties <- factor(rep(c(%s), rep(4,23)))\n' % ','.join(['"%s"'%str(treat) for treat in treatment_factors]))
-		f.write('Environments <- factor(rep(c(%s), 23))\n' % ','.join(['"%s"'%str(block) for block in blocking_factors]))
-		f.write("""model <- aov(yield ~ Varieties + Environments)
+		R_script = tempfile.NamedTemporaryFile(delete=False)
+		R_out = tempfile.NamedTemporaryFile(delete=False)
+		R_out.close()
+		
+		R_script.write('yield <- c(%s)\n' % ','.join([str(t) for t in trt]))
+		R_script.write('Varieties <- factor(rep(c(%s), rep(4,23)))\n' % ','.join(['"%s"'%str(treat) for treat in treatment_factors]))
+		R_script.write('Environments <- factor(rep(c(%s), 23))\n' % ','.join(['"%s"'%str(block) for block in blocking_factors]))
+		R_script.write('''model <- aov(yield ~ Varieties + Environments)
 mse <- deviance(model) / df.residual(model) 
+.libPaths("/var/www/wheat/R/library")
 require(agricolae)
 LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
-"""
-			)
-		f.close()
+''')
+		R_script.close()
+		
 		"""
 		IS_POSIX = 'posix' in sys.builtin_module_names
 		R =  Popen(
@@ -186,9 +190,9 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
 			bufsize=1,
 			close_fds=IS_POSIX
 		)
-		"""
+		#"""
 		try:
-			output = check_output(
+			call(
 					[
 						'R', 
 						'CMD',
@@ -196,21 +200,35 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
 						'--no-restore',
 						'--no-timing',
 						'--quiet',
-						f.name,
-						'/dev/stdout'
+						R_script.name,
+						R_out.name
 					]
 				);
 		except CalledProcessError:
-			output = None
-			print f.name
+			print R_script.name
+			print output.name
 			raise
-		os.unlink(f.name)
-		
-		"""
-		print output
-		print output.split('\n')[-29][29:]
 		#"""
-		value = float(output.split('\n')[-29][29:])
+		
+		os.unlink(R_script.name)
+		
+		output = None
+		
+		#debug = tempfile.NamedTemporaryFile(delete=False)
+		with open(R_out.name, 'r') as f:
+			for line in f:
+				#debug.write(line)
+				if line.startswith("Least Significant Difference"):
+					output = line
+					break
+		
+		#debug.close()
+		os.unlink(R_out.name)
+		
+		if output:
+			value = float(output[29:])
+		else:
+			value = None
 		
 		return value
 	
