@@ -38,18 +38,6 @@ from variety_trials_data.page.Row import Row, Aggregate_Row, Fake_Variety
 from variety_trials_data.page.Column import Column, Aggregate_Column, Fake_Location
 from variety_trials_data.page.Cell import Cell, Aggregate_Cell, Empty_Cell, LSD_Aggregate_Cell, LSD_Cell
 import datetime
-
-class LSDProbabilityOutOfRange(Exception):
-	def __init__(self, message=None):
-		if not message:
-			message = "The alpha-value for the LSD calculation was out of range."
-		Exception.__init__(self, message)
-
-class TooFewDegreesOfFreedom(Exception):
-	def __init__(self, message=None):
-		if not message:
-			message = "Could not calculate the LSD, too few degrees of freedom in the input."
-		Exception.__init__(self, message)
 		
 class NotEnoughDataInYear(Exception):
 	def __init__(self, message=None):
@@ -208,7 +196,7 @@ class Page:
 				best_score = score
 		return exemplar_variety
 	
-	def _add_aggregate_and_lsd_cells(self, year_range):
+	def _add_aggregate_and_lsd_cells(self, year_range, lsd_probability):
 		# create fake varieties, locations
 		variety = Fake_Variety("LSD")
 		self.row_order.append(variety) # displays at end of table
@@ -240,7 +228,7 @@ class Page:
 						cell.table = table
 						table.append(cell)
 					else:
-						cell = LSD_Aggregate_Cell(row.variety, location, self.year, self.fieldname)
+						cell = LSD_Aggregate_Cell(row.variety, location, self.year, self.fieldname, lsd_probability)
 						cell.table = table
 						table.append(cell)
 				column = table.column(location)
@@ -336,7 +324,7 @@ class Page:
 					table.append(cell)
 		
 		# Decorate the tables
-		self._add_aggregate_and_lsd_cells(year_range)
+		self._add_aggregate_and_lsd_cells(year_range, lsd_probability)
 					
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
 		self._tables = sorted(self._tables, key=lambda (table): table.site_years, reverse=True)
