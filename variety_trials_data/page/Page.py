@@ -258,7 +258,11 @@ class Page:
 				# continue if a decorative element
 				if isinstance(row.variety, Fake_Variety):
 					continue
-				table.append([cell for cell in row])
+				for cell in row:
+					if isinstance(cell, Aggregate_Cell):
+						cell = Aggregate_Cell(cell.variety, cell.location, cell.year, cell.fieldname)
+						cell.table = table
+					table.append(cell)
 
 	def _init_table(self, table, variety, year_range):
 		self.append(table)
@@ -276,7 +280,7 @@ class Page:
 	def __init__(self, locations, number_locations, not_locations, 
 			default_year, year_range, default_fieldname, lsd_probability, 
 			break_into_subtables=False, varieties=[], show_appendix_tables=False,
-			number_of_tables=3, all_varieties_in_subtables=False):
+			number_of_tables=3, all_varieties_in_subtables=True):
 		self._tables = []
 		self.cells = {}
 		self.clear()
