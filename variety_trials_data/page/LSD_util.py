@@ -9,6 +9,7 @@ from math import sqrt, pi, exp
 from scipy.special import erfinv
 import os, sys, signal, tempfile
 from subprocess import Popen, STDOUT, PIPE, check_output, call, CalledProcessError
+from variety_trials_website import settings
 
 class LSDProbabilityOutOfRange(Exception):
 	def __init__(self, message=None):
@@ -162,12 +163,12 @@ class LSD_Calculator():
 		R_out = tempfile.NamedTemporaryFile(delete=False)
 		R_out.close()
 		
+		R_script.write('.libPaths("%s")\n' % settings.R_LIBRARY)
 		R_script.write('yield <- c(%s)\n' % ','.join([str(t) for t in trt]))
 		R_script.write('Varieties <- factor(rep(c(%s), rep(4,23)))\n' % ','.join(['"%s"'%str(treat) for treat in treatment_factors]))
 		R_script.write('Environments <- factor(rep(c(%s), 23))\n' % ','.join(['"%s"'%str(block) for block in blocking_factors]))
 		R_script.write('''model <- aov(yield ~ Varieties + Environments)
 mse <- deviance(model) / df.residual(model) 
-.libPaths("/var/www/wheat/R/library")
 require(agricolae)
 LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
 ''')

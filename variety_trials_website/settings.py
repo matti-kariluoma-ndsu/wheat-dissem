@@ -71,6 +71,9 @@ STATIC_URL = '/static/'
 # URL prefix for all links, not automaticcally appended, though.
 HOME_URL = ''
 
+# Where are the R libraries?
+R_LIBRARY = '/var/www/wheat/R/library'
+
 # Additional locations of static files
 STATICFILES_DIRS = (
 		'variety_trials_data/static/',
