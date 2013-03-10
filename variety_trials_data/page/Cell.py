@@ -287,10 +287,17 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 					[46.9,31.5,50.2,68.3],
 					[52.2,31.6,48,65]
 				]
+			del values[2011]
 		if not values:
 			value = None
 		else:
-			value = LSD_Calculator().calculate_lsd(values, self.lsd_probability, internal_implementation=False)
+			value = LSD_Calculator().calculate_lsd(
+					values, 
+					['Albany','Breaker','Brennan','Brick','Briggs','Cromwell','Edge','Faller','Glenn','Jenna','Knudson','Marshall','Prosper','RB07','	Rollag','SY Soren','Sabin','Samson','	Select','	Vantage','Velva','WB-Digger','WB-Mayville'], 
+					['Saint Paul','Lamberton','Morris','Fergus Falls'], 
+					self.lsd_probability, 
+					internal_implementation=False
+				)
 			try:
 				self.precalculated_value[year][fieldname] = value
 			except KeyError:
