@@ -8,7 +8,7 @@ Provides mechanisms to calculate the LSD, usually for multiple trials.
 from math import sqrt, pi, exp
 from scipy.special import erfinv
 import os, sys, signal, tempfile
-from subprocess import Popen, STDOUT, PIPE
+from subprocess import Popen, STDOUT, PIPE, check_output, CalledProcessError
 
 class LSDProbabilityOutOfRange(Exception):
 	def __init__(self, message=None):
@@ -152,9 +152,22 @@ class LSD_Calculator():
 
 		return LSD
 	
-	def _R_subprocess(self, response_to_treatments, probability):
+	def _R_subprocess(self, response_to_treatments, treatment_factors, blocking_factors, probability):
+		# collapse into single list
+		trt = []
+		for row in response_to_treatments:
+			trt.extend(row)
+		
 		f = tempfile.NamedTemporaryFile(delete=False)
-		f.write(str(response_to_treatments))
+		f.write('yield <- c(%s)\n' % ','.join([str(t) for t in trt]))
+		f.write('Varieties <- factor(rep(c(%s), rep(4,23)))\n' % ','.join(['"%s"'%str(treat) for treat in treatment_factors]))
+		f.write('Environments <- factor(rep(c(%s), 23))\n' % ','.join(['"%s"'%str(block) for block in blocking_factors]))
+		f.write("""model <- aov(yield ~ Varieties + Environments)
+mse <- deviance(model) / df.residual(model) 
+require(agricolae)
+LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
+"""
+			)
 		f.close()
 		"""
 		IS_POSIX = 'posix' in sys.builtin_module_names
@@ -165,6 +178,7 @@ class LSD_Calculator():
 				'BATCH',
 				'--no-restore',
 				'--no-timing',
+				'--quiet',
 				f.name,
 				'/dev/stdout'
 			], 
@@ -174,24 +188,33 @@ class LSD_Calculator():
 		)
 		"""
 		try:
-			output = subprocess.check_output(
+			output = check_output(
 					[
 						'R', 
 						'CMD',
 						'BATCH',
 						'--no-restore',
 						'--no-timing',
+						'--quiet',
 						f.name,
 						'/dev/stdout'
 					]
 				);
 		except CalledProcessError:
 			output = None
-			
+			print f.name
+			raise
 		os.unlink(f.name)
-		return output
+		
+		"""
+		print output
+		print output.split('\n')[-29][29:]
+		#"""
+		value = float(output.split('\n')[-29][29:])
+		
+		return value
 	
-	def calculate_lsd(self, unbalanced_input, lsd_probability, digits=1, internal_implementation=True):
+	def calculate_lsd(self, unbalanced_input, varieties, locations, lsd_probability, digits=1, internal_implementation=True):
 		"""
 		for table in unbalanced_input:
 			for row in unbalanced_input[table]:
@@ -276,7 +299,7 @@ class LSD_Calculator():
 				if internal_implementation:
 					lsd = self._LSD(balanced_input, lsd_probability)
 				else:
-					lsd = self._R_subprocess(balanced_input, lsd_probability)
+					lsd = self._R_subprocess(balanced_input, varieties, locations, lsd_probability)
 				if lsd is not None:
 					lsd = round(lsd, digits)
 			except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
