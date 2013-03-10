@@ -329,7 +329,13 @@ class Page:
 		# sort descending by site-years tuple, i.e. [(8, 12, 16), ...]
 		self._tables = sorted(self._tables, key=lambda (table): table.site_years, reverse=True)
 		
-		self._make_appendix()
+		# remove extra tables
+		# TODO: recover the tables and combine them into an appendix table
+		self._tables = self._tables[0:number_of_tables]
+		
+		show_appendix = False
+		if show_appendix:
+			self._make_appendix()
 		
 		# add data from higher-order tables to lower-order ones (ordering is by site-years)
 		if all_varieties_in_subtables:
