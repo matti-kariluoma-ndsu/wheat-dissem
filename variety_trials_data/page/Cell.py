@@ -296,7 +296,7 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 					['Albany','Breaker','Brennan','Brick','Briggs','Cromwell','Edge','Faller','Glenn','Jenna','Knudson','Marshall','Prosper','RB07','	Rollag','SY Soren','Sabin','Samson','	Select','	Vantage','Velva','WB-Digger','WB-Mayville'], 
 					['Saint Paul','Lamberton','Morris','Fergus Falls'], 
 					self.lsd_probability, 
-					internal_implementation=False
+					internal_implementation=True
 				)
 			try:
 				self.precalculated_value[year][fieldname] = value
