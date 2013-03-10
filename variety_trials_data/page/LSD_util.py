@@ -7,6 +7,8 @@ Provides mechanisms to calculate the LSD, usually for multiple trials.
 
 from math import sqrt, pi, exp
 from scipy.special import erfinv
+import os, sys, signal, tempfile
+from subprocess import Popen, STDOUT, PIPE
 
 class LSDProbabilityOutOfRange(Exception):
 	def __init__(self, message=None):
@@ -151,8 +153,43 @@ class LSD_Calculator():
 		return LSD
 	
 	def _R_subprocess(self, response_to_treatments, probability):
-		
-		return None
+		f = tempfile.NamedTemporaryFile(delete=False)
+		f.write(str(response_to_treatments))
+		f.close()
+		"""
+		IS_POSIX = 'posix' in sys.builtin_module_names
+		R =  Popen(
+			[
+				os.sep.join(['usr','bin','R']),
+				'CMD',
+				'BATCH',
+				'--no-restore',
+				'--no-timing',
+				f.name,
+				'/dev/stdout'
+			], 
+			stdout=PIPE, 
+			bufsize=1,
+			close_fds=IS_POSIX
+		)
+		"""
+		try:
+			output = subprocess.check_output(
+					[
+						'R', 
+						'CMD',
+						'BATCH',
+						'--no-restore',
+						'--no-timing',
+						f.name,
+						'/dev/stdout'
+					]
+				);
+		except CalledProcessError:
+			output = None
+			
+		os.unlink(f.name)
+		return output
 	
 	def calculate_lsd(self, unbalanced_input, lsd_probability, digits=1, internal_implementation=True):
 		"""

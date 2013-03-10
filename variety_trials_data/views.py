@@ -11,7 +11,8 @@ from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from variety_trials_data.page.Page import LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
+from variety_trials_data.page.Page import NotEnoughDataInYear
+from variety_trials_data.page.LSD_util import LSDProbabilityOutOfRange, TooFewDegreesOfFreedom
 from variety_trials_data.variety_trials_util import get_page, get_locations
 import datetime
 
