@@ -154,10 +154,27 @@ class LSD_Calculator():
 		return LSD
 	
 	def _R_subprocess(self, response_to_treatments, treatment_factors, blocking_factors, probability):
+		"""
+		Hey, just stop right there. 
+		
+		This code isn't meant to be readable or maintainable. 
+		
+		We're going to create some temporary files,	write some R code to 
+		them, run them through /usr/bin/R, then delete them.
+		
+		This process is difficult to debug, even when the code is properly 
+		working. It'd best to comment out the os.unlink/0 commands and send
+		the generated scripts to an R programmer for debugging.
+		"""
 		# collapse into single list
 		trt = []
 		for row in response_to_treatments:
 			trt.extend(row)
+		len_blocking_factors = len(blocking_factors)
+		len_treatment_factors = len(treatment_factors)
+		len_repetitions = int(len(trt) / (len_blocking_factors * len_treatment_factors))
+		str_blocking_factors = ','.join(['"%s"'%str(block) for block in blocking_factors])
+		str_treatment_factors = ','.join(['"%s"'%str(treat) for treat in treatment_factors])
 		
 		R_script = tempfile.NamedTemporaryFile(delete=False)
 		R_out = tempfile.NamedTemporaryFile(delete=False)
@@ -165,13 +182,26 @@ class LSD_Calculator():
 		
 		R_script.write('.libPaths("%s")\n' % settings.R_LIBRARY)
 		R_script.write('yield <- c(%s)\n' % ','.join([str(t) for t in trt]))
-		R_script.write('Varieties <- factor(rep(c(%s), rep(4,23)))\n' % ','.join(['"%s"'%str(treat) for treat in treatment_factors]))
-		R_script.write('Environments <- factor(rep(c(%s), 23))\n' % ','.join(['"%s"'%str(block) for block in blocking_factors]))
+		R_script.write('Varieties <- factor(c(\n')
+		for _ in range(len_repetitions):
+			R_script.write('rep(c(%s), rep(%d,%d)),\n' % (
+					str_treatment_factors,
+					len_blocking_factors,
+					len_treatment_factors
+				))
+		R_script.write('c()))\n')
+		R_script.write('Environments <- factor(c(\n')
+		for _ in range(len_repetitions):
+			R_script.write('rep(c(%s), %d),\n' % (
+					str_blocking_factors,
+					len_treatment_factors
+				))
+		R_script.write('c()))\n')
 		R_script.write('''model <- aov(yield ~ Varieties + Environments)
 mse <- deviance(model) / df.residual(model) 
 require(agricolae)
-LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
-''')
+LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
+''' % probability)
 		R_script.close()
 		
 		"""
@@ -215,15 +245,15 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
 		
 		output = None
 		
-		#debug = tempfile.NamedTemporaryFile(delete=False)
+		debug = tempfile.NamedTemporaryFile(delete=False)
 		with open(R_out.name, 'r') as f:
 			for line in f:
-				#debug.write(line)
+				debug.write(line)
 				if line.startswith("Least Significant Difference"):
 					output = line
 					break
 		
-		#debug.close()
+		debug.close()
 		os.unlink(R_out.name)
 		
 		if output:
@@ -323,5 +353,5 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=0.05)
 					lsd = round(lsd, digits)
 			except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
 				lsd = None
-		
+						
 		return lsd

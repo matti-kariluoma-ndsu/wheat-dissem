@@ -226,7 +226,6 @@ Source for zipcode-autocomplete
 need to use the urlencode filter when making /view/variety/name/ links
 
 2013 Jan 11 Meeting:
-* Send R-script to Dr. Wiersma, detailing the multi-year LSD calculation. Use data from 55108
 * Self
 ** Advanced search
 *** More advanced queries can be dreamt up? More powerful interaction with the URL generator?
@@ -250,7 +249,6 @@ need to use the urlencode filter when making /view/variety/name/ links
 
 * Include upper tables in each following table.
 ** Highlight new entries?
-** Aggregate Cell is being a problem. All of the code makes to many assumptions on visible_location etc. Need a new class of column to denote "do not aggregate"
 
 * PAGE RELOAD IS NONDETERMINISTIC
 ** reloading zipcode=58102 causes these to show up:

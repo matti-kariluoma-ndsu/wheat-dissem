@@ -186,7 +186,7 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 	"""
 	def __init__(self, variety, location, default_year, default_fieldname, lsd_probability):
 		Aggregate_Cell.__init__(self, variety, location, default_year, default_fieldname)
-		self.lsd_probabilty = lsd_probability
+		self.lsd_probability = lsd_probability
 	
 	def get(self, year, fieldname):
 		if (year in self.precalculated_value and	
@@ -302,10 +302,10 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 		else:
 			value = LSD_Calculator().calculate_lsd(
 					values, 
-					['Albany','Breaker','Brennan','Brick','Briggs','Cromwell','Edge','Faller','Glenn','Jenna','Knudson','Marshall','Prosper','RB07','	Rollag','SY Soren','Sabin','Samson','	Select','	Vantage','Velva','WB-Digger','WB-Mayville'], 
+					['Albany','Breaker','Brennan','Brick','Briggs','Cromwell','Edge','Faller','Glenn','Jenna','Knudson','Marshall','Prosper','RB07','Rollag','SY Soren','Sabin','Samson','Select','Vantage','Velva','WB-Digger','WB-Mayville'], 
 					['Saint Paul','Lamberton','Morris','Fergus Falls'], 
 					self.lsd_probability, 
-					internal_implementation=True
+					internal_implementation=False
 				)
 			try:
 				self.precalculated_value[year][fieldname] = value
@@ -316,7 +316,7 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 	
 	def clear(self):
 		Aggregate_Cell.clear(self)
-		self.lsd_probability = 0
+		self.lsd_probability = 0.05
 
 class Empty_Cell(Cell):
 	"""
