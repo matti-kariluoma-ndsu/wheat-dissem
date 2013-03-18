@@ -268,7 +268,6 @@ class Page:
 		self.append(table)
 		# populate site_years
 		site_years = []
-		masked_locations = []
 		if variety:
 			for years_back in range(year_range):
 				try:
@@ -276,16 +275,7 @@ class Page:
 				except KeyError:
 					site_year = 0
 				site_years.append(site_year)
-			try:
-				is_data_present = self.is_data_present[year][variety]
-				masked_locations = filter(
-						lambda location: not is_data_present[location],
-						is_data_present
-					)
-			except KeyError:
-				pass
 		table.site_years = tuple(site_years)
-		table.masked_locations = masked_locations
 		return table
 
 	def __init__(self, locations, number_locations, not_locations, 

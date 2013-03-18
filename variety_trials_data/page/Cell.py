@@ -318,6 +318,9 @@ class Empty_Cell(Cell):
 	"""
 	def __init__(self, variety, location, default_year=0, default_fieldname=""):
 		Cell.__init__(self, variety, location, default_year, default_fieldname)
-		
+	
+	def get(self, year, fieldname):
+		return None	
+	
 	def clear(self):
 		Cell.clear(self)

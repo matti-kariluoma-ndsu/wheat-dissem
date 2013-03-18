@@ -55,12 +55,10 @@ class Table:
 		if self.iter_rows:
 			iter_dict = self._rows
 			iter_order = self.page.row_order
-			iter_skip = []
 			iter_show_missing = False
 		else:
 			iter_dict = self._columns
 			iter_order = self.page.column_order
-			iter_skip = self.masked_locations
 			iter_show_missing = True
 		
 		while True:
@@ -70,14 +68,11 @@ class Table:
 			except IndexError:
 				self.iter_rows = True # reset state
 				raise StopIteration
-				
-			if key in iter_skip:
+
+			try:
+				collection = iter_dict[key]
+			except KeyError:
 				collection = None
-			else:
-				try:
-					collection = iter_dict[key]
-				except KeyError:
-					collection = None
 					
 			if collection is None and not iter_show_missing:
 				continue

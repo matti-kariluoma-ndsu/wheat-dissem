@@ -58,7 +58,6 @@ class Row:
 		index = 0
 		iter_dict = self._cells
 		iter_order = self.table.page.column_order
-		iter_skip = self.table.masked_locations
 		#iter_show_missing = True
 		
 		while True:
@@ -67,14 +66,12 @@ class Row:
 				index += 1
 			except IndexError:
 				raise StopIteration
-				
-			if key in iter_skip:
+			try:
+				cell = iter_dict[key]
+			except KeyError:
 				cell = None
-			else:
-				try:
-					cell = iter_dict[key]
-				except KeyError:
-					cell = None
+			
+			#if cell is None and not iter_show_missing: continue
 			
 			yield cell
 	

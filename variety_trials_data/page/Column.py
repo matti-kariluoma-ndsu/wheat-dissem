@@ -73,7 +73,7 @@ class Column:
 			except KeyError:
 				cell = None	
 				
-			if cell is None: #and not self.iter_show_missing:
+			if cell is None: #and not iter_show_missing:
 				continue
 			
 			yield cell
