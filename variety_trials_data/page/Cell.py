@@ -145,19 +145,24 @@ class Aggregate_Cell(Cell):
 			return self.precalculated_value[year][fieldname]
 		else:
 			values = []
-			for cell in self.table.row(self.variety):
-				if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell): # Shouldn't see any other types
-					continue
-				for years_diff in range(self.table.column(self.location).years_back + 1):
-					cur_year = year - years_diff
-					if cell.location in self.table.column(self.location).balanced_criteria[cur_year]:
-						try:
-							value = cell.get(cur_year, fieldname)
-						except ExtraneousTrial:
-							value = None
-						if value is None:
-							raise UnbalancedData(self.location, self.variety, year, fieldname)
-						values.append(value)
+			any_empty = False
+			for years_diff in range(self.table.column(self.location).years_back + 1):
+				cur_year = year - years_diff
+				any_empty = any_empty or len(self.table.column(self.location).balanced_criteria[cur_year]) < 1
+			if not any_empty:
+				for cell in self.table.row(self.variety):
+					if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell): # Shouldn't see any other types
+						continue
+					for years_diff in range(self.table.column(self.location).years_back + 1):
+						cur_year = year - years_diff
+						if cell.location in self.table.column(self.location).balanced_criteria[cur_year]:
+							try:
+								value = cell.get(cur_year, fieldname)
+							except ExtraneousTrial:
+								value = None
+							if value is None:
+								raise UnbalancedData(self.location, self.variety, year, fieldname)
+							values.append(value)
 			
 		if not values:
 			value = None
