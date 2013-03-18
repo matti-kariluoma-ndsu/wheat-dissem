@@ -264,17 +264,28 @@ class Page:
 						cell.table = table
 					table.append(cell)
 
-	def _init_table(self, table, variety, year_range):
+	def _init_table(self, table, variety=None, year_range=0, year=0):
 		self.append(table)
 		# populate site_years
 		site_years = []
-		for years_back in range(year_range):
+		masked_locations = []
+		if variety:
+			for years_back in range(year_range):
+				try:
+					site_year = len(filter(None, self.is_data_present[self.year - years_back][variety].values()))
+				except KeyError:
+					site_year = 0
+				site_years.append(site_year)
 			try:
-				site_year = len(filter(None, self.is_data_present[self.year - years_back][variety].values()))
+				is_data_present = self.is_data_present[year][variety]
+				masked_locations = filter(
+						lambda location: not is_data_present[location],
+						is_data_present
+					)
 			except KeyError:
-				site_year = 0
-			site_years.append(site_year)
+				pass
 		table.site_years = tuple(site_years)
+		table.masked_locations = masked_locations
 		return table
 
 	def __init__(self, locations, number_locations, not_locations, 
@@ -303,25 +314,25 @@ class Page:
 			# Sort the varieties by number of locations they appear in.
 			variety_order = sorted(self.is_data_present[self.year], key = lambda variety: self.is_data_present[self.year][variety], reverse=True)
 			
-			if len(variety_order) < 1:
+			if not variety_order: # i.e. is an empty list
 				break_into_subtables = False
 			else:
 				prev = variety_order[0]
 				
 				# Move balanced varieties to their own tables
-				table = self._init_table(Table(), prev, year_range)
+				table = self._init_table(Table(), prev, year_range, default_year)
 				for variety in variety_order:
+					# if this variety is the first of the next group in our sorted list
 					if self.is_data_present[self.year][variety] != self.is_data_present[self.year][prev]:
 						prev = variety
-						table = self._init_table(Table(), variety, year_range)
+						table = self._init_table(Table(), variety, year_range, default_year)
 
 					for location in self.cells[variety]:
 						cell = self.cells[variety][location]
 						table.append(cell)
 		
 		if not break_into_subtables:
-			table = Table()
-			self.append(table)
+			table = self._init_table(Table())
 			for variety in self.cells:
 				for location in self.cells[variety]:
 					cell = self.cells[variety][location]
