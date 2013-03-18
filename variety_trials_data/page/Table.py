@@ -43,39 +43,46 @@ class Table:
 		return str(unicode(self))
 		
 	def __iter__(self):
-		self.index = 0
+		"""
+		Does not conform to Python 2.3:
+		``The intention of the protocol is that once an iterator's next() 
+		method raises StopIteration, it will continue to do so on 
+		subsequent calls. Implementations that do not obey this property 
+		are deemed broken.''
+		http://docs.python.org/2/library/stdtypes.html#iterator-types
+		"""
+		index = 0
 		if self.iter_rows:
-			self.iter_dict = self._rows
-			self.iter_order = self.page.row_order
-			self.iter_skip = []
-			self.iter_show_missing = False
+			iter_dict = self._rows
+			iter_order = self.page.row_order
+			iter_skip = []
+			iter_show_missing = False
 		else:
-			self.iter_dict = self._columns
-			self.iter_order = self.page.column_order
-			self.iter_skip = self.masked_locations
-			self.iter_show_missing = True
-		return self
+			iter_dict = self._columns
+			iter_order = self.page.column_order
+			iter_skip = self.masked_locations
+			iter_show_missing = True
 		
-	def next(self):
-		try:
-			key = self.iter_order[self.index]
-			self.index += 1
-		except IndexError:
-			self.iter_rows = True # reset state
-			raise StopIteration
-			
-		if key in self.iter_skip:
-			collection = None
-		else:
+		while True:
 			try:
-				collection = self.iter_dict[key]
-			except KeyError:
-				collection = None
+				key = iter_order[index]
+				index += 1
+			except IndexError:
+				self.iter_rows = True # reset state
+				raise StopIteration
 				
-		if collection is None and not self.iter_show_missing:
-			return self.next()
-		
-		return collection
+			if key in iter_skip:
+				collection = None
+			else:
+				try:
+					collection = iter_dict[key]
+				except KeyError:
+					collection = None
+					
+			if collection is None and not iter_show_missing:
+				continue
+			
+			yield collection
 	
 	def rows(self):
 		self.iter_rows = True
