@@ -6,6 +6,8 @@ Cell contains a list of trial_entry that have the same variety and
 location.
 """
 
+from variety_trials_data.page.Row import Aggregate_Row
+from variety_trials_data.page.Column import Aggregate_Column
 from variety_trials_data.page.LSD_util import LSD_Calculator
 
 class TrialNotMatched(Exception):
@@ -138,6 +140,19 @@ class Aggregate_Cell(Cell):
 	def __init__(self, variety, location, default_year, default_fieldname):
 		Cell.__init__(self, variety, location, default_year, default_fieldname)
 	
+	def _fill_values(self, year, fieldname, variety, values):
+		for cell in self.table.row(variety):
+			if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell): # Shouldn't see any other types
+				continue
+			if cell.location in self.table.column(self.location).balanced_criteria[year]:
+				try:
+					value = cell.get(year, fieldname)
+				except ExtraneousTrial:
+					value = None
+				if value is None:
+					raise UnbalancedData(self.location, self.variety, year, fieldname)
+				values.append(value)
+	
 	def get(self, year, fieldname):
 		if (year in self.precalculated_value and	
 				fieldname in self.precalculated_value[year] and	
@@ -150,19 +165,9 @@ class Aggregate_Cell(Cell):
 				cur_year = year - years_diff
 				any_empty = any_empty or len(self.table.column(self.location).balanced_criteria[cur_year]) < 1
 			if not any_empty:
-				for cell in self.table.row(self.variety):
-					if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell): # Shouldn't see any other types
-						continue
-					for years_diff in range(self.table.column(self.location).years_back + 1):
-						cur_year = year - years_diff
-						if cell.location in self.table.column(self.location).balanced_criteria[cur_year]:
-							try:
-								value = cell.get(cur_year, fieldname)
-							except ExtraneousTrial:
-								value = None
-							if value is None:
-								raise UnbalancedData(self.location, self.variety, year, fieldname)
-							values.append(value)
+				for years_diff in range(self.table.column(self.location).years_back + 1):
+					cur_year = year - years_diff
+					self._fill_values(cur_year, fieldname, self.variety, values)
 			
 		if not values:
 			value = None
@@ -187,7 +192,7 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 	def __init__(self, variety, location, default_year, default_fieldname, lsd_probability):
 		Aggregate_Cell.__init__(self, variety, location, default_year, default_fieldname)
 		self.lsd_probability = lsd_probability
-	
+		
 	def get(self, year, fieldname):
 		if (year in self.precalculated_value and	
 				fieldname in self.precalculated_value[year] and	
@@ -195,115 +200,36 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 			return self.precalculated_value[year][fieldname]
 		else:
 			values = {}
-			"""2012-2011_55108.csv
-			Variety,Saint Paul,Lamberton,Morris,Fergus Falls
-			Albany,54.4,43.9,70.3,83.9
-			Breaker,39.4,36.6,62.3,72.4
-			Brennan,47.3,38.8,64.7,86.8
-			Brick,31.6,34.4,60.6,71.7
-			Briggs,41.3,43.1,73.6,76.7
-			Cromwell,45.2,37,63.1,59.5
-			Edge,40.5,30,55.6,71
-			Faller,45.1,40.9,56.8,66
-			Glenn,36.3,36.4,57.1,63.8
-			Jenna,50.9,40.3,72.4,76.7
-			Knudson,47.9,40.6,64.1,71
-			Marshall,30.4,27.5,40.3,58.1
-			Prosper,45.3,41.4,64.3,68.8
-			RB07,45.2,40.8,55.8,68.8
-			Rollag,37.8,36.6,57.1,71
-			SY Soren,48.3,37.7,59.7,74.6
-			Sabin,41,36.6,57.8,72.4
-			Samson,47.7,38.4,67.1,83.9
-			Select,35.7,38.2,67,81
-			Vantage,38.7,36.7,53.6,60.2
-			Velva,43.1,33.9,48.7,62.4
-			WB-Digger,43.7,41.5,62.1,76
-			WB-Mayville,48.2,40.9,59.6,82.5
-			Albany,73.5,36.4,54.5,72.9
-			Breaker,50.3,30.3,52.5,64.2
-			Brennan,55.2,31.5,40.9,63.7
-			Brick,46.6,31.1,48.9,67
-			Briggs,54.7,38.6,54.5,68.4
-			Cromwell,60.2,31.1,53.7,66
-			Edge,51.6,28.2,44.5,59.3
-			Faller,53.9,35.3,55.7,74.7
-			Glenn,50.8,29.5,43.3,67.8
-			Jenna,62.5,33.8,55.4,71.2
-			Knudson,67.5,34.1,56.7,71.4
-			Marshall,41,24.4,36.9,48.8
-			Prosper,58.7,33.2,53.1,75
-			RB07,54.9,31,48.5,63.1
-			Rollag,37.3,29.1,44.1,63.6
-			SY Soren,48.6,35.2,46.8,66
-			Sabin,66.2,31.9,50.1,64.8
-			Samson,65.9,33.4,52,73.3
-			Select,59.1,39.5,56.4,70.4
-			Vantage,58,28.5,47.2,62.4
-			Velva,55.6,31.8,47.1,66.2
-			WB-Digger,46.9,31.5,50.2,68.3
-			WB-Mayville,52.2,31.6,48,65
-			"""
-			# 2012, LSD is 4.603553
-			values[2012] = [
-					[54.4,43.9,70.3,83.9],
-					[39.4,36.6,62.3,72.4],
-					[47.3,38.8,64.7,86.8],
-					[31.6,34.4,60.6,71.7],
-					[41.3,43.1,73.6,76.7],
-					[45.2,37,63.1,59.5],
-					[40.5,30,55.6,71],
-					[45.1,40.9,56.8,66],
-					[36.3,36.4,57.1,63.8],
-					[50.9,40.3,72.4,76.7],
-					[47.9,40.6,64.1,71],
-					[30.4,27.5,40.3,58.1],
-					[45.3,41.4,64.3,68.8],
-					[45.2,40.8,55.8,68.8],
-					[37.8,36.6,57.1,71],
-					[48.3,37.7,59.7,74.6],
-					[41,36.6,57.8,72.4],
-					[47.7,38.4,67.1,83.9],
-					[35.7,38.2,67,81],
-					[38.7,36.7,53.6,60.2],
-					[43.1,33.9,48.7,62.4],
-					[43.7,41.5,62.1,76],
-					[48.2,40.9,59.6,82.5]
-				]
-			# 2011, with 2012 LSD is 6.516289
-			values[2011] = [
-					[73.5,36.4,54.5,72.9],
-					[50.3,30.3,52.5,64.2],
-					[55.2,31.5,40.9,63.7],
-					[46.6,31.1,48.9,67],
-					[54.7,38.6,54.5,68.4],
-					[60.2,31.1,53.7,66],
-					[51.6,28.2,44.5,59.3],
-					[53.9,35.3,55.7,74.7],
-					[50.8,29.5,43.3,67.8],
-					[62.5,33.8,55.4,71.2],
-					[67.5,34.1,56.7,71.4],
-					[41,24.4,36.9,48.8],
-					[58.7,33.2,53.1,75],
-					[54.9,31,48.5,63.1],
-					[37.3,29.1,44.1,63.6],
-					[48.6,35.2,46.8,66],
-					[66.2,31.9,50.1,64.8],
-					[65.9,33.4,52,73.3],
-					[59.1,39.5,56.4,70.4],
-					[58,28.5,47.2,62.4],
-					[55.6,31.8,47.1,66.2],
-					[46.9,31.5,50.2,68.3],
-					[52.2,31.6,48,65]
-				]
-			del values[2011]
+			varieties = []
+			locations = []
+			any_empty = False
+			for years_diff in range(self.table.column(self.location).years_back + 1):
+				cur_year = year - years_diff
+				any_empty = any_empty or len(self.table.column(self.location).balanced_criteria[cur_year]) < 1
+			if not any_empty:
+				for years_diff in range(self.table.column(self.location).years_back + 1):
+					cur_year = year - years_diff
+					values[cur_year] = this_years_values = []
+					for row in self.table:
+						if not isinstance(row, Aggregate_Row):
+							this_varieties_values = []
+							this_years_values.append(this_varieties_values)
+							self._fill_values(cur_year, fieldname, row.variety, this_varieties_values)
+				for row in self.table:
+					if not isinstance(row, Aggregate_Row):
+						varieties.append(row.variety.name)
+				for column in self.table.columns():
+					if not isinstance(column, Aggregate_Column):
+						locations.append(column.location.name)
+		
 		if not values:
 			value = None
 		else:
+			print '%s %s' % (self.table.site_years, values)
 			value = LSD_Calculator().calculate_lsd(
 					values, 
-					['Albany','Breaker','Brennan','Brick','Briggs','Cromwell','Edge','Faller','Glenn','Jenna','Knudson','Marshall','Prosper','RB07','Rollag','SY Soren','Sabin','Samson','Select','Vantage','Velva','WB-Digger','WB-Mayville'], 
-					['Saint Paul','Lamberton','Morris','Fergus Falls'], 
+					varieties,
+					locations,
 					self.lsd_probability, 
 					internal_implementation=False
 				)
