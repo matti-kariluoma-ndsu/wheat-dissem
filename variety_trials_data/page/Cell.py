@@ -142,7 +142,7 @@ class Aggregate_Cell(Cell):
 		else:
 			values = []
 			for cell in self.table.row(self.variety):
-				if cell is None or isinstance(cell, Aggregate_Cell): # Shouldn't see any other types
+				if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell): # Shouldn't see any other types
 					continue
 				for years_diff in range(self.table.column(self.location).years_back + 1):
 					cur_year = year - years_diff
@@ -307,8 +307,6 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 	
 	def clear(self):
 		Aggregate_Cell.clear(self)
-		self.precalculated_value = {}
-		self.table = None
 		self.lsd_probability = 0
 
 class Empty_Cell(Cell):

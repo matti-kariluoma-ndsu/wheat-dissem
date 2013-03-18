@@ -253,18 +253,33 @@ class Page:
 		except IndexError:
 			return
 			
-		for table in self:
+		for table in self._tables[1:]: # skip first table
+			# populate masked_locations, so we can fill in some Empty_Cells
+			for row in table:
+				first_row = row
+				try:
+					is_data_present = self.is_data_present[self.year][first_row.variety]
+					masked_locations = filter(
+						lambda location: not is_data_present[location],
+						is_data_present
+					)
+				except KeyError:
+					masked_locations = []
+				break
+			
 			for row in prev_table:
 				# continue if a decorative element
 				if isinstance(row.variety, Fake_Variety):
 					continue
 				for cell in row:
-					if isinstance(cell, Aggregate_Cell):
+					if cell.location in masked_locations:
+						cell = Empty_Cell(cell.variety, cell.location)
+					elif isinstance(cell, Aggregate_Cell):
 						cell = Aggregate_Cell(cell.variety, cell.location, cell.year, cell.fieldname)
 						cell.table = table
 					table.append(cell)
 
-	def _init_table(self, table, variety=None, year_range=0, year=0):
+	def _init_table(self, table, variety=None, year_range=0):
 		self.append(table)
 		# populate site_years
 		site_years = []
@@ -310,12 +325,12 @@ class Page:
 				prev = variety_order[0]
 				
 				# Move balanced varieties to their own tables
-				table = self._init_table(Table(), prev, year_range, default_year)
+				table = self._init_table(Table(), prev, year_range)
 				for variety in variety_order:
 					# if this variety is the first of the next group in our sorted list
 					if self.is_data_present[self.year][variety] != self.is_data_present[self.year][prev]:
 						prev = variety
-						table = self._init_table(Table(), variety, year_range, default_year)
+						table = self._init_table(Table(), variety, year_range)
 
 					for location in self.cells[variety]:
 						cell = self.cells[variety][location]
