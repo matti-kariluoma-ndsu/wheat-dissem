@@ -400,8 +400,8 @@ class Page:
 		return self
 	
 	def set_defaults(self, year, fieldname):
-		for variety in self.self.cells:
-			for cell in self.self.cells[variety].values():
+		for variety in self.cells:
+			for cell in self.cells[variety].values():
 				cell.set_defaults(year, fieldname)
 			
 	def clear(self):

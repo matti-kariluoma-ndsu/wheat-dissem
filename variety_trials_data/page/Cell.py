@@ -95,6 +95,10 @@ class Cell:
 			value = round(value, digits)
 		return value
 	
+	def set_defaults(self, year, fieldname):
+		self.year = year
+		self.fieldname = fieldname
+	
 	def clear(self):
 		self.variety = None
 		self.location = None
