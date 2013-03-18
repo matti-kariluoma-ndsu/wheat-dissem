@@ -73,7 +73,7 @@ class Table:
 				collection = iter_dict[key]
 			except KeyError:
 				collection = None
-					
+
 			if collection is None and not iter_show_missing:
 				continue
 			

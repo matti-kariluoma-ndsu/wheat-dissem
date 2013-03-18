@@ -182,6 +182,7 @@ class LSD_Calculator():
 		
 		R_script.write('.libPaths("%s")\n' % settings.R_LIBRARY)
 		R_script.write('yield <- c(%s)\n' % ','.join([str(t) for t in trt]))
+
 		R_script.write('Varieties <- factor(c(\n')
 		for _ in range(len_repetitions):
 			R_script.write('rep(c(%s), rep(%d,%d)),\n' % (
@@ -353,5 +354,5 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 					lsd = round(lsd, digits)
 			except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
 				lsd = None
-						
+		
 		return lsd

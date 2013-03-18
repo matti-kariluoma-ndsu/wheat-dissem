@@ -328,6 +328,6 @@ class Empty_Cell(Cell):
 	
 	def get(self, year, fieldname):
 		return None	
-	
+
 	def clear(self):
 		Cell.clear(self)
