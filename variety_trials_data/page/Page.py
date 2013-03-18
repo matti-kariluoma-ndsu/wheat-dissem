@@ -355,16 +355,22 @@ class Page:
 		return str(unicode(self))
 	
 	def __iter__(self):
-		self.index = 0
-		return self
-		
-	def next(self):
-		try:
-			table = self._tables[self.index]
-			self.index += 1
-		except IndexError:
-			raise StopIteration
-		return table
+		"""
+		Does not conform to Python 2.3:
+		``The intention of the protocol is that once an iterator's next() 
+		method raises StopIteration, it will continue to do so on 
+		subsequent calls. Implementations that do not obey this property 
+		are deemed broken.''
+		http://docs.python.org/2/library/stdtypes.html#iterator-types
+		"""
+		index = 0
+		while True:
+			try:
+				table = self._tables[index]
+				index += 1
+			except IndexError:
+				raise StopIteration
+			yield table
 	
 	def append(self, table):
 		table.page = self

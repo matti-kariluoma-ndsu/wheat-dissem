@@ -47,29 +47,36 @@ class Row:
 		return str(unicode(self))
 		
 	def __iter__(self):
-		self.index = 0
-		self.iter_dict = self._cells
-		self.iter_order = self.table.page.column_order
-		self.iter_skip = self.table.masked_locations
-		#self.iter_show_missing = True
-		return self
+		"""
+		Does not conform to Python 2.3:
+		``The intention of the protocol is that once an iterator's next() 
+		method raises StopIteration, it will continue to do so on 
+		subsequent calls. Implementations that do not obey this property 
+		are deemed broken.''
+		http://docs.python.org/2/library/stdtypes.html#iterator-types
+		"""
+		index = 0
+		iter_dict = self._cells
+		iter_order = self.table.page.column_order
+		iter_skip = self.table.masked_locations
+		#iter_show_missing = True
 		
-	def next(self):
-		try:
-			key = self.iter_order[self.index]
-			self.index += 1
-		except IndexError:
-			raise StopIteration
-			
-		if key in self.iter_skip:
-			cell = None
-		else:
+		while True:
 			try:
-				cell = self.iter_dict[key]
-			except KeyError:
+				key = iter_order[index]
+				index += 1
+			except IndexError:
+				raise StopIteration
+				
+			if key in iter_skip:
 				cell = None
-		
-		return cell
+			else:
+				try:
+					cell = iter_dict[key]
+				except KeyError:
+					cell = None
+			
+			yield cell
 	
 	def append(self, cell):
 		if self.variety is None:

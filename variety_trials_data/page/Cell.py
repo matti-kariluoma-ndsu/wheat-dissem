@@ -141,8 +141,8 @@ class Aggregate_Cell(Cell):
 			return self.precalculated_value[year][fieldname]
 		else:
 			values = []
-			for cell in self.table.row(self.variety)._cells.values(): # can't iterate through the row while something else is iterating, must use backchannel ... why?
-				if isinstance(cell, Aggregate_Cell): # Shouldn't see any other types
+			for cell in self.table.row(self.variety):
+				if cell is None or isinstance(cell, Aggregate_Cell): # Shouldn't see any other types
 					continue
 				for years_diff in range(self.table.column(self.location).years_back + 1):
 					cur_year = year - years_diff

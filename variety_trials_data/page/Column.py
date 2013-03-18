@@ -48,28 +48,35 @@ class Column:
 		return str(unicode(self))
 		
 	def __iter__(self):
-		self.index = 0
-		self.iter_dict = self._cells
-		self.iter_order = self.table.page.row_order
-		#self.iter_skip = []
-		#self.iter_show_missing = False
-		return self
+		"""
+		Does not conform to Python 2.3:
+		``The intention of the protocol is that once an iterator's next() 
+		method raises StopIteration, it will continue to do so on 
+		subsequent calls. Implementations that do not obey this property 
+		are deemed broken.''
+		http://docs.python.org/2/library/stdtypes.html#iterator-types
+		"""
+		index = 0
+		iter_dict = self._cells
+		iter_order = self.table.page.row_order
+		#iter_skip = []
+		#iter_show_missing = False
 		
-	def next(self):
-		try:
-			key = self.iter_order[self.index]
-			self.index += 1
-		except IndexError:
-			raise StopIteration
-		try:
-			cell = self.iter_dict[key]
-		except KeyError:
-			cell = None	
+		while True:
+			try:
+				key = iter_order[index]
+				index += 1
+			except IndexError:
+				raise StopIteration
+			try:
+				cell = iter_dict[key]
+			except KeyError:
+				cell = None	
+				
+			if cell is None: #and not self.iter_show_missing:
+				continue
 			
-		if cell is None: #and not self.iter_show_missing:
-			return self.next()
-		
-		return cell
+			yield cell
 	
 	def append(self, cell):
 		if self.location is None:
