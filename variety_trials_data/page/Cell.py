@@ -212,7 +212,13 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 			#print varieties
 			for cell in self.table.row(varieties[0]):
 				if not isinstance(cell, Aggregate_Cell) and not isinstance(cell, Empty_Cell):
-					locations.append(cell.location)
+					try:
+						value = cell.get(year-self.table.column(self.location).years_back, fieldname)
+					except UnbalancedData:
+						value = None
+					if value is not None:
+						locations.append(cell.location)
+			print locations
 			for years_diff in range(self.table.column(self.location).years_back + 1):
 				cur_year = year - years_diff
 				values[cur_year] = this_years_values = []
