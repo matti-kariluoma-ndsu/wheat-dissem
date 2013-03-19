@@ -289,6 +289,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 		for index in sorted(list(set(delete_rows)), reverse=True):
 			for year in unbalanced_input:
 				unbalanced_input[year].pop(index)
+			varieties.pop(index)
 		#
 		## delete columns that are all None		
 		#
@@ -311,6 +312,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 			for year in unbalanced_input:
 				for row in unbalanced_input[year]:
 					row.pop(index)
+			locations.pop(index)
 		#
 		## delete rows with impudence until balanced
 		#
@@ -329,13 +331,15 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 		for index in sorted(list(set(delete_rows)), reverse=True):
 			for year in unbalanced_input:
 				unbalanced_input[year].pop(index)
-		
-		"""
+			varieties.pop(index)
+		#"""
+		print '%d: %s' % (len(locations), locations)
+		print '%d: %s' % (len(varieties), varieties)
 		for table in unbalanced_input:
 			for row in unbalanced_input[table]:
-				print row
+				print '%d: %s' % (len(row), row)
 			print "==="
-		"""
+		#"""
 		
 		balanced_input = []
 		for year in unbalanced_input:

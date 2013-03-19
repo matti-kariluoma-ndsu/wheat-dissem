@@ -199,17 +199,20 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 			values = {}
 			varieties = []
 			locations = []
+			for column in self.table.columns():
+				if isinstance(column, Aggregate_Column):
+					continue
+				locations.append(column.location.name)
+			for row in self.table:
+				if isinstance(row, Aggregate_Row):
+					continue
+				varieties.append(row.variety.name)
 			for years_diff in range(self.table.column(self.location).years_back + 1):
 				cur_year = year - years_diff
 				values[cur_year] = this_years_values = []
-				for column in self.table.columns():
-					if isinstance(column, Aggregate_Column):
-						continue
-					locations.append(column.location.name)
 				for row in self.table:
 					if isinstance(row, Aggregate_Row):
 						continue
-					varieties.append(row.variety.name)
 					this_rows_values = []
 					this_years_values.append(this_rows_values)
 					for cell in row:
@@ -229,7 +232,6 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 		if not values:
 			value = None
 		else:
-			return None
 			"""
 			print '%s %s' % (self.table.site_years, self.location.name)
 			for year in values:
