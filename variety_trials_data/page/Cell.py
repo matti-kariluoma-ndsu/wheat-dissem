@@ -234,7 +234,14 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 		if not values:
 			value = None
 		else:
-			print '%s %s' % (self.table.site_years, values)
+			#"""
+			print '%s %s' % (self.table.site_years, self.location.name)
+			for year in values:
+				print year
+				for row in values[year]:
+					print '%d: %s' % (len(row), row)
+			print "==="
+			#"""
 			value = LSD_Calculator().calculate_lsd(
 					values, 
 					varieties,
