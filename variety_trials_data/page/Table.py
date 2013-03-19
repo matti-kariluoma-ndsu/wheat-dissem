@@ -41,26 +41,9 @@ class Table:
 	
 	def __str__(self):
 		return str(unicode(self))
-		
-	def __iter__(self):
-		"""
-		Does not conform to Python 2.3:
-		``The intention of the protocol is that once an iterator's next() 
-		method raises StopIteration, it will continue to do so on 
-		subsequent calls. Implementations that do not obey this property 
-		are deemed broken.''
-		http://docs.python.org/2/library/stdtypes.html#iterator-types
-		"""
+	
+	def _iter_generator(self, iter_dict, iter_order, iter_show_missing):
 		index = 0
-		if self.iter_rows:
-			iter_dict = self._rows
-			iter_order = self.page.row_order
-			iter_show_missing = False
-		else:
-			iter_dict = self._columns
-			iter_order = self.page.column_order
-			iter_show_missing = True
-		
 		while True:
 			try:
 				key = iter_order[index]
@@ -79,13 +62,30 @@ class Table:
 			
 			yield collection
 	
+	def __iter__(self):
+		"""
+		Does not conform to Python 2.3:
+		``The intention of the protocol is that once an iterator's next() 
+		method raises StopIteration, it will continue to do so on 
+		subsequent calls. Implementations that do not obey this property 
+		are deemed broken.''
+		http://docs.python.org/2/library/stdtypes.html#iterator-types
+		"""
+		# iterate through rows
+		iter_dict = self._rows
+		iter_order = self.page.row_order
+		iter_show_missing = False
+		return self._iter_generator(iter_dict, iter_order, iter_show_missing)
+	
 	def rows(self):
-		self.iter_rows = True
 		return self
 		
 	def columns(self):
-		self.iter_rows = False
-		return self
+		# iterate through columns
+		iter_dict = self._columns
+		iter_order = self.page.column_order
+		iter_show_missing = True
+		return self._iter_generator(iter_dict, iter_order, iter_show_missing)
 	
 	def row(self, variety):
 		try:
@@ -119,8 +119,6 @@ class Table:
 	
 	def clear(self):
 		self.page = None
-		self.iter_rows = True
-		self.masked_locations = []
 		for row in self._rows.values():
 			row.clear()
 		self._rows = {} # variety: Row(), ...

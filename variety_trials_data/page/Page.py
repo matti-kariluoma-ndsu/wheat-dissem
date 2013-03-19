@@ -220,10 +220,8 @@ class Page:
 			years_back_sum = 0
 			exemplar_variety = self._find_exemplar_variety(table, year_range)
 			for (years_back, location) in fake_locations:
-				tables_varieties = [] # need to go through these and find the "most balanced"
 				for row in table.rows():
 					if not isinstance(row.variety, Fake_Variety):
-						tables_varieties.append(row.variety)
 						cell = Aggregate_Cell(row.variety, location, self.year, self.fieldname)
 						cell.table = table
 						table.append(cell)
