@@ -222,7 +222,7 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 					for cell in self.table.row(variety):
 						if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell):
 							continue					
-						if cell.location in self.table.column(self.location).balanced_criteria[year]:
+						if cell.location in self.table.column(self.location).balanced_criteria[cur_year]:
 							try:
 								value = cell.get(cur_year, fieldname)
 							except ExtraneousTrial:
