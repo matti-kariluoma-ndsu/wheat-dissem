@@ -140,19 +140,6 @@ class Aggregate_Cell(Cell):
 	def __init__(self, variety, location, default_year, default_fieldname):
 		Cell.__init__(self, variety, location, default_year, default_fieldname)
 	
-	def _fill_values(self, year, fieldname, variety, values):
-		for cell in self.table.row(variety):
-			if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell): # Shouldn't see any other types
-				continue
-			if cell.location in self.table.column(self.location).balanced_criteria[year]:
-				try:
-					value = cell.get(year, fieldname)
-				except ExtraneousTrial:
-					value = None
-				if value is None:
-					raise UnbalancedData(self.location, self.variety, year, fieldname)
-				values.append(value)
-	
 	def get(self, year, fieldname):
 		if (year in self.precalculated_value and	
 				fieldname in self.precalculated_value[year] and	
@@ -167,7 +154,17 @@ class Aggregate_Cell(Cell):
 			if not any_empty:
 				for years_diff in range(self.table.column(self.location).years_back + 1):
 					cur_year = year - years_diff
-					self._fill_values(cur_year, fieldname, self.variety, values)
+					for cell in self.table.row(self.variety):
+						if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell):
+							continue
+						if cell.location in self.table.column(self.location).balanced_criteria[cur_year]:
+							try:
+								value = cell.get(cur_year, fieldname)
+							except ExtraneousTrial:
+								value = None
+							if value is None:
+								raise UnbalancedData(self.location, self.variety, year, fieldname)
+							values.append(value)
 			
 		if not values:
 			value = None
@@ -202,25 +199,37 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 			values = {}
 			varieties = []
 			locations = []
-			any_empty = False
+			for cell in self.table.column(self.location):
+				if not isinstance(cell, LSD_Aggregate_Cell):
+					try:
+						value = cell.get(year, fieldname)
+					except UnbalancedData:
+						value = None
+					if value is not None:
+						varieties.append(cell.variety)
+			if not varieties:
+				return None
+			#print varieties
+			for cell in self.table.row(varieties[0]):
+				if not isinstance(cell, Aggregate_Cell) and not isinstance(cell, Empty_Cell):
+					locations.append(cell.location)
 			for years_diff in range(self.table.column(self.location).years_back + 1):
 				cur_year = year - years_diff
-				any_empty = any_empty or len(self.table.column(self.location).balanced_criteria[cur_year]) < 1
-			if not any_empty:
-				for years_diff in range(self.table.column(self.location).years_back + 1):
-					cur_year = year - years_diff
-					values[cur_year] = this_years_values = []
-					for row in self.table:
-						if not isinstance(row, Aggregate_Row):
-							this_varieties_values = []
-							this_years_values.append(this_varieties_values)
-							self._fill_values(cur_year, fieldname, row.variety, this_varieties_values)
-				for row in self.table:
-					if not isinstance(row, Aggregate_Row):
-						varieties.append(row.variety.name)
-				for column in self.table.columns():
-					if not isinstance(column, Aggregate_Column):
-						locations.append(column.location.name)
+				values[cur_year] = this_years_values = []
+				for variety in varieties:
+					this_varieties_values = []
+					this_years_values.append(this_varieties_values)
+					for cell in self.table.row(variety):
+						if cell is None or isinstance(cell, Aggregate_Cell) or isinstance(cell, Empty_Cell):
+							continue					
+						if cell.location in self.table.column(self.location).balanced_criteria[year]:
+							try:
+								value = cell.get(cur_year, fieldname)
+							except ExtraneousTrial:
+								value = None
+							if value is None:
+								raise UnbalancedData(self.location, self.variety, cur_year, fieldname)
+							this_varieties_values.append(value)
 		
 		if not values:
 			value = None
