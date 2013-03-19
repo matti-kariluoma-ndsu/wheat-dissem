@@ -199,35 +199,40 @@ class LSD_Aggregate_Cell(Aggregate_Cell):
 			values = {}
 			varieties = []
 			locations = []
-			for column in self.table.columns():
-				if isinstance(column, Aggregate_Column):
-					continue
-				locations.append(column.location.name)
-			for row in self.table:
-				if isinstance(row, Aggregate_Row):
-					continue
-				varieties.append(row.variety.name)
+			any_empty = False
 			for years_diff in range(self.table.column(self.location).years_back + 1):
 				cur_year = year - years_diff
-				values[cur_year] = this_years_values = []
+				any_empty = any_empty or len(self.table.column(self.location).balanced_criteria[cur_year]) < 1
+			if not any_empty:
+				for column in self.table.columns():
+					if isinstance(column, Aggregate_Column):
+						continue
+					locations.append(column.location.name)
 				for row in self.table:
 					if isinstance(row, Aggregate_Row):
 						continue
-					this_rows_values = []
-					this_years_values.append(this_rows_values)
-					for cell in row:
-						if cell is None:
-							this_rows_values.append(None)
+					varieties.append(row.variety.name)
+				for years_diff in range(self.table.column(self.location).years_back + 1):
+					cur_year = year - years_diff
+					values[cur_year] = this_years_values = []
+					for row in self.table:
+						if isinstance(row, Aggregate_Row):
 							continue
-						if isinstance(self.table.column(cell.location), Aggregate_Column):
-							continue
-						try:
-							value = cell.get(cur_year, fieldname)
-						except UnbalancedData:
-							value = None
-						except:
-							value = None
-						this_rows_values.append(value)
+						this_rows_values = []
+						this_years_values.append(this_rows_values)
+						for cell in row:
+							if cell is None:
+								this_rows_values.append(None)
+								continue
+							if isinstance(self.table.column(cell.location), Aggregate_Column):
+								continue
+							try:
+								value = cell.get(cur_year, fieldname)
+							except UnbalancedData:
+								value = None
+							except:
+								value = None
+							this_rows_values.append(value)
 						
 		if not values:
 			value = None

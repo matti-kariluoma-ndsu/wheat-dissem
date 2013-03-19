@@ -274,3 +274,5 @@ Decimal('68.1')
 
 Can we rewrite _get_entries() to itereate through years and directly fetch the self.cells? will need to profile both approaches
 Must find a way to bacth the calls to the R subprocess, or at least async them (time for ajax?)
+
+X-ing a location no longer works. Seems it doesn't work on the live version either.

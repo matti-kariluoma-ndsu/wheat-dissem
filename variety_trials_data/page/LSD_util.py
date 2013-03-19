@@ -246,15 +246,15 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 		
 		output = None
 		
-		debug = tempfile.NamedTemporaryFile(delete=False)
+		#debug = tempfile.NamedTemporaryFile(delete=False)
 		with open(R_out.name, 'r') as f:
 			for line in f:
-				debug.write(line)
+				#debug.write(line)
 				if line.startswith("Least Significant Difference"):
 					output = line
 					break
 		
-		debug.close()
+		#debug.close()
 		os.unlink(R_out.name)
 		
 		if output:
@@ -332,7 +332,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 			for year in unbalanced_input:
 				unbalanced_input[year].pop(index)
 			varieties.pop(index)
-		#"""
+		"""
 		print '%d: %s' % (len(locations), locations)
 		print '%d: %s' % (len(varieties), varieties)
 		for table in unbalanced_input:
