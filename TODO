@@ -276,3 +276,8 @@ Can we rewrite _get_entries() to itereate through years and directly fetch the s
 Must find a way to bacth the calls to the R subprocess, or at least async them (time for ajax?)
 
 X-ing a location no longer works. Seems it doesn't work on the live version either.
+
+55108 2012 NEAR shows (8, 0, 0) for first table, but 2011 shows (8, 7, 5)...!? 
+	It's beacuse of LeCenter... how are the means still calculating for 2-yr?
+
+55108 2010 NEAR has Dickey County twice...

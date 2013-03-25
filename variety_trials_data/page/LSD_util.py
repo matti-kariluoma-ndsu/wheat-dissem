@@ -153,6 +153,12 @@ class LSD_Calculator():
 
 		return LSD
 	
+	def _NA_or_str(self, value):
+		if value is None:
+			return 'NA'
+		else:
+			return str(value)
+	
 	def _R_subprocess(self, response_to_treatments, treatment_factors, blocking_factors, probability):
 		"""
 		Hey, just stop right there. 
@@ -181,7 +187,7 @@ class LSD_Calculator():
 		R_out.close()
 		
 		R_script.write('.libPaths("%s")\n' % settings.R_LIBRARY)
-		R_script.write('yield <- c(%s)\n' % ','.join([str(t) for t in trt]))
+		R_script.write('yield <- c(%s)\n' % ','.join([self._NA_or_str(t) for t in trt]))
 
 		R_script.write('Varieties <- factor(c(\n')
 		for _ in range(len_repetitions):
@@ -237,8 +243,8 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 					]
 				);
 		except CalledProcessError:
-			print R_script.name
-			print output.name
+			#print R_script.name
+			#print output.name
 			raise
 		#"""
 		
@@ -272,75 +278,77 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 			print "==="
 		#"""
 		
-		#
-		## delete rows that are all None
-		#
-		delete_rows = [] # indexes of rows to delete
-		for year in unbalanced_input:
-			for (r, row) in enumerate(unbalanced_input[year]):
-				delete_row = True
-				for cell in row:
-					if cell is not None:
-						delete_row = False
-						break
-				if delete_row:
-					delete_rows.append(r)
-					
-		for index in sorted(list(set(delete_rows)), reverse=True):
+		# force balanced data if using the internal implementation
+		if internal_implementation:
+			#
+			## delete rows that are all None
+			#
+			delete_rows = [] # indexes of rows to delete
 			for year in unbalanced_input:
-				unbalanced_input[year].pop(index)
-			varieties.pop(index)
-		#
-		## delete columns that are all None		
-		#
-		delete_columns = [] # indexes of columns to delete
-		for year in unbalanced_input:
-			column_length = len(unbalanced_input[year])
-			delete_column = {} # was `[0] * len(row)' but len(row) != num_columns...?
-			for row in unbalanced_input[year]: 
-				for (c, cell) in enumerate(row):
-					if cell is None:
-						try:
-							delete_column[c] += 1
-						except KeyError:
-							delete_column[c] = 1
-			for index in delete_column:
-				if delete_column[index] == column_length:
-					delete_columns.append(index)
-					
-		for index in sorted(list(set(delete_columns)), reverse=True):
-			for year in unbalanced_input:
-				for row in unbalanced_input[year]:
-					row.pop(index)
-			locations.pop(index)
-		#
-		## delete rows with impudence until balanced
-		#
-		delete_rows = [] # indexes of rows to delete
-		for year in unbalanced_input:
-			for (r, row) in enumerate(unbalanced_input[year]):
-				delete_row = False
-				for cell in row:
-					if cell is None:
-						delete_row = True
-						break
+				for (r, row) in enumerate(unbalanced_input[year]):
+					delete_row = True
+					for cell in row:
+						if cell is not None:
+							delete_row = False
+							break
+					if delete_row:
+						delete_rows.append(r)
 						
-				if delete_row:
-					delete_rows.append(r)
-					
-		for index in sorted(list(set(delete_rows)), reverse=True):
+			for index in sorted(list(set(delete_rows)), reverse=True):
+				for year in unbalanced_input:
+					unbalanced_input[year].pop(index)
+				varieties.pop(index)
+			#
+			## delete columns that are all None		
+			#
+			delete_columns = [] # indexes of columns to delete
 			for year in unbalanced_input:
-				unbalanced_input[year].pop(index)
-			varieties.pop(index)
-		"""
-		print '%d: %s' % (len(locations), locations)
-		print '%d: %s' % (len(varieties), varieties)
-		for table in unbalanced_input:
-			for row in unbalanced_input[table]:
-				print '%d: %s' % (len(row), row)
-			print "==="
-		#"""
-		
+				column_length = len(unbalanced_input[year])
+				delete_column = {} # was `[0] * len(row)' but len(row) != num_columns...?
+				for row in unbalanced_input[year]: 
+					for (c, cell) in enumerate(row):
+						if cell is None:
+							try:
+								delete_column[c] += 1
+							except KeyError:
+								delete_column[c] = 1
+				for index in delete_column:
+					if delete_column[index] == column_length:
+						delete_columns.append(index)
+						
+			for index in sorted(list(set(delete_columns)), reverse=True):
+				for year in unbalanced_input:
+					for row in unbalanced_input[year]:
+						row.pop(index)
+				locations.pop(index)
+			#
+			## delete rows with impudence until balanced
+			#
+			delete_rows = [] # indexes of rows to delete
+			for year in unbalanced_input:
+				for (r, row) in enumerate(unbalanced_input[year]):
+					delete_row = False
+					for cell in row:
+						if cell is None:
+							delete_row = True
+							break
+							
+					if delete_row:
+						delete_rows.append(r)
+						
+			for index in sorted(list(set(delete_rows)), reverse=True):
+				for year in unbalanced_input:
+					unbalanced_input[year].pop(index)
+				varieties.pop(index)
+			"""
+			print '%d: %s' % (len(locations), locations)
+			print '%d: %s' % (len(varieties), varieties)
+			for table in unbalanced_input:
+				for row in unbalanced_input[table]:
+					print '%d: %s' % (len(row), row)
+				print "==="
+			#"""
+			
 		balanced_input = []
 		for year in unbalanced_input:
 			balanced_input.extend(unbalanced_input[year])
