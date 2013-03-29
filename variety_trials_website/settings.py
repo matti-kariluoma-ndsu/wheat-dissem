@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # coding: ascii
 
-# Django settings for variety_trials_website project.
+"""
+Django settings for variety_trials_website project.
+
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
+"""
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # coding: ascii
 
+"""
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
+"""
+
 from django.db import models
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist

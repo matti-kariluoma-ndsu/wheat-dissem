@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # coding: ascii
 
+"""
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
+"""
+
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse

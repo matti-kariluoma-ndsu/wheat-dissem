@@ -6,6 +6,9 @@ This file demonstrates two different styles of tests (one doctest and one
 unittest). These will both pass when you run "manage.py test".
 
 Replace these with more appropriate tests for your application.
+
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
 """
 
 from django.test import TestCase

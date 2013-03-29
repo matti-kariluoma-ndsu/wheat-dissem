@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # coding: ascii
 
+"""
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
+"""
+
 from django import forms
 from django.forms.formsets import BaseFormSet
 from variety_trials_data import models

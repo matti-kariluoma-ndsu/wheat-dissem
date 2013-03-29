@@ -29,6 +29,8 @@ In addition:
 	row = table.row(variety)
 	column = table.column(location)
 
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
 """
 
 from variety_trials_data.models import Trial_Entry, Date

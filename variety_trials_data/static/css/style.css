@@ -1,3 +1,13 @@
+div.cc-text 
+{
+	font-style: italic;
+}
+
+div.cc-image
+{
+	float: left;
+}
+
 #variety_trials__scope_input li
 {
 	list-style-type: none;

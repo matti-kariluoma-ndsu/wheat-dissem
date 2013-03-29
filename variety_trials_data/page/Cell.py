@@ -4,6 +4,9 @@
 """
 Cell contains a list of trial_entry that have the same variety and 
 location.
+
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
 """
 
 from variety_trials_data.page.Row import Aggregate_Row

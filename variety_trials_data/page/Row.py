@@ -7,6 +7,9 @@ Row contains a list of cells, and has a list-like interface:
 	row.append(cell)
 	row.extend(cells)
 	row_copy = Row(row)
+
+:copyright: 2012 Matti Kariluoma <matti.m.kariluoma@ndsu.edu>
+:license: CC BY-NC-ND 3.0 @see LICENSE
 """
 
 class Fake_Variety:
