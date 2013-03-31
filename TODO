@@ -285,3 +285,5 @@ X-ing a location no longer works. Seems it doesn't work on the live version eith
 Head-to-head do not have any of the {1,2,3}-yr columns filled in.
 
 Explain caveats of setting variety= on advanced_search.html (does not_locations still work?, etc.)
+
+Filter out "id" from list of fields on advanced_search.html
