@@ -175,15 +175,35 @@ class LSD_Calculator():
 		working. It'd best to comment out the os.unlink/0 commands and send
 		the generated scripts to an R programmer for debugging.
 		"""
+		# check input sanity
+		for year in response_to_treatments:
+			if year not in treatment_factors:
+				return None
+			if year not in blocking_factors:
+				return None
+		
+		"""
+		debug_out = tempfile.NamedTemporaryFile(delete=False)
+		debug_out.write(repr(response_to_treatments))
+		debug_out.write('\n')
+		debug_out.write(repr(treatment_factors))
+		debug_out.write('\n')
+		debug_out.write(repr(blocking_factors))
+		debug_out.write('\n')
+		debug_out.close()
+		return None
+		#"""
+		
 		# collapse into single list
 		trt = []
-		for row in response_to_treatments:
-			trt.extend(row)
-		len_blocking_factors = len(blocking_factors)
-		len_treatment_factors = len(treatment_factors)
-		len_repetitions = int(len(trt) / (len_blocking_factors * len_treatment_factors))
-		str_blocking_factors = ','.join(['"%s"'%str(block) for block in blocking_factors])
-		str_treatment_factors = ','.join(['"%s"'%str(treat) for treat in treatment_factors])
+		for year in sorted(response_to_treatments.keys()):
+			for row in response_to_treatments[year]:
+				trt.extend(row)
+		#len_blocking_factors = len(blocking_factors)
+		#len_treatment_factors = len(treatment_factors)
+		#len_repetitions = int(len(trt) / (len_blocking_factors * len_treatment_factors))
+		#str_blocking_factors = ','.join(['"%s"' % str(block) for block in blocking_factors])
+		#str_treatment_factors = ','.join(['"%s"' % str(treat) for treat in treatment_factors])
 		
 		R_script = tempfile.NamedTemporaryFile(delete=False)
 		R_out = tempfile.NamedTemporaryFile(delete=False)
@@ -193,20 +213,22 @@ class LSD_Calculator():
 		R_script.write('yield <- c(%s)\n' % ','.join([self._NA_or_str(t) for t in trt]))
 
 		R_script.write('Varieties <- factor(c(\n')
-		for _ in range(len_repetitions):
+		for year in sorted(treatment_factors.keys()):
 			R_script.write('rep(c(%s), rep(%d,%d)),\n' % (
-					str_treatment_factors,
-					len_blocking_factors,
-					len_treatment_factors
+					','.join(['"%s"' % str(treat) for treat in treatment_factors[year]]),
+					len(blocking_factors[year]),
+					len(treatment_factors[year])
 				))
 		R_script.write('c()))\n')
+		
 		R_script.write('Environments <- factor(c(\n')
-		for _ in range(len_repetitions):
+		for year in sorted(blocking_factors.keys()):
 			R_script.write('rep(c(%s), %d),\n' % (
-					str_blocking_factors,
-					len_treatment_factors
+					','.join(['"%s%d"' % (str(block), year) for block in blocking_factors[year]]),
+					len(treatment_factors[year])
 				))
 		R_script.write('c()))\n')
+		
 		R_script.write('''model <- aov(yield ~ Varieties + Environments)
 mse <- deviance(model) / df.residual(model) 
 require(agricolae)
@@ -223,6 +245,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 				'BATCH',
 				'--no-restore',
 				'--no-timing',
+				'--no-save',
 				'--quiet',
 				f.name,
 				'/dev/stdout'
@@ -240,6 +263,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 						'BATCH',
 						'--no-restore',
 						'--no-timing',
+						'--no-save',
 						'--quiet',
 						R_script.name,
 						R_out.name
@@ -264,7 +288,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 					break
 		
 		#debug.close()
-		os.unlink(R_out.name)
+		#os.unlink(R_out.name)
 		
 		if output:
 			value = float(output[29:])
@@ -280,9 +304,15 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 				print row
 			print "==="
 		#"""
+		"""
+		unbalanced_out = tempfile.NamedTemporaryFile(delete=False)
+		unbalanced_out.write(repr(unbalanced_input))
+		unbalanced_out.write('\n')
+		unbalanced_out.close()
+		#"""
 		
-		# force balanced data if using the internal implementation
-		if internal_implementation:
+		# deletes varieties and locations from all years if they fail to balance in any year
+		if internal_implementation: 
 			#
 			## delete rows that are all None
 			#
@@ -352,22 +382,93 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 				print "==="
 			#"""
 			
-		balanced_input = []
-		for year in unbalanced_input:
-			balanced_input.extend(unbalanced_input[year])
+			balanced_input = []
+			for year in sorted(unbalanced_input.keys()):
+				balanced_input.extend(unbalanced_input[year])
+				
+		# deletes varieties from all years if they fail to balance in any year, only deletes locations from the year they fail to balance.
+		else:
+			# we expect varieties and locations to be in a different format
+			extend_locations_as_dict = {}
+			extend_varieties_as_dict = {}
+			for year in unbalanced_input.keys():
+				extend_locations_as_dict[year] = list(locations)
+				extend_varieties_as_dict[year] = list(varieties)
+			"""
+			r_impl_debug = tempfile.NamedTemporaryFile(delete=False)
+			r_impl_debug.write(repr(extend_locations_as_dict))
+			r_impl_debug.write('\n')
+			r_impl_debug.write(repr(extend_varieties_as_dict))
+			r_impl_debug.write('\n')
+			r_impl_debug.close()
+			return None
+			#"""
+			#
+			## delete columns that are all None		
+			#
+			for year in unbalanced_input:
+				delete_columns = [] # indexes of columns to delete
+				column_length = len(unbalanced_input[year])
+				delete_column = {} # was `[0] * len(row)' but len(row) != num_columns...?
+				for row in unbalanced_input[year]: 
+					for (c, cell) in enumerate(row):
+						if cell is None:
+							try:
+								delete_column[c] += 1
+							except KeyError:
+								delete_column[c] = 1
+				for index in delete_column:
+					if delete_column[index] == column_length:
+						delete_columns.append(index)
+						
+				for index in sorted(list(set(delete_columns)), reverse=True):
+					for row in unbalanced_input[year]:
+						row.pop(index)
+					extend_locations_as_dict[year].pop(index)
+			#
+			## delete rows from all years if row contains none in any year
+			#
+			delete_rows = [] # indexes of rows to delete
+			for year in unbalanced_input:
+				for (r, row) in enumerate(unbalanced_input[year]):
+					delete_row = False
+					for cell in row:
+						if cell is None:
+							delete_row = True
+							break
+					if delete_row:
+						delete_rows.append(r)
+						
+			for index in sorted(list(set(delete_rows)), reverse=True):
+				for year in unbalanced_input:
+					unbalanced_input[year].pop(index)
+					extend_varieties_as_dict[year].pop(index)
 			
-		#print balanced_input
+			"""
+			r_impl_debug = tempfile.NamedTemporaryFile(delete=False)
+			r_impl_debug.write(repr(extend_locations_as_dict))
+			r_impl_debug.write('\n')
+			r_impl_debug.write(repr(extend_varieties_as_dict))
+			r_impl_debug.write('\n')
+			r_impl_debug.close()
+			return None
+			#"""
+			
+			# overwrite the locations/varities with their extend_*_as_dict 
+			locations = extend_locations_as_dict
+			varieties = extend_varieties_as_dict
+			# pass the modified dictionary along
+			balanced_input = unbalanced_input
 		
-		lsd = None
-		if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
-			try:
-				if internal_implementation:
+		try:
+			if internal_implementation:
+				if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
 					lsd = self._LSD(balanced_input, lsd_probability)
-				else:
-					lsd = self._R_subprocess(balanced_input, varieties, locations, lsd_probability)
-				if lsd is not None:
-					lsd = round(lsd, digits)
-			except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
-				lsd = None
+			else:
+				lsd = self._R_subprocess(balanced_input, varieties, locations, lsd_probability)
+			if lsd is not None:
+				lsd = round(lsd, digits)
+		except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
+			lsd = None
 		
 		return lsd
