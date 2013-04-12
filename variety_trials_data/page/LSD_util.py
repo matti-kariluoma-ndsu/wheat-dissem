@@ -288,7 +288,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 					break
 		
 		#debug.close()
-		#os.unlink(R_out.name)
+		os.unlink(R_out.name)
 		
 		if output:
 			value = float(output[29:])
@@ -309,6 +309,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 		unbalanced_out.write(repr(unbalanced_input))
 		unbalanced_out.write('\n')
 		unbalanced_out.close()
+		return None
 		#"""
 		
 		# deletes varieties and locations from all years if they fail to balance in any year
@@ -425,6 +426,49 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 					for row in unbalanced_input[year]:
 						row.pop(index)
 					extend_locations_as_dict[year].pop(index)
+			
+			#
+			## delete rows from all years if a row is all None in any year
+			#
+			delete_rows = [] # indexes of rows to delete
+			for year in unbalanced_input:
+				for (r, row) in enumerate(unbalanced_input[year]):
+					delete_row = True
+					for cell in row:
+						if cell is not None:
+							delete_row = False
+							break
+					if delete_row:
+						delete_rows.append(r)
+						
+			for index in sorted(list(set(delete_rows)), reverse=True):
+				for year in unbalanced_input:
+					unbalanced_input[year].pop(index)
+					extend_varieties_as_dict[year].pop(index)
+
+			#
+			## delete columns that contain any None values
+			#
+			for year in unbalanced_input:
+				delete_columns = [] # indexes of columns to delete
+				column_length = len(unbalanced_input[year])
+				delete_column = {} # was `[0] * len(row)' but len(row) != num_columns...?
+				for row in unbalanced_input[year]: 
+					for (c, cell) in enumerate(row):
+						if cell is not None:
+							try:
+								delete_column[c] += 1
+							except KeyError:
+								delete_column[c] = 1
+				for index in delete_column:
+					if delete_column[index] != column_length:
+						delete_columns.append(index)
+						
+				for index in sorted(list(set(delete_columns)), reverse=True):
+					for row in unbalanced_input[year]:
+						row.pop(index)
+					extend_locations_as_dict[year].pop(index)
+			
 			#
 			## delete rows from all years if row contains none in any year
 			#
