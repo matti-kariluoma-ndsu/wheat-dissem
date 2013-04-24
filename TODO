@@ -267,10 +267,7 @@ Decimal('73.9')
 Decimal('68.1')
 >>> t[0].delete()
 
-* Remove LSD code
-** replace with rPy->agricolae
-*** better yet, use subprocess with careful testing.
-** print R version, agricolae version in footer of each page. May as well print django/python as well.
+print R version, agricolae version in footer of each page. May as well print django/python as well.
 
 Can we rewrite _get_entries() to itereate through years and directly fetch the self.cells? will need to profile both approaches
 Must find a way to bacth the calls to the R subprocess, or at least async them (time for ajax?)
