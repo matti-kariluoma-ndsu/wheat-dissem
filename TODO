@@ -284,3 +284,11 @@ Head-to-head do not have any of the {1,2,3}-yr columns filled in.
 Explain caveats of setting variety= on advanced_search.html (does not_locations still work?, etc.)
 
 Filter out "id" from list of fields on advanced_search.html
+
+On many pages, no LSD results appear, and _sometimes_ a refresh causes them to appear/disappear...
+
+Fix for head-to-head: 
+ * "temporarily" hide locations that have all none in this year, reshow if new year selected
+ * ... or skip over such locations when calculating mean...? Would have to do so for all n-yr, might as well psedo-hide it
+ * ... do we just auto hide it, and reset when a new year is cleared?
+ * should their be a list of "locations hidden", with links to unhide them? yes?
