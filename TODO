@@ -287,8 +287,27 @@ Filter out "id" from list of fields on advanced_search.html
 
 On many pages, no LSD results appear, and _sometimes_ a refresh causes them to appear/disappear...
 
-Fix for head-to-head: 
- * "temporarily" hide locations that have all none in this year, reshow if new year selected
- * ... or skip over such locations when calculating mean...? Would have to do so for all n-yr, might as well psedo-hide it
- * ... do we just auto hide it, and reset when a new year is cleared?
- * should their be a list of "locations hidden", with links to unhide them? yes?
+should their be a list of "locations hidden", with links to unhide them? yes?
+
+head-to-head problems: 
+	after doing lots&lots of queries, I conclude we have extra data in 2012 for
+	only Williston and Carrington.
+	Performed:
+	query = models.Trial_Entry.objects.filter(harvest_date__in=this_year_dates).filter(hidden=False).filter(location=wil).filter(planting_method_tags="no till")
+	>>> query.count()
+	32
+	>>> for e in query:
+	...  e.hidden = True
+	...  e.save()
+	>>> query = models.Trial_Entry.objects.filter(harvest_date__in=this_year_dates).filter(hidden=False).filter(location=car).exclude(planting_method_tags=None)
+	>>> query.count()
+	107
+	>>> for e in query:
+	...  e.hidden = True
+	...  e.save()
+
+This is now approaching a problem point; We just threw away 107+32 pieces of data because we have no way of showing no-till vs fallow trials, etc. fix!
+
+A new problem: I'm now seeing lsd when 3-yr is all none, it's just a copy of the 2-yr...
+
+

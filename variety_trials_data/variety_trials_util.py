@@ -92,16 +92,7 @@ class Locations_from_Zipcode_x_Scope:
 			distances[location] = d
 		
 		# sort by distance from input zipcode
-		sorted_list = []
-		for d in sorted(distances.values()):
-			for location in locations:
-				if d == distances[location]:
-					sorted_list.append(location)
-					break
-		"""
-		for l in sorted_list:
-			print "%f\t%s" %(distances[l], l.name)
-		"""
+		sorted_list = sorted(distances, key=lambda location: distances[location])
 		return sorted_list
 		
 def get_locations(zipcode, scope=ScopeConstants.near):
@@ -135,7 +126,7 @@ def get_page(zipcode, scope, curyear, fieldname, year_url_bit, not_locations=[],
 		break_into_subtables = True
 		#if scope != variety_trials_forms.ScopeConstants.all:
 		if scope == ScopeConstants.near:
-			number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
+			number_locations = 8 # TODO: hardcoded constant, should be at least based on web page width
 	
 	cache_key = '%s%s%s%s%s%s%s' % (
 			[l.pk for l in sorted(locations, key=lambda location: location.pk)], 

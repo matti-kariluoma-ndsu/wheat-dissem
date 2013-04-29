@@ -72,20 +72,34 @@ class Page:
 		all_dates = models.Date.objects.filter(
 				date__range=(datetime.date(min_year,1,1), datetime.date(max_year,12,31))
 			)
+		
+		varieties = models.Variety.objects.filter(
+				name__in=variety_names
+			)
 		#
 		## Only use locations with data in the current year
 		#
 		locations_with_data = []
+		query = models.Trial_Entry.objects.filter(
+				harvest_date__in=this_year_dates
+			).filter(
+				hidden=False
+			)
 		for loc in locations:
-			if models.Trial_Entry.objects.filter(
+			query_loc = query.filter(
 					location=loc
-				).filter(
-					harvest_date__in=this_year_dates
-				).filter(
-					hidden=False
-				).count() > 0:
-					locations_with_data.append(loc)
-			if len(locations_with_data) >= number_locations:
+				)
+			
+			if len(variety_names) > 0:
+				query_loc = query_loc.filter(
+						variety__in=varieties
+					)
+			
+			if query_loc.count() > 0:
+				locations_with_data.append(loc)
+					
+			# number_locations == len(locations) if variety_names is populated, else some lesser number (8 as of writing)
+			if len(locations_with_data) >= number_locations: 
 				break
 		
 		result = models.Trial_Entry.objects.select_related(
@@ -100,9 +114,7 @@ class Page:
 				
 		if len(variety_names) > 0:
 			result = result.filter(
-					variety__in=models.Variety.objects.filter(
-							name__in=variety_names
-						)
+					variety__in=varieties
 				)
 				
 		return (locations_with_data, result)
@@ -353,8 +365,7 @@ class Page:
 		# TODO: recover the tables and combine them into an appendix table
 		self._tables = self._tables[0:number_of_tables]
 		
-		show_appendix = False
-		if show_appendix:
+		if show_appendix_tables:
 			self._make_appendix()
 		
 		# add data from higher-order tables to lower-order ones (ordering is by site-years)
