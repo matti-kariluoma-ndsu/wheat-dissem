@@ -24,6 +24,19 @@ class ScopeConstants:
 				self.all
 			]
 
+class PlantingMethodConstants:
+	dryland = 'DRYLAND'
+	irrigated = 'IRRIGATED'
+	no_till = 'NO-TILL'
+	all = 'ALL'
+	def get_list(self):
+		return [
+				self.all,
+				self.irrigated,
+				self.fallow,
+				self.no_till
+			]
+
 class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(
 			max_length=5, 
@@ -41,6 +54,20 @@ class SelectLocationByZipcodeForm(forms.Form):
 			initial=ScopeConstants.near,
 			help_text=''
 		)
+	'''
+	planting_method = forms.ChoiceField(
+			required=False,
+			widget=forms.RadioSelect(),
+			choices=(
+					(PlantingMethodConstants.all,	'All Planting Methods'),
+					(PlantingMethodConstants.dryland,	'Dryland'),
+					(PlantingMethodConstants.irrigated,	'Irrigated'),
+					(PlantingMethodConstants.no_till,	'No-Till / Fallow'),
+				),
+			initial=PlantingMethodConstants.all,
+			help_text=''
+		)
+	'''
 	year = forms.CharField(
 			max_length=4, 
 			required=False,
@@ -51,12 +78,12 @@ class SelectLocationByZipcodeForm(forms.Form):
 			required=False,
 			choices=[(location.name, location.name) for location in models.Location.objects.all()],
 			help_text='Select locations to exclude from the query.'
-			)
+		)
 	variety = forms.MultipleChoiceField(
 			required=False,
 			choices=[(variety.name, variety.name) for variety in models.Variety.objects.all()],
 			help_text='Select varieties to compare head-to-head.'
-			)
+		)
 
 class UploadCSVForm(forms.Form):
 	csv_file = forms.FileField(

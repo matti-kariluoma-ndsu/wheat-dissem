@@ -8,9 +8,19 @@ div.cc-image
 	float: left;
 }
 
-#variety_trials__scope_input li
+#variety_trials__radio_input li
 {
 	list-style-type: none;
+}
+
+#variety_trials__radio_input input
+{
+	display: inline;
+}
+
+.variety_trials__hidden_input
+{
+	display: none;
 }
 
 .variety_trials__hidden

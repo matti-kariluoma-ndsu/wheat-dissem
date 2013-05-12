@@ -18,11 +18,13 @@
 		<form id="static_form" action="{{home_url}}/view/last_3_years/bushels_acre/" method="GET">
 			{% for field in zipcode_form %}
 			{% if field.name == 'zipcode' %}
-			<div id='variety_trials__zipcode_input'>
+			<div>
 			{% elif field.name == 'scope' %}
-			<div id='variety_trials__scope_input'>
+			<div id='variety_trials__radio_input'>
+			{% elif field.name == 'planting_method' %}
+			<div id='variety_trials__radio_input'>
 			{% else %}
-			<div class="variety_trials__hidden_input" style="display: none;">
+			<div class="variety_trials__hidden_input">
 			{% endif %}
 				<span style='color: red'>{{ field.errors }}</span>
 				{{ field.label_tag }}: {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>

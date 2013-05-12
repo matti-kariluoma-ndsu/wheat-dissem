@@ -1,49 +1,32 @@
 (grep for TODOs)
-variety_trials_website/urls.py:19:         ## TODO: There are 3 views of our data, reduce to 2 if not 1.
-variety_trials_data/handle_csv.py:84:   ## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
-variety_trials_data/handle_csv.py:147:  # TODO: Consider not save() -ing each line, maybe do batches of ~100?
-variety_trials_data/templates/add_form_confirmation.html:11:    <!--TODO: auto generate this file from the model-->
-variety_trials_data/templates/add_from_csv_template.html:25:    <!--TODO: auto generate this file from the model-->
-variety_trials_data/templates/add_information.html:11:  <!--TODO: auto generate this file from the model-->
-variety_trials_data/templates/tabbed_object_view.html:21:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_object_view.html:59:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_object_view.html:98:       <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_object_view.html:100:              <!--TODO: auto-generate these year button images-->
-variety_trials_data/templates/tabbed_view.html:21:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view.html:59:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view.html:98:      <div ><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view.html:100:             <!--TODO: auto-generate these year button images-->
-variety_trials_data/templates/tabbed_view.html:125:                     <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}} Zipcode: {{zipcode}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view.html:146:                     <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view_ndsu.html:19:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_ndsu.html:55:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_ndsu.html:123:                        <div colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view_ndsu.html:144:                        <div colspan="{{ heading_list|length|add:1 }}" class="current_year"></div> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/main.html:29:     TODO: Add noscript version of this field to point to the noscript
-variety_trials_data/templates/main.html:32:     TODO: fix input validation strings return an error.
-variety_trials_data/templates/main_ndsu.html:19:        TODO: Add noscript version of this field to point to the noscript
-variety_trials_data/templates/main_ndsu.html:22:        TODO: fix input validation strings return an error.
-variety_trials_data/templates/tabbed_view_table_ndsu.html:19:<div class="location_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_table_ndsu.html:55:<div class="variety_form years"><!-- style="padding: 5px;" TODO: Apply on NoScript?-->
-variety_trials_data/templates/tabbed_view_table_ndsu.html:127:                  <td colspan="{{ heading_list|length|add:1 }}" class="current_year">{{curyear}}</td> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/templates/tabbed_view_table_ndsu.html:134:                  <td colspan="{{ heading_list|length|add:1 }}" class="current_year"></td> <!--TODO: Hardcoded value `2' isn't always correct-->
-variety_trials_data/variety_trials_util.py:45:                  locations = models.Location.objects.all() # TODO: only return N locations? is that faster?
-variety_trials_data/Page.py:166:                                lsd = real_cell.get(cell.year, "hsd_10") # TODO: this will try and average if multiple values datapoints found...
-variety_trials_data/Page.py:285:                        # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
-variety_trials_data/views.py:23:        # TODO: don't pass a curyear, instead have main.html point
-variety_trials_data/views.py:102:# TODO: does this belong in the DB?
-variety_trials_data/views.py:134:               # TODO: what is the behavior of HEAD?
-variety_trials_data/views.py:139:                       # TODO: Have this view point to / , and if successful redirect them
-variety_trials_data/views.py:166:                                       # TODO: return to main page and show error
-variety_trials_data/views.py:187:                               # TODO: redirect to /view/curyear/field/?... instead
-variety_trials_data/views.py:211:                                       number_locations = 8 # TODO: hardcoded constant, should be at least based on page width
-variety_trials_data/views.py:254:                                       # TODO: Print message to the user telling them why we are exiting
-variety_trials_data/views.py:298:               # TODO: what is the behavior of HEAD?
-variety_trials_data/views.py:303:                       # TODO: Have this view point to / , and if successful redirect them
-variety_trials_data/views.py:317:                               # TODO: return to main page and show error
+./variety_trials_data/adding_data_views.py:             #TODO: this is the case if a user does not fill out an entire row
+./variety_trials_data/variety_trials_util.py:                   locations = models.Location.objects.all() # TODO: only return N locations? is that faster?
+./variety_trials_data/variety_trials_util.py:                   number_locations = 8 # TODO: hardcoded constant, should be at least based on web page width
+./variety_trials_data/views.py:# TODO: does this belong in the DB?
+./variety_trials_data/views.py:         # TODO: what is the behavior of HEAD?
+./variety_trials_data/views.py:                 # TODO: Have this view point to / , and if successful redirect them
+./variety_trials_data/views.py:                         # TODO: redirect to /view/curyear/field/?... instead
+./variety_trials_data/views.py:                         # TODO: repopulate form
+./variety_trials_data/views.py:                 # TODO: is python's refcount/garbage collection enough?
+./variety_trials_data/views.py:         # TODO: what is the behavior of HEAD?
+./variety_trials_data/views.py:                 # TODO: Have this view point to / , and if successful redirect them
+./variety_trials_data/views.py:                         # TODO: repopulate form
+./variety_trials_data/handle_csv.py:    ## TODO: Ask user if the match is good, and whether or not to use an existing/make a new entry
+./variety_trials_data/handle_csv.py:    # TODO: Consider not save() -ing each line, maybe do batches of ~100?
+./variety_trials_data/templates/adding_data.html:                       TODO: how do we ``safely'' edit a variety?
+./variety_trials_data/templates/adding_data.html:                       TODO: how do we ``safely'' edit a variety?
+./variety_trials_data/templates/add_from_csv_template.html:                                     <!--TODO: auto generate this file from the model-->
+./variety_trials_data/page/Page.py:             ## TODO: for variety in self.dropped_tables: table.append(Empty_Cell(variety, location))
+./variety_trials_data/page/Page.py:             # TODO: recover the tables and combine them into an appendix table
+./variety_trials_data/page/LSD_util.py:         # TODO: what is the difference between type I and type III SS? (http://www.statmethods.net/stats/anova.html)
+./variety_trials_data/json_views.py:# TODO: add cache.get/set calls to these functions?
+./variety_trials_data/json_views.py:    #TODO: filter properly for zipcodes starting with 0, 00
+./variety_trials_data/json_views.py:    #TODO: do any zipcodes start with 000? 0000? does zip 00000 exist? 
+./variety_trials_data/json_views.py:    # TODO: json_response() wasn't flexible enough, so this is copy+pasted. FIX
+./variety_trials_data/json_views.py:    #TODO: the logic here should follow views.zipcode_view
 
-Each variety could have a scroll-over box to 
-information about that particular variety.
+
+Each variety could have a scroll-over box to information about that particular variety.
 
 Modern browsers support 
 <link media="print" rel="stylesheet" src="file.css">
@@ -55,39 +38,19 @@ would be available from a hyperlink on the variety name.
 We need to dredge up the old data we had and enter the LSD value, back 
 to 2010.
 
-When the user clicks the checkboxes next to the variety names, then
-selects "Compare Selected" they can sometimes be brought to the 
-variety-variety view, but no data is on the page. 
-
-* "compare selected" should do nothing if 0 or 1 varieties are selected
-  * show a message telling them why they can't compare 0 or 1?
+* "compare selected" should do nothing if 1 variety is selected
   * maybe they just want to see all the location data for that variety?
-		* it may confusing to have them click the variety name-as-linkt o 
+		* it may confusing to have them click the variety name-as-link o 
 		generate that view
 
 In addition to the "Yield" "Protein Percent" "Test Weight" buttons at
 the top of the page, we also need a button "All" that shows all of
 those fields. This view would only show the n-yr averages to save space.
 
-* 50 mi 58501, 2010, Kidder County has an index of -1, why?
-
-* wierd behavior
-  * 56716, 50mi
-
 button to view source data/access the json views
 
 reimagine in terms of smartphone app
  e.g smaller screens, more drill before view
-
-Why does Carrington 2011 bushels_acre return 25 up to 41?
-Why does Kidder County 2011 bushels_acre show up twice with different values?
-
-
-
-
-
-** REGRESSION ** 58103 200 mi.. Barnes?
-** REGRESSION ** Barlow, Brennan, Faller, Glenn in variety show two tables...
 
 Think on database synchronization for UMN<=>NDSU. Email admin when something
 happens? if unresolved after 10 days, email users?
@@ -96,58 +59,48 @@ UI for entering data, confirmation/error pages
 Reminder to make the user-entry page robust (iterative), and undoable.
 
 For the iterative upload:
-	1) user uploads file
-	2) preprocess, no db lookup, publish the parsed file to a webpage
-	3) user hits next
-	4) server goes cell by cell, returning the first error to the user
-	  in the same formatted page as step 2, asks the user what to do
-	  i.e. accept guess, create new, etc.
-	5) repeat 4 until no errors
-	6) show the user the actual entered data (page as step 2, except all
-	  values pulled from the databse)
-	7) a page showing recent changes with the ability to undo recent changes
+ 1) user uploads file
+ 2) preprocess, no db lookup, publish the parsed file to a webpage
+ 3) user hits next
+ 4)	server goes cell by cell, returning the first error to the user
+		in the same formatted page as step 2, asks the user what to do
+		i.e. accept guess, create new, etc.
+ 5) repeat 4 until no errors
+ 6)	show the user the actual entered data (page as step 2, except all
+		values pulled from the databse)
+ 7) a page showing recent changes with the ability to undo recent changes
 
-4 ways to get to variety-varietie from home:
+4 ways to get to variety-variety from home:
  1) mutliple select
  2) n select
  3) select > text field
  4) checkboxes
 
 Variety-Variety selection designs in Mr. Sharma's branch:
-	javascript box-to-box: 408feb06df5461d6a6c9398a7bff2cc3be89b33f
-	n-checkboxes: c2efd1cf8c4a7eff47447db859ab275a1d0b224e
-	4-dropdowns: 5c88ccfda119faa8eba1b781a6fdf391990c54d3
-	The original is in master:
-	multiple-select: adcc766712e777872b04d8620cb3ba82c53aee6f
+* javascript box-to-box: 408feb06df5461d6a6c9398a7bff2cc3be89b33f
+* n-checkboxes: c2efd1cf8c4a7eff47447db859ab275a1d0b224e
+* 4-dropdowns: 5c88ccfda119faa8eba1b781a6fdf391990c54d3
+* The original is in master:
+* multiple-select: adcc766712e777872b04d8620cb3ba82c53aee6f
 
 Philosphize: AJAX or fully load? LSDs can't be calculated w/o all of the
 data, although we could start to populate the table.. but the subtables will 
 morph while loading... desirable? it does show some sort of loading screen...
 
 On mobile views:
-	http://dev.opera.com/articles/view/love-your-devices-adaptive-web-design-with-media-queries-viewport-and-more/
-
-	http://dev.opera.com/articles/view/an-introduction-to-meta-viewport-and-viewport/
-
-	http://dev.opera.com/articles/view/opera-mini-web-content-authoring-guidelines/
-
-	http://dev.opera.com/articles/view/the-mobile-web-optimization-guide/
-
-	mobile + accessibility
-	http://www.w3.org/TR/mwbp-wcag/
-
-	mobile best practives
-	http://www.w3.org/TR/mwabp/
+* http://dev.opera.com/articles/view/love-your-devices-adaptive-web-design-with-media-queries-viewport-and-more/
+* http://dev.opera.com/articles/view/an-introduction-to-meta-viewport-and-viewport/
+* http://dev.opera.com/articles/view/opera-mini-web-content-authoring-guidelines/
+* http://dev.opera.com/articles/view/the-mobile-web-optimization-guide/
+* mobile + accessibility: http://www.w3.org/TR/mwbp-wcag/
+* mobile best practices:* http://www.w3.org/TR/mwabp/
 
 On page loading speed:
-	application-cache (AppCache):
-	http://www.w3.org/TR/html5/offline.html#appcache
-
-	css-sprites:
-	http://wellstyled.com/css-nopreload-rollovers.html
+* application-cache (AppCache):* http://www.w3.org/TR/html5/offline.html#appcache
+* css-sprites: http://wellstyled.com/css-nopreload-rollovers.html
 
 Javascript's introspection of passed arguments:
-	http://javascriptweblog.wordpress.com/2011/01/18/javascripts-arguments-object-and-beyond/
+* http://javascriptweblog.wordpress.com/2011/01/18/javascripts-arguments-object-and-beyond/
 
 Caching has been implemented as tempory-files, some thought should be
 given to memcached (a security risk?). Community hivemind says db-based
@@ -160,16 +113,16 @@ In-page spreadsheet requirements
 * Ability to render in all browsers not necessary
 
 Google:
-http://stackoverflow.com/questions/4143901/access-google-spreadsheet-or-google-data-api-only-with-javascript
-https://developers.google.com/google-apps/documents-list/#creating_a_new_document_or_file_with_metadata_only
-https://developers.google.com/google-apps/documents-list/#deleting_documents_and_files
-Will need to hide/diable the headers. 
-Can we use google's spreadsheet editor? Only in a new window/iframe...
+	http://stackoverflow.com/questions/4143901/access-google-spreadsheet-or-google-data-api-only-with-javascript
+	https://developers.google.com/google-apps/documents-list/#creating_a_new_document_or_file_with_metadata_only
+	https://developers.google.com/google-apps/documents-list/#deleting_documents_and_files
+	Will need to hide/diable the headers. 
+	Can we use google's spreadsheet editor? Only in a new window/iframe...
 
 Non-google:
-http://roberto.open-lab.com/2010/01/30/javascript-grid-editor-i-want-to-be-excel/
-https://github.com/mleibman/SlickGrid
-http://mleibman.github.com/SlickGrid/examples/example3-editing.html
+	http://roberto.open-lab.com/2010/01/30/javascript-grid-editor-i-want-to-be-excel/
+	https://github.com/mleibman/SlickGrid
+	http://mleibman.github.com/SlickGrid/examples/example3-editing.html
 
 Secretary view needs
 * Testing for multiple lines entry
@@ -179,8 +132,8 @@ Notes from July 27 meeting
 * Allow variety descriptions (the varieties table) to be updated
 ** What about protection from deletion/malicious overwrite?
 * Update the main page to check for javascript, do an instant-search 
-type query when the zipcode is entered (i.e. dynamic keeps the zipcode 
-form on the main page)
+	type query when the zipcode is entered (i.e. dynamic keeps the zipcode 
+	form on the main page)
 * Fill in zipcode as typed, with name data
 * Ensure newly entered varieties can show up in search
 
@@ -192,7 +145,7 @@ Notes from Aug 10 Meeting
 * Rollout Sep 1
 * JSONP for other sites to grab from DB
 
-put /add/  in robots.txt
+put /add/ in robots.txt
 
 * Anything special so google can find us?
 ** We need a list of keywords
@@ -204,21 +157,12 @@ put /add/  in robots.txt
 *** Extension Info Type Breed Description ...
 
 Notes from Aug 24 meeting with Dr. Wiersma
-* other jump page for variety-variety if farmers want it/current 
-	system confusing
-* Go-ahead on the table restructure when a location is removed 
-** backing off for now, it'd be easy to merge the tables, but we would
-	have a hard time un-merging them, unless we could make the Table 
-	class support {merge,mix}ing
 * v-v wonky with caching
 
 * was able to crash-the-cache by selecting '2010' after the 5mins
-* why does the head-to-head always show -!- for one of the 1-yr means?
-	is it because of my super-neat lsd code?
 
 Investigate an appropriate time to call page.clear(), if ever -or- set
 up garbage-collection __name__() functions, if exists?
-
 
 Source for zipcode-autocomplete
 	http://tomcoote.co.uk/wp-content/CodeBank/Demos/JSONSuggestBox/demo.html
@@ -250,36 +194,13 @@ need to use the urlencode filter when making /view/variety/name/ links
 * Include upper tables in each following table.
 ** Highlight new entries?
 
-* PAGE RELOAD IS NONDETERMINISTIC
-** reloading zipcode=58102 causes these to show up:
-*** (8, 13, 18) (always)
-*** (7, 12, 17) (mostly)
-*** (7, 10, 11) (sometimes)
-*** (6, 10, 15) (other times)
-** setting number_tables to 4 causes stranger behavior; I managed to get between 2-4 tables.
-** is DummyCache to blame?
-
-** Found extraneous data point; has been deleted from sqlite & psql.
-t = models.Trial_Entry.objects.filter(location__name="Fergus Falls").filter(harvest_date__in=all_dates).filter(variety__name="Edge").filter(hidden=False)
->>> t[0].bushels_acre
-Decimal('73.9')
->>> t[1].bushels_acre
-Decimal('68.1')
->>> t[0].delete()
-
 print R version, agricolae version in footer of each page. May as well print django/python as well.
 
 Can we rewrite _get_entries() to itereate through years and directly fetch the self.cells? will need to profile both approaches
 Must find a way to bacth the calls to the R subprocess, or at least async them (time for ajax?)
 
-X-ing a location no longer works. Seems it doesn't work on the live version either.
-
 55108 2012 NEAR shows (8, 0, 0) for first table, but 2011 shows (8, 7, 5)...!? 
 	It's beacuse of LeCenter... how are the means still calculating for 2-yr?
-
-55108 2010 NEAR has Dickey County twice...
-
-Head-to-head do not have any of the {1,2,3}-yr columns filled in.
 
 Explain caveats of setting variety= on advanced_search.html (does not_locations still work?, etc.)
 
@@ -287,7 +208,10 @@ Filter out "id" from list of fields on advanced_search.html
 
 On many pages, no LSD results appear, and _sometimes_ a refresh causes them to appear/disappear...
 
-should their be a list of "locations hidden", with links to unhide them? yes?
+UI:
+* should their be a list of "locations hidden", with links to unhide them? yes?
+* button to "load more locations"
+* message saying which planting methods are shown on the page
 
 head-to-head problems: 
 	after doing lots&lots of queries, I conclude we have extra data in 2012 for
@@ -306,8 +230,45 @@ head-to-head problems:
 	...  e.hidden = True
 	...  e.save()
 
-This is now approaching a problem point; We just threw away 107+32 pieces of data because we have no way of showing no-till vs fallow trials, etc. fix!
+This is now approaching a problem point; We just threw away 107+32 pieces of 
+data because we have no way of showing no-till vs fallow trials, etc. fix!
 
 A new problem: I'm now seeing lsd when 3-yr is all none, it's just a copy of the 2-yr...
 
+Planting method tags in the database:
+	fallow
+	no till, recrop
+	direct, dryland, recrop, elite
+	irrigated
+	organic
+	dryland
+	direct
+	fungicide
+	no till, durum stubble
+	no till
+	recrop
+	tilled soybean cover
+	direct, fungicide
+	intensive
+	direct, recrop, elite
 
+Planting method tags normalizing:
+for e in  models.Trial_Entry.objects.filter(planting_method_tags=u''):
+ e.planting_method_tags=None
+ e.save()
+e = models.Trial_Entry.objects.filter(planting_method_tags=u'no till recrop')[0]
+e.planting_method_tags = u'no till, recrop'
+e.save()
+for e in models.Trial_Entry.objects.filter(planting_method_tags=u'foliar fungicide, variety response, main factors'):
+ e.planting_method_tags = u'fungicide'
+ e.save()
+for e in  models.Trial_Entry.objects.filter(planting_method_tags=u'direct seeded'):
+ e.planting_method_tags = u'direct'
+ e.save()
+for e in  models.Trial_Entry.objects.filter(planting_method_tags=u'direct seeded, dryland, recrop, elite'):
+ e.planting_method_tags = u'direct, dryland, recrop, elite'
+ e.save()
+
+Planting method tags UI:
+* user indicates preference on main page, defaults to none
+* tags are displayed with location name.
