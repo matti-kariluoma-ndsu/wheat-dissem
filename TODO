@@ -271,4 +271,11 @@ for e in  models.Trial_Entry.objects.filter(planting_method_tags=u'direct seeded
 
 Planting method tags UI:
 * user indicates preference on main page, defaults to none
+** or do we want to have them indicate exclusion? i.e. how do we handle 
+	the untagged trials... We won't have enough data if we only search 
+	for dryland near fargo, we'll need dryland + untagged. It'd be easier
+	to show all, and let the user let us know before hand to exclude
+	all irrigated results.
+*** this could easier be accomplished on the results page, a kind of
+	of meta-exlcude locations
 * tags are displayed with location name.
