@@ -180,9 +180,16 @@ class Page:
 				delete_these.append(index)
 			elif location not in locations_with_data:
 				delete_these.append(index)
-				
+			
 		for index in sorted(delete_these, reverse=True):
 			self.column_order.pop(index)
+		
+		# mutate self.is_data_present if not_locations is not None
+		for location in not_locations:
+			for year in self.is_data_present:
+				for variety in self.is_data_present[year]:
+					if location in self.is_data_present[year][variety]:
+						self.is_data_present[year][variety][location] = False
 	
 	def _make_appendix(self):
 		table = Appendix_Table()
@@ -321,7 +328,7 @@ class Page:
 		# populate self.row_order
 		self.row_order = sorted(list(self.cells.keys()), key=lambda variety: variety.name) # sorted alphanumeric
 		
-		# populate self.column_order
+		# populate self.column_order, maybe mutate self.is_data_present
 		self._mask_locations(locations, not_locations, locations_with_data) # sorted by distance
 		
 		# Make tables from self.cells

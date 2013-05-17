@@ -504,15 +504,19 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 			# pass the modified dictionary along
 			balanced_input = unbalanced_input
 		
-		try:
-			if internal_implementation:
-				if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
+		if internal_implementation:
+			if len(balanced_input) > 1 and len(balanced_input[0]) > 1:
+				try:
 					lsd = self._LSD(balanced_input, lsd_probability)
-			else:
+				except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
+					lsd = None
+		else:
+			try:
 				lsd = self._R_subprocess(balanced_input, varieties, locations, lsd_probability)
-			if lsd is not None:
-				lsd = round(lsd, digits)
-		except (LSDProbabilityOutOfRange, TooFewDegreesOfFreedom):
-			lsd = None
+			except (CalledProcessError,):
+				lsd = None
+				
+		if lsd is not None:
+			lsd = round(lsd, digits)
 		
 		return lsd

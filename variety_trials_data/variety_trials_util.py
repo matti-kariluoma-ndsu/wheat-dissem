@@ -142,9 +142,11 @@ def get_page(zipcode, scope, curyear, fieldname, year_url_bit, not_locations=[],
 	#print cache_key
 	page = cache.get(cache_key)
 	if page is not None:
+		''' TODO: Fix before enableing caching
 		for table in page.data_tables:
 			table.set_defaults(curyear, fieldname)
 			table.mask_locations(not_location_objects)
+		'''
 	else:
 		# may throw LSDProbabilityOutOfRange, TooFewDegreesOfFreedom, NotEnoughDataInYear
 		page = Page(
