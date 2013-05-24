@@ -447,8 +447,7 @@ def planting_method_survey(request):
 	formset = None
 	
 	l_times_y = 0
-	#for l in models.Location.objects.all():
-	for l in models.Location.objects.filter(name="Minot"):
+	for l in models.Location.objects.all():
 		trials_l = trials[l] = {}
 		for e in models.Trial_Entry.objects.filter(location=l):
 			year = e.harvest_date.date.year
