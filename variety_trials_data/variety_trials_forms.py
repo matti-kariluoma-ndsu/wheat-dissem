@@ -25,17 +25,22 @@ class ScopeConstants:
 			]
 
 class PlantingMethodConstants:
-	dryland = 'DRYLAND'
-	irrigated = 'IRRIGATED'
-	no_till = 'NO-TILL'
-	all = 'ALL'
-	def get_list(self):
-		return [
-				self.all,
-				self.irrigated,
-				self.fallow,
-				self.no_till
-			]
+	irrigated_yes = 'IRRIGATED'
+	irrigated_no = 'DRYLAND'
+	irrigated_either = 'ANY'
+	irrigatedOrNot = (
+			irrigated_yes,
+			irrigated_no,
+			irrigated_either
+		)
+	fungicide_yes = 'FUNGICIDE'
+	fungicide_no = 'CONVENTIONAL'
+	fungicide_either = 'BOTH'
+	fungicideOrNot = (
+			fungicide_yes,
+			fungicide_no,
+			fungicide_either
+		)
 
 class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(
@@ -85,6 +90,45 @@ class SelectLocationByZipcodeForm(forms.Form):
 			help_text='Select varieties to compare head-to-head.'
 		)
 
+class LocationYearPlantingMethodSurveyForm(forms.Form):
+	location_id = forms.CharField(
+			required=True,
+		)
+	year = forms.CharField(
+			required=True,
+			max_length=4, 
+		)
+	irrigated = forms.ChoiceField(
+			required=True,
+			widget=forms.RadioSelect(),
+			choices=(
+					(PlantingMethodConstants.irrigated_either, "Don't know"),
+					(PlantingMethodConstants.irrigated_yes,	'Irrigated'),
+					(PlantingMethodConstants.irrigated_no,	'Dryland')
+				),
+			initial=PlantingMethodConstants.irrigated_either,
+			help_text='Were these trials irrigated?'
+		)
+	fungicide = forms.ChoiceField(
+			required=True,
+			widget=forms.RadioSelect(),
+			choices=(
+					(PlantingMethodConstants.fungicide_either, "Don't know"),
+					(PlantingMethodConstants.fungicide_yes,	'Fungicide'),
+					(PlantingMethodConstants.fungicide_no,	'No fungicide')
+				),
+			initial=PlantingMethodConstants.fungicide_either,
+			help_text='Was fungicide applied to these trials?'
+		)
+	notes = forms.CharField(
+			required=False,
+			widget=forms.Textarea(attrs={
+					'rows': '3',
+					'cols': '40',
+				}),
+			help_text="Anything else we should note?"
+		)
+		
 class UploadCSVForm(forms.Form):
 	csv_file = forms.FileField(
 			required=False

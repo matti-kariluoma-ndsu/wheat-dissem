@@ -1,0 +1,149 @@
+{% extends "base_ag_ndsu.html" %}
+{% block breadcrumbs %}
+<span class="breadcrumbSeparator"> &#8250; </span>
+</span>
+<span id="breadcrumbs-level1">
+	<a href="{{home_url}}/survey/">Survey</a>
+</span>
+{% endblock %}
+
+{% block content %}
+
+
+<form action="results/" method="post">
+	{{ formset_management_form }}
+	{% for location, year_dict in trials.items %}
+		<div class="location_block {% cycle 'location_block_odd' 'location_block_even' %}">
+			<p>{{location}}</p>
+		{% for year, trials_dict in year_dict.items %}
+			<div class="year_block {% cycle 'year_block_odd' 'year_block_even' %}">
+				
+				<p class="year" name="{{location}}"><span class="location">{{location}}: </span>{{year}}</p>
+			{% for field in trials_dict.form %}
+				{% if field.name == 'location_id' %}
+				<div style="display: none;">
+				{% elif field.name == 'year' %}
+				<div style="display: none;">
+				{% else %}
+				<div class="{{ field.name }}">
+				{% endif %}
+					<p class="variety_trials__help_text">{{field.help_text}}</p> 
+					{{ field.label_tag }} {{ field }} 
+				</div>
+				
+			{% endfor %}
+				<div class="survey_block_trials" >
+					<p>Trials Data:</p>
+					<div>
+						<table>
+						<tr>
+							<th>Variety</th>
+							<th>Bushels/Acre</th>
+							<th>Notes</th>
+						</tr>
+			{% for trial in trials_dict.trial_entries %}
+					<tr>
+						<td>{{trial.variety}}</td>
+						<td>{{trial.bushels_acre}}</td>
+						<td>{{trial.planting_method_tags}}</td>
+					</tr>
+			{% endfor %}
+						</table>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	{% endfor %}
+	<input type="submit" value="Submit" />
+</form>
+
+<style type="text/css">
+	div.location_block
+	{
+		width: 500px;
+	}
+	
+	div.irrigated
+	{
+		float: left;
+	}
+	div.fungicide
+	{
+		float: right;
+	}
+	div.notes
+	{
+		clear: both;
+	}
+</style>
+
+{% endblock %}
+
+{% block javascript %}
+
+$('div.survey_block_trials').children('div').hide();
+
+$('div.survey_block_trials').click(
+		function()
+		{
+			$(this).children('div').slideToggle();
+		}
+	);
+
+$('div.location_block > p').click(
+		function()
+		{
+			$(this).parent().children('div').slideToggle();
+		}
+	);
+$('div.location_block > p').css(
+		'background-color', 'grey'
+	).css(
+		'padding', '5px'
+	).css(
+		'border-radius', '5px'
+	).css(
+		'cursor', 'pointer'
+	);
+
+$('div.survey_block_trials').css(
+		'cursor', 'pointer'
+	);
+
+$('div.survey_block_trials > p').css(
+		'background-color', 'grey'
+	).css(
+		'padding', '10px'
+	).css(
+		'border-radius', '10px'
+	);
+
+$('div.location_block').css(
+		'padding', '10px'
+	).css(
+		'border-radius', '10px'
+	).css(
+		'margin-bottom', '10px'
+	);
+
+$('div.year_block').css(
+		'padding', '5px'
+	).css(
+		'border-radius', '5px'
+	).css(
+		'margin-bottom', '5px'
+	);
+
+$('div.location_block_even').css(
+		'background-color', '#FDD'
+	);
+$('div.location_block_odd').css(
+		'background-color', '#DDF'
+	);
+$('div.year_block_even').css(
+		'background-color', '#DBB'
+	);
+$('div.year_block_odd').css(
+		'background-color', '#BBD'
+	);
+{% endblock %}

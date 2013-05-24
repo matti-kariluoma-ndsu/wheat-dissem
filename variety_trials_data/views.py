@@ -349,8 +349,6 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 				)
 
 def inspect(request):
-	
-	
 	cur_year = datetime.date.today().year
 	year_list=list()
 	min_year = datetime.date.today().year
@@ -400,12 +398,12 @@ def inspect(request):
 				masterList[year]["rows"][x].append(masterDict[year]["rows"][v.name][l.id])
 			x+=1
 	return render_to_response(
-		'inspect.html',
-		{
-			'home_url': HOME_URL,
-			'masterList':masterList,
-		}
-	)
+			'inspect.html',
+			{
+				'home_url': HOME_URL,
+				'masterList':masterList,
+			}
+		)
 
 def debug(request):
 	return render_to_response(
@@ -415,7 +413,71 @@ def debug(request):
 			}
 		)
 
-
-
+def planting_method_view_survey(request):
+	from django.forms.formsets import formset_factory
+	from variety_trials_data.variety_trials_forms import LocationYearPlantingMethodSurveyForm
+	
+	if request.method == 'POST':
+		LocationYearPlantingMethodSurveyFormSet = formset_factory(LocationYearPlantingMethodSurveyForm)
+		formset = LocationYearPlantingMethodSurveyFormSet(request.POST)
+		for form in formset:
+			if form.is_valid():
+				models.Location_Year_PlantingMethods_Survey_Answer(
+						location = models.Location.objects.filter(pk=form.cleaned_data['location_id'])[0],
+						year = form.cleaned_data['year'],
+						irrigated = form.cleaned_data['irrigated'],
+						fungicide = form.cleaned_data['fungicide'],
+						notes = form.cleaned_data['notes'],
+					).save()
+					
+	return render_to_response(
+			'planting_method_survey_results.html',
+			{
+				'home_url': HOME_URL,
+				'results': models.Location_Year_PlantingMethods_Survey_Answer.objects.all(),
+			}
+		)
+	
+	
+def planting_method_survey(request):
+	from django.forms.formsets import formset_factory
+	from variety_trials_data.variety_trials_forms import LocationYearPlantingMethodSurveyForm
+	
+	trials = {} # {location: {year: {trial_entries:[trial,...], form:form}}
+	formset = None
+	
+	l_times_y = 0
+	#for l in models.Location.objects.all():
+	for l in models.Location.objects.filter(name="Minot"):
+		trials_l = trials[l] = {}
+		for e in models.Trial_Entry.objects.filter(location=l):
+			year = e.harvest_date.date.year
+			try:
+				trials_l[year]['trial_entries'].append(e)
+			except KeyError:
+				l_times_y += 1
+				trials_l[year] = {}
+				trials_l[year]['trial_entries'] = [e]
+	
+	LocationYearPlantingMethodSurveyFormSet = formset_factory(LocationYearPlantingMethodSurveyForm, extra=l_times_y)
+	formset = LocationYearPlantingMethodSurveyFormSet()
+	formset_index = 0
+	for l in trials:
+		for y in trials[l]:
+			form = formset[formset_index]
+			form.fields['location_id'].initial = l.id
+			form.fields['year'].initial = y
+			trials[l][y]['form'] = form
+			formset_index += 1
+		
+				
+	return render_to_response(
+			'planting_method_survey.html',
+			{
+				'home_url': HOME_URL,
+				'trials': trials,
+				'formset_management_form': formset.management_form,
+			}
+		)
 
 

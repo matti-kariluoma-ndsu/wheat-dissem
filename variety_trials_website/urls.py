@@ -58,10 +58,10 @@ urlpatterns = patterns('',
 		(r'^add/date/', adding_data_views.add_date),
 		(r'^add/location/', adding_data_views.add_location),
 		(r'^add/variety/', adding_data_views.add_variety), 
-		
-		
-		
 		(r'^add/history/', adding_data_views.history), # defaults to location-based view
 		(r'^add/history/delete/(?P<delete>[0-9]+)/', adding_data_views.history_delete), # defaults to location-based view
+		
+		(r'^survey/$', views.planting_method_survey), 
+		(r'^survey/results/', views.planting_method_view_survey), 
 )
 

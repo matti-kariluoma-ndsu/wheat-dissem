@@ -127,6 +127,23 @@ class Trial_Entry_History(models.Model):
 			trial = str("none")
 		return trial +" by "+str(self.username)+" on "+str(self.created_date)
 
+class Location_Year_PlantingMethods_Survey_Answer(models.Model):
+	location = models.ForeignKey(Location)
+	year = models.PositiveIntegerField()
+	irrigated = models.CharField(max_length=32)
+	fungicide = models.CharField(max_length=32)
+	notes = models.CharField(max_length=2000)
+	def __unicode__(self):
+		return unicode(
+				'%s in %s: irrigated: %s, fungicide: %s, notes: %s.' % (
+						unicode(self.year), 
+						unicode(self.location), 
+						self.irrigated, 
+						self.fungicide, 
+						self.notes
+					)
+			)
+
 # Custom forms to populate these data:
 class VarietyForm(ModelForm):
 	class Meta:
