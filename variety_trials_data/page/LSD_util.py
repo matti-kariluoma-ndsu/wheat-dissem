@@ -11,7 +11,7 @@ Provides mechanisms to calculate the LSD, usually for multiple trials.
 from math import sqrt, pi, exp
 from scipy.special import erfinv
 import os, sys, signal, tempfile
-from subprocess import Popen, STDOUT, PIPE, check_output, call, CalledProcessError
+from subprocess import check_call, CalledProcessError
 from variety_trials_website import settings
 
 class LSDProbabilityOutOfRange(Exception):
@@ -209,8 +209,8 @@ class LSD_Calculator():
 		R_out = tempfile.NamedTemporaryFile(delete=False)
 		R_out.close()
 		
-		R_script.write('.libPaths("%s")\n' % settings.R_LIBRARY)
-		R_script.write('yield <- c(%s)\n' % ','.join([self._NA_or_str(t) for t in trt]))
+		R_script.write('.libPaths("%s")\n' % (settings.R_LIBRARY))
+		R_script.write('yield <- c(%s)\n' % (','.join([self._NA_or_str(t) for t in trt])))
 
 		R_script.write('Varieties <- factor(c(\n')
 		for year in sorted(treatment_factors.keys()):
@@ -233,30 +233,11 @@ class LSD_Calculator():
 mse <- deviance(model) / df.residual(model) 
 require(agricolae)
 LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
-''' % probability)
+''' % (probability))
 		R_script.close()
 		
-		"""
-		IS_POSIX = 'posix' in sys.builtin_module_names
-		R =  Popen(
-			[
-				os.sep.join(['usr','bin','R']),
-				'CMD',
-				'BATCH',
-				'--no-restore',
-				'--no-timing',
-				'--no-save',
-				'--quiet',
-				f.name,
-				'/dev/stdout'
-			], 
-			stdout=PIPE, 
-			bufsize=1,
-			close_fds=IS_POSIX
-		)
-		#"""
 		try:
-			call(
+			check_call(
 					[
 						'R', 
 						'CMD',
@@ -272,8 +253,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 		except CalledProcessError:
 			#print R_script.name
 			#print output.name
-			raise
-		#"""
+			return 1000.0
 		
 		os.unlink(R_script.name)
 		
@@ -293,7 +273,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 		if output:
 			value = float(output[29:])
 		else:
-			value = None
+			value = 1001.0 # ``LSD appears/goes away each time the page is loaded'' source
 		
 		return value
 	
