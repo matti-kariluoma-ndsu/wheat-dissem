@@ -206,8 +206,6 @@ Explain caveats of setting variety= on advanced_search.html (does not_locations 
 
 Filter out "id" from list of fields on advanced_search.html
 
-On many pages, no LSD results appear, and _sometimes_ a refresh causes them to appear/disappear...
-
 UI:
 * should their be a list of "locations hidden", with links to unhide them? yes?
 * button to "load more locations"
@@ -296,3 +294,16 @@ Planting method tags UI:
 * tags are displayed with location name.
 
 May have found problem with caching; not_locations isn't included in the cache_key
+
+On many pages, no LSD results appear, and _sometimes_ a refresh causes them to appear/disappear...
+This has been solved: 
+* doc/2013Jun05.livetrace.html
+* http://stackoverflow.com/questions/8494335/running-subprocess-popen-under-apachemod-wsgi-is-always-returning-an-error-with
+* this bug: http://bugs.python.org/issue13156 was solved after 2.7.3rc1:
+** 2.7.2: http://hg.python.org/cpython/rev/8527427914a2
+** solved: http://hg.python.org/cpython/rev/aa6ce09d2350/
+** 2.7.3rc1: http://hg.python.org/cpython/rev/b2c6aff96e12
+* furthermore, www.ag.ndsu.edu is running Ubuntu 11.10, which is deprecated and has no package for 2.7.3
+* solutions: 
+** rewrite _R_subprocess() to use pipes/etc. and test on a 11.10 server (can do we find an old server!?)
+** setup a HTTP 30x redirect to another box
