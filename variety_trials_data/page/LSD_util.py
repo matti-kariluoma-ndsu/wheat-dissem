@@ -236,6 +236,8 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 ''' % (probability))
 		R_script.close()
 		
+		
+		
 		try:
 			check_call(
 					[
@@ -252,8 +254,10 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 				);
 		except CalledProcessError:
 			#print R_script.name
-			#print output.name
-			return 1000.0
+			#print R_out.name
+			os.unlink(R_script.name)
+			os.unlink(R_out.name)
+			return None # ``LSD appears/goes away each time the page is loaded'' source
 		
 		os.unlink(R_script.name)
 		
@@ -273,7 +277,7 @@ LSD.test(yield, Varieties, df.residual(model), mse, alpha=%s)
 		if output:
 			value = float(output[29:])
 		else:
-			value = 1001.0 # ``LSD appears/goes away each time the page is loaded'' source
+			value = None
 		
 		return value
 	
