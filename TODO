@@ -231,8 +231,6 @@ head-to-head problems:
 This is now approaching a problem point; We just threw away 107+32 pieces of 
 data because we have no way of showing no-till vs fallow trials, etc. fix!
 
-A new problem: I'm now seeing lsd when 3-yr is all none, it's just a copy of the 2-yr...
-
 Planting method tags normalizing:
 for e in  models.Trial_Entry.objects.filter(planting_method_tags=u''):
  e.planting_method_tags=None
@@ -291,7 +289,7 @@ Planting method tags UI:
 	all irrigated results.
 *** this could easier be accomplished on the results page, a kind of
 	of meta-exlcude locations
-* tags are displayed with location name.
+* tags are displayed alongside location name.
 
 May have found problem with caching; not_locations isn't included in the cache_key
 
@@ -305,5 +303,15 @@ This has been solved:
 ** 2.7.3rc1: http://hg.python.org/cpython/rev/b2c6aff96e12
 * furthermore, www.ag.ndsu.edu is running Ubuntu 11.10, which is deprecated and has no package for 2.7.3
 * solutions: 
-** rewrite _R_subprocess() to use pipes/etc. and test on a 11.10 server (can do we find an old server!?)
+** rewrite _R_subprocess() to use pipes/etc. and test on a 11.10 server (can we find an old server!?)
 ** setup a HTTP 30x redirect to another box
+
+A new problem: I'm now seeing lsd when 3-yr is all none, it's just a copy of the 2-yr...
+This actually wasn't a bug:
+* R was being sent the n-yr data in all cases
+* sometimes R would decide that the LSD is calculable, even though I neglected to print the mean.
+We need to show the means if R thinks its good:
+* means need to be calculated, and only hidden if R returns nothing.
+** anaylsis: are there instances where the input to mean() would differ from what R sees?
+*** imagine an empty year, R would see items from the previous year and still spit out an LSD
+* will want to keep this behavior on a boolean, say "conservative_means_reporting=False"
