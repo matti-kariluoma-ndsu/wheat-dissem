@@ -13,6 +13,7 @@ Prerequisites:
    $ python -c  "import django; print django.get_version()"
    # should print the version number and exit w/o errors
    # Sep 2012: Verified the project is compatible with Django 1.4
+   # Jun 2013: Verified the project is compatible with Django 1.5.1
  
 Install to a fresh machine w/apache (Ubuntu/Debian syntax):
 NOTE: Ensure a previous version of Django is not installed; run 
