@@ -305,6 +305,7 @@ This has been solved:
 * solutions: 
 ** rewrite _R_subprocess() to use pipes/etc. and test on a 11.10 server (can we find an old server!?)
 ** setup a HTTP 30x redirect to another box
+* this problem persists... maybe calculating the LSDs before returning the (partial) response... this will help with the following problem:
 
 A new problem: I'm now seeing lsd when 3-yr is all none, it's just a copy of the 2-yr...
 This actually wasn't a bug:
