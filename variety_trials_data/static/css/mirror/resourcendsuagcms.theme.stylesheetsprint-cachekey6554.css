@@ -1,0 +1,46 @@
+
+/* - ++resource++ndsuagcms.theme.stylesheets/print.css - */
+@media print {
+/* http://www.ag.ndsu.edu/portal_css/++resource++ndsuagcms.theme.stylesheets/print.css?original=1 */
+body {
+background: white;
+width: 90%;
+margin: 0 auto; }
+header, footer, #univservices, #breadcrumbs, #sitenav, #sidebar2, .addthis_toolbox, .documentActions,
+#top_bar_container, #sflgru, #navfooter, #typo3footers {
+display: none; }
+.visualClear {
+clear: both;
+display: block; }
+#container {
+width: 100%;
+float: none;
+margin: 0;
+padding: 0; }
+#typo3content,
+.contentwrapper,
+.clear,
+.agcms-clear,
+#mainborder,
+#main,
+.documentFirstHeading,
+.documentDescription,
+#creative-commons {
+width: 100%;
+float: none;
+margin: 0; }
+#mainborder {
+padding: 0; }
+#main, #creative-commons {
+padding: 0 !important;
+background: transparent; }
+#creative-commons {
+margin-top: 2em; }
+#creative-commons .cc-image {
+float: left;
+width: 98px; }
+#creative-commons .cc-text {
+font-style: italic; }
+
+}
+

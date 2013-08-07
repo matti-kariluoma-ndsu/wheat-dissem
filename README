@@ -1,6 +1,6 @@
 Prerequisites:
  Python:
-  Download and Install Python, version 2.4 or greater. (http://www.python.org/download)
+  Download and Install Python, version 2.7.3 or greater. (http://www.python.org/download)
  Scipy:
   Download and install scipy, version 0.7 or greater. (http://www.scipy.org/download)
  Django:
@@ -13,15 +13,14 @@ Prerequisites:
    $ python -c  "import django; print django.get_version()"
    # should print the version number and exit w/o errors
    # Sep 2012: Verified the project is compatible with Django 1.4
+   # Jun 2013: Verified the project is compatible with Django 1.5.1
  
 Install to a fresh machine w/apache (Ubuntu/Debian syntax):
 NOTE: Ensure a previous version of Django is not installed; run 
  $ python -c  "import django; print django.get_version()"
 If so, remove it before continuing.
 
- $ sudo apt-get install git sqlite3 \
-     python-{sqlite,flup,psycopg2,rpy2,scipy} subversion apache2 \
-     libapache2-mod-wsgi 
+ $ sudo apt-get install git sqlite3 python-{sqlite,scipy} libapache2-mod-wsgi 
  $ git clone http://github.com/matti-kariluoma-ndsu/wheat-dissem.git
  $ cd wheat-dissem
  $ cat README # this file you are currently reading
@@ -63,5 +62,4 @@ To populate a table in the testing (sqlite) db:
 To add the lines from these files into psql:
 	$ psql> \copy variety_trials_data_location from 'your_filename' with delimiter ';' null as ''
 
-NOTE: Did a chmod a+w {variety_trials_website/, variety_trials_website/sqlite.db} , will need
-to be undone when we move on from sqlite.
+NOTE: Did a chmod a+w {variety_trials_website/, variety_trials_website/sqlite.db} , will need to be undone when we move on from sqlite.
