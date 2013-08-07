@@ -1,0 +1,180 @@
+
+/* - slideshow.css - */
+@media all {
+/* http://www.ag.ndsu.edu/portal_css/slideshow.css?original=1 */
+/* */
+/* */
+.pics {
+padding: 0;
+margin: 0;
+overflow: hidden;
+position: relative;
+}
+.pics img {
+padding: 0px;
+}
+.slideContainer {
+background-color: #ffffff;
+}
+#nav {
+text-align: center;
+height: 21px;
+background-color: #dee7ec;
+}
+#nav a,
+#nav #navNumbers a {
+text-decoration: none;
+outline: none;
+}
+#nav #navNumbers a {
+padding: 2px 3px 4px;
+margin-right: 5px;
+line-height: 19px;
+}
+#nav #navNumbers a.activeSlide {
+background-color: #ffffff;
+}
+/* */
+#nav.thumbnails {
+height: auto;
+padding-top: 5px;
+}
+#nav.thumbnails #prev,
+#nav.thumbnails #next {
+position: relative;
+top: -23px;
+padding-top: 23px;
+border: none;
+display: inline-block;
+height: 27px;
+}
+#nav img {
+cursor: pointer;
+outline: none;
+margin-bottom: 5px;
+}
+#nav.thumbnails #navNumbers a,
+#nav.thumbnails #navNumbers a.activeSlide {
+padding: 0;
+border: none;
+background-color: transparent;
+}
+#nav.thumbnails .activeSlide img {
+outline: 1px solid #333333;
+}
+/* */
+.imageCaption {
+z-index: 9;
+color: #ffffff;
+background: url(http://www.ag.ndsu.edu/slideshow_bg.png);
+height: 65px;
+padding: 5px 0;
+position: absolute;
+width: 100%;
+}
+.imageCaption .imageTitle,
+.imageCaption .imageDescrip {
+margin: 0 5px;
+display: block;
+}
+.imageCaption .imageTitle {
+font-size: 150%;
+font-weight: bold;
+}
+#slideshow a[href^="http:"],
+#slideshow a.link-external {
+background: none;
+padding: 0;
+}
+/* */
+.portletPics {
+border: none;
+}
+.portletPics {
+padding: 0;
+margin: 0;
+border-color: #8cacbb;
+border-style: solid;
+border-width: 0 1px 1px;
+overflow: hidden;
+position: relative;
+}
+.portletPics .imageCaption {
+background: none;
+height: 35px;
+position: static;
+color: Black;
+}
+.slideshowPortlet a {
+outline: none;
+}
+.slideshowPortlet .nav {
+margin-top: 10px;
+clear: both;
+}
+.portlet.slideshowPortlet .navNumbers a {
+padding: 0;
+font-size: 5px;
+border: none;
+color: #DDDDDD;
+background-color: #DDDDDD;
+margin: 0 8px 8px 0;
+display: inline-block;
+text-indent: -12px;
+width: 12px;
+height: 12px;
+overflow: hidden;
+}
+.portlet.slideshowPortlet .navNumbers a:hover {
+color: #DDDDDD;
+}
+.slideshowPortlet .nav .navNumbers a.activeSlide {
+color: #888888;
+background-color: #888888;
+}
+#slideshow-edit-property {
+height: 140px;
+width: 400px;
+display: inline-block;
+float: left;
+}
+/* */
+
+}
+
+
+/* - ++resource++ContentWellPortlets.styles/ContentWellPortlets.css - */
+@media all {
+/* http://www.ag.ndsu.edu/portal_css/++resource++ContentWellPortlets.styles/ContentWellPortlets.css?original=1 */
+.managePortletsAboveLink,
+.managePortletsBelowLink,
+.manageFooterPortletsLink,
+.manageInHeaderPortletsLink { text-align: center; margin: 0 auto 1em; clear:both;}
+.portlet-manager-row .porlet-well_manager { width: 30%; float:left; margin:1%; }
+.portlet-manager-row { width:100%; float:left; }
+/* */
+div.width-1\3a 5 { width:    17.75%; } /* */
+div.width-2\3a 5 { width:    37.75%; } /* */
+div.width-3\3a 5 { width:    57.75%; } /* */
+div.width-4\3a 5 { width:    77.75%; } /* */
+div.position-1\3a 5 {margin-left:    -78.875%;} /* */
+div.position-2\3a 5 {margin-left:    -58.875%;} /* */
+div.position-3\3a 5 {margin-left:    -38.875%;} /* */
+div.position-4\3a 5 {margin-left:    -18.875%;} /* */
+div.width-1\3a 6 { width:    14.416%; } /* */
+div.width-5\3a 6 { width:    81.083%; } /* */
+div.position-1\3a 6 {margin-left:    -82.208%;} /* */
+div.position-5\3a 6 {margin-left:    -15.542%;} /* */
+
+}
+
+
+/* - ++resource++simplesocial.css - */
+/* http://www.ag.ndsu.edu/portal_css/++resource++simplesocial.css?original=1 */
+/* */
+#portal-top {
+z-index: 10;
+}
+#formfield-form-widgets-like_button_types .option {
+display: block;
+}

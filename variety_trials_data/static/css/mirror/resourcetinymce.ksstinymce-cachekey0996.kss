@@ -1,0 +1,13 @@
+
+/* - ++resource++tinymce.kss/tinymce.kss - */
+/* http://www.ag.ndsu.edu/portal_kss/++resource++tinymce.kss/tinymce.kss?original=1 */
+textarea.mce_editable:load {
+action-client: init-tinymce;
+}
+.kssattr-macro-rich-field-view form.inlineForm input[name=kss-save]:click {
+action-client: save-tinymce;
+}
+.kssattr-macro-text-field-view form.inlineForm input[name=kss-save]:click {
+action-client: save-tinymce;
+}
+
