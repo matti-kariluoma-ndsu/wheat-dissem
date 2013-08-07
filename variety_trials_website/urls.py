@@ -7,7 +7,6 @@
 """
 
 from django.conf.urls.defaults import *
-from django.views.generic import list_detail
 from django.conf import settings
 from variety_trials_data.models import *
 from variety_trials_data import views
