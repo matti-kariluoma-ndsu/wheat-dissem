@@ -1,5 +1,5 @@
-Following is a listing of third-party software included in this 
-distribuition, in the format "SOFTWARE_NAME ~ AUTHOR ~ LICENSE":
+A listing of third-party software included in this 
+distribution (in the format "SOFTWARE ~ AUTHOR ~ LICENSE"):
 
 agricolae ~ Felipe de Mendiburu ~ GPL 3.0
 CivicSpace US ZIP Code Database ~ CivicSpace Labs, Inc. ~ Creative Commons Attribution-ShareAlike (cc-by-sa)
@@ -13,10 +13,10 @@ jQuery ~ jquery.com/team ~ MIT
 json2 ~ Anonymous ~ Public Domain
 Modernizr ~ Faruk Ates ~ BSD // MIT
 tabview ~ Ilya S. Lyubinskiy ~ http://www.php-development.ru/javascripts/tabview.php
-jQUery jsonSuggest ~ Tom Coote ~ https://github.com/cootetom/jQuery-JSON-Suggest-Search-Box/blob/master/LICENSE
+jQuery jsonSuggest ~ Tom Coote ~ https://github.com/cootetom/jQuery-JSON-Suggest-Search-Box/blob/master/LICENSE
 
-Followng is a listing of third-party algorithms included in this 
-distribuition, in the format "FUNCTION ~ SOURCE":
+... and third-party algorithms included in this 
+distribuition (in the format "ALGORITHM ~ SOURCE"):
 qnorm ~ http://en.wikipedia.org/wiki/Normal_distribution#Quantile_function
 qt ~ Hill, G. W. (1970) Algorithm 396: Student's t-quantiles. Communications of the ACM, 13(10), 619-620.
 LSD ~ derived from agricolae:LSD.test, Felipe de Mendiburu
