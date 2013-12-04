@@ -316,3 +316,15 @@ We need to show the means if R thinks its good:
 ** anaylsis: are there instances where the input to mean() would differ from what R sees?
 *** imagine an empty year, R would see items from the previous year and still spit out an LSD
 * will want to keep this behavior on a boolean, say "conservative_means_reporting=False"
+
+Variety "Rollag 1.3x" should be changed to "Rollag" with a planting_method_tag of 130% seed rate 
+Planting method tags should be shown, somehow (by location, or by Variety? Lookin' at you, Rollag & Carrington)
+older data with planting method tags and hidden=True should be unhidden
+
+Notes from Dec 2 meeting:
+Future direction, new crops or more state's data? New crops:
+	* Winter wheat
+	* Soybeans
+	* Barley, Durum, ...
+	* Corn...?
+May need to put up MSU-branded site in future.
