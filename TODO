@@ -328,3 +328,5 @@ Future direction, new crops or more state's data? New crops:
 	* Barley, Durum, ...
 	* Corn...?
 May need to put up MSU-branded site in future.
+
+the postgres database is acting up at www.ag.ndsu.edu, I've switched it to use the sqlite db. Need to switch that back!
