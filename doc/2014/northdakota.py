@@ -217,12 +217,16 @@ for v in ys:
    tags = None
   tw = tws[v][i]
   p = ps[v][i]
-  t = models.Trial_Entry(bushels_acre=y, protein_percent=p, test_weight = w, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
+  t = models.Trial_Entry(bushels_acre=y, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
+  if tw is not None:
+   t.test_weight = tw
+  if p is not None:
+   t.protein_percent = p
   if tags is not None:
    t.planting_method_tags = tags
   if lsd10 is not None:
    t.lsd_10 = lsd10
   if lsd5 is not None: 
-   lt.sd_05 = lsd5
+   t.lsd_05 = lsd5
   t.save()
  
