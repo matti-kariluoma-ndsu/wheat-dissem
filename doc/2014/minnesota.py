@@ -1,3 +1,4 @@
+#$ python manage.py shell
 #from variety_trials_data import models
 
 # (name, lsd10)
@@ -11,7 +12,7 @@ ls = [("Crookston", None),
 ("Strathcona", 5.2),
 ("Benson", 9.6),
 ("Kimball", 4.3),
-("LeCenter", 5.1),
+("Le Center", 5.1),
 ("Lamberton", 6.2),
 ("Morris", 6.4),
 ("Saint Paul", 3.2),
@@ -53,23 +54,25 @@ ys["WB9507"]=[104.7, 90.9, 98.6, 101.6, 87.5, 90.5, 67.8, 89.1, 117.5, 97.1, 66.
 
 plant, harvest =  models.Date.objects.filter(date__year=2014)
 for v in ys:
-  for i in range(len(ls)):
-   y = ys[v][i]
-   l, lsd10 = ls[i]
-   t = models.Trial_Entry(bushels_acre=y, lsd_05=lsd5, lsd_10=lsd10, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
-   t.save()
+ for i in range(len(ls)):
+  y = ys[v][i]
+  l, lsd10 = ls[i]
+  t = models.Trial_Entry(bushels_acre=y, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
+  if lsd10 is not None:
+   t.lsd_10 = lsd10
+  t.save()
 
 twls = [("Crookston"),
 ("Benson"),
 ("Kimball"),
 ("Lamberton"),
-("LeCenter"),
+("Le Center"),
 ("Morris"),
 ("Roseau"),
 ("Fergus Falls"),
 ("Oklee"),
 ("Hallock"),
-("St. Paul"),
+("Saint Paul"),
 ("Waseca")]
 
 tws  = {}
@@ -106,17 +109,21 @@ tws["WB-Mayville"]=[58.9, 59.9, 57.0, 58.2, 57.0, 57.7, 58.9, 60.5, 63.5, 56.4, 
 tws["WB9507"]=[60.1, 59.9, 56.9, 57.7, 56.0, 57.5, 58.2, 62.8, 62.9, 56.4, 58.2, 59.6]
 
 for v in tws:
-  for i in range(len(twls)):
-   tw = tws[v][i]
-   l = twls[i]
-   # query for exisiting entry
-   #t = models.Trial_Entry(bushels_acre=y, lsd_05=lsd5, lsd_10=lsd10, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
-   #t.save()
+ for i in range(len(twls)):
+  tw = tws[v][i]
+  l = twls[i]
+  # query for existing entry
+  ts = models.Trial_Entry.objects.filter(plant_date=plant, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0])
+  if len(ts) > 0:
+    t = ts[0]
+    t.test_weight = tw
+  else:
+   t = models.Trial_Entry(test_weight=tw, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
+  t.save()
 
 twils = [("Lamberton"),
 ("Morris")]
-tags = "intensive"
-hide=True
+
 
 twis  = {}
 twis["Advance"]=[61.7, 61.2]
@@ -184,11 +191,13 @@ pis["WB-Digger"]=[14.3, 14.7]
 pis["WB-Mayville"]=[15.5, 15.1]
 pis["WB9507"]=[14.8, 14.6]
 
+tags = "intensive"
+hide=True
 for v in twis:
-  for i in range(len(twils)):
-   tw = twis[v][i]
-   p = pis[v][i]
-   l = twils[i]
-   # query for exisiting entry
-   #t = models.Trial_Entry(bushels_acre=y, lsd_05=lsd5, lsd_10=lsd10, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=hide, planting_tags=tags)
-   #t.save()
+ for i in range(len(twils)):
+  tw = twis[v][i]
+  p = pis[v][i]
+  l = twils[i]
+  t = models.Trial_Entry(test_weight=tw, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=hide, planting_method_tags=tags)
+  # can't save this data quite yet... we're missing the yield data for these locations' "intensive" trials.
+  #t.save()

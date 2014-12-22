@@ -1,3 +1,6 @@
+#$ python manage.py shell
+#from variety_trials_data import models
+
 # name, lsd10, lsd5
 ls = [("Carrington", 6.0, 7.1),
 ("Dazey", 7.1, 8.6),
@@ -203,23 +206,23 @@ ps["WB9879CLP"]=[None, None, None, None, None, None, None, None, None, None, 12.
 plant, harvest =  models.Date.objects.filter(date__year=2014)
 
 for v in ys:
-	for i in range(len(ls)):
-		y = ys[v][i]
-		if y is None:
-			continue
-		l, lsd10, lsd5 = ls[i]
-		if l == "Carrington":
-			tags = "dryland"
-		else:
-			tags = None
-		tw = tws[v][i]
-		p = ps[v][i]
-		t = models.Trial_Entry(bushels_acre=y, protein_percent=p, test_weight = w, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
-		if tags is not None:
-			t.planting_method_tags = tags
-		if lsd10 is not None:
-			t.lsd_10 = lsd10
-		if lsd5 is not None: 
-			lt.sd_05 = lsd5
-		t.save()
+ for i in range(len(ls)):
+  y = ys[v][i]
+  if y is None:
+   continue
+  l, lsd10, lsd5 = ls[i]
+  if l == "Carrington":
+   tags = "dryland"
+  else:
+   tags = None
+  tw = tws[v][i]
+  p = ps[v][i]
+  t = models.Trial_Entry(bushels_acre=y, protein_percent=p, test_weight = w, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
+  if tags is not None:
+   t.planting_method_tags = tags
+  if lsd10 is not None:
+   t.lsd_10 = lsd10
+  if lsd5 is not None: 
+   lt.sd_05 = lsd5
+  t.save()
  

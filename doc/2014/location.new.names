@@ -1,5 +1,6 @@
-LeCenter
-Strathcona
-Prosper
 Pekin
 
+#$ python manage.py shell
+#from variety_trials_data import models
+l = models.Location(name="Pekin", zipcode=models.Zipcode.objects.filter(zipcode=58361)[0])
+l.save()

@@ -1,0 +1,6 @@
+#$ python manage.py shell
+#from variety_trials_data import models
+d = models.Date(date="2014-05-01")
+d.save() # order matters! save the may date first! otherswise minnesota.pay won't grab them correctly
+d = models.Date(date="2014-08-01")
+d.save()

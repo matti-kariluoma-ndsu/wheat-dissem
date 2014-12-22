@@ -9,3 +9,21 @@ Nitro
 Pro
 Chevelle
 WB9879CLP
+
+#$ python manage.py shell
+#from variety_trials_data import models
+vs = ['WB9507'
+'HRS 3361'
+'HRS 3378'
+'HRS 3419'
+'Prevail'
+'SY Ingmar'
+'Cardale'
+'Nitro'
+'Pro'
+'Chevelle'
+'WB9879CLP']
+
+for variety_name in vs:
+ v = models.Variety(name=variety_name)
+ v.save()
