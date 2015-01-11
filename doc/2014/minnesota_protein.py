@@ -6,13 +6,13 @@ ls = [("Crookston"),
 ("Benson"),
 ("Kimball"),
 ("Lamberton"),
-("LeCenter"),
+("Le Center"),
 ("Morris"),
 ("Roseau"),
 ("Fergus Falls"),
 ("Oklee"),
 ("Hallock"),
-("St. Paul"),
+("Saint Paul"),
 ("Waseca")]
 
 ps = {}
