@@ -126,4 +126,4 @@ for v in ys:
    t = models.Trial_Entry(bushels_acre=y, test_weight=tw, protein_percent=p, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=hide, planting_method_tags=tags)
   else:
    t = models.Trial_Entry(bushels_acre=y, plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=hide, planting_method_tags=tags)
-  #t.save()
+  t.save()
