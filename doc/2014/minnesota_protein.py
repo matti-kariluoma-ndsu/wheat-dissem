@@ -52,7 +52,7 @@ expected_size = len(ps.values()[0])
 for value in ps.values():
  assert(expected_size == len(value))
 
-commit = False
+commit = True
 plant, harvest =  models.Date.objects.filter(date__year=2014)
 for v in ps:
  for i in range(len(ls)):
@@ -60,7 +60,9 @@ for v in ps:
   l = ls[i]
   t = models.Trial_Entry.objects.filter(plant_date=plant, harvest_date=harvest, location=models.Location.objects.filter(name=l)[0], variety=models.Variety.objects.filter(name=v)[0], hidden=False)
   if commit:
-   pass #t.protein = p; t.save()
+   trial = t[0]
+   trial.protein_percent = p
+   trial.save()
   else:
    assert(len(t) == 1)
   
