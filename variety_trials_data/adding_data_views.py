@@ -265,7 +265,7 @@ def add_trial_entry_csv_file_confirm(request):
 		context_instance=RequestContext(request)
 	)
 
-DiseaseFormset = inlineformset_factory(models.Variety, models.Disease_Entry)
+DiseaseFormset = inlineformset_factory(models.Variety, models.Disease_Entry, fields=['disease','variety','susceptibility',])
 def add_variety(request):
 	if request.method == 'POST': # If the form has been submitted...
 		message = "Add failed"

@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.http import urlencode
 from django.core.cache import cache
-from django.forms.util import ErrorDict, ErrorList
+from django.forms.utils import ErrorDict, ErrorList
 from variety_trials_website.settings import HOME_URL
 from variety_trials_data import models
 from variety_trials_data import variety_trials_forms

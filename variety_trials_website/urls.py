@@ -6,7 +6,7 @@
 :license: CC BY-NC-ND 3.0 @see LICENSE
 """
 
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, include, url
 from django.conf import settings
 from variety_trials_data.models import *
 from variety_trials_data import views
