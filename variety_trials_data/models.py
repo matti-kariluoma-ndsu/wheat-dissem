@@ -148,19 +148,23 @@ class Location_Year_PlantingMethods_Survey_Answer(models.Model):
 class VarietyForm(ModelForm):
 	class Meta:
 		model = Variety
+		fields = ['name',]
 		# exclude any ForeignKey or ManyToMany fields
 		exclude = ('diseases',)
 		
 class Trial_EntryForm(ModelForm):
 	class Meta:
 		model = Trial_Entry
+		fields = ['bushels_acre','protein_percent','plant_date','harvest_date','location','variety',]
 		# don't allow the user to effect `hidden'
 		exclude = ('hidden',)
 		
 class LocationForm(ModelForm):
 	class Meta:
 		model = Location
+		fields = ['name','zipcode',]
 		
 class DateForm(ModelForm):
 	class Meta:
 		model = Date
+		fields = ['date',]
