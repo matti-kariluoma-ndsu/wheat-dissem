@@ -73,6 +73,8 @@ rename_varieties["Elgin-ND"] = "Elgin"
 
 for vname in varieties:
 	try:
+		if vname in rename_varieties:
+			vname = rename_varieties[vname]
 		variety = models.Variety.objects.filter(name=vname)[0]
 	except:
 		fail = True

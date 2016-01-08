@@ -103,6 +103,16 @@ rename_varieties["ND901CL Plus"] = "ND 901CL Plus"
 rename_varieties["SY605CL"] = "SY605 CL"
 rename_varieties["WB9879CLP+"] = "WB9879CLP Plus"
 
+for vname in varieties:
+	try:
+		if vname in rename_varieties:
+			vname = rename_varieties[vname]
+		variety = models.Variety.objects.filter(name=vname)[0]
+	except:
+		fail = True
+		print 'Missing Variety record: ', vname
+		#models.Variety.objects.filter(name__contains=vname)
+
 # location name, yield lsd10, yield lsd5
 yield_lsds = [
 		('Carrington-Dry', 7.4, 8.9),
