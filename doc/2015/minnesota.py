@@ -689,7 +689,9 @@ for lname in yields_proteins:
 		weight = None
 		lsd10, lsd5 = None, None
 		if lname in rename_locations:
-			lname, tags = rename_locations[lname]
+			dblname, tags = rename_locations[lname]
+		else:
+			dblname = lname
 		if tags is not None and tags is not "dryland":
 			hidden = True
 		if vname in rename_varieties:
@@ -698,7 +700,7 @@ for lname in yields_proteins:
 				bushels_acre=bushels, 
 				plant_date=planted, 
 				harvest_date=harvested, 
-				location=models.Location.objects.filter(name=lname)[0], 
+				location=models.Location.objects.filter(name=dblname)[0], 
 				variety=models.Variety.objects.filter(name=vname)[0], 
 				hidden=hidden
 			)

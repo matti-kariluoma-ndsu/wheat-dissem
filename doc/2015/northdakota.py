@@ -389,13 +389,15 @@ for vname in yields:
 		weight = weights[vname][i]
 		protein = proteins[vname][i]
 		if vname in rename_varieties:
-			vname = rename_varieties[vname]
+			dbvname = rename_varieties[vname]
+		else:
+			dbvname = vname
 		new_trial = models.Trial_Entry(
 				bushels_acre=bushels, 
 				plant_date=planted, 
 				harvest_date=harvested, 
 				location=models.Location.objects.filter(name=lname)[0], 
-				variety=models.Variety.objects.filter(name=vname)[0], 
+				variety=models.Variety.objects.filter(name=dbvname)[0], 
 				hidden=hidden
 			)
 		if weight is not None:
