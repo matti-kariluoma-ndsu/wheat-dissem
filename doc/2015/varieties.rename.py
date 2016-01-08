@@ -21,3 +21,7 @@ for vname in varieties:
 		)[0]
 	variety.name = vname
 	variety.save()
+
+variety = models.Variety.objects.filter(name="Vantage")[0]
+variety.name = "WB-Vantage"
+variety.save()
