@@ -21,6 +21,8 @@ locations = [
 		"Kimball",
 	]
 
+rename_locations = {}
+
 fail = False
 for lname in locations:
 	try:
