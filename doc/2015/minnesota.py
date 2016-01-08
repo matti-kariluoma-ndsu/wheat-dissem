@@ -676,3 +676,40 @@ kimball["WB9507"]=[89.0, 12.5]
 kimball["WB9653"]=[107.9, 13.6]
 kimball["WB-Mayville"]=[90.9, 14.1]
 
+planted = models.Date.objects.filter(date__year=2015, date__month=5)[0]
+harvested = models.Date.objects.filter(date__year=2015, date__month=8)[0]
+
+for lname in yields_proteins:
+	for vname in yields_proteins[lname]:
+		tags = None
+		hidden = False
+		bushels, protein = yields_proteins[lname][vname]
+		if bushels is None:
+			continue
+		weight = None
+		lsd10, lsd5 = None, None
+		if lname in rename_locations:
+			lname, tags = rename_locations[lname]
+		if tags is not None and tags is not "dryland":
+			hidden = True
+		if vname in rename_varieties:
+			vname = rename_varieties[vname]
+		new_trial = models.Trial_Entry(
+				bushels_acre=bushels, 
+				plant_date=planted, 
+				harvest_date=harvested, 
+				location=models.Location.objects.filter(name=lname)[0], 
+				variety=models.Variety.objects.filter(name=vname)[0], 
+				hidden=hidden
+			)
+		if weight is not None:
+			new_trial.test_weight = weight
+		if protein is not None:
+			new_trial.protein_percent = protein
+		if tags is not None:
+			new_trial.planting_method_tags = tags
+		if lsd10 is not None:
+			new_trial.lsd_10 = lsd10
+		if lsd5 is not None: 
+			new_trial.lsd_05 = lsd5
+		new_trial.save()

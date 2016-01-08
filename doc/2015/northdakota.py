@@ -39,6 +39,7 @@ rename_locations["LREC-Pekin"] = ("Pekin", None)
 rename_locations["Williston"] = ("Williston", "dryland")
 rename_locations["Williston-Irr."] = ("Williston", "irrigated")
 
+fail = False
 for lname in locations:
 	try:
 		if lname in rename_locations:
@@ -135,6 +136,11 @@ for vname in varieties:
 		fail = True
 		print 'Missing Variety record: ', vname
 		#models.Variety.objects.filter(name__contains=vname)
+
+if fail:
+	print "ERROR: Missing records. See preceding output. Exiting..."
+	import sys
+	sys.exit(1)
 
 # location name, yield lsd10, yield lsd5
 yield_lsds = [
@@ -365,3 +371,41 @@ proteins=["WB9507"]=[14.0, 12.8, 11.8, 12.8, 13.4, 13.8, 13.7, 15.7, 15.7, 11.9,
 proteins=["WB9653"]=[14.9, None, None, 13.4, 12.5, 13.7, 13.5, None, None, 12.5, 13.5, None, 14.0, 12.4, 15.2, 13.1, 14.0, 12.8, None]
 proteins=["WB9879CLP+"]=[None, None, None, None, None, None, None, None, None, None, None, None, None, None, 16.1, 14.1, 14.4, 12.9, None]
 
+planted = models.Date.objects.filter(date__year=2015, date__month=5)[0]
+harvested = models.Date.objects.filter(date__year=2015, date__month=8)[0]
+
+for vname in yields:
+	for i in range(len(yield_lsds)):
+		tags = None
+		hidden = False
+		bushels = yields[vname][i]
+		if bushels is None:
+			continue
+		lname, lsd10, lsd5 = yield_lsds[i]
+		if lname in rename_locations:
+			lname, tags = rename_locations[lname]
+		if tags is not None and tags is not "dryland":
+			hidden = True
+		weight = weights[vname][i]
+		protein = proteins[vname][i]
+		if vname in rename_varieties:
+			vname = rename_varieties[vname]
+		new_trial = models.Trial_Entry(
+				bushels_acre=bushels, 
+				plant_date=planted, 
+				harvest_date=harvested, 
+				location=models.Location.objects.filter(name=lname)[0], 
+				variety=models.Variety.objects.filter(name=vname)[0], 
+				hidden=hidden
+			)
+		if weight is not None:
+			new_trial.test_weight = weight
+		if protein is not None:
+			new_trial.protein_percent = protein
+		if tags is not None:
+			new_trial.planting_method_tags = tags
+		if lsd10 is not None:
+			new_trial.lsd_10 = lsd10
+		if lsd5 is not None: 
+			new_trial.lsd_05 = lsd5
+		new_trial.save()
