@@ -93,6 +93,16 @@ varieties = [
 		"WB9879CLP+",
 	]
 
+rename_varieties = {}
+rename_varieties["Elgin-ND"] = "Elgin"
+rename_varieties["SY-Rowyn"] = "SY Rowyn"
+rename_varieties["SY-Soren"] = "SY Soren"
+rename_varieties["SY-Tyra"] = "SY Tyra"
+rename_varieties["SY-Valda"] = "SY Valda"
+rename_varieties["ND901CL Plus"] = "ND 901CL Plus"
+rename_varieties["SY605CL"] = "SY605 CL"
+rename_varieties["WB9879CLP+"] = "WB9879CLP Plus"
+
 # location name, yield lsd10, yield lsd5
 yield_lsds = [
 		('Carrington-Dry', 7.4, 8.9),

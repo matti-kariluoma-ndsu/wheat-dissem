@@ -21,6 +21,14 @@ locations = [
 		"Kimball",
 	]
 
+fail = False
+for lname in locations:
+	try:
+		location = models.Location.objects.filter(name=lname)[0]
+	except:
+		fail = True
+		print 'Missing Location record: ', lname
+
 varieties = [
 		"Barlow",
 		"Bolles",
@@ -59,6 +67,22 @@ varieties = [
 		"WB9653",
 		"WB-Mayville",
 	]
+
+rename_varieties = {}
+rename_varieties["Elgin-ND"] = "Elgin"
+
+for vname in varieties:
+	try:
+		variety = models.Variety.objects.filter(name=vname)[0]
+	except:
+		fail = True
+		print 'Missing Variety record: ', vname
+		#models.Variety.objects.filter(name__contains=vname)
+		
+if fail:
+	print "ERROR: Missing records. See preceding output. Exiting..."
+	import sys
+	sys.exit(1)
 
 # location name, yield lsd10, yield lsd5
 yield_lsds = [
