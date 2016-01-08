@@ -302,7 +302,7 @@ weights["WB-Mayville"]=[61.3, 57.1, 55.8, 57.4, 56.8, 59.5, 57.4, None, None, 60
 weights["WB-Vantage"]=[61.7, 58.4, 59.8, None, None, 62.1, 60.6, None, None, 63.1, None, None, None, None, 60.2, None, 60.4, 59.3, 62.8]
 weights["WB9507"]=[59.1, 55.3, 56.7, 57.2, 50.4, 56.9, 53.9, 56.3, 55.5, 57.7, 58.2, 52.9, 54.2, 56.1, 54.6, 59.1, 58.1, 57.0, None]
 weights["WB9653"]=[62.2, None, None, 58.3, 53.9, 58.0, 56.2, None, None, 58.1, 58.5, 54.0, 57.0, 53.5, 54.6, 61.9, 57.7, 57.8, None]
-weights["WB9879CLP"]=[None, None, None, None, None, None, None, None, None, None, None, None, None, None, 55.9, 60.6, 56.7, 58.1, None]
+weights["WB9879CLP+"]=[None, None, None, None, None, None, None, None, None, None, None, None, None, None, 55.9, 60.6, 56.7, 58.1, None]
 
 proteins = {}
 proteins["Advance"]=[13.6, 12.9, 12.1, 13.4, 12.7, 13.5, 13.9, None, 15.7, 12.5, None, None, None, None, 14.9, 13.3, 14.0, 12.5, None]
