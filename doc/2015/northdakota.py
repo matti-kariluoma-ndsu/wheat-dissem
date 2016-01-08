@@ -25,6 +25,29 @@ locations = [
 		"Williston-Irr.",
 	]
 
+rename_locations = {}
+# (name, planting_method_tags)
+rename_locations["Carrington-Dry"] = ("Carrington", "dryland")
+rename_locations["Carrington-Irrigated"] = ("Carrington", "irrigated")
+rename_locations["CarringtonElite"] = ("Carrington", "elite")
+rename_locations["CREC-Dazey"] = ("Dazey", None)
+rename_locations["CREC-Wishek"] = ("Wishek", None)
+rename_locations["LREC-Cando"] = ("Cando", None)
+rename_locations["LREC-Cavalier"] = ("Cavalier", None)
+rename_locations["LREC-Park River"] = ("Park River", None)
+rename_locations["LREC-Pekin"] = ("Pekin", None)
+rename_locations["Williston"] = ("Williston", "dryland")
+rename_locations["Williston-Irr."] = ("Williston", "irrigated")
+
+for lname in locations:
+	try:
+		if lname in rename_locations:
+			lname, tags = rename_locations[lname]
+		location = models.Location.objects.filter(name=lname)[0]
+	except:
+		fail = True
+		print 'Missing Location record: ', lname
+
 varieties = [
 		"Advance",
 		"Agawam",
