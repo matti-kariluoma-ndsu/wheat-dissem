@@ -70,6 +70,7 @@ varieties = [
 
 rename_varieties = {}
 rename_varieties["Elgin-ND"] = "Elgin"
+rename_varieties["Chevelle"] = "MS Chevelle"
 
 for vname in varieties:
 	try:
