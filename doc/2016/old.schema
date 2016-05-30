@@ -1,0 +1,114 @@
+BEGIN;
+CREATE TABLE "variety_trials_data_disease" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" varchar(200) NOT NULL
+)
+;
+CREATE TABLE "variety_trials_data_variety" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" varchar(200) NOT NULL,
+    "description_url" varchar(200),
+    "picture_url" varchar(200),
+    "agent_origin" varchar(200),
+    "year_released" varchar(200),
+    "straw_length" varchar(200),
+    "maturity" varchar(200),
+    "grain_color" varchar(200),
+    "seed_color" varchar(200),
+    "beard" varchar(200),
+    "wilt" varchar(200)
+)
+;
+CREATE TABLE "variety_trials_data_varietymanager" (
+    "variety_ptr_id" integer NOT NULL PRIMARY KEY REFERENCES "variety_trials_data_variety" ("id")
+)
+;
+CREATE TABLE "variety_trials_data_disease_entry" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "disease_id" integer NOT NULL REFERENCES "variety_trials_data_disease" ("id"),
+    "variety_id" integer NOT NULL REFERENCES "variety_trials_data_variety" ("id"),
+    "susceptibility" decimal NOT NULL
+)
+;
+CREATE TABLE "variety_trials_data_zipcode" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "zipcode" integer unsigned NOT NULL,
+    "city" varchar(200) NOT NULL,
+    "state" varchar(2) NOT NULL,
+    "latitude" decimal NOT NULL,
+    "longitude" decimal NOT NULL,
+    "timezone" smallint NOT NULL,
+    "daylight_savings" smallint NOT NULL
+)
+;
+CREATE TABLE "variety_trials_data_location" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" varchar(200) NOT NULL,
+    "zipcode_id" integer NOT NULL REFERENCES "variety_trials_data_zipcode" ("id"),
+    "latitude" decimal,
+    "longitude" decimal
+)
+;
+CREATE TABLE "variety_trials_data_date" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "date" date NOT NULL
+)
+;
+CREATE TABLE "variety_trials_data_trial_entry" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "bushels_acre" decimal NOT NULL,
+    "protein_percent" decimal,
+    "test_weight" decimal,
+    "kernel_weight" decimal,
+    "plant_height" decimal,
+    "days_to_head" decimal,
+    "lodging_factor" decimal,
+    "jday_of_head" decimal,
+    "winter_survival_rate" decimal,
+    "shatter" decimal,
+    "seeds_per_round" decimal,
+    "canopy_density" decimal,
+    "canopy_height" decimal,
+    "days_to_flower" decimal,
+    "seed_oil_percent" decimal,
+    "planting_method_tags" varchar(200),
+    "seeding_rate" decimal,
+    "previous_crop" varchar(200),
+    "moisture_basis" decimal,
+    "lsd_05" decimal,
+    "lsd_10" decimal,
+    "hsd_10" decimal,
+    "plant_date_id" integer REFERENCES "variety_trials_data_date" ("id"),
+    "harvest_date_id" integer NOT NULL REFERENCES "variety_trials_data_date" ("id"),
+    "location_id" integer NOT NULL REFERENCES "variety_trials_data_location" ("id"),
+    "variety_id" integer NOT NULL REFERENCES "variety_trials_data_variety" ("id"),
+    "hidden" bool NOT NULL
+)
+;
+CREATE TABLE "variety_trials_data_trial_entry_history" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "username" varchar(200) NOT NULL,
+    "created_date" date NOT NULL,
+    "trial_entry_id" integer NOT NULL REFERENCES "variety_trials_data_trial_entry" ("id")
+)
+;
+CREATE TABLE "variety_trials_data_location_year_plantingmethods_survey_answer" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "location_id" integer NOT NULL REFERENCES "variety_trials_data_location" ("id"),
+    "year" integer unsigned NOT NULL,
+    "irrigated" varchar(32) NOT NULL,
+    "fungicide" varchar(32) NOT NULL,
+    "notes" varchar(2000) NOT NULL
+)
+;
+CREATE INDEX "variety_trials_data_disease_entry_62a0ae28" ON "variety_trials_data_disease_entry" ("disease_id");
+CREATE INDEX "variety_trials_data_disease_entry_29b77837" ON "variety_trials_data_disease_entry" ("variety_id");
+CREATE INDEX "variety_trials_data_location_d76a4203" ON "variety_trials_data_location" ("zipcode_id");
+CREATE INDEX "variety_trials_data_trial_entry_0790066d" ON "variety_trials_data_trial_entry" ("plant_date_id");
+CREATE INDEX "variety_trials_data_trial_entry_8992e466" ON "variety_trials_data_trial_entry" ("harvest_date_id");
+CREATE INDEX "variety_trials_data_trial_entry_afbb987d" ON "variety_trials_data_trial_entry" ("location_id");
+CREATE INDEX "variety_trials_data_trial_entry_29b77837" ON "variety_trials_data_trial_entry" ("variety_id");
+CREATE INDEX "variety_trials_data_trial_entry_history_229e6efe" ON "variety_trials_data_trial_entry_history" ("trial_entry_id");
+CREATE INDEX "variety_trials_data_location_year_plantingmethods_survey_answer_afbb987d" ON "variety_trials_data_location_year_plantingmethods_survey_answer" ("location_id");
+
+COMMIT;
