@@ -133,9 +133,11 @@ class TrialEntry(models.Model):
 	plant_date          	= models.ForeignKey(Date, related_name='plant_date', on_delete=models.DO_NOTHING, blank=True, null=True, 
 			help_text='Date this trial was planted'
 		)
-	planting_method_tags	= models.ForeignKey(PlantingMethod, related_name='planting_method_tags', on_delete=models.DO_NOTHING, blank=True, null=True,
+	planting_method_tags_new= models.ForeignKey(PlantingMethod, related_name='planting_method_tags', on_delete=models.DO_NOTHING, blank=True, null=True,
 			help_text='Comma-separated list of planting methods'
 		)
+	planting_method_tags = models.CharField(max_length=200, blank=True, null=True, help_text='Comma-separated list of planting methods')
+
 	# Optional, usually not reported
 	seeding_rate        	= models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True, 
 			help_text='Format: 2.1, Number of seeds (in 1000s) per foot'
