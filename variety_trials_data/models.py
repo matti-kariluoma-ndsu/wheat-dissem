@@ -85,7 +85,7 @@ class Date(models.Model):
 		
 
 		
-class Trial_Entry(models.Model):
+class TrialEntry(models.Model):
 	bushels_acre         = models.DecimalField(decimal_places=5, max_digits=10, help_text='Format: 37.4, Bushels per Acre')
 	protein_percent      = models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True, help_text='Format: 12.1, Percentage of protein per pound')
 	test_weight          = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True, help_text='Format: 50.1, Pounds per bushel')
@@ -116,55 +116,3 @@ class Trial_Entry(models.Model):
 	def __unicode__(self):
 		return str(self.variety)+" at "+str(self.location)+", "+str(self.harvest_date.date.year)
 		
-class Trial_Entry_History(models.Model):
-	username     = models.CharField(max_length=200)
-	created_date = models.DateField()
-	trial_entry  = models.ForeignKey(Trial_Entry, on_delete=models.DO_NOTHING)
-	def __unicode__(self):
-		try:
-			trial = str(self.trial_entry)
-		except ObjectDoesNotExist:
-			trial = str("none")
-		return trial +" by "+str(self.username)+" on "+str(self.created_date)
-
-class Location_Year_PlantingMethods_Survey_Answer(models.Model):
-	location = models.ForeignKey(Location)
-	year = models.PositiveIntegerField()
-	irrigated = models.CharField(max_length=32)
-	fungicide = models.CharField(max_length=32)
-	notes = models.CharField(max_length=2000)
-	def __unicode__(self):
-		return unicode(
-				'%s in %s: irrigated: %s, fungicide: %s, notes: %s.' % (
-						unicode(self.year), 
-						unicode(self.location), 
-						self.irrigated, 
-						self.fungicide, 
-						self.notes
-					)
-			)
-
-# Custom forms to populate these data:
-class VarietyForm(ModelForm):
-	class Meta:
-		model = Variety
-		fields = ['name',]
-		# exclude any ForeignKey or ManyToMany fields
-		exclude = ('diseases',)
-		
-class Trial_EntryForm(ModelForm):
-	class Meta:
-		model = Trial_Entry
-		fields = ['bushels_acre','protein_percent','plant_date','harvest_date','location','variety',]
-		# don't allow the user to effect `hidden'
-		exclude = ('hidden',)
-		
-class LocationForm(ModelForm):
-	class Meta:
-		model = Location
-		fields = ['name','zipcode',]
-		
-class DateForm(ModelForm):
-	class Meta:
-		model = Date
-		fields = ['date',]
