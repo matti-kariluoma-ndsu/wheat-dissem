@@ -11,7 +11,6 @@ from django.conf import settings
 from variety_trials_data.models import *
 from variety_trials_data import views
 from variety_trials_data import json_views
-from variety_trials_data import adding_data_views
 
 # Uncomment the next two lines to enable the admin:
 #from django.contrib import admin
