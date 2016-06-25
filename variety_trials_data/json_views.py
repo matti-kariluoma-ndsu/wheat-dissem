@@ -67,7 +67,7 @@ def autocomplete_zipcode_json(request, partial_zipcode):
 	return json_response(request, z)
 
 def trial_entry_json(request, id):
-	v = models.Trial_Entry.objects.filter(pk=id)
+	v = models.TrialEntry.objects.filter(pk=id)
 	fields = (
 		'pk',
 		'model',
@@ -132,7 +132,7 @@ def trial_entry_near_ids_json(request, zipcode):
 	except models.Zipcode.DoesNotExist:
 		locations=models.Location.objects.all()
 	
-	d=models.Trial_Entry.objects.select_related(depth=3).filter(
+	d=models.TrialEntry.objects.select_related(depth=3).filter(
 				location__in=locations
 			).filter(
 				harvest_date__in=models.Date.objects.filter(
@@ -179,7 +179,7 @@ def trial_entry_near_json(request, zipcode):
 	except models.Zipcode.DoesNotExist:
 		locations=models.Location.objects.all()
 	
-	d=models.Trial_Entry.objects.select_related(depth=3).filter(
+	d=models.TrialEntry.objects.select_related(depth=3).filter(
 				location__in=locations[0:8]
 			).filter(
 				harvest_date__in=models.Date.objects.filter(

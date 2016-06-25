@@ -64,7 +64,7 @@ def advanced_search(request):
 		{ 
 			'home_url': HOME_URL,
 			'form': form,
-			'fieldnames': [field.name for field in models.Trial_Entry._meta.fields],
+			'fieldnames': [field.name for field in models.TrialEntry._meta.fields],
 		},
 		context_instance=RequestContext(request)
 	)
@@ -315,7 +315,7 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 			result = 0;
 			curyear = datetime.date.today().year
 			while result < 1 and curyear > 1900:
-				result = models.Trial_Entry.objects.filter(
+				result = models.TrialEntry.objects.filter(
 						location__in = locations
 					).filter(
 							harvest_date__in = models.Date.objects.filter(
@@ -374,7 +374,7 @@ def inspect(request):
 			for l in locations:
 				masterDict[year]["rows"][v.name][l.id]=" "
 	
-	for entry in models.Trial_Entry.objects.select_related(depth=3).filter(
+	for entry in models.TrialEntry.objects.select_related(depth=3).filter(
 				harvest_date__in=models.Date.objects.filter(
 					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
 				)

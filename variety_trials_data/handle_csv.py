@@ -130,7 +130,7 @@ def inspect_trial_entry():
 	trial_entry_foreign_fields = {} # {column name: field, ...}
 	
 	# Inspect our model, grab its fields
-	for field in models.Trial_Entry._meta.fields:
+	for field in models.TrialEntry._meta.fields:
 		if (field.get_internal_type() == 'ForeignKey' 
 				or field.get_internal_type() == 'ManyToManyField' ):
 			trial_entry_foreign_fields[field.name] = field
@@ -184,7 +184,7 @@ def handle_json(uploaded_data, username, name_to_field_lookup):
 	
 	user_to_confirm = []
 	which_row = {}
-	unsaved_model_instance = models.Trial_Entry()
+	unsaved_model_instance = models.TrialEntry()
 	for (row_number, trial_entry) in enumerate(trial_entries):
 		for fieldname in trial_entry:
 			if fieldname in trial_entry_foreign_fields:
@@ -263,7 +263,7 @@ def handle_file(uploaded_file, username, name_to_field_lookup):
 	
 	user_to_confirm = []
 	which_row = {}
-	unsaved_model_instance = models.Trial_Entry()
+	unsaved_model_instance = models.TrialEntry()
 	for (row_number, trial_entry) in enumerate(trial_entries):
 		for fieldname in trial_entry:
 			if fieldname in trial_entry_foreign_fields:
@@ -355,7 +355,7 @@ def handle_csv_file(uploaded_file):
 
 	# Inspect our model, to grab the fields from it
 
-	for field in models.Trial_Entry._meta.fields:
+	for field in models.TrialEntry._meta.fields:
 		if (field.get_internal_type() == 'ForeignKey' 
 				or field.get_internal_type() == 'ManyToManyField' ):
 			trial_entry_foreign_fields["%s_id" % (field.name)] = field.rel.to.objects.all()
@@ -405,11 +405,10 @@ def handle_csv_file(uploaded_file):
 					
 				column_number += 1
 				
-			model_instance = models.Trial_Entry()
+			model_instance = models.TrialEntry()
 			for column_name in trial_entry_fields:
 				setattr(model_instance, column_name, trial_entry_fields[column_name])
 				#print "Writing %s as %s" % (name, insertion_dict[column_name])
 			model_instance.save() # ARE YOU BRAVE ENOUGH? 
-			#models.Trial_Entry_History(trial_entry=model_instance,username="asdasd",created_date = date.today()).save()
 			
 	return (False, errors)

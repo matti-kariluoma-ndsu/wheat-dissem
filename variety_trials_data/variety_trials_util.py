@@ -114,7 +114,7 @@ def get_page(zipcode, scope, curyear, fieldname, year_url_bit, not_locations=[],
 			
 	not_location_objects = models.Location.objects.filter(name__in=not_locations)
 	
-	for field in models.Trial_Entry._meta.fields:
+	for field in models.TrialEntry._meta.fields:
 		if field.name == fieldname:
 			break;
 	
