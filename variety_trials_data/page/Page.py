@@ -33,7 +33,6 @@ In addition:
 :license: CC BY-NC-ND 3.0 @see LICENSE
 """
 
-from variety_trials_data.models import Trial_Entry, Date
 from variety_trials_data import models
 from variety_trials_data.page.Table import Table, Appendix_Table
 from variety_trials_data.page.Row import Row, Aggregate_Row, Fake_Variety
@@ -80,7 +79,7 @@ class Page:
 		## Only use locations with data in the current year
 		#
 		locations_with_data = []
-		query = models.Trial_Entry.objects.filter(
+		query = models.TrialEntry.objects.filter(
 				harvest_date__in=this_year_dates
 			).filter(
 				hidden=False
@@ -102,7 +101,7 @@ class Page:
 			if len(locations_with_data) >= number_locations: 
 				break
 		
-		result = models.Trial_Entry.objects.select_related(
+		result = models.TrialEntry.objects.select_related(
 				'location', 'variety', 'harvest_date__date'
 			).filter(
 				location__in=locations_with_data
