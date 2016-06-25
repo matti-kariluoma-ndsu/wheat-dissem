@@ -29,19 +29,19 @@ def populate_sig_pm(apps, schema_editor):
 		entry.save()
 		# collect significance values from all TrialEntry
 		if entry.lsd_05:
-			lpyv = (entry.location.pk, pmt, entry.date.date.year, entry.lsd_05)
+			lpyv = (entry.location.pk, pmt, entry.harvest_date.date.year, entry.lsd_05)
 			try:
 				sigs_lsd_5[lpyv].append(entry.pk)
 			except KeyError:
 				sigs_lsd_5[lpyv] = [entry.pk]
 		if entry.lsd_10:
-			lpyv = (entry.location.pk, pmt, entry.date.date.year, entry.lsd_10)
+			lpyv = (entry.location.pk, pmt, entry.harvest_date.date.year, entry.lsd_10)
 			try:
 				sigs_lsd_10[lpyv].append(entry.pk)
 			except KeyError:
 				sigs_lsd_10[lpyv] = [entry.pk]
 		if entry.hsd_10:
-			lpyv = (entry.location.pk, pmt, entry.date.date.year, entry.hsd_10)
+			lpyv = (entry.location.pk, pmt, entry.harvest_date.date.year, entry.hsd_10)
 			try:
 				sigs_10_hsd[lpyv].append(entry.pk)
 			except KeyError:
