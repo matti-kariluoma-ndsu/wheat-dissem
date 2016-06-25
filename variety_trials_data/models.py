@@ -108,9 +108,6 @@ class DiseaseEntry(models.Model):
 class TrialEntry(models.Model):
 	measures = ('bushels_acre', 'protein_percent', 'test_weight', )
 	# Database fields
-	lsd_05               = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True, help_text='Bushels per Acre LSD at a=0.05 (for the entire location in this year)')
-	lsd_10               = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True, help_text='Bushels per Acre LSD at a=0.10 (for the entire location in this year)')
-	hsd_10               = models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True, help_text='Bushels per Acre HSD at a=0.05 (for the entire location in this year)')
 	bushels_acre        	= models.DecimalField(decimal_places=5, max_digits=10, blank=True, null=True,
 			help_text='Format: 37.4, Bushels per Acre'
 		)
@@ -136,8 +133,6 @@ class TrialEntry(models.Model):
 	planting_method_tags_new= models.ForeignKey(PlantingMethod, related_name='planting_method_tags', on_delete=models.DO_NOTHING, blank=True, null=True,
 			help_text='Comma-separated list of planting methods'
 		)
-	planting_method_tags = models.CharField(max_length=200, blank=True, null=True, help_text='Comma-separated list of planting methods')
-
 	# Optional, usually not reported
 	seeding_rate        	= models.DecimalField(decimal_places=5, max_digits=8, blank=True, null=True, 
 			help_text='Format: 2.1, Number of seeds (in 1000s) per foot'
