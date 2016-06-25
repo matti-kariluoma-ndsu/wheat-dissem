@@ -50,32 +50,38 @@ def populate_sig_pm(apps, schema_editor):
 	for lpyv, trial_pks in sigs_lsd_5.items():
 		(loc_pk, planting_method_tags, year, value) = lpyv
 		sigentry = SignificanceEntry(
-				trials=TrialEntry.objects.filter(pk__in=trial_pks),
 				comparing='bushels_acre',
 				method='LSD',
 				alpha=0.05,
 				value=value,
 			)
 		sigentry.save()
+		trials = list(TrialEntry.objects.filter(pk__in=trial_pks))
+		sigentry.trials.add(*trials)
+		sigentry.save()
 	for lpyv, trial_pks in sigs_lsd_10.items():
 		(loc_pk, planting_method_tags, year, value) = lpyv
 		sigentry = SignificanceEntry(
-				trials=TrialEntry.objects.filter(pk__in=trial_pks),
 				comparing='bushels_acre',
 				method='LSD',
 				alpha=0.10,
 				value=value,
 			)
 		sigentry.save()
+		trials = list(TrialEntry.objects.filter(pk__in=trial_pks))
+		sigentry.trials.add(*trials)
+		sigentry.save()
 	for lpyv, trial_pks in sigs_10_hsd.items():
 		(loc_pk, planting_method_tags, year, value) = lpyv
 		sigentry = SignificanceEntry(
-				trials=TrialEntry.objects.filter(pk__in=trial_pks),
 				comparing='bushels_acre',
 				method='HSD',
 				alpha=0.10,
 				value=value,
 			)
+		sigentry.save()
+		trials = list(TrialEntry.objects.filter(pk__in=trial_pks))
+		sigentry.trials.add(*trials)
 		sigentry.save()
 
 class Migration(migrations.Migration):
