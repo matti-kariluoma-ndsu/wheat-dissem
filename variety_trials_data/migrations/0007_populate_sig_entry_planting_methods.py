@@ -19,6 +19,8 @@ def populate_sig_pm(apps, schema_editor):
 	for entry in TrialEntry.objects.all():
 		# write new planting tags, update planting method tags on trials
 		pmt = entry.planting_method_tags
+		if not pmt:
+			pmt = ''
 		if pmt not in planting_methods:
 			pm = PlantingMethod(planting_methods=pmt)
 			pm.save()
