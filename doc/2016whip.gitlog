@@ -1,0 +1,1169 @@
+commit ca53d37d300ce3ae41a096811bd163a39a28884d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun May 15 11:46:24 2016 -0500
+
+    change impl of update view, use a stored query instead of stored pks
+
+commit f049db3a02dbf6d56ef44993f52b55c5a6ecfb2d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 15 11:21:32 2016 -0500
+
+    update README
+
+commit e97d0babebd79375a41bd655fa0ba728f917f781
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 15 10:42:30 2016 -0500
+
+    shouldve grepped after that name change
+
+commit be2e33413db2865d76ed7ae20dfaee4c640b9a3a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 15 10:38:32 2016 -0500
+
+    migration for name change
+
+commit 83c2ef8c339804e9c3b9fa5f64b55e94497b705f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 15 10:39:30 2016 -0500
+
+    semantic change to plantingmethod, add planting method to url
+
+commit 7d6874ba23d079d32ae970e4d467c3af266df50c
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 15 10:33:42 2016 -0500
+
+    remove POST from the update view, attempt to put in planting-method aware
+
+commit 4480c18bc6584ad3a3f05938e15dff1db383b9a0
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 14:44:06 2016 -0500
+
+    works. unfortunately, the view at update/ doesnt see my add-entry changes since we dont also mutate the progress table... i guess we need to store a query and use that alongside when populating the update/ page
+
+commit 101a4c535daef47d7e586ad66df63253668f41b9
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 14:41:46 2016 -0500
+
+    a bit ugly, but that should be all the meta I need. I note that the (location, planting_method) tuple isn't being handled in this view proplery
+
+commit 853d37b0566098c37095e941e349418c518ad204
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 14:16:30 2016 -0500
+
+    got the syntax down, now need to pass/extract that info for each link
+
+commit 99780c47dd535e9c8a871d2cf4ef95a9cf940558
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 14:05:12 2016 -0500
+
+    try and spriknle the add-affordances in the right spots
+
+commit 337e07411c79aa1d681137adf7bf8f4a07175687
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 13:02:52 2016 -0500
+
+    oh neat, I can set css too
+
+commit 0de465b3c148cbccece99fe04b781f66c2494583
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 12:58:52 2016 -0500
+
+    after slowly grokking the architecture of the admin views, this better be the final answer
+
+commit ec0b823d5749771e67f8d7ebbcebb0aafe685916
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 12:53:50 2016 -0500
+
+    and again
+
+commit 4fd9d993a35c60ca4081a8234fca72ab9e199cbe
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 12:46:37 2016 -0500
+
+    try again... yay
+
+commit 3c477314d1e2c75f3509593017530f667ee53c5b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 12:39:30 2016 -0500
+
+    didn't work, trying again
+
+commit b9998bf9d3fadab297102577eecb0e77cf41101b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 12:34:57 2016 -0500
+
+    I think this will only change sort order for the listing of all trialentry, but maybe itll propgate to the manymany field too
+
+commit 0ad694215d63599764089e2538eab3c62f1cc14e
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 12:23:26 2016 -0500
+
+    can't tell if its being sorted, but that might just be a pk-sort...
+
+commit 1065d23cf5572d3d6b57e1b68ffec49e01c8c30f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 12:16:45 2016 -0500
+
+    more decsrivpive unicode of trialentry, and modified-to-sort the view to admin
+
+commit 41980a0bf7d75ee9432d12924bd23b37d361baeb
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 11:49:29 2016 -0500
+
+    fix up some help_text. Added links to the new admin views in update, changed views.update to send over more info
+
+commit c87d513da33d6499d910ef7fd7f0697131c04b94
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 11:19:39 2016 -0500
+
+    extend AdminSite and cancel some of their checks
+
+commit e1a49f502b57b27f51e4294630f25eb6f21e6737
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 11:13:07 2016 -0500
+
+    separate admin view for the trials models, goal is to separate admin-addusers view from admin-modify forward-facing data
+
+commit fea33930c0f553fdb965d329567b86dbdcc6147f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 10:18:26 2016 -0500
+
+    need to use prefetch_related with mantytomany fields
+
+commit 8b4c7a3e39f4bd9f66607f1e228a1297920db76f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 10:13:23 2016 -0500
+
+    aha, we kept overwriting there, needed a list of objects instead
+
+commit 6a85dba3f5c692aa9d73543e74ce1ac808a8b6a4
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 14 10:03:28 2016 -0500
+
+    found the errors, but now have more problems: seems some of the sigentries have empty 'trials' also need to include a select_related call in progress
+
+commit ee5960f33d7e2ab7d7e244c04ec1d3f97dc7449e
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Apr 12 11:59:13 2016 -0500
+
+    oops, thats why it displayed nothing. After this change still has errors, and seeing lots of little errors. Starting to think this view would be better off as a summary of the trials entered, with lots of links into admin/ to change data there.
+
+commit 5971bec7c3d97b0575d47f89ca7f044b1bbb7f0e
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Apr 12 11:51:30 2016 -0500
+
+    syntax err
+
+commit de7fb89e54b3efcbaab6070f368c707a87cfeb98
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Apr 12 11:41:54 2016 -0500
+
+    impl use of saved pks. changed update.html to match, no prefill of the user-upload form yet. Will prob want to move away from the static table view, and just prefill the upload form only (unless case of no javascrupt... hmm)
+
+commit f3942e588fdf6609161aee76c2e3b067ea3a56fd
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 14:29:00 2016 -0500
+
+    added new view, ability to update. Need to refactor to actually use the saved pks though
+
+commit 1fddae9e872204c1227f67bf36bcd6dc5b9e51c4
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 13:19:52 2016 -0500
+
+    looks like next steps are to fix up ui, make sure is_stat doesn't show up in add_single, then do the battery of tests. Some thought into showing/editing what was written after submission too.
+
+commit 7f59766989bf37f8a845fd7b70a7561e90247a68
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 13:18:19 2016 -0500
+
+    longer input field
+
+commit 8f35e23648915d8932b22987c058b5b3dac9c5bf
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 11:35:11 2016 -0500
+
+    unintended sidde-effects. lets just make the local copy during iteration
+
+commit 7153170c5f6e3063e499ecb0449c13b51c80682f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 11:32:25 2016 -0500
+
+    ah-ha, we were mutating our iterator...
+
+commit 7c05f659f519dceda6bc152ff5a9b35f119f3b4f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 11:19:16 2016 -0500
+
+    looks like at one time I prefiltered those, but lets put the check down here in any case
+
+commit deb69b4fd31110426b2338ebfe9b3f011bfadfdc
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 11:15:33 2016 -0500
+
+    stop multiple entries of the same item getting in there
+
+commit 85ca9196af0991b3510bb7d8c4981b1caffa925b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 11:12:44 2016 -0500
+
+    tired of seeing that behavior
+
+commit 2005bfa978e9ff0dd17ad0e9a753271b100b0246
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 11:11:01 2016 -0500
+
+    clean up logic flow, avoid repeating that stanza
+
+commit 10dca165038aafcdbc13a39101a44953f5b04853
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 10:44:01 2016 -0500
+
+    put a bandaid on that sucker
+
+commit 8e9b7f24516dee9a5711b09035e6ba6e6119b0ad
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 10:42:40 2016 -0500
+
+    fix 6-row sheet not showing a dropdown, but introduce error if no headers. May need to have None be a valid guess in this case
+
+commit 6b2865857fc69f910c1397be22080785e43d0185
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Apr 11 10:40:31 2016 -0500
+
+    fix double-list bug
+
+commit abefc62fe1b38486aea3380d59dc952c3894378b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Apr 10 12:14:53 2016 -0500
+
+    after cleaning up a few repr errors and syntax, got it to write to database. I note that detection of stat doesn't remove it from its source list, Im seeing the double listing error again when revisting a page, and a wierd error when uploading a 6row sheet with only 3 varieties, no select-type is shown on first view. Also selecting multiple items to set as statistical fails and shoots me back to select the second one again, and the single-variety view asks if this is a statisictal entry... oi
+
+commit 8b0d96e04a1446aa26b59d08a61b4d2d0a4b7269
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sat Apr 9 13:53:50 2016 -0500
+
+    fixed up handling of statistics, but not quite sure how to handle assumption that they are always reported alongside location. This may need to be an assertion earlier in the code.
+
+commit 503afe6bfb67ce727de54a7abd0e8ca48e9b1db4
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 8 13:56:44 2016 -0500
+
+    oh right, If I want to add to that dict I'll need to copy it first
+
+commit b49192858ce60010cfcf54432b02e485382d4c18
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 8 13:34:54 2016 -0500
+
+    comment-delimiter
+
+commit 4347d70cfd5ae1aaed454655747944b986ae8799
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 8 13:34:25 2016 -0500
+
+    catch a KeyError, return None
+
+commit 93b85bf164e3241881f0dd02342dba7f73bd6c9f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Apr 8 13:33:05 2016 -0500
+
+    I don't quite see how this improved on the previous method
+
+commit 6d673b711a757ecf76cfb65d5414ae2798511ec7
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 13:02:50 2016 -0500
+
+    current thinking on how to get cell value
+
+commit 8b4a464ca2dddafd612245303d3bfb93d7d3da28
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 12:57:46 2016 -0500
+
+    get rid of the unused enum
+
+commit 01b9f739f0c361b4d5ac6efb08cc0aac28c4b8e1
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 12:53:25 2016 -0500
+
+    noticed I was kludging 'name'. need to extract the value from self.progress['cells
+
+commit 7c88f3cd379ab14525ea12587eae98e986fa73d1
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 12:45:45 2016 -0500
+
+    fixed a few runtime errors
+
+commit 24501de0e0c78db1cf510a7f7457bcf00419f7c5
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 12:41:19 2016 -0500
+
+    first attempt at rewrite prepare_table
+
+commit 2c94095fb128a8a57ccf7fd6c77b8e26792519d3
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 12:08:24 2016 -0500
+
+    cost me nothinga atm to put more years in the allowable range
+
+commit 220832b186e0eead00ca501ac4c1b2a052b6ad48
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 12:03:49 2016 -0500
+
+    implemented new date procedure
+
+commit 1515ba041281a6f503cff2a0e6f1ba3159677a76
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 11:51:47 2016 -0500
+
+    switch date repr over to year-only
+
+commit 90302c53c0b6062ee24e3abaecf6fd237091c431
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 11:08:59 2016 -0500
+
+    okay, that works. next up is to change dateform to be a-year only, flesh out the add-statistics page, and fix prepare_table
+
+commit 71d9ea1b82b06d98fe14559e19610911bbe758c2
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 10:36:06 2016 -0500
+
+    put a useful snippet in another NotImplemented function, this should allow the verify-stats view to work
+
+commit f396aba425beefb9446428d3bcd17b555bfd6ab6
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Apr 7 10:22:19 2016 -0500
+
+    move old code over to add-stats, not implemented yet. changing verify-stats to use the same codepath/style/metaphor as the other verify pages.
+
+commit 183e9b74a52718bcbbb15cb414ff33754ca6d6ad
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 31 16:59:14 2016 -0500
+
+    try again
+
+commit ce9510782fd50b55b3f6ca66ed9bf2577a7780c5
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 31 14:26:24 2016 -0500
+
+    hmm.. unintended side effects from that change... will need to look closer at it
+
+commit 22c7f457b128b5f95feca2a2e69877222e50ea62
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 31 14:25:50 2016 -0500
+
+    noticed cells was constructed wrong, added preview to other templates
+
+commit fc038014172b4234708cd1efdfd004bd6fd0e6e7
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 31 14:16:27 2016 -0500
+
+    put preview on page
+
+commit b6858e2abc8e5f86b6066fc969b5abe633f624fa
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 16:59:16 2016 -0500
+
+    after testing, seems the changes are good. next steps: add previews of each row using progress['cells'], change the add-statisitc over to /statistics/add/, then move on to fixing up statistics_guesses and prepare_table
+
+commit ebaa4cc387f346590640de85cde3ae153f10fec0
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 16:44:24 2016 -0500
+
+    ignore emptyu rows in noscript input!
+
+commit 67beb721411fde6e91f9876c7179d3bfcdb51f14
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 16:30:12 2016 -0500
+
+    only disregard expected except
+
+commit 43abb35457fa28a4b08c6bb9c415227cd22a4ce7
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 16:29:31 2016 -0500
+
+    verify_statistics doesn't have an is_stat field, default to False for that view
+
+commit 784576ffe37e4ea6868db40903d49769c8211a0e
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 16:27:17 2016 -0500
+
+    propagate changes to all except prepare_table
+
+commit f6a361e7ec7ef8d5e8d40fa37137ebcc66dbec29
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 16:17:27 2016 -0500
+
+    using map_statistic was wrong, We didnt have a form filled out for it. meant to mutate the list of statisitics
+
+commit 9b09a25912c47bec7d8594b7c438c158a93648f1
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 15:57:19 2016 -0500
+
+    actually, if I just keep track of cells-by-name, I can later use progress['statistics'] as keys into it, same with 'locations', etc.
+
+commit d8f5c48361c93e9171c0cfd940ef82739f84efc8
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 30 12:46:39 2016 -0500
+
+    refactor to respect new form control
+
+commit 56de8942036864e3e09f2b9162231d450a80c3ad
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 29 12:24:33 2016 -0500
+
+    phew, lucky I caught that bug right away.. that could've lurked. syntax error fixed too
+
+commit 963b8bf879fbd004bde6443bf06ed01e00ff9166
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 29 12:23:44 2016 -0500
+
+    only check for empties in one place. Added filter for empty columns before iterating over rows
+
+commit ab19222d522c4748af43155223a9e924fcd0c188
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 29 12:06:37 2016 -0500
+
+    put a few checks in for empty rows, columns
+
+commit 8f6e8ff1e0495279173dd03904e44a59f57029c9
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 29 11:57:43 2016 -0500
+
+    almost back to feature-p-parity, just need to reimplment cleaning of empty rows
+
+commit c664e26774506819469723872ce7fd0ff5a15ccb
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 29 11:45:49 2016 -0500
+
+    that should do it, other interfaces shouldn't need to know of the change. This'll make it easier to have previews on other pages besisdes /statistics/, and make writing prepare_table easier
+
+commit ef02f0b9ebfef1ba32ffa4c6d18ca269ee7702b0
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 29 11:33:36 2016 -0500
+
+    move util funcs and classes around, made controversial change to how rows, columns are stored. Hope to improve prepare_table with this change
+
+commit f16d5df9404c20a5b8561dd80bc058d5c7676cb9
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 25 14:36:24 2016 -0500
+
+    add some color-puke to remind myself to make it easy to distinguish what is being written as stats, locations, varieties, etc.
+
+commit 180b891f9dfa1b25ce4b334efcfc9f4566f27b61
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 25 14:25:46 2016 -0500
+
+    I think this is the sanest way to handle all cases: allow the user to mark any field as a statistical measure. Either that or require the user to submit the statistical data later
+
+commit 7a7d611fe28465cf7a8b6899cb6d20a0d4eaf545
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 25 14:14:44 2016 -0500
+
+    allow aliases for measure names, since matching with the database model fieldname exactly is unlikely
+
+commit a8c7fdce0b48781de40764df4f642bf47a7e1d5e
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 25 11:07:31 2016 -0500
+
+    code review while getting ready to fix statistic_guesses()
+
+commit 9c630e909b0c7d6b6864dcb34bd222882081296d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 22 10:41:39 2016 -0500
+
+    put in rough trial-updating, and an even rougher usability message in the template
+
+commit c428a61a9f7c6d51e8da211da68f8939dbcc419e
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 18 12:30:10 2016 -0500
+
+    color cues to help the user notice mistakes, although maybe even allowing them to select comparing is a mistake...
+
+commit c83d463691ee1e1b66f7f26346c66199cb509069
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 18 12:22:12 2016 -0500
+
+    new test case: if the user enters the same date, locations, varieties as a previous upload- error if same measure, add to trial if different measure. either case, no new trials should be written
+
+commit cef1c569afe2edb58ba0a52a138435e3e2a5066c
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 18 12:10:05 2016 -0500
+
+    found a harmless bug using the new summary tool
+
+commit 2c4fa9e0e759d6fa5075777625f48319f9e01146
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 18 11:43:17 2016 -0500
+
+    primitive tool to help keep track of changes to database. Will prob need to expand this tool
+
+commit 45c4496ee3a35a3dae729eec6d813d30cf733f3a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 17 11:24:07 2016 -0500
+
+    finished 1-yield, but now need tools to see what was written to the databse vs what we saved in progress['trials']
+
+commit 0a5ef0ed4567faf6de0ea9447a4d9b240baed9e7
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 17 11:02:41 2016 -0500
+
+    starting with test doc 1-yield, got up to an error on locations/add/planting-methods
+
+commit 213a2648ca4ad14072fbd70827d33ec6835ae65f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 17 10:49:17 2016 -0500
+
+    initially wrote switch to use a yet-unreleased feature, but decided to hardcode it so we don't see new behavior in production
+
+commit bd5462141cc97c4030a8db6f944af4e225e9521a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 15 13:34:00 2016 -0500
+
+    more runtimke fixes after a bit of testing. Time to kill the db and start real testing
+
+commit f7ffe35fc4dc11a9aa6273177ef2ba1ad581b2c5
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 15 13:11:17 2016 -0500
+
+    runtime fixes, now to check what was written
+
+commit 17dcc8de08ee0fa5082ed880a4e4913230c8e6a2
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 15 12:55:31 2016 -0500
+
+    finsihed write_database, onto testing
+
+commit 2a6a86670ad309049038781e8ae1809aa5bcd496
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 15 12:04:39 2016 -0500
+
+    add comparing to VerifyStat form
+
+commit 80572fd43c3c12b2af256ac71e2081c37a2650b9
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 15 11:54:08 2016 -0500
+
+    writing more of write_database(), notice I'm missing more data still- what field are the statisitics comparing
+
+commit 3a1c5cc627bf45526765bb98a8e392890422c859
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 13:50:55 2016 -0500
+
+    a bit ugly, but works
+
+commit d8c2e69ad1648845694207382b316b153aa6bb4d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 12:33:34 2016 -0500
+
+    getting ready to write, forgot to ask the user which date this is for... damn. I think I can get by with putting the form on the write_database page, either that or on the verify headers page.
+
+commit 11cad5e1a214624d3ac2570133e853ddbf3041f1
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 12:21:24 2016 -0500
+
+    that should stop stats from propgatring everytime clean() is called
+
+commit ea208e073707a8788bcbf382b5fd88a8c260e12a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 12:19:31 2016 -0500
+
+    oh man, that took forever to figure out, and now the codebase looks like garbage again
+
+commit 0e83887fbc884410d1a01b309a61495c5d7f3e82
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 11:01:47 2016 -0500
+
+    testing the 'no stats entered' codepaths, found some errors, and the Single Statistic is formatted wrong in the tempolate
+
+commit 8733dad155424f113b1ac546b47f05e97d33a0b8
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 10:54:23 2016 -0500
+
+    oops, snarfed a fragment. remove prints, this works now
+
+commit 6aedbc4325ed8470a3ae63a188b91084ac7a5e6a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 10:52:28 2016 -0500
+
+    ok, that should worjk
+
+commit 38a5174e37710ecd49676f55992c3e936b1299ae
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Mar 14 10:19:47 2016 -0500
+
+    close, but im using the wrong list of locations...
+
+commit 3a7c3314fe3240fd6a297ba91302a0aa7e1900e6
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 11 14:38:58 2016 -0600
+
+    that wasnt so hard
+
+commit 756b028b97b885404e80b45700ef940cd418f049
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 11 14:34:53 2016 -0600
+
+    ok, tested working with and w/o javascript. TODO: more testing of user input, graceful acceptance of extra lines, bogus lines, etc
+
+commit 4dfccee3e20cf67a3bde2efa0b1e00939602b5f4
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 11 12:20:04 2016 -0600
+
+    remove cruft
+
+commit 623b05dea3b94729dd26e4e686b797bff09fb391
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Mar 11 11:53:52 2016 -0600
+
+    thats enough frontend for now. Now to read process the POST and tuck it away in progress
+
+commit cedcdd5f3b461c54a01d1c59c9484b8b14bcf224
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 15:26:26 2016 -0600
+
+    headers showing, had to pick new format for plaintext unfortunantely
+
+commit ee0f9e6b7206417763f817a5cc33e66809d1a00d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 14:03:21 2016 -0600
+
+    data from progress bubbles up to view now, both with and without script
+
+commit 808208e3bcb932bf7a479f2c858c076df67ed799
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 12:59:47 2016 -0600
+
+    massaged javascript to submit the multiple spreadsheets. tested with scripts and without
+
+commit 2de35ecc3682841163093577fb9c9513a1c3fc5f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 12:01:41 2016 -0600
+
+    initial attempt at get HandsOnTable to work on this view
+
+commit 80adff84ffb4f9fcab035972fb7721370660a561
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 11:31:59 2016 -0600
+
+    made fuzzy-predict for alpha levels work
+
+commit d0db65c6b06ab158c0d577c29d3057987e33df9d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 11:31:43 2016 -0600
+
+    broke out form into its parts, now to copy impl from upload.html
+
+commit 612970d2c2f65e82e0e109abeb0d329945ff446d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 11:04:55 2016 -0600
+
+    added alpha to form
+
+commit 40775cd8bfc7b318e2c4a3b3c9a2416aba47dd22
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 11:04:35 2016 -0600
+
+    makes form confusing, not sure we'll ever see .01 significance reported anyway
+
+commit 6ba0b7b1b727486fb0c62a85286faab7a8bf9f1d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 10:56:28 2016 -0600
+
+    change to lowercase
+
+commit e68cb5f94d96ee7f691a224b28972de90b8d7196
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 10 10:55:23 2016 -0600
+
+    allow null on alpha, place default alpha-levels as class member
+
+commit bd072c4698c536d98a1fcf89f55407253ca4ea5d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 12:55:18 2016 -0600
+
+    done for today. next steps are to flesh out the ui for adding/verifying statistics
+
+commit fe2db2ab96b9fed89419674845749515d89b5814
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 12:54:48 2016 -0600
+
+    move a few bits around, add imports
+
+commit 62dfa11faca12ffe8acf1cb4dd79d905e4f6dd64
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 12:49:22 2016 -0600
+
+    stale print debug
+
+commit b8bab5f47c1105681356f5273bf981198c0fe78d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 12:49:26 2016 -0600
+
+    move Progress class to own file
+
+commit ddd72d7aa7ab7efc0d0f2ff8aff4f029d5d6e855
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 12:39:58 2016 -0600
+
+    right... json doesn't allow null as a dict key. put in conversion shi, but Im sure Ill see that bug again
+
+commit 412cd0dea2d3f89a398da0037442410ad1176165
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 12:34:09 2016 -0600
+
+    runtime fixes
+
+commit c9ef337399dbe048ef210c79ff7d32d3fb0b3bbf
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 12:08:44 2016 -0600
+
+    finish refactor, test
+
+commit a6c4d507b9d878ea6027007dcc3697f564066d80
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Wed Mar 9 10:44:26 2016 -0600
+
+    half-way through refactor, test it
+
+commit 2f195c98dda503cc50b94302cccb14f77cf78887
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 8 13:00:30 2016 -0600
+
+    decided to just use the framework in place, since its much like measures (except we need to support entering data too...?) Saw some nasty bugs while working... I think the new plan is to work out a UI for entering always entering multiple pieces of info, instead of this current set_single pattern. And get rid of the single_ methods in utils
+
+commit 2d2cc448b9e5fc5d4d724fbbafed1978273fa1f7
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Thu Mar 3 15:08:42 2016 -0600
+
+    uggh.. tried to add verify logic for stats but mind is mush
+
+commit 074533aecba36cd8079ff50aadcc08330cf59e51
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 1 11:46:18 2016 -0600
+
+    routine to get names of statistics from vareity list
+
+commit 7475d02c26b08ba455f5646879b50da32557dd9b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 1 11:39:40 2016 -0600
+
+    oh, duh
+
+commit 1bfa5a1f3c0cb18bd9e8aebf1b0334ef637f25ea
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Mar 1 11:35:37 2016 -0600
+
+    tried to match for statistic names, can't get it to work or show. While trying to clean varieites, noticed errors, fixed and fixed for other endopoints to CODE REVIEW WHEN
+
+commit a33af0923eb48da48b7d7691df4ecbd9ac7e0f96
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 29 12:38:14 2016 -0600
+
+    created spot in flow fofor user to enter LSDs, etc. May need some hand-holding in the verify varieties page
+
+commit 0f3a9a25f565c67ff88c03fab802c4de8084b4b2
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 29 11:29:27 2016 -0600
+
+    whoops, before all of that need to read and place LSDs, and actually write to db
+
+commit 5299321ef6fcfe4ef0715257995888f0ce15a3ab
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 29 11:10:34 2016 -0600
+
+    that does it for all show-stoppers I found on pass one of the test spreadsheets. remains to test again with fresh database, probably in different order. then need to try and break the system, and put guards in place. then ui-review, finally code review
+
+commit e1359736b3ca2335a6f10b9e61f582fd55e561cf
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 29 11:10:15 2016 -0600
+
+    added instructions for how to handle no headers
+
+commit 88f322e556efd6901b84830a4ac77cd7c949d0e4
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 29 10:38:58 2016 -0600
+
+    added clean function, made accesible from webpages
+
+commit 18633967b83fdd18199415a28aaabe3c5ee632e6
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 29 10:16:13 2016 -0600
+
+    that should fix the issues when setting a single location. having trouble testing due to stickiness of old data... may try and delete all prev results whenever a form is rendered
+
+commit 8dd43548b824967086710bb761895384b42d28aa
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 28 16:50:12 2016 -0600
+
+    couldn't get 6-crookston to verify if planting-tags set to Not Listed, kept coming though as None. Tried to put in logic to stop it, great failure unless I want to hardcode the pk for the Normal model
+
+commit 2769751a1445ed7e57111e7415ac98455a7a4d34
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 28 16:27:59 2016 -0600
+
+    fixed ambiguity with Not a handling, and made measures forgettable
+
+commit 4534f7aa2aec76be457314f5dee7c282b8fd13c2
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 28 16:16:48 2016 -0600
+
+    selecting Not a Measure seems to do nothing
+
+commit 670b495c1be0152106529d89e3c237a99ddef52b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 28 15:49:20 2016 -0600
+
+    closer, but now it loops back on self. Also noticed that step-1 will allow to select no headers, or two of the same without error
+
+commit 7d9cfc97ada909a9f33dbd0e4d5c4e8410beea5a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 28 15:34:01 2016 -0600
+
+    fixing errors as I test, .got to 3-kimball and it won't let me verify locations (kimball isn't listed, not letting me go to locations/add/
+
+commit 4460f847e4b8970afe5527cbf382dfe04265381d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 28 15:22:00 2016 -0600
+
+    much better, sorted and everything
+
+commit ddc7ba3e46be1a99be01292de6f68b5a68b36a41
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 26 13:26:00 2016 -0600
+
+    almost there! just need to get planting-method tags to display in the preview
+
+commit 4ce3006317348678de42fd07e0b4c9a5cefd6358
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 26 12:59:29 2016 -0600
+
+    finished dealing with change4s to planting_methods. Noticed odd behaviuor in _guesses(), when in their to add searhing from progress dict as well. Also noticed var being recreated on each loop, fixed
+
+commit 34d5d00f85aaaf0f63e5a7429fbeec519731c9e4
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 26 11:44:16 2016 -0600
+
+    new populate_database actions; fixed runtime errors
+
+commit 2bdcbdc2e4019fffe6da667785a483eeb50b732f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 26 11:35:46 2016 -0600
+
+    Since its a model, this may be easier than I thought. rename db fields to denote plurality
+
+commit 8c62f5d99921d535c6dcf3adb3beb33c8f042b56
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 26 11:30:42 2016 -0600
+
+    folding in ability to add planting method tags, but my brain is melting when it comes time to auto-update the ChoiceField when the user reverifies the locations. Decided to change db model to have each set of tags its own 256-wide char table
+
+commit 1c5e89d6f2ec5bfa1cc1f2b3225a1551d7819ddf
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 23 12:35:34 2016 -0600
+
+    my bad, i munged the namespace, oops
+
+commit f69d082ff9978dac66d0eae3b35964a6d03afb5c
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 23 12:15:11 2016 -0600
+
+    template should show a static table? making changes to support pulling all of the collected data together, and seeing that same bug I saw earlier where the form fails is_valid() if the default values are selected... arghghh
+
+commit 44d612b6c25723cd1698ed011a7220f8867d8086
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 14:37:07 2016 -0600
+
+    okay, solved the problem of creating too many of one model, by zig-zagging back and forth between add and verify
+
+commit c9271c4495bf7650cf83b22abe870cda610fac73
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 14:10:14 2016 -0600
+
+    the first item is often noisy; check for it and don't show to user. hopefully this doesn't result in a bug down the road... premature UI optimization
+
+commit 9eadd9f8c8603fb459eb506d4d1182a9f851044f
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 14:01:48 2016 -0600
+
+    super-hacky, but it does the job. made possbile because required=False anyway
+
+commit 4057e24c2c77392a6161e18e4fd38a8eceea9968
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 13:52:56 2016 -0600
+
+    added ability to forget bad values; problematic in the single-form case
+
+commit a7860ff24063e56e691a8cc68ccc9c75f97da596
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 13:28:20 2016 -0600
+
+    modify to allow running from projet root
+
+commit e297aa484af3e6c281940b141a5919aa410bdee8
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 13:26:15 2016 -0600
+
+    manually revert change to models; it was a noisy value since the data is modifed when viewing any of the pages, befpre even submitting the form
+
+commit 62d49aea2d563f9a83577f4358293fcdbf408c1a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 13:19:26 2016 -0600
+
+    added check to emit HeaderTypes.Data
+
+commit 371e896f60f5e497cf660e32da0e939d85917414
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 13:12:28 2016 -0600
+
+    added fuzzy search for header_type
+
+commit ce3d778a80dc48ec2c6788292a09565c0e5a8f2d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 12:49:40 2016 -0600
+
+    added fifth step, preview data. added modified field to UploadProgress. Fixed up some of the parsing steps at the start.
+
+commit 89171eb78fc460906e6e4fc7caf993863d60491d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 11:45:06 2016 -0600
+
+    folded in add_varieties, fixed all sorts of bugs. Noticed that Not Listed wasn't doing anything; thats becuase it always causes is_valid to fail. Added check to set the mapping to None in that case, seems to work w/o side-effects
+
+commit 0e4f91d20d8c864b8a46f487cf8adfe29451add9
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 22 10:47:13 2016 -0600
+
+    noticed caching behavior of my ChoiceField; docs say ModelChoiceField should be used. Finished add_location, time to move changes/fixes over to varieties
+
+commit 9a5aea2c82aafa85b52bfabba8d8b0aec3aaf3eb
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 21 10:41:34 2016 -0600
+
+    started adding with ModelForm for Location, but notice that I need to resolve planting_methods information as well, as in the existing VerifyLocation form. I'll need to bounce the user back to the verify page, or resolve it all on the add-locations page. I also note that it would be possible to have location-measure, variety-platning_method etc. in the input data, and havent thought about handling that wooly mess yet
+
+commit c4666c4a4f779265eef72802af8f7110e0761423
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sun Feb 21 10:20:56 2016 -0600
+
+    sync option, added ModelForms for hrsw models
+
+commit 32cb46d3c0328014e47ce83dcabc996d754a6fc7
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sat Feb 20 16:39:06 2016 -0600
+
+    hmmm... null that prev comment. Things are working fine now... must have debugged sloppily
+
+commit 2a401c8353f6ad08e022866af08967a120584ad0
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sat Feb 20 15:13:56 2016 -0600
+
+    seeing some real wierd behavior of a pre-bound form. docs are confusing, I'm seeign the data being posted with Inspector, yet Django insists that the initial data causes forms to be not is_valid(). This implies some sort of state is being kept somewhere, how else would they know a user didn't modify the prefilled form?
+
+commit 248bf3e15e274666d87892f7d7979a8c59947915
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Sat Feb 20 13:51:27 2016 -0600
+
+    fixed Guess object for use with fieldnames too. Added fuzzy searching.
+
+commit 2ef03c5414cf66ae67ce19c4fc65b089cdde9dcc
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 14:51:08 2016 -0600
+
+    put in measures selection, but need to rethink the guess pattern for it, since its not a model and has no pk. hopefully can do without changing the general-purpose view I wrote
+
+commit ba5d06c7d42d399ef66b86ad15e32982e546f473
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 14:33:08 2016 -0600
+
+    ack, wrong template. fixed and tested
+
+commit 93f278cf4fe44bd20c37cd314f62636ea6bc562d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 14:31:55 2016 -0600
+
+    moved logic for verify_locations into a general-use function, now verify-varieties uses it too. good idea? we'll see
+
+commit c31ced5561d1e8751167e62af466d25a88ecec18
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 13:48:34 2016 -0600
+
+    remove old boilerplate
+
+commit 4ee9a3fa84823d4407c495491ea64cccf3d5b487
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 13:37:39 2016 -0600
+
+    put in processing of verify-locaiton form
+
+commit 06bc6c73a5a8afa0dc159ef18067aed7b403abb8
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 12:19:59 2016 -0600
+
+    moved oodles of utils f funcs to a wrapper class for the UploadProgress.path json file
+
+commit a298f611171babde306aecf2118a3a486402d525
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 11:53:09 2016 -0600
+
+    hard to remember to change everything when copying templates
+
+commit fa6566404961ee0def39fcfd0f98b5d0a7497108
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 19 11:51:05 2016 -0600
+
+    verification of locations, up to actually writing the data. Notice utils needs to have a class for handling the 'progress' json dict, and I expect verify-varities and measures can use the same template as verify-locations, may need to generalize (or maybe not)
+
+commit 18176be47bdf312c362d02f0ec1d397b0be15330
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 16 15:09:16 2016 -0600
+
+    next up is to verify mapping of location-names, etc. to ones in the database; with the option to create new location, etc. entries if no match found or found match rejected by user
+
+commit 95396926f1b9690e62c0ea8d98359dfb841c369d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 16 14:59:59 2016 -0600
+
+    ok, can verify headers now. not tested well, will come back to it after completed all steps to getting data submitted
+
+commit 7cc3a64ae62c73bbdb9feb42efda34b1956410dc
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 16 13:04:39 2016 -0600
+
+    taking break for now; need to make the template aware of the different header types, create a drop-down list, and avoid showing the form if type is Data
+
+commit a360f50048fe112f313ff5c9ccf9e70a5ed6ed5b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 16 11:33:48 2016 -0600
+
+    test files in, time to start dealing with user input
+
+commit 5676a92b0c7cfb648cf6f7aa1b4e525022d3ecf9
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 16 10:42:06 2016 -0600
+
+    lets create some test spreadsheets, and a script to bring the database to a predictable state
+
+commit 2233d804cb8b33a6e68325926a28ada43206bf73
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 16 10:29:41 2016 -0600
+
+    renamed module
+
+commit e791bb8dd2af92e21112d163a59fff97492ceea7
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 16 10:19:22 2016 -0600
+
+    modified wheat_dissem models after seeing its weaknesses in production
+
+commit 4a8d341cab1b036c2dbcac2c22eef359dafe181d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 15 12:57:03 2016 -0600
+
+    started upload workflow, broke out steps and possible hurdles onto a piece of paper on my desk. summarize: row/col headers may be swapped, and one or both may be missing. looks like verification will be three major steps: verify col/row headers; verify locations and their planting methods, then verify variety names and LSD info. LSD may need its own step, and it is possible (unlikely) to have LSD-location as well as LSD-variety. No thoughts yet on how to handle test-weight and yield etc. at the same time
+
+commit 6207f4b1be47f40a4aeaa414b773e2cdf33b2f00
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 15 10:43:52 2016 -0600
+
+    moved form verification to utils
+
+commit 26b0872c9a83b2da7671a2450def5b6b261c7af0
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 12 16:15:30 2016 -0600
+
+    added model to keep track of upload of spreadsheet.
+
+commit f7f4b7e955fc56ce68d2d2c1f651132b68ea3d93
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 12 12:10:15 2016 -0600
+
+    file-based storage for authenticated users. will need to keep track of filepaths in database, based on username. When user logs back in, message of pending deletion and ability to restart one of their sessions, manual delete.
+
+commit d9676411b12f6b0fa3d5a8ebcda99602ba30e58d
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 12 11:55:02 2016 -0600
+
+    updated README
+
+commit fd517ce056952f28f730618992da84c9fad775a4
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 12 11:52:08 2016 -0600
+
+    oops, shouldn't be saving the SECRET_KEY to repo. generated a new one.
+
+commit 056c929f6295f5b0771bd33a2b4ffc815f44b7bd
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 12 11:30:05 2016 -0600
+
+    move upload/ to its own app, since I'll need to create models to store the users input as-we-validate.
+
+commit d2603d09d4c02126b3fb4199d43ecf3aeab0ce17
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Tue Feb 9 13:58:43 2016 -0600
+
+    mock-up views that echo the data sent to them. Added javascript spreadsheet widget, have textarea fallback
+
+commit e14e3bd5d7d4e6c1646dc82b8937ebfa8cc14702
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 15:09:53 2016 -0600
+
+    that tries implementqaiton was asilly, heres a better one
+
+commit 83ceb9baa299288e9d43505642711a5ccaaee588
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 15:06:12 2016 -0600
+
+    always show error on first failuer
+
+commit ee72467d35d906e5bb30a771fc1772034b94afb8
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 15:00:47 2016 -0600
+
+    added custom 404 page with a mini-faq
+
+commit 49a3990795cf9d622dd601de39e6b4601e2219ea
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 14:24:28 2016 -0600
+
+    hmm, if the code is wrong or the link expires a 404 is shown... must improve that error msg
+
+commit 2ee85c1b6649701a813c6b5819e6167826893d87
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 13:59:59 2016 -0600
+
+    added an error page when a non-user email is entered. The default was to keep loading the page w/o any message
+
+commit dfb9292107664fbd2e3ecd6dcc3fd52d765e415a
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 13:17:27 2016 -0600
+
+    added more text to login process, cleaned up settings file
+
+commit 8db85c68878d446c1151f24756d5801a001d519b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 12:56:30 2016 -0600
+
+    use the proper login view when trying to get at the admin view
+
+commit bcf75c927582c2d45614e6d943b2bbe9ad104524
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 11:58:10 2016 -0600
+
+    adding template files that I might want to override for the nopassword app
+
+commit 0e3efa2f1530b30805b6afd2a8954bc2ee41db79
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Mon Feb 8 11:52:03 2016 -0600
+
+    wrote, tested custom user model to make the nopassword app more usable
+
+commit fad41dd984e9cf32f765d64252d470c6c18c7ad6
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 5 12:51:20 2016 -0600
+
+    add docstring to show source of boilerplate
+
+commit 6e3c119880115e021fc25936b79d97c474b3cf9b
+Author: Matti Kariluoma <matti@kariluo.ma>
+Date:   Fri Feb 5 12:48:04 2016 -0600
+
+    Started new project, using the nopassword app installed through pip. Decided to make a custom user to make things smoother, curretnly have the example code from the django 1.9 docs in the nopasswordauth app

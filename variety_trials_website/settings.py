@@ -123,7 +123,7 @@ TEMPLATES = [
 USE_ETAGS=True # see CommonMiddleWare
 
 MIDDLEWARE_CLASSES = (
-		'django.middleware.gzip.GZipMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -160,7 +160,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.redirects',
+    #'django.contrib.redirects',
 )
 
 AUTHENTICATION_BACKENDS = (
