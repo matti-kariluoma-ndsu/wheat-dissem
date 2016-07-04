@@ -1,0 +1,57 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Verify - 3 / 6" %}</title>
+</head>
+<body>
+
+<h2>{% trans "Step 3 of 6: Match input variety names with known varieties" %}</h2>
+<p>{% trans "If the variety name isn't present, please select 'Not Listed'. The system will help you create variety entries for anything marked 'Not Listed'. " %}</p>
+<p>{% trans "Please answer the following questions" %}:</p>
+<form method="post" class="form-vertical" id="spreadsheet_form">
+	{% csrf_token %}
+{% if verify_dicts %}
+	<h3>{% trans "Multiple Varieties" %}</h3>
+{% else %}
+	<h3>{% trans "Single Variety" %}</h3>
+{% endif %}
+{% for verify_dict in verify_dicts %}
+        <p>You input "{{ verify_dict.name }}".</p>
+        <table>
+					<tr class="variety">
+{% for header in verify_dict.headers %}
+					<th>{{ header }}</th>
+{% endfor %}
+					</tr>
+					<tr>
+{% for value in verify_dict.values %}
+					<td>{{ value }}</td>
+{% endfor %}
+					</tr>
+        </table>
+        <p>This is {{ verify_dict.form }}</p>
+{% empty %}
+	<p>{% trans "We couldn't find any vareity info on your spreadsheet. If this data is for a single variety, please fill out the following:" %}</p>
+	{{ single_form }}
+	<input type="hidden" name="single_model" value="single_model">
+{% endfor %}
+	<button id="submit" type="submit" class="btn">{% trans "Submit" %}</button>
+</form>
+{% if not verify_dicts %}
+	<h3>{% trans "Multiple Varieties" %}</h3>
+	<p>
+	{% trans "If this data is for multiple varieties, do not continue. When copying data into the " %}
+	<a href="../../">{% trans "upload form" %}</a>
+	{% trans " please ensure the varieties' names are copied as well. You will need to start over with a new upload. Sorry!" %}
+	</p>
+{% endif %}
+<h3>{% trans "Having Problems?" %}</h3>
+<p>
+        {% trans "If you are having problems with this form, first try to " %}
+        <a href="clean/">{% trans "clean" %}</a>
+        {% trans " any data previously entered. If the problem persists, please contact the site administrator." %}
+</p>
+</body>
+</html>

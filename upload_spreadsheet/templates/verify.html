@@ -1,0 +1,33 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Verify - 1 / 6" %}</title>
+</head>
+<body>
+
+<h2>{% trans "Step 1 of 6: Verify the Structure of the Data" %}</h2>
+<p>{% trans "Please answer the following questions." %}:</p>
+<form method="post" class="form-vertical" id="spreadsheet_form">
+	{% csrf_token %}
+	<p>
+	{{ dateform.year.label }}
+	{{ dateform.year }}
+	</p>
+{% for verify_dict in verify_dicts %}
+	<p>The following is a list of: {{ verify_dict.form.header_type }}</p>
+	<ul>
+	{% for item in verify_dict.headers %}
+	<li>{{ item }}</li>
+	{% empty %}
+	<li> {% trans "No items in this list..." %}</li>
+	{% endfor %}
+	</ul>
+{% empty %}
+	<p>{% trans "No headers were detected in your spreadsheet" %}</p>
+{% endfor %}
+	<button id="submit" type="submit" class="btn">{% trans "Submit" %}</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Add Planting Methods to Database" %}</title>
+</head>
+<body>
+
+<h2>{% trans "Add new planting methods to the database" %}</h2>
+<p>{% trans "Please answer the following questions" %}:</p>
+<p>{% trans "Planting Methods are a series of keywords, separated by commas." %}</p>
+<p>{% trans "Note: If there are no special planting methods for a location, just leave the form input blank." %}</p>
+<form method="post" class="form-vertical" id="spreadsheet_form">
+	{% csrf_token %}
+<ul>
+{% for dict in add_model_dicts %}
+        <li>
+	{% if dict.name %}
+                {% trans "You input" %} "{{ dict.name }}".
+	{% else %}
+		{% trans "If this location uses a planting method that wasn't listed, please enter it below. If there was no special planting method, leave the form input blank and click submit." %}
+        {% endif %}
+	{% trans "This indicates the planting method tags were used at this location" %}:
+		<ul>
+			<li>{{ dict.form }}</li>
+		</ul>
+	</li>
+{% empty %}
+	<li>{% trans "We couldn't find any planting methods/locations on your spreadsheet that aren't already in the database. If you are constantly being redirected to this page, please contact your system administrator." %}</li>
+{% endfor %}
+</ul>
+	<button id="submit" type="submit" class="btn">{% trans "Submit" %}</button>
+</form>
+</body>
+</html>

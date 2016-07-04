@@ -1,0 +1,21 @@
+.bushels_acre {
+	background-color: green;
+}
+.protein_percent {
+	background-color: red;	
+}
+.test_weight {
+	background-color: green;
+}
+.location {
+	color: blue;
+}
+.variety {
+	color: yellow;
+}
+.statistic {
+	color: orange;
+}
+.empty {
+ color: grey;
+}

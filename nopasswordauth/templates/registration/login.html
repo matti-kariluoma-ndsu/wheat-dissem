@@ -1,0 +1,23 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Login" %}</title>
+</head>
+<body>
+<h2>{% trans "Login" %}</h2>
+<p>{% trans "Please enter your email address in order to login. An email will be sent to you with login instructions." %}</p>
+<p>{% trans "It may take up to 30 seconds after pressing Login for your request to be processed. Please be patient. A success message will appear when complete." %}</p>
+<form method="post" class="form-vertical">
+	{% csrf_token %}
+	{{ form.media }}
+	<div class="control-group row-fluid">
+		<label for="id_username">Your email address:</label>
+		<input id="id_username" maxlength="256" name="username" type="text" style="width: 30em;"class="span12">
+	</div>
+	<div class="controls">
+		<button type="submit" class="btn">{% trans "Login" %}</button>
+	</div>
+</form>
+</body>
+</html>

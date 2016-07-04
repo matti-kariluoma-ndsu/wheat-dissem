@@ -1,0 +1,169 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Verify - 5 / 6" %}</title>
+	<script src="{% static "jquery-1.12.1.min.js" %}"></script>
+	<!-- thanks https://github.com/handsontable/handsontable -->
+	<script src="{% static "handsontable.full.min.js" %}"></script>
+	<link rel="stylesheet" media="screen" href="{% static "handsontable.full.min.css" %}">
+</head>
+<body>
+
+<h2>{% trans "Step 5 of 6: Enter statistical information" %}</h2>
+<p>{% trans "If your data has any statistical information associated with it (LSDs, HSDs, CVs, etc.) please enter them below." %}</p>
+<p>{% trans "Please answer the following questions" %}:</p>
+<form method="post" class="form-vertical" id="statistics-form">
+	{% csrf_token %}
+{% if verify_dicts %}
+        <h3>{% trans "Multiple Statistics" %}</h3>
+{% else %}
+        <h3>{% trans "Single Statistic" %}</h3>
+{% endif %}
+{% for verify_dict in verify_dicts %}
+        <h4>You input "{{ verify_dict.name }}". This is:</h4>
+	<ul>
+		<li>
+	{{ verify_dict.form.statistic.label }}:
+	{{ verify_dict.form.statistic }}
+		</li>
+		<li>
+	{{ verify_dict.form.alpha.label }}:
+	{{ verify_dict.form.alpha }}
+	{% trans "(Note: Mean and CV have no alpha level.)" %}
+		</li>
+		<li>
+	{{ verify_dict.form.measure.label }}:
+	{{ verify_dict.form.measure }}
+		</li>
+		<li>
+	{% trans "Data:" %}
+		<div class="spreadsheet-data control-group row-fluid">
+<noscript>
+			{{ verify_dict.form.data }}
+</noscript>
+			<span style="display: none;">
+			{{ verify_dict.form.data_json }}
+			<span class="hidden-check">{{ verify_dict.form.is_json }}</span>
+			</span>
+		</div>
+	{% trans "(Note: You may need to click and drag the scrollbar to see all of the entered data.)" %}
+		</li>
+		<li>
+	{{ verify_dict.form.is_not.label }}:
+	{{ verify_dict.form.is_not }}
+		</li>
+	</ul>
+	<hr>
+{% empty %}
+        <p>{% trans "We couldn't find any statistical data on your spreadsheet. If you have statistics to enter, please fill out the following spreadsheet:" %}</p>
+	<input type="hidden" name="single_model" value="single_model">
+	<ul>
+		<li>
+		I don't have any statistical data to enter:
+		<input type="checkbox" name="_whip_single-is_not">
+		</li>
+		<li>
+	{{ single_form.statistic.label }}:
+	{{ single_form.statistic }}
+		</li>
+		<li>
+	{{ single_form.alpha.label }}:
+	{{ single_form.alpha }}
+	{% trans "(Note: Mean and CV have no alpha level.)" %}
+		</li>
+		<li>
+	{{ single_form.measure.label }}:
+	{{ single_form.measure }}
+		</li>
+		<li>
+	{% trans "Data:" %}
+		<div class="spreadsheet-data control-group row-fluid">
+<noscript>
+			{{ single_form.data }}
+</noscript>
+			<span style="display: none;">
+			{{ single_form.data_json }}
+			<span class="hidden-check">{{ single_form.is_json }}</span>
+			</span>
+		</div>
+	{% trans "(Note: You may need to click and drag the scrollbar to enter all of your data.)" %}
+		</li>
+	</ul>
+	{% endfor %}
+	<button id="statistics_submit" type="submit" class="btn">{% trans "Submit" %}</button>
+</form>
+
+<h3>{% trans "Having Problems?" %}</h3>
+<p>
+	{% trans "If you are having problems with this form, first try to " %}
+	<a href="clean/">{% trans "clean" %}</a>
+	{% trans " any data previously entered. If the problem persists, please contact the site administrator." %}
+</p>
+<script>
+var hots = []
+// thanks http://stackoverflow.com/a/5047712
+String.prototype.width = function(font) 
+{
+  var o = $('<div>' + this + '</div>')
+            .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden'})
+            .appendTo($('body'));
+  var w = o.width();
+  o.remove();
+  return w;
+}
+$(document).ready(function()
+	{
+		var max_width = 100;
+		var container_width = 750;
+		var container_height = 75;
+		$('.spreadsheet-data').each(function(i, container)
+			{
+				container.style.overflow = 'hidden' // show scroll-bars
+				container.style.width = container_width+'px'
+				container.style.height = container_height+'px'
+				container.style.border = '1px solid grey'
+				$(container).find('.hidden-check input').each(function(i, check)
+					{
+						check.checked = true
+					})
+				var verifyme = $(container).find('textarea').val()
+				verifyme = JSON.parse(verifyme)
+				var options = {
+						data: verifyme.data,
+						rowHeaders: verifyme.rowname,
+						colHeaders: verifyme.headers,
+						stretchH: 'all',
+						minSpareRows: 0,
+						minSpareCols: 0,
+						contextMenu: true,
+				}
+				var hot = new Handsontable(container, options)
+				hots[i] = {hot: hot, headers: verifyme.headers}
+				var row_width = verifyme.rowname[0].width()
+				if (row_width > max_width)
+				{
+					max_width = row_width
+				}
+			})
+		max_width += 10
+		$('.handsontable col.rowHeader').css('width', max_width+'px')
+		$('#statistics-form').submit(function(event)
+			{
+				$('.spreadsheet-data').each(function(i, container)
+					{
+						var hot = hots[i].hot
+						var headers = hots[i].headers
+						$(container).find('textarea').val(
+								JSON.stringify({
+										data: hot.getData(),
+										headers: headers,
+									})
+							)
+					})
+			})
+	})
+</script>
+</body>
+</html>

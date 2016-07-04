@@ -1,0 +1,17 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Clean Previous Input" %}</title>
+</head>
+<body>
+
+<h2>{% trans "Clean Previous Input" %}</h2>
+<p>{% trans "If you've previously entered incorrect data and can't get this application to work properly, click Clean below to remove all traces of old entries. Your original spreadsheet will not be touched. You will then be sent to reenter the data." %}:</p>
+<form method="post" class="form-vertical" id="spreadsheet_form">
+	{% csrf_token %}
+	<button id="submit" type="submit" class="btn">{% trans "Clean" %}</button>
+</form>
+</body>
+</html>

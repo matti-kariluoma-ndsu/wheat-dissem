@@ -8,7 +8,7 @@
 
 from django import forms
 from django.forms.formsets import BaseFormSet
-from variety_trials_data import models
+from . import models
 import datetime
 
 class ScopeConstants:
@@ -90,111 +90,19 @@ class SelectLocationByZipcodeForm(forms.Form):
 			help_text='Select varieties to compare head-to-head.'
 		)
 
-class LocationYearPlantingMethodSurveyForm(forms.Form):
-	location_id = forms.CharField(
-			required=True,
-		)
-	year = forms.CharField(
-			required=True,
-			max_length=4, 
-		)
-	irrigated = forms.ChoiceField(
-			required=True,
-			widget=forms.RadioSelect(),
-			choices=(
-					(PlantingMethodConstants.irrigated_either, "Don't know"),
-					(PlantingMethodConstants.irrigated_yes,	'Irrigated'),
-					(PlantingMethodConstants.irrigated_no,	'Dryland')
-				),
-			initial=PlantingMethodConstants.irrigated_either,
-			help_text='Were these trials irrigated?'
-		)
-	fungicide = forms.ChoiceField(
-			required=True,
-			widget=forms.RadioSelect(),
-			choices=(
-					(PlantingMethodConstants.fungicide_either, "Don't know"),
-					(PlantingMethodConstants.fungicide_yes,	'Fungicide'),
-					(PlantingMethodConstants.fungicide_no,	'No fungicide')
-				),
-			initial=PlantingMethodConstants.fungicide_either,
-			help_text='Was fungicide applied to these trials?'
-		)
-	notes = forms.CharField(
-			required=False,
-			widget=forms.Textarea(attrs={
-					'rows': '3',
-					'cols': '40',
-				}),
-			help_text="Anything else we should note?"
-		)
-		
-class UploadCSVForm(forms.Form):
-	csv_file = forms.FileField(
-			required=False
-		)
-	csv_json = forms.CharField(
-			required=False,
-			widget=forms.Textarea(attrs={
-					'style': 'display: none;'
-				})
-		)
-	username_unique = forms.CharField(
-			required=False,
-			widget=forms.TextInput(attrs={
-					'style': 'display: none;'
-				})
-		)
+class NewLocation(forms.ModelForm):
+	class Meta:
+		model = models.Location
+		fields = ('name', 'zipcode', )
 
-class SelectDateForm(forms.Form):
-	def __init__(self, *args, **kwargs):
-		name = None
-		if 'name' in kwargs:
-			name = kwargs.pop('name')
-		super(forms.Form, self).__init__(*args, **kwargs)
-		if name:
-			self.prompt = name.replace('_', ' ')
-			
-	value = forms.ModelChoiceField(
-			queryset = models.Date.objects.all()
-		)
-	label = 'Date'
+class NewVariety(forms.ModelForm):
+	class Meta:
+		model = models.Variety
+		fields = ('name', )
+		# exclude any ForeignKey or ManyToMany fields
+		exclude = ('diseases',)
 
-class SelectLocationForm(forms.Form):
-	def __init__(self, *args, **kwargs):
-		name = None
-		if 'name' in kwargs:
-			name = kwargs.pop('name')
-		super(forms.Form, self).__init__(*args, **kwargs)
-		if name:
-			self.prompt = name.replace('_', ' ')
-			
-	value = forms.ModelChoiceField(
-			queryset = models.Location.objects.all()
-		)
-	label = 'Location'
-		
-class SelectVarietyForm(forms.Form):
-	def __init__(self, *args, **kwargs):
-		name = None
-		if 'name' in kwargs:
-			name = kwargs.pop('name')
-		super(forms.Form, self).__init__(*args, **kwargs)
-		if name:
-			self.prompt = name.replace('_', ' ')
-			
-	value = forms.ModelChoiceField(
-			queryset = models.Variety.objects.all()
-		)
-	label = 'Variety'
-		
-def make_model_field_form(name, field):
-	class ModelFieldForm(forms.Form):
-		pass
-	attrs = {
-			'value': field,
-			'prompt': name.replace('_', ' '),
-		}
-	custom_class = type(name+"ModelFieldForm", (ModelFieldForm, ), attrs)
-	
-	return custom_class
+class NewPlantingMethod(forms.ModelForm):
+	class Meta:
+		model = models.PlantingMethod
+		fields = ('planting_methods', )

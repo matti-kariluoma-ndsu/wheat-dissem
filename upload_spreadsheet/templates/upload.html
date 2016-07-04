@@ -1,0 +1,73 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Upload" %}</title>
+	<!-- thanks https://github.com/handsontable/handsontable -->
+	<script src="{% static "handsontable.full.min.js" %}"></script>
+	<link rel="stylesheet" media="screen" href="{% static "handsontable.full.min.css" %}">
+</head>
+<body>
+<h2>{% trans "Uploads in progress" %}...</h2>
+{% for progress in in_progress %}
+	<a href="verify-{{progress.pk}}/">
+	<p>Verify data for {{ progress.path }} created {{ progress.created }} </p>
+	</a>
+{% empty %}
+	<p>{% trans "No uploads have been started." %}</p>
+{% endfor %}
+
+<h2>{% trans "Uploads submitted" %}</h2>
+{% for progress in submitted %}
+	<a href="update-{{progress.pk}}/">
+	<p>Update {{ progress.path }} created {{ progress.created }}</p>
+	</a>
+{% empty %}
+	<p>{% trans "No uploads have been finished and submitted." %}</p>
+{% endfor %}
+
+<h2>{% trans "Begin a new upload" %}</h2>
+<p>{% trans "Upload your data by copying it from a spreadsheet and pasting it below." %}</p>
+<form method="post" class="form-vertical" id="spreadsheet_form">
+	{% csrf_token %}
+	<div id="spreadsheet_data" class="control-group row-fluid" style="width: 55em; height: 300px;">
+<noscript>
+		<label for="id_data">Data:</label>
+		<textarea id="id_data" name="data"></textarea>
+</noscript>
+		<textarea id="spreadsheet_data_text" name="data_json" style="display: none;"></textarea>
+	</div>
+	<div class="controls">
+<noscript>
+		<button id="submit" type="submit" class="btn">{% trans "Upload" %}</button>
+</noscript>
+		<button id="spreadsheet_submit" type="button" class="btn" style="display: none;">{% trans "Upload" %}</button>
+	</div>
+</form>
+<script>
+	var container = document.getElementById('spreadsheet_data');
+	container.style.overflow = 'hidden'; // show scroll-bars
+	var options = {
+			rowHeaders: true,
+			colHeaders: true,
+			stretchH: 'all',
+			minSpareRows: 2,
+			minSpareCols: 2,
+			contextMenu: true,
+		};
+	var hot = new Handsontable(container, options);
+	var submit = document.getElementById('spreadsheet_submit');
+	submit.style.display = ''; // visible
+	Handsontable.Dom.addEvent(submit, 'click', function()
+			{
+				var textarea = document.getElementById('spreadsheet_data_text');
+				textarea.value = JSON.stringify({data: hot.getData()});
+				var form = document.getElementById('spreadsheet_form');
+				form.submit();
+			}
+		);
+	
+</script>
+</body>
+</html>

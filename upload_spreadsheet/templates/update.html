@@ -1,0 +1,90 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "View Submitted Data" %}</title>
+	<link rel="stylesheet" media="screen" href="{% static "whip.css" %}">
+</head>
+<body>
+
+<h2>{% trans "Here are the data previously submitted" %}</h2>
+<p>{% trans "You can follow the links in the table below to edit the data." %}</p>
+<p>{% trans "The [+] links create new data (TODO: they currently dont show up on this page)." %}</p>
+<p>Date: {{ year }}</p>
+<table>
+	<tr class="location">
+{% for colname, pk, method, mpk in column_headers %}
+		<th>
+		<a href="/hrsw-admin/hrsw/location/{{pk}}/">{{ colname }}</a>
+		-
+		<a href="/hrsw-admin/hrsw/plantingmethod/{{mpk}}/">{{ method }}</a>
+		</th>
+{% endfor %}
+	</tr>
+{% for name_pk, row in table %}
+	<tr class="variety">
+		<th>
+		<a href="/hrsw-admin/hrsw/variety/{{name_pk.1}}/">{{ name_pk.0 }}</a>
+		</th>
+	{% for trial, extra in row %}
+		<td>
+		{% if trial %}
+		<a href="/hrsw-admin/hrsw/trialentry/{{trial.pk}}/">
+		<p class="bushels_acre">
+		bushels_acre: {{ trial.bushels_acre }}
+		</p>
+		<p class="protein_percent">
+		protein_percent: {{ trial.protein_percent }}
+		</p>
+		<p class="test_weight">
+		test_weight: {{ trial.test_weight }}
+		</p>
+		</a>
+		{% else %}
+		<p class="empty">--</p>
+<a href="/hrsw-admin/hrsw/trialentry/add/?variety={{name_pk.1}}&location={{extra.location}}&planting_method_tags={{extra.pmt}}&harvest_date={{extra.hd}}&plant_date={{extra.pd}}">
+[+]
+</a>
+		{% endif %}
+		</td>
+	{% endfor %}
+	</tr>
+{% endfor %}
+{% for method_alpha, row in summary %}
+	<tr class="statistic">
+		<th>
+		<p>{{ method_alpha.0 }} ({{method_alpha.1}})</p>
+		</th>
+	{% for sig, trial_pks in row %}
+		<td>
+		{% if sig %}
+<a href="/hrsw-admin/hrsw/significanceentry/{{sig.pk}}/">
+		<p class="{{ sig.comparing }}">
+		{{ sig.comparing }}: {{ sig.value }}
+		</p>
+</a>
+<a href="/hrsw-admin/hrsw/significanceentry/add/?trials={{trial_pks}}&method={{sig.method}}&alpha={{sig.alpha}}">
+[+]
+</a>
+		{% else %}
+		<p class="empty">--</p>
+<a href="/hrsw-admin/hrsw/significanceentry/add/?trials={{trial_pks}}&method={{method_alpha.0}}&alpha={{method_alpha.1}}">
+[+]
+</a>
+		{% endif %}
+		</td>
+	{% endfor %}
+	</tr>
+{% endfor %}
+	<tr>
+		<td>
+<!-- link to create entry for first column -->
+<a href="/hrsw-admin/hrsw/significanceentry/add/?trials={{first_trial_pks}}">
+[+]
+</a>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

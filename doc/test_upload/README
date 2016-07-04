@@ -1,0 +1,8 @@
+These files are used to test the UI of the spreadsheet-upload workflow.
+
+The script in this directory brings the database to a predictable state before
+testing begins.
+
+The csv files (all taken from real world examples) each represent a different 
+way of representing the data. 1 & 3 are the two typically seen. 7 represents 
+an extreme case, but the system will try and handle it anyway.

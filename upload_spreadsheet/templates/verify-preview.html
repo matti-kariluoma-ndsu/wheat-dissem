@@ -1,0 +1,66 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Verify - 6 / 6" %}</title>
+	<link rel="stylesheet" media="screen" href="{% static "whip.css" %}">
+</head>
+<body>
+
+<h2>{% trans "Step 6 of 6: Preview input data" %}</h2>
+<p>{% trans "Please carefully check the spreadsheet below. There is a button at the bottom of this page that will write these values to the database. If anything is incorrect, please go back and fix it." %}</p>
+<p>Date: {{ year }}</p>
+<table>
+	<tr class="location">
+{% for colname in column_headers %}
+		<th>
+		<p>{{ colname }}</p>
+		</th>
+{% endfor %}
+	</tr>
+{% for rowname, row in preview_table %}
+	<tr class="variety">
+		<th>
+		<p>{{ rowname }}</p>
+		</th>
+	{% for cell in row %}
+		<td>
+		{% for item in cell %}
+		{% if item %}
+		<p class="{{ item.measure.fieldname }}">
+		{{ item.measure.fieldname }}: {{ item.measure.value }}
+		</p>
+		{% else %}
+		<p class="empty">--</p>
+		{% endif %}
+		{% endfor %}
+		</td>
+	{% endfor %}
+	</tr>
+{% endfor %}
+{% for rowname, row in preview_summary %}
+	<tr class="statistic">
+		<th>
+		<p>{{ rowname }}</p>
+		</th>
+	{% for cell in row %}
+		<td>
+		{% if cell %}
+		<p class="{{ cell.comparing }}">
+		{{ cell.comparing }}: {{ cell.value }}
+		</p>
+		{% else %}
+		<p class="empty">--</p>
+		{% endif %}
+		</td>
+	{% endfor %}
+	</tr>
+{% endfor %}
+</table>
+<form method="post" class="form-vertical" id="spreadsheet_form">
+	{% csrf_token %}
+	<button id="spreadsheet_submit" type="submit" class="btn">{% trans "Write to Database" %}</button>
+</form>
+</body>
+</html>

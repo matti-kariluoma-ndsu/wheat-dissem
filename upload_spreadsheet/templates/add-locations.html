@@ -1,0 +1,34 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% trans "Add Locations to Database" %}</title>
+</head>
+<body>
+
+<h2>{% trans "Add new locations to the database" %}</h2>
+<p>{% trans "Please answer the following questions" %}:</p>
+<p>{% trans "The wikipedia article for a city usually lists its zipcode in the sidebar. If this location is not a city, please select the nearest city and use its zipcode." %}</p>
+<p>{% trans "Planting methods that were marked as Not Listed will be filled out on the next page." %}</p>
+<form method="post" class="form-vertical" id="spreadsheet_form">
+	{% csrf_token %}
+<ul>
+{% for add_model_dict in add_model_dicts %}
+	<li>
+	{% if add_model_dict.name %}
+	        {% trans "You input" %} "{{ add_model_dict.name }}".
+	{% else %}
+		{% trans "There are no Locations listed on your spreadsheet. If this spreadsheet is data for a single location, enter its name below. Otherwise, go back and indicate which list of names are Locations." %}
+	{% endif %}
+	{% trans "This is the Location" %}:
+		<ul><li>{{ add_model_dict.form }}</li></ul>
+	</li>
+{% empty %}
+	<li>{% trans "We couldn't find any locations on your spreadsheet that aren't already in the database. If you are constantly being redirected to this page, please contact your system administrator." %}</li>
+{% endfor %}
+</ul>
+	<button id="submit" type="submit" class="btn">{% trans "Submit" %}</button>
+</form>
+</body>
+</html>
