@@ -7,7 +7,7 @@
 """
 from django import forms
 from variety_trials_data import models # TODO: reduce this cross-module coupling
-from variety_trials_data import forms as hrsw_forms
+from variety_trials_data import variety_trials_forms as hrsw_forms
 from . import progress
 import datetime
 
