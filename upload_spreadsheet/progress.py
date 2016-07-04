@@ -8,7 +8,7 @@
 from django import VERSION
 from django.utils.text import normalize_newlines
 from django.core.files.storage import default_storage
-from hrsw import models # TODO: reduce coupling
+from variety_trials_data import models # TODO: reduce coupling
 from fuzzywuzzy import fuzz, process as fuzz_process # pip install fuzzywuzzy
 import os, json, datetime
 from utils import isfloat

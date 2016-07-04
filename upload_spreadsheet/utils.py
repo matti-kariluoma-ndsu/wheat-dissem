@@ -6,7 +6,7 @@
 :license: CC BY-NC-ND 3.0 @see LICENSE
 """
 from django.utils.text import normalize_newlines
-from hrsw import models # TODO: reduce coupling
+from variety_trials_data import models # TODO: reduce coupling
 from fuzzywuzzy import fuzz # pip install fuzzywuzzy
 import json
 

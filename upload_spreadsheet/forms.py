@@ -6,8 +6,8 @@
 :license: CC BY-NC-ND 3.0 @see LICENSE
 """
 from django import forms
-from hrsw import models # TODO: reduce this cross-module coupling
-from hrsw import forms as hrsw_forms
+from variety_trials_data import models # TODO: reduce this cross-module coupling
+from variety_trials_data import forms as hrsw_forms
 from . import progress
 import datetime
 
