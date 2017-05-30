@@ -27,80 +27,24 @@
 			<div class="variety_trials__hidden_input">
 			{% endif %}
 				<span style='color: red'>{{ field.errors }}</span>
-				{{ field.label_tag }}: {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
+				{{ field.label_tag }} {{ field }} <span class="variety_trials__help_text">{{field.help_text}}</span>
 			</div>
 			{% endfor %}
 			<input type="submit" value="Submit" />
 		</form>
-		<form id="dynamic_form" style="display: none;">
-			Zipcode: <input id="js_zipcode" type="text" name="zipcode" autocomplete="off" onkeyup="variety_trials_app.initSuggest(); return false;"/><br />
-			<div class="jsonSuggestResults" style="top: 494px; left: 8px; width: 410px;">
-			</div>
-			<input TYPE="submit" Value="Submit" onClick="variety_trials_app.makeTable(); return false;">
-		</form>
+		
 </div>
 
-<div id="dynamic_table" style="display: none;">
-	<INPUT TYPE="button" NAME="button" Value="Swap Rows" onClick="variety_trials_app.reorderTable(1,4); return false;">
-	<INPUT TYPE="button" NAME="button" Value="Output Data" onClick="variety_trials_app.testData(); return false;">
-	<table>
-		<thead><tr id=location><th></th></tr></thead>
-		<tbody id="debug"></tbody>
-	</table>
-</div>
 
 {% endblock %}
 
 
 {% block javascript_imports %}
-<script language="JavaScript" src="{{home_url}}/static/js/jquery.jsonSuggest.js"></script>
-<script language="JavaScript" src="{{home_url}}/static/js/json2.min.js"></script>
-<script language="JavaScript" src="{{home_url}}/static/js/variety_trials_app.js"></script>
+
 {% endblock %}
 
 {% block javascript %}
 
-function variety_trials__init()
-{
-	$('#dynamic_form').show();
-	$('#dynamic_table').show();
-	$('#static_form').hide();
-	if (variety_trials_app)
-	{
-		variety_trials_app.initSuggest = function()
-		{
-			var input = $('input#js_zipcode')
-			var get_url = "{{home_url}}/data/zipcode/partial_zipcode_"+input.val()+"/json/"
-			var entry1 = {
-				url: get_url,
-				dataType: "json",
-			}
-			
-			function processAjaxFunction(zipcodes) 
-			{
-				testData = {}
-				testData.city = []
-				for (i=0; i < zipcodes.length; i++)
-				{
-					zipcode_object = zipcodes[i];
-					//alert(JSON.stringify(zipcode_object));
-					testData.city.push({
-						text: String(zipcode_object.fields.zipcode),
-						extra: zipcode_object.fields.city + ", " + zipcode_object.fields.state
-						})
-				}
-				
-				
-				//testData.city=[{"text":"58102","extra":"Fargo,ND"}];
-				input.jsonSuggest(testData.city, {maxResults:20});
-			}
-			
-			jQuery.ajax(entry1).done(processAjaxFunction);
-		}
-	}
-}
-
-//variety_trials__init();
 
 {% endblock %}
 

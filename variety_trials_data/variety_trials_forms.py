@@ -46,7 +46,7 @@ class SelectLocationByZipcodeForm(forms.Form):
 	zipcode = forms.CharField(
 			max_length=5, 
 			required=True,
-			help_text=''
+			help_text='The results are sorted by distance from your zipcode.'
 		)
 	scope = forms.ChoiceField(
 			widget=forms.RadioSelect(),
@@ -90,19 +90,3 @@ class SelectLocationByZipcodeForm(forms.Form):
 			help_text='Select varieties to compare head-to-head.'
 		)
 
-class NewLocation(forms.ModelForm):
-	class Meta:
-		model = models.Location
-		fields = ('name', 'zipcode', )
-
-class NewVariety(forms.ModelForm):
-	class Meta:
-		model = models.Variety
-		fields = ('name', )
-		# exclude any ForeignKey or ManyToMany fields
-		exclude = ('diseases',)
-
-class NewPlantingMethod(forms.ModelForm):
-	class Meta:
-		model = models.PlantingMethod
-		fields = ('planting_methods', )

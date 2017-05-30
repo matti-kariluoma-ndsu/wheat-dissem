@@ -31,7 +31,7 @@ def index(request):
 			zipcode_form._errors = ErrorDict()
 		errors = zipcode_form._errors['zipcode'] = ErrorList() # errors for field 'zipcode'
 		if request.GET['error'] == 'no_zipcode':
-			errors.append(u"Please enter your zipcode.")
+			errors.append(u"Please enter your zipcode. The retrieved data are sorted by distance from your zipcode.")
 		elif request.GET['error'] == 'bad_zipcode':
 			errors.append(u"Sorry, that zipcode didn't match any records.")
 	else:
@@ -68,68 +68,6 @@ def advanced_search(request):
 		},
 		context_instance=RequestContext(request)
 	)
-
-def howto_api(request):
-	
-	return render_to_response(
-		'using_api.html', 
-		{
-			'home_url': HOME_URL,
-		},
-		context_instance=RequestContext(request)
-	)
-	
-def howto_add_data(request):
-	
-	return render_to_response(
-		'adding_data.html', 
-		{ 
-			'home_url': HOME_URL,
-		},
-		context_instance=RequestContext(request)
-	)
-	
-def variety_info(request, variety_name):
-	try:
-		variety = models.Variety.objects.filter(name=variety_name).get()
-		message = None
-	except models.Variety.DoesNotExist:
-		variety = None
-		message = " ".join([
-				ERROR_MESSAGE, 
-				"Variety '%s' not found." % (variety_name),
-				"Try replacing any special characters (spaces, apostrophes, etc.) with '+'.",
-				"Variety names are case-sensitive."
-			])
-
-	return render_to_response(
-		'variety_info.html', 
-		{ 
-			'home_url': HOME_URL,
-			'variety': variety,
-			'message': message,
-		},
-		context_instance=RequestContext(request)
-	)
-
-# TODO: does this belong in the DB?
-unit_blurbs = {
-		'bushels_acre': [
-			'Yield', 
-			'Bushels per Acre', 
-			'The average number of bushels that can be expected from each acre of farmed land.'
-			],
-		'protein_percent': [
-			'Protein', 
-			'Percent of Mass',
-			'The average percentage of protein usable for baking. 12% or greater is required for export to	many countries.'
-			],
-		'test_weight': [
-			'Test Weight',
-			'Pounds per Bushel', 
-			'The average weight of each bushel.'
-		]
-}
 
 def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None, locations=None, year_range=3):
 	if request.method != 'GET':
@@ -347,69 +285,4 @@ def zipcode_view(request, year_range, fieldname, abtest=None):
 					locations=locations, 
 					year_range=year_range
 				)
-
-def inspect(request):
-	cur_year = datetime.date.today().year
-	year_list=list()
-	min_year = datetime.date.today().year
-	date_count=1
-	while date_count>0:
-		min_year-=1
-		date_count=models.Date.objects.filter(date__range=(datetime.date(min_year-1,1,1), datetime.date(min_year,12,31))).count()
-		#print str(min_year)+" "+str(date_count)
-	for year in range(min_year+1,cur_year):
-		year_list.append(year)
-	varieties = models.Variety.objects.all().order_by("name")
-	locations = models.Location.objects.all().order_by("name")
-	
-	masterDict=dict()
-	for year in year_list:
-		masterDict[year]=dict()
-		masterDict[year]["header"]=list()
-		for l in locations:
-			masterDict[year]["header"].append(l.name)
-		masterDict[year]["rows"]=dict()
-		for v in varieties:
-			masterDict[year]["rows"][v.name]=dict()
-			for l in locations:
-				masterDict[year]["rows"][v.name][l.id]=" "
-	
-	for entry in models.TrialEntry.objects.select_related(depth=3).filter(
-				harvest_date__in=models.Date.objects.filter(
-					date__range=(datetime.date(min(year_list),1,1), datetime.date(max(year_list),12,31))
-				)
-			).filter(
-				hidden=False
-			):
-		masterDict[entry.harvest_date.date.year]["rows"][entry.variety.name][entry.location.id]="X"
-
-	masterList=dict()
-	for year in year_list:
-		masterList[year]=dict()
-		masterList[year]["header"]=masterDict[year]["header"]
-		masterList[year]["rows"]=list()
-		x=0
-		for v in varieties:
-			dummy_list=list()
-			dummy_list.append(v.name)
-			masterList[year]["rows"].append(dummy_list)
-			
-			for l in locations:
-				masterList[year]["rows"][x].append(masterDict[year]["rows"][v.name][l.id])
-			x+=1
-	return render_to_response(
-			'inspect.html',
-			{
-				'home_url': HOME_URL,
-				'masterList':masterList,
-			}
-		)
-
-def debug(request):
-	return render_to_response(
-			'debug.html',
-			{
-				'home_url': HOME_URL,
-			}
-		)
 

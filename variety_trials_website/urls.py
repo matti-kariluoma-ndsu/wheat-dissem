@@ -29,7 +29,7 @@ urlpatterns = [
 		url(r'^view/$', views.advanced_search),
 		url(r'^view/last_(?P<year_range>[0-9]+)_years/(?P<fieldname>[a-z0-9_]+)/', views.zipcode_view), # defaults to location-based view
 		url(r'^view/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.historical_zipcode_view), # defaults to location-based view
-		url(r'^view/variety/(?P<variety_name>[a-zA-Z_]+)/', views.variety_info),
+		#url(r'^view/variety/(?P<variety_name>[a-zA-Z_]+)/', views.variety_info),
 		#url(r'^view/available/', views.inspect),
 		
 		'''
