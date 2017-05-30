@@ -23,6 +23,25 @@ import datetime
 
 ERROR_MESSAGE = "Request failed. Please use the 'back' button in your browser to visit the previous view."
 
+# TODO: does this belong in the DB?
+unit_blurbs = {
+		'bushels_acre': [
+			'Yield', 
+			'Bushels per Acre', 
+			'The average number of bushels that can be expected from each acre of farmed land.'
+			],
+		'protein_percent': [
+			'Protein', 
+			'Percent of Mass',
+			'The average percentage of protein usable for baking. 12% or greater is required for export to	many countries.'
+			],
+		'test_weight': [
+			'Test Weight',
+			'Pounds per Bushel', 
+			'The average weight of each bushel.'
+		]
+}
+
 def index(request):
 	if 'error' in request.GET:
 		#zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm(request.GET)
