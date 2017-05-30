@@ -16,11 +16,11 @@ from nopasswordauth import views as authviews
 handler404 = authviews.page_not_found
 
 urlpatterns = [
-		url(r'^admin/login/', authviews.login),
-		url(r'^admin/', include(admin.site.urls)),
-		url(r'^accounts/login/', authviews.login),
-		url(r'^accounts/', include('nopassword.urls')),
-		url(r'^upload/', include('upload_spreadsheet.urls')),
+		#url(r'^admin/login/', authviews.login),
+		#url(r'^admin/', include(admin.site.urls)),
+		#url(r'^accounts/login/', authviews.login),
+		#url(r'^accounts/', include('nopassword.urls')),
+		#url(r'^upload/', include('upload_spreadsheet.urls')),
 		
 		url(r'^$', views.index), # the home page
 		
@@ -30,8 +30,9 @@ urlpatterns = [
 		url(r'^view/last_(?P<year_range>[0-9]+)_years/(?P<fieldname>[a-z0-9_]+)/', views.zipcode_view), # defaults to location-based view
 		url(r'^view/(?P<startyear>[0-9]+)/(?P<fieldname>[a-z0-9_]+)/', views.historical_zipcode_view), # defaults to location-based view
 		url(r'^view/variety/(?P<variety_name>[a-zA-Z_]+)/', views.variety_info),
-		url(r'^view/available/', views.inspect),
+		#url(r'^view/available/', views.inspect),
 		
+		'''
 		url(r'^data/$', views.howto_api),
 		url(r'^data/trial_entry/id_(?P<id>[0-9]+)/json/', json_views.trial_entry_json),
 		url(r'^data/trial_entry/near_zipcode_(?P<zipcode>[0-9]+)/last_3_years/json/', json_views.trial_entry_near_json),
@@ -44,5 +45,6 @@ urlpatterns = [
 		url(r'^data/variety/all/json/', json_views.variety_json_all),
 		url(r'^data/variety/id_(?P<id>[0-9]+)/json/', json_views.variety_json),
 		url(r'^data/disease/id_(?P<id>[0-9]+)/json/', json_views.disease_json),
+		'''
 ]
 
