@@ -108,15 +108,21 @@ varieties = [
 	]
 
 rename_varieties = {}
+rename_varieties["AFK-Astro"] = "AFK Astro"
+rename_varieties["Prosper/ND VitPro"] = "Mix (Proper / ND VitPro)"
+rename_varieties["Shelly/Bolles"] = "Mix (Shelly / Bolles)"
 rename_varieties["Elgin-ND"] = "Elgin"
+rename_varieties["SY-Rustler"] = "SY Rustler"
 rename_varieties["SY-Rowyn"] = "SY Rowyn"
 rename_varieties["SY-Soren"] = "SY Soren"
 rename_varieties["SY-Tyra"] = "SY Tyra"
+rename_varieties["SY-Valda"] = "SY Valda"
 rename_varieties["SY-Valda"] = "SY Valda"
 rename_varieties["ND901CL Plus"] = "ND 901CL Plus"
 rename_varieties["SY605CL"] = "SY605 CL"
 rename_varieties["WB9879CLP+"] = "WB9879CLP Plus"
 rename_varieties["07S0027-3 (SY Rockford)"] = "SY Rockford 07S0027-3"
+rename_varieties["TCG-Climax"] = "TCG Climax"
 rename_varieties["TCG-Cornerstone"] = "TCG Cornerstone"
 rename_varieties["TCG-Spitfire"] = "TCG Spitfire"
 rename_varieties["TCG-Wildfire"] = "TCG Wildfire"
