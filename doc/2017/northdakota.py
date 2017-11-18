@@ -349,6 +349,8 @@ for dic in (yields, weights, proteins):
 planted = models.Date.objects.filter(date__year=2017, date__month=5)[0]
 harvested = models.Date.objects.filter(date__year=2017, date__month=8)[0]
 
+normal = models.PlantingMethod.objects.filter(planting_methods="")[0]
+
 for vname in yields:
 	for i in range(len(yield_lsds)):
 		tags = None
@@ -367,7 +369,7 @@ for vname in yields:
 			dbvname = rename_varieties[vname]
 		else:
 			dbvname = vname
-		new_trial = models.Trial_Entry(
+		new_trial = models.TrialEntry(
 				bushels_acre=bushels, 
 				plant_date=planted, 
 				harvest_date=harvested, 
@@ -380,7 +382,9 @@ for vname in yields:
 		if protein is not None:
 			new_trial.protein_percent = protein
 		if tags is not None:
-			new_trial.planting_method_tags = tags
+			new_trial.planting_method_tags = models.PlantingMethod.objects.filter(planting_methods=tags)[0]
+		else:
+			new_trial.planting_method_tags = normal
 		if lsd10 is not None:
 			new_trial.lsd_10 = lsd10
 		if lsd5 is not None: 
