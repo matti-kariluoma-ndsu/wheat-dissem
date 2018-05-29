@@ -204,7 +204,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 				except: # We have no expected exceptions for this code block
 					page = None
 					message = ERROR_MESSAGE
-					#raise
+					raise
 			
 			if response is None:
 				response = render(
