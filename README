@@ -14,21 +14,30 @@ Prerequisites:
    # should print the version number and exit w/o errors
    # Sep 2012: Verified the project is compatible with Django 1.4
    # Jun 2013: Verified the project is compatible with Django 1.5.1
- 
+ R:
+  Install R, $sudo apt-get install r-base
+ django-nopassword:
+  $ pip install django-nopassword
+
+Configure:
+ Create the file 'variety_trials_website/secrets.py' and define
+ SECRET_KEY and EMAIL_HOST_PASSWORD
+  SECRET_KEY:
+   string, about 50 characters in length. use random ascii characters
+  EMAIL_HOST_PASSWORD:
+   string, password for django-nopassword to use (only needed if enabling admin interface)
+
 Install to a fresh machine w/apache (Ubuntu/Debian syntax):
 NOTE: Ensure a previous version of Django is not installed; run 
  $ python -c  "import django; print django.get_version()"
 If so, remove it before continuing.
 
- $ sudo apt-get install git sqlite3 python-{sqlite,scipy} libapache2-mod-wsgi 
+ $ sudo apt-get install git sqlite3 python-{sqlite,scipy,django,pip} libapache2-mod-wsgi r-base
+ $ pip install django-nopassword
  $ git clone http://github.com/matti-kariluoma-ndsu/wheat-dissem.git
  $ cd wheat-dissem
  $ cat README # this file you are currently reading
- $ wget -O django-1.4.tar.gz http://djangoproject.com/download/1.4/tarball/
- $ tar xzf django-1.4.tar.gz
- $ cd Django-1.4
- $ sudo python setup.py install # should install to /usr/local/lib/python-*
- $ cd ..
+ $ nano variety_trials_website/secrets.py # define SECRET_KEY and EMAIL_HOST_PASSWORD
  $ cat apache/httpd.conf >> /etc/apache2/httpd.conf # then fix any conflicts
  $ sudo /etc/init.d/apache2 reload # or restart
 
