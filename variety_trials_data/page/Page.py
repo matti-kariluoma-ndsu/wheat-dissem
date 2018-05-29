@@ -102,7 +102,7 @@ class Page:
 				break
 		
 		result = models.TrialEntry.objects.select_related(
-				'location', 'variety', 'harvest_date__date'
+				'location', 'variety', 'harvest_date'
 			).filter(
 				location__in=locations_with_data
 			).filter(

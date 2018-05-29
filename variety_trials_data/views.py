@@ -6,7 +6,7 @@
 :license: CC BY-NC-ND 3.0 @see LICENSE
 """
 
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.http import urlencode
@@ -56,36 +56,35 @@ def index(request):
 	else:
 		zipcode_form = variety_trials_forms.SelectLocationByZipcodeForm()
 	
-	return render_to_response(
+	return render(request, 
 		'main_ndsu.html', 
 		{ 
 			'zipcode_form': zipcode_form,
 			'home_url': HOME_URL,
-		},
-		context_instance=RequestContext(request)
+		}
 	)
 	
 def about(request):
 	
-	return render_to_response(
+	return render(
+		request,
 		'about.html', 
 		{ 
 			'home_url': HOME_URL,
-		},
-		context_instance=RequestContext(request)
+		}
 	)
 	
 def advanced_search(request):
 	form = variety_trials_forms.SelectLocationByZipcodeForm()
 	
-	return render_to_response(
+	return render(
+		request,
 		'advanced_search.html', 
 		{ 
 			'home_url': HOME_URL,
 			'form': form,
 			'fieldnames': [field.name for field in models.TrialEntry._meta.fields],
-		},
-		context_instance=RequestContext(request)
+		}
 	)
 
 def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=None, year_url_bit=None, locations=None, year_range=3):
@@ -176,7 +175,8 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 			response = None
 			if page is not None:
 				try:
-					response = render_to_response(
+					response = render(
+						request,
 						'tabbed_view_table_ndsu.html',
 						{
 							'home_url': HOME_URL,
@@ -199,8 +199,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 							'blurbs' : unit_blurbs,
 							'curfield' : fieldname,
 							'show_appendix_tables': False,
-						},
-						context_instance=RequestContext(request)
+						}
 					)
 				except: # We have no expected exceptions for this code block
 					page = None
@@ -208,7 +207,8 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 					#raise
 			
 			if response is None:
-				response = render_to_response(
+				response = render(
+						request,
 						'tabbed_view_table_ndsu.html',
 						{
 							'home_url': HOME_URL,
@@ -231,8 +231,7 @@ def historical_zipcode_view(request, startyear, fieldname, abtest=None, years=No
 							'blurbs' : unit_blurbs,
 							'curfield' : fieldname,
 							'show_appendix_tables': False,
-						},
-						context_instance=RequestContext(request)
+						}
 					)
 			
 			# TODO: is python's refcount/garbage collection enough?
